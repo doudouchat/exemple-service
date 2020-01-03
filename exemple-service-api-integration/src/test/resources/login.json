@@ -1,0 +1,26 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"additionalProperties": false,
+	"required": [
+		"login",
+		"password",
+		"id"
+	],
+	"properties": {
+		"login": {
+			"type": "string",
+			"login": true
+		},
+		"id": {
+			"type": "string",
+			"createOnly": true
+		},
+		"password": {
+			"type": "string",
+			"writeOnly": true
+		},
+		"enable": {
+			"type": "boolean"
+		}
+	}
+}

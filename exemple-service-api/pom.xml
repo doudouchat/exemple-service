@@ -1,0 +1,382 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>exemple</groupId>
+		<artifactId>exemple-service</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>exemple-service-api</artifactId>
+	<packaging>war</packaging>
+
+	<dependencies>
+
+		<!-- CUSTOMER -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-customer</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- STORE -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-store</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- SCHEMA -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-schema</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- APPLICATION -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-application</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- JERSEY -->
+
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.ext</groupId>
+			<artifactId>jersey-spring4</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.hibernate</groupId>
+					<artifactId>hibernate-validator</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.ext</groupId>
+			<artifactId>jersey-bean-validation</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.hibernate</groupId>
+					<artifactId>hibernate-validator</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-server</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.ext</groupId>
+			<artifactId>jersey-mvc-jsp</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.test-framework</groupId>
+			<artifactId>jersey-test-framework-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.test-framework.providers</groupId>
+			<artifactId>jersey-test-framework-provider-grizzly2</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-json-jackson</artifactId>
+		</dependency>
+
+		<!-- JAVAX EL -->
+
+		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>javax.el-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.el</artifactId>
+		</dependency>
+
+		<!-- JSON -->
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.jaxrs</groupId>
+			<artifactId>jackson-jaxrs-json-provider</artifactId>
+		</dependency>
+
+		<!-- SPRING FRAMEWORK -->
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+		</dependency>
+
+		<!-- SPRING SECURITY -->
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-taglibs</artifactId>
+		</dependency>
+
+		<!-- SPRING KAFKA -->
+
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka-test</artifactId>
+		</dependency>
+
+		<!-- JWT TOKEN -->
+
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+		</dependency>
+
+		<!-- SERVLET -->
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet.jsp.jstl</groupId>
+			<artifactId>javax.servlet.jsp.jstl-api</artifactId>
+		</dependency>
+
+		<!-- JSON PATH -->
+
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path</artifactId>
+		</dependency>
+
+		<!-- JCABI -->
+
+		<dependency>
+			<groupId>com.jcabi</groupId>
+			<artifactId>jcabi-manifests</artifactId>
+		</dependency>
+
+		<!-- JSR303 -->
+
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+		</dependency>
+
+		<!-- COMMONS APACHE -->
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
+
+		<!-- GOOGLE GUAVA -->
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+
+		<!-- EXCEPTION LAMBDA -->
+
+		<dependency>
+			<groupId>com.pivovarit</groupId>
+			<artifactId>throwing-function</artifactId>
+		</dependency>
+
+		<!-- ASPECTJ -->
+
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+		</dependency>
+
+		<!-- JSON PATCH -->
+
+		<dependency>
+			<groupId>com.flipkart.zjsonpatch</groupId>
+			<artifactId>zjsonpatch</artifactId>
+		</dependency>
+
+		<!-- SWAGGER -->
+
+		<dependency>
+			<groupId>io.swagger.core.v3</groupId>
+			<artifactId>swagger-jaxrs2</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.swagger.core.v3</groupId>
+			<artifactId>swagger-annotations</artifactId>
+		</dependency>
+
+		<!-- TEST -->
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+		</dependency>
+
+		<!-- MOCKITO -->
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+		</dependency>
+
+		<!-- HAMCREST -->
+
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>nl.fd</groupId>
+			<artifactId>hamcrest-jackson</artifactId>
+		</dependency>
+
+		<!-- JNDI SIMPLE -->
+
+		<dependency>
+			<groupId>com.github.h-thurow</groupId>
+			<artifactId>simple-jndi</artifactId>
+		</dependency>
+
+		<!-- MOCK SERVER -->
+
+		<dependency>
+			<groupId>org.mock-server</groupId>
+			<artifactId>mockserver-netty</artifactId>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
+
+		<plugins>
+
+			<!-- DEPLOY -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+
+			<!-- HELPER -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>reserve-network-port</id>
+						<goals>
+							<goal>reserve-network-port</goal>
+						</goals>
+						<phase>process-resources</phase>
+						<configuration>
+							<portNames>
+								<portName>hazelcast.port</portName>
+								<portName>authorization.port</portName>
+							</portNames>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- TEST UNITAIRE -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<mockserver.logLevel>DEBUG</mockserver.logLevel>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+
+			<!-- MOCK SERVER -->
+			<plugin>
+				<groupId>org.mock-server</groupId>
+				<artifactId>mockserver-maven-plugin</artifactId>
+				<configuration>
+					<serverPort>${authorization.port}</serverPort>
+					<logLevel>WARN</logLevel>
+				</configuration>
+			</plugin>
+
+		</plugins>
+
+	</build>
+
+</project>

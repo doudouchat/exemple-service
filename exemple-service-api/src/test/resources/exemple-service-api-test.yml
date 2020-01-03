@@ -1,0 +1,11 @@
+api:
+   resourceId: exemple
+   authorization:
+      port: ${authorization.port}
+      path: http://localhost:${authorization.port}
+      hazelcast:
+         port: ${hazelcast.port}
+         addresses: 127.0.0.1:${hazelcast.port}
+      client:
+         clientId: resource
+         clientSecret: secret

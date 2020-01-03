@@ -1,0 +1,111 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"additionalProperties": false,
+	"required": [
+		"lastname",
+		"firstname"
+	],
+	"dependencies": {
+		"opt_in_email": {
+			"if": {
+				"properties": {
+					"opt_in_email": {
+						"const": true
+					}
+				}
+			},
+			"then": {
+				"required": [
+					"email"
+				]
+			}
+		}
+	},
+	"properties": {
+		"id": {
+			"type": "string",
+			"readOnly": true
+		},
+		"email": {
+			"type": "string",
+			"format": "email",
+			"login": true
+		},
+		"civility": {
+			"type": "string",
+			"enum": [
+				"Mr",
+				"Mm"
+			]
+		},
+		"lastname": {
+			"type": "string"
+		},
+		"firstname": {
+			"type": "string",
+			"pattern": "^(?!\\s*$).+"
+		},
+		"password": {
+			"type": "string",
+			"writeOnly": true
+		},
+		"birthday": {
+			"type": "string",
+			"format": "date"
+		},
+		"creation_date": {
+			"type": "string",
+			"format": "date-time"
+		},
+		"opt_in_email": {
+			"type": "boolean"
+		},
+		"addresses": {
+			"type": "object",
+			"maxProperties": 2,
+			"additionalProperties": {
+				"$ref": "#/definitions/Address"
+			}
+		},
+		"cgus": {
+			"type": "array",
+			"uniqueItems": true,
+			"maxItems": 2,
+			"items": {
+				"$ref": "#/definitions/Cgu"
+			}
+		}
+	},
+	"definitions": {
+		"Address": {
+			"type": "object",
+			"properties": {
+				"street": {
+					"type": "string"
+				},
+				"city": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"street",
+				"city"
+			]
+		},
+		"Cgu": {
+			"type": "object",
+			"properties": {
+				"code": {
+					"type": "string"
+				},
+				"version": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"code",
+				"version"
+			]
+		}
+	}
+}

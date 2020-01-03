@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="api" parallel="false">
+	<test name="ut common">
+		<packages>
+			<package name="com.exemple.service.api.common" />
+		</packages>
+	</test>
+	<test name="ut api">
+		<packages>
+			<package name="com.exemple.service.api.account" />
+			<package name="com.exemple.service.api.schema" />
+			<package name="com.exemple.service.api.login" />
+			<package name="com.exemple.service.api.stock" />
+			<package name="com.exemple.service.api.subscription" />
+		</packages>
+	</test>
+	<test name="ut actuate">
+		<packages>
+			<package name="com.exemple.service.api.core.actuate" />
+		</packages>
+	</test>
+	<test name="ut swagger">
+		<classes>
+			<class name="com.exemple.service.api.core.swagger.DocumentApiResourceTest" />
+		</classes>
+	</test>
+	<test name="ut security">
+		<packages>
+			<package name="com.exemple.service.api.core.authorization" />
+		</packages>
+		<classes>
+			<class name="com.exemple.service.api.core.swagger.DocumentApiResourceSecureTest" />
+		</classes>
+	</test>
+</suite>

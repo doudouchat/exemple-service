@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="schema" parallel="false">
+	<test name="ut">
+		<packages>
+			<package name="com.exemple.service.schema.filter" />
+			<package name="com.exemple.service.schema.validation" />
+			<package name="com.exemple.service.schema.description" />
+			<package name="com.exemple.service.schema.core.validator.rule" />
+		</packages>
+	</test>
+</suite>

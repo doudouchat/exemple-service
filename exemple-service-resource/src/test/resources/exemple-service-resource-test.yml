@@ -1,0 +1,8 @@
+resource: 
+   cassandra:
+      addresses: localhost
+      port: ${cassandra.nativeTransportPort}
+      local_data_center: datacenter1
+   hazelcast:
+      port: ${hazelcast.port}
+      member: 127.0.0.1:${hazelcast.port}
