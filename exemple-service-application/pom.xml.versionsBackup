@@ -5,19 +5,11 @@
 	<parent>
 		<groupId>exemple</groupId>
 		<artifactId>exemple-service</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>exemple-service-store</artifactId>
+	<artifactId>exemple-service-application</artifactId>
 
 	<dependencies>
-
-		<!-- RESOURCE -->
-
-		<dependency>
-			<groupId>exemple</groupId>
-			<artifactId>exemple-service-resource</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<!-- ZOOKEEPER -->
 
@@ -47,11 +39,11 @@
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 
-		<!-- GOOGLE GUAVA -->
+		<!-- JSR303 -->
 
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
 		</dependency>
 
 		<!-- TEST -->
@@ -128,5 +120,4 @@
 		</plugins>
 
 	</build>
-
 </project>

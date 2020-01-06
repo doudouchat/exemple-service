@@ -5,25 +5,29 @@
 	<parent>
 		<groupId>exemple</groupId>
 		<artifactId>exemple-service</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>exemple-service-store</artifactId>
+	<artifactId>exemple-service-event</artifactId>
+
+	<properties>
+
+		<!-- KAFKA -->
+		<kafka.broker.logs-dir>${project.build.directory}/kafka</kafka.broker.logs-dir>
+
+	</properties>
 
 	<dependencies>
 
-		<!-- RESOURCE -->
+		<!-- SPRING KAFKA -->
 
 		<dependency>
-			<groupId>exemple</groupId>
-			<artifactId>exemple-service-resource</artifactId>
-			<version>${project.version}</version>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
 		</dependency>
 
-		<!-- ZOOKEEPER -->
-
 		<dependency>
-			<groupId>org.apache.zookeeper</groupId>
-			<artifactId>zookeeper</artifactId>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka-test</artifactId>
 		</dependency>
 
 		<!-- SPRING FRAMEWORK -->
@@ -47,11 +51,10 @@
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 
-		<!-- GOOGLE GUAVA -->
-
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- TEST -->
@@ -59,18 +62,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-		</dependency>
-
-		<!-- CURATOR -->
-
-		<dependency>
-			<groupId>org.apache.curator</groupId>
-			<artifactId>curator-recipes</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.curator</groupId>
-			<artifactId>curator-test</artifactId>
 		</dependency>
 
 		<!-- MOCKITO -->
@@ -90,6 +81,13 @@
 		<dependency>
 			<groupId>nl.fd</groupId>
 			<artifactId>hamcrest-jackson</artifactId>
+		</dependency>
+
+		<!-- ASSERTJ -->
+
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
 		</dependency>
 
 	</dependencies>
@@ -118,8 +116,33 @@
 						<phase>process-resources</phase>
 						<configuration>
 							<portNames>
-								<portName>zmp.clientPort</portName>
+								<portName>kafka.port</portName>
 							</portNames>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>delete_repertory_kafka</id>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+						<phase>test</phase>
+						<configuration>
+							<excludeDefaultDirectories>true</excludeDefaultDirectories>
+							<verbose>true</verbose>
+							<filesets>
+								<fileset>
+									<directory>${java.io.tmpdir}</directory>
+									<includes>
+										<include>kafka-*/**</include>
+									</includes>
+								</fileset>
+							</filesets>
 						</configuration>
 					</execution>
 				</executions>
