@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.output.NullOutputStream;
@@ -93,7 +94,7 @@ public final class JsonRestTemplate {
             int counter = COUNTER.incrementAndGet();
 
             try {
-                String log = RequestPrinter.print(requestSpec, requestSpec.getMethod(), requestSpec.getURI(), LogDetail.ALL,
+                String log = RequestPrinter.print(requestSpec, requestSpec.getMethod(), requestSpec.getURI(), LogDetail.ALL, Collections.emptySet(),
                         new PrintStream(new NullOutputStream(), true, StandardCharsets.UTF_8.name()), true);
                 LOG.debug("Request {}\n{}", counter, log);
             } catch (UnsupportedEncodingException e) {
@@ -110,7 +111,7 @@ public final class JsonRestTemplate {
 
             try {
                 String log = ResponsePrinter.print(response, response, new PrintStream(new NullOutputStream(), true, StandardCharsets.UTF_8.name()),
-                        LogDetail.ALL, true);
+                        LogDetail.ALL, true, Collections.emptySet());
                 LOG.debug("Response {} {}ms\n{}", counter, duration, log);
             } catch (UnsupportedEncodingException e) {
                 throw new IllegalStateException(e);
