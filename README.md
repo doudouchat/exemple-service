@@ -11,20 +11,9 @@
 ## Docker
 
 <ol>
-<li>docker build -t exemple-service-api exemple-service-api</li>
-<li>docker build -t exemple-service-db exemple-service-api-integration</li>
+<li>docker build -t exemple-service .</li>
 </ol>
 
 <ol>
-<li>docker-compose up -d zookeeper</li>
-<li>docker-compose up -d cassandra</li>
-<li>docker container exec exemple-service-db cqlsh --debug -f /usr/local/tmp/cassandra/schema.cql</li>
-<li>docker container exec exemple-service-db cqlsh --debug -f /usr/local/tmp/cassandra/exec.cql</li>
-<li>docker-compose up -d api</li>
+<li>docker-compose up -d service</li>
 </ol>
-
-docker-compose exec api cat logs/localhost.2018-08-24.log
-
-## Certificate
-
-keytool -genkeypair -alias mytest -keyalg RSA -keypass mypass -keystore mytest.jks -storepass mypass
