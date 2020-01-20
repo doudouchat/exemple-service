@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>exemple</groupId>
 		<artifactId>exemple-service</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>exemple-service-event</artifactId>
 
