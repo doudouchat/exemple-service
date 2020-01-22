@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.everit.json.schema.Schema;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.schema.common.SchemaBuilder;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationException.ValidationExceptionModel;
@@ -39,9 +37,6 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private SchemaValidation validation;
-
-    @Autowired
-    private SchemaResource schemaResource;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -167,9 +162,6 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
 
     @Test(dataProvider = "failures")
     public void validationFailure(String expectedCode, String expectedPath, Map<String, Object> model) {
-
-        Mockito.when(schemaResource.getRule(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class)))
-                .thenReturn(Collections.singletonMap("dependencies", Collections.singleton("opt_in_email")));
 
         try {
 

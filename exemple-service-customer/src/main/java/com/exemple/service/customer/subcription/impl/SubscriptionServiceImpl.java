@@ -10,7 +10,7 @@ import com.exemple.service.event.model.EventData;
 import com.exemple.service.event.model.EventType;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
-import com.exemple.service.resource.core.statement.SubscriptionStatement;
+import com.exemple.service.resource.subscription.SubscriptionField;
 import com.exemple.service.resource.subscription.SubscriptionResource;
 import com.exemple.service.schema.filter.SchemaFilter;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,7 +38,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public boolean save(String email, JsonNode source, String app, String version) {
 
         JsonNode subscription = JsonNodeUtils.clone(source);
-        JsonNodeUtils.set(subscription, email, SubscriptionStatement.EMAIL);
+        JsonNodeUtils.set(subscription, email, SubscriptionField.EMAIL.field);
 
         subscriptionValidation.validate(subscription, null, app, version);
 

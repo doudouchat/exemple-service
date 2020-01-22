@@ -10,9 +10,11 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.insert.Insert;
+import com.datastax.oss.driver.api.querybuilder.select.Select;
 import com.datastax.oss.driver.api.querybuilder.update.Update;
 import com.exemple.service.resource.common.JsonQueryBuilder;
-import com.exemple.service.resource.core.statement.LoginStatement;
+import com.exemple.service.resource.core.ResourceExecutionContext;
+import com.exemple.service.resource.login.LoginField;
 import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.login.exception.LoginResourceExistException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,23 +23,22 @@ import com.fasterxml.jackson.databind.JsonNode;
 @Validated
 public class LoginResourceImpl implements LoginResource {
 
-    private final CqlSession session;
+    private static final String LOGIN_TABLE = "login";
 
-    private final LoginStatement loginStatement;
+    private final CqlSession session;
 
     private final JsonQueryBuilder jsonQueryBuilder;
 
-    public LoginResourceImpl(LoginStatement loginStatement, CqlSession session) {
-        this.loginStatement = loginStatement;
+    public LoginResourceImpl(CqlSession session) {
         this.session = session;
-        this.jsonQueryBuilder = new JsonQueryBuilder(session, LoginStatement.LOGIN);
+        this.jsonQueryBuilder = new JsonQueryBuilder(session, LOGIN_TABLE);
 
     }
 
     @Override
     public Optional<JsonNode> get(String login) {
 
-        JsonNode source = loginStatement.get(login);
+        JsonNode source = getByLogin(login);
 
         return Optional.ofNullable(source);
     }
@@ -45,7 +46,7 @@ public class LoginResourceImpl implements LoginResource {
     @Override
     public void save(String login, JsonNode source) {
 
-        JsonNode data = loginStatement.get(login);
+        JsonNode data = getByLogin(login);
 
         if (data == null) {
 
@@ -53,8 +54,11 @@ public class LoginResourceImpl implements LoginResource {
 
         } else {
 
-            loginStatement.findById(UUID.fromString(data.get(LoginStatement.ID).textValue())).stream()
-                    .map((JsonNode l) -> l.get(LoginStatement.LOGIN).textValue()).forEach((String l) -> session.execute(update(l, source).build()));
+            Select select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), LOGIN_TABLE).json().all()
+                    .whereColumn(LoginField.ID.field).isEqualTo(QueryBuilder.literal(UUID.fromString(data.get(LoginField.ID.field).textValue())));
+
+            session.execute(select.build()).all().stream().map((Row row) -> row.get(0, JsonNode.class))
+                    .map((JsonNode l) -> l.get(LoginField.LOGIN.field).textValue()).forEach((String l) -> session.execute(update(l, source).build()));
         }
 
     }
@@ -75,12 +79,23 @@ public class LoginResourceImpl implements LoginResource {
     @Override
     public void delete(String login) {
 
-        loginStatement.delete(login);
+        session.execute(QueryBuilder.deleteFrom(ResourceExecutionContext.get().keyspace(), LOGIN_TABLE).whereColumn(LoginField.LOGIN.field)
+                .isEqualTo(QueryBuilder.literal(login)).build());
+    }
+
+    private JsonNode getByLogin(String login) {
+
+        Select select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), LOGIN_TABLE).json().all()
+                .whereColumn(LoginField.LOGIN.field).isEqualTo(QueryBuilder.literal(login));
+
+        Row row = session.execute(select.build()).one();
+
+        return row != null ? row.get(0, JsonNode.class) : null;
     }
 
     private Update update(String login, JsonNode source) {
 
-        return jsonQueryBuilder.update(source).whereColumn(LoginStatement.LOGIN).isEqualTo(QueryBuilder.literal(login));
+        return jsonQueryBuilder.update(source).whereColumn(LoginField.LOGIN.field).isEqualTo(QueryBuilder.literal(login));
     }
 
 }

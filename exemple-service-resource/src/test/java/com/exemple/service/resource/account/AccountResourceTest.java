@@ -1,6 +1,5 @@
 package com.exemple.service.resource.account;
 
-import static com.exemple.service.resource.core.statement.AccountStatement.ID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
@@ -21,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import javax.validation.ConstraintViolationException;
 
@@ -36,6 +34,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.datastax.oss.driver.api.core.data.ByteUtils;
+import com.exemple.service.resource.account.history.AccountHistoryResource;
 import com.exemple.service.resource.account.model.Account;
 import com.exemple.service.resource.account.model.AccountHistory;
 import com.exemple.service.resource.account.model.Address;
@@ -45,8 +44,6 @@ import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
-import com.exemple.service.resource.core.statement.AccountHistoryStatement;
-import com.exemple.service.resource.core.statement.AccountStatement;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
@@ -57,9 +54,6 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private AccountResource resource;
 
-    @Autowired
-    private AccountStatement accountStatement;
-
     private UUID id;
 
     private JsonNode account;
@@ -67,7 +61,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
     private byte[] schemaResource;
 
     @Autowired
-    private AccountHistoryStatement accountHistoryStatement;
+    private AccountHistoryResource accountHistoryResource;
 
     @AfterClass
     public void executionContextDestroy() {
@@ -144,7 +138,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         assertThat(this.account.get("preferences"), is(account.get("preferences")));
         assertThat(account.get("content"), is(this.account.get("content")));
 
-        List<AccountHistory> histories = accountHistoryStatement.findById(id);
+        List<AccountHistory> histories = accountHistoryResource.findById(id);
 
         assertThat(histories, is(hasSize(9)));
 
@@ -251,7 +245,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         assertThat(account.get("creation_date"), is(model.get("creation_date")));
         assertThat(account.get("preferences"), is(model.get("preferences")));
 
-        account = accountStatement.get(id);
+        account = resource.get(id).get();
 
         JsonNodeFilterUtils.clean(account);
 
@@ -284,7 +278,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         assertThat(account.get("creation_date"), is(model.get("creation_date")));
         assertThat(account.get("preferences"), is(model.get("preferences")));
 
-        List<AccountHistory> histories = accountHistoryStatement.findById(id).stream().filter(h -> h.getDate().equals(now.toInstant()))
+        List<AccountHistory> histories = accountHistoryResource.findById(id).stream().filter(h -> h.getDate().equals(now.toInstant()))
                 .collect(Collectors.toList());
 
         assertThat(histories, is(hasSize(10)));
@@ -328,7 +322,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         account.fields().forEachRemaining(
                 (Map.Entry<String, JsonNode> node) -> assertThat(node.getKey() + " no match", node.getValue(), is(origin.get(node.getKey()))));
 
-        List<AccountHistory> histories = accountHistoryStatement.findById(id).stream().filter(h -> h.getDate().equals(now.toInstant()))
+        List<AccountHistory> histories = accountHistoryResource.findById(id).stream().filter(h -> h.getDate().equals(now.toInstant()))
                 .collect(Collectors.toList());
 
         assertThat(histories, hasSize(expectedHistories));
@@ -342,12 +336,12 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
         resource.update(id, JsonNodeUtils.init("addresses"));
 
-        account = accountStatement.get(id);
+        account = resource.get(id).get();
         JsonNodeFilterUtils.clean(account);
 
         assertThat(account.path("addresses").getNodeType(), is(JsonNodeType.MISSING));
 
-        List<AccountHistory> histories = accountHistoryStatement.findById(id).stream().filter(h -> h.getDate().equals(now.toInstant()))
+        List<AccountHistory> histories = accountHistoryResource.findById(id).stream().filter(h -> h.getDate().equals(now.toInstant()))
                 .collect(Collectors.toList());
 
         assertThat(histories, is(hasSize(1)));
@@ -415,30 +409,28 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void getByStatus() {
+    public void findByIndex() {
 
         final String status = "NEW";
 
         Account model1 = new Account();
         model1.setStatus(status);
-        String id1 = resource.save(UUID.randomUUID(), JsonNodeUtils.create(model1)).get(ID).asText();
+        String id1 = resource.save(UUID.randomUUID(), JsonNodeUtils.create(model1)).get(AccountField.ID.field).asText();
 
         Account model2 = new Account();
         model2.setStatus(status);
-        String id2 = resource.save(UUID.randomUUID(), JsonNodeUtils.create(model2)).get(ID).asText();
+        String id2 = resource.save(UUID.randomUUID(), JsonNodeUtils.create(model2)).get(AccountField.ID.field).asText();
 
         Account model3 = new Account();
         model3.setStatus("OLD");
-        String id3 = resource.save(UUID.randomUUID(), JsonNodeUtils.create(model3)).get(ID).asText();
+        String id3 = resource.save(UUID.randomUUID(), JsonNodeUtils.create(model3)).get(AccountField.ID.field).asText();
 
-        JsonNode accountsNode = resource.getByStatus(status);
+        Set<JsonNode> accounts = resource.findByIndex("status", status);
 
-        assertThat(accountsNode.get("accounts").isArray(), is(true));
-        List<String> accounts = StreamSupport.stream(accountsNode.get("accounts").spliterator(), false).map(account -> account.get(ID).asText())
-                .collect(Collectors.toList());
+        List<String> ids = accounts.stream().map(account -> account.get(AccountField.ID.field).asText()).collect(Collectors.toList());
 
-        assertThat(accounts, hasSize(2));
-        assertThat(accounts, containsInAnyOrder(id1, id2));
-        assertThat(accounts, not(containsInAnyOrder(id3)));
+        assertThat(ids, hasSize(2));
+        assertThat(ids, containsInAnyOrder(id1, id2));
+        assertThat(ids, not(containsInAnyOrder(id3)));
     }
 }

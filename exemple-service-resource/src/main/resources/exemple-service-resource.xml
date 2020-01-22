@@ -17,7 +17,7 @@
 					<hz:tcp-ip enabled="false" />
 				</hz:join>
 			</hz:network>
-			<hz:map name="parameter_histories" time-to-live-seconds="0"
+			<hz:map name="parameter" time-to-live-seconds="0"
 				in-memory-format="BINARY" />
 			<hz:map name="schema_resource" time-to-live-seconds="0"
 				in-memory-format="BINARY" />

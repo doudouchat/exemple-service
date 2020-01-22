@@ -39,7 +39,7 @@ import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.account.context.AccountContext;
 import com.exemple.service.customer.account.exception.AccountServiceException;
 import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
-import com.exemple.service.resource.core.statement.AccountStatement;
+import com.exemple.service.resource.account.AccountField;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -117,7 +117,7 @@ public class AccountApi {
         JsonNode source = service.save(account, schemaBeanParam.getApp(), schemaBeanParam.getVersion());
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
-        builder.path(source.get(AccountStatement.ID).textValue());
+        builder.path(source.get(AccountField.ID.field).textValue());
         return Response.created(builder.build()).build();
 
     }

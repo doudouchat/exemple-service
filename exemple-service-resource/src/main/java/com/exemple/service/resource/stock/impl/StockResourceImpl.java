@@ -16,7 +16,7 @@ import com.exemple.service.resource.stock.StockResource;
 @Validated
 public class StockResourceImpl implements StockResource {
 
-    public static final String TABLE = "stock";
+    private static final String STOCK_TABLE = "stock";
 
     private CqlSession session;
 
@@ -27,8 +27,9 @@ public class StockResourceImpl implements StockResource {
     @Override
     public void update(String store, String product, long quantity) {
 
-        Update update = QueryBuilder.update(ResourceExecutionContext.get().keyspace(), TABLE).increment("quantity", QueryBuilder.literal(quantity))
-                .whereColumn("store").isEqualTo(QueryBuilder.literal(store)).whereColumn("product").isEqualTo(QueryBuilder.literal(product));
+        Update update = QueryBuilder.update(ResourceExecutionContext.get().keyspace(), STOCK_TABLE)
+                .increment("quantity", QueryBuilder.literal(quantity)).whereColumn("store").isEqualTo(QueryBuilder.literal(store))
+                .whereColumn("product").isEqualTo(QueryBuilder.literal(product));
 
         session.execute(update.build());
     }
@@ -36,7 +37,7 @@ public class StockResourceImpl implements StockResource {
     @Override
     public long get(String store, String product) {
 
-        Select select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), TABLE).column("quantity").whereColumn("store")
+        Select select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), STOCK_TABLE).column("quantity").whereColumn("store")
                 .isEqualTo(QueryBuilder.literal(store)).whereColumn("product").isEqualTo(QueryBuilder.literal(product));
 
         Row row = session.execute(select.build().setConsistencyLevel(ConsistencyLevel.QUORUM)).one();

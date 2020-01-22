@@ -8,7 +8,6 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import com.datastax.oss.driver.api.core.CqlSession;
@@ -19,7 +18,6 @@ import com.exemple.service.resource.core.cassandra.codec.JacksonJsonCodec;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Configuration
-@ComponentScan(basePackages = "com.exemple.service.resource.core.statement")
 public class ResourceCassandraConfiguration {
 
     @Value("${resource.cassandra.addresses}")

@@ -14,7 +14,6 @@ import org.testng.annotations.Test;
 
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
-import com.exemple.service.resource.core.statement.LoginStatement;
 import com.exemple.service.resource.login.exception.LoginResourceExistException;
 import com.exemple.service.resource.login.model.Login;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -61,8 +60,8 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
     public void get() {
 
         JsonNode login0 = resource.get(login).get();
-        assertThat(login0.get(LoginStatement.LOGIN).textValue(), is(login));
-        assertThat(login0.get(LoginStatement.ID).textValue(), is(source.get("id").toString()));
+        assertThat(login0.get(LoginField.LOGIN.field).textValue(), is(login));
+        assertThat(login0.get(LoginField.ID.field).textValue(), is(source.get("id").toString()));
         assertThat(login0.get("password").textValue(), is(source.get("password")));
         assertThat(login0.get("enable").booleanValue(), is(source.get("enable")));
         assertThat(login0.path("note").getNodeType(), is(JsonNodeType.MISSING));
@@ -107,14 +106,14 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         resource.save(login1, JsonNodeUtils.create(source));
 
         JsonNode data1 = resource.get(login1).get();
-        assertThat(data1.get(LoginStatement.LOGIN).textValue(), is(login1));
-        assertThat(data1.get(LoginStatement.ID).textValue(), is(id.toString()));
+        assertThat(data1.get(LoginField.LOGIN.field).textValue(), is(login1));
+        assertThat(data1.get(LoginField.ID.field).textValue(), is(id.toString()));
         assertThat(data1.get("password").textValue(), is(source.get("password")));
         assertThat(data1.get("enable").booleanValue(), is(source.get("enable")));
 
         JsonNode data2 = resource.get(login2).get();
-        assertThat(data2.get(LoginStatement.LOGIN).textValue(), is(login2));
-        assertThat(data2.get(LoginStatement.ID).textValue(), is(id.toString()));
+        assertThat(data2.get(LoginField.LOGIN.field).textValue(), is(login2));
+        assertThat(data2.get(LoginField.ID.field).textValue(), is(id.toString()));
         assertThat(data2.get("password").textValue(), is(source.get("password")));
         assertThat(data2.get("enable").booleanValue(), is(source.get("enable")));
     }

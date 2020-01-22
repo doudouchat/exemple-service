@@ -25,8 +25,8 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
 import com.exemple.service.resource.core.ResourceTestConfiguration;
-import com.exemple.service.resource.core.statement.SchemaStatement;
-import com.exemple.service.resource.schema.model.ResourceSchema;
+import com.exemple.service.resource.schema.impl.SchemaResourceImpl;
+import com.exemple.service.resource.schema.model.SchemaEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -45,7 +45,7 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
 
         schemaResource = IOUtils.toByteArray(new ClassPathResource("test.json").getInputStream());
 
-        ResourceSchema resourceSchema = new ResourceSchema();
+        SchemaEntity resourceSchema = new SchemaEntity();
         resourceSchema.setApplication("app1");
         resourceSchema.setVersion("v1");
         resourceSchema.setResource("account");
@@ -60,7 +60,7 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
     @Test(dependsOnMethods = "save")
     public void get() throws IOException {
 
-        byte[] schemaResource = resource.get("app1", "v1", "account");
+        byte[] schemaResource = resource.get("app1", "v1", "account").getContent();
 
         assertThat(schemaResource, not(nullValue()));
 
@@ -73,7 +73,7 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
     @Test(dependsOnMethods = "get")
     public void update() throws IOException {
 
-        ResourceSchema resourceSchema = new ResourceSchema();
+        SchemaEntity resourceSchema = new SchemaEntity();
         resourceSchema.setApplication("app1");
         resourceSchema.setVersion("v1");
         resourceSchema.setResource("account");
@@ -82,27 +82,27 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
 
         resource.update(resourceSchema);
 
-        byte[] schemaResource = resource.get("app1", "v1", "account");
+        byte[] schemaResource = resource.get("app1", "v1", "account").getContent();
 
         assertThat(schemaResource, not(nullValue()));
 
         LOG.debug(IOUtils.toString(schemaResource, "utf-8"));
 
-        assertThat(Arrays.equals(schemaResource, SchemaStatement.SCHEMA_DEFAULT.getBytes()), is(Boolean.TRUE));
+        assertThat(Arrays.equals(schemaResource, SchemaResourceImpl.SCHEMA_DEFAULT.getBytes()), is(Boolean.TRUE));
 
     }
 
     @Test(dependsOnMethods = "save")
     public void allVersions() {
 
-        ResourceSchema resourceSchema1 = new ResourceSchema();
+        SchemaEntity resourceSchema1 = new SchemaEntity();
         resourceSchema1.setApplication("app1");
         resourceSchema1.setVersion("v1");
         resourceSchema1.setResource("product");
 
         resource.save(resourceSchema1);
 
-        ResourceSchema resourceSchema2 = new ResourceSchema();
+        SchemaEntity resourceSchema2 = new SchemaEntity();
         resourceSchema2.setApplication("app1");
         resourceSchema2.setVersion("v2");
         resourceSchema2.setResource("product");
@@ -121,31 +121,31 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
     public void getEmptySchema() throws IOException {
         String version = UUID.randomUUID().toString();
 
-        ResourceSchema resourceSchema = new ResourceSchema();
+        SchemaEntity resourceSchema = new SchemaEntity();
         resourceSchema.setApplication("app2");
         resourceSchema.setVersion(version);
         resourceSchema.setResource("account");
 
         resource.save(resourceSchema);
 
-        byte[] schemaResource = resource.get(resourceSchema.getApplication(), version, resourceSchema.getResource());
+        byte[] schemaResource = resource.get(resourceSchema.getApplication(), version, resourceSchema.getResource()).getContent();
 
         assertThat(schemaResource, not(nullValue()));
         ObjectMapper mapper = new ObjectMapper();
         JsonNode schema = mapper.readTree(schemaResource);
-        assertThat(schema, is(mapper.readTree(SchemaStatement.SCHEMA_DEFAULT.getBytes())));
+        assertThat(schema, is(mapper.readTree(SchemaResourceImpl.SCHEMA_DEFAULT.getBytes())));
 
-        schemaResource = resource.get(resourceSchema.getApplication(), UUID.randomUUID().toString(), resourceSchema.getResource());
+        schemaResource = resource.get(resourceSchema.getApplication(), UUID.randomUUID().toString(), resourceSchema.getResource()).getContent();
         schema = mapper.readTree(schemaResource);
         assertThat(schemaResource, not(nullValue()));
-        assertThat(schema, is(mapper.readTree(SchemaStatement.SCHEMA_DEFAULT.getBytes())));
+        assertThat(schema, is(mapper.readTree(SchemaResourceImpl.SCHEMA_DEFAULT.getBytes())));
 
     }
 
     @Test(dependsOnMethods = "save")
     public void getFilter() {
 
-        Set<String> filter = resource.getFilter("app1", "v1", "account");
+        Set<String> filter = resource.get("app1", "v1", "account").getFilters();
 
         assertThat(filter, hasItem("filter"));
 
@@ -154,7 +154,7 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
     @Test
     public void getFilterFailure() {
 
-        Set<String> filter = resource.getFilter("app1", UUID.randomUUID().toString(), "account");
+        Set<String> filter = resource.get("app1", UUID.randomUUID().toString(), "account").getFilters();
 
         assertThat(filter, empty());
 
@@ -163,7 +163,7 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
     @Test(dependsOnMethods = "save")
     public void getRule() {
 
-        Map<String, Set<String>> filter = resource.getRule("app1", "v1", "account");
+        Map<String, Set<String>> filter = resource.get("app1", "v1", "account").getRules();
 
         assertThat(filter.get("login"), hasItem("email"));
 
@@ -172,7 +172,7 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
     @Test(dependsOnMethods = "save")
     public void getRuleEmpty() {
 
-        Map<String, Set<String>> filter = resource.getRule("app1", UUID.randomUUID().toString(), "account");
+        Map<String, Set<String>> filter = resource.get("app1", UUID.randomUUID().toString(), "account").getRules();
 
         assertThat(filter.isEmpty(), is(true));
 

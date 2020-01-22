@@ -1,10 +1,10 @@
-package com.exemple.service.resource.core.mapper;
+package com.exemple.service.resource.schema.mapper;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.mapper.MapperBuilder;
 import com.datastax.oss.driver.api.mapper.annotations.DaoFactory;
 import com.datastax.oss.driver.api.mapper.annotations.Mapper;
-import com.exemple.service.resource.core.dao.ResourceSchemaDao;
+import com.exemple.service.resource.schema.dao.ResourceSchemaDao;
 
 @Mapper
 public interface ResourceSchemaMapper {

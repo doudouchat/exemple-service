@@ -36,7 +36,7 @@ import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.customer.login.exception.LoginServiceException;
 import com.exemple.service.customer.login.exception.LoginServiceNotFoundException;
-import com.exemple.service.resource.core.statement.LoginStatement;
+import com.exemple.service.resource.login.LoginField;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -107,7 +107,7 @@ public class LoginApi {
         loginService.save(source, schemaBeanParam.getApp(), schemaBeanParam.getVersion());
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
-        builder.path(source.get(LoginStatement.LOGIN).textValue());
+        builder.path(source.get(LoginField.LOGIN.field).textValue());
         return Response.created(builder.build()).build();
 
     }
