@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -17,6 +18,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
 import com.exemple.service.resource.schema.SchemaResource;
+import com.exemple.service.resource.schema.model.SchemaEntity;
 import com.exemple.service.schema.core.SchemaTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,13 +47,16 @@ public class SchemaFilterTest extends AbstractTestNGSpringContextTests {
 
         data.put("field3", object);
 
-        Set<String> filter = new HashSet<>();
-        filter.add("field1");
-        filter.add("field3[object2]");
+        Set<String> filters = new HashSet<>();
+        filters.add("field1");
+        filters.add("field3[object2]");
 
-        Mockito.when(schemaResource.getFilter(Mockito.eq("default"), Mockito.eq("default"), Mockito.eq("schema_test"))).thenReturn(filter);
+        String app = RandomStringUtils.random(15);
+        SchemaEntity resourceSchema = new SchemaEntity();
+        resourceSchema.setFilters(filters);
+        Mockito.when(schemaResource.get(Mockito.eq(app), Mockito.eq("default"), Mockito.eq("schema_test"))).thenReturn(resourceSchema);
 
-        JsonNode newData = schemaFilter.filter("default", "default", "schema_test", MAPPER.convertValue(data, JsonNode.class));
+        JsonNode newData = schemaFilter.filter(app, "default", "schema_test", MAPPER.convertValue(data, JsonNode.class));
         assertThat(newData, hasJsonField("field1", "value1"));
         assertThat(newData, not(hasJsonField("field2")));
         assertThat(newData, hasJsonField("field3", hasJsonField("object2", "value2")));
@@ -64,10 +69,13 @@ public class SchemaFilterTest extends AbstractTestNGSpringContextTests {
         Map<String, Object> data = new HashMap<>();
         data.put("field1", "value1");
 
-        Mockito.when(schemaResource.getFilter(Mockito.eq("default"), Mockito.eq("default"), Mockito.eq("schema_test")))
-                .thenReturn(Collections.singleton(" ,field1"));
+        String app = RandomStringUtils.random(15);
+        SchemaEntity resourceSchema = new SchemaEntity();
+        resourceSchema.setFilters(Collections.singleton(" ,field1"));
 
-        schemaFilter.filter("default", "default", "schema_test", MAPPER.convertValue(data, JsonNode.class));
+        Mockito.when(schemaResource.get(Mockito.eq(app), Mockito.eq("default"), Mockito.eq("schema_test"))).thenReturn(resourceSchema);
+
+        schemaFilter.filter(app, "default", "schema_test", MAPPER.convertValue(data, JsonNode.class));
 
     }
 

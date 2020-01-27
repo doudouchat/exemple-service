@@ -1,4 +1,4 @@
-package com.exemple.service.resource.core.dao;
+package com.exemple.service.resource.account.history.dao;
 
 import java.util.UUID;
 

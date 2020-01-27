@@ -15,7 +15,7 @@ import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 
 @Entity
 @CqlName("resource_schema")
-public class ResourceSchema implements Serializable {
+public class SchemaEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

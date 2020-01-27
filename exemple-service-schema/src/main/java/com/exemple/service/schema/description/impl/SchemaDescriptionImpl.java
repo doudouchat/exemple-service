@@ -32,7 +32,7 @@ public class SchemaDescriptionImpl implements SchemaDescription {
     @Override
     public JsonNode get(String app, String version, String resource) {
 
-        JSONObject rawSchema = new JSONObject(new JSONTokener(new ByteArrayInputStream(schemaResource.get(app, version, resource))));
+        JSONObject rawSchema = new JSONObject(new JSONTokener(new ByteArrayInputStream(schemaResource.get(app, version, resource).getContent())));
         return MAPPER.convertValue(rawSchema.toMap(), JsonNode.class);
     }
 

@@ -54,10 +54,9 @@ public class DependenciesValidator implements ValidatorService {
         if (old != null && isPresent(form, values)) {
 
             JSONObject rawSchema = new JSONObject();
-            rawSchema.put("dependencies",
-                    new JSONObject().put(path,
-                            ((JSONObject) new JSONObject(new JSONTokener(new ByteArrayInputStream(schemaResource.get(app, version, resource))))
-                                    .remove("dependencies")).get(path)));
+            rawSchema.put("dependencies", new JSONObject().put(path,
+                    ((JSONObject) new JSONObject(new JSONTokener(new ByteArrayInputStream(schemaResource.get(app, version, resource).getContent())))
+                            .remove("dependencies")).get(path)));
 
             SchemaLoader schemaLoader = SchemaLoader.builder().draftV7Support().schemaJson(rawSchema).build();
             Schema schema = schemaLoader.load().build();

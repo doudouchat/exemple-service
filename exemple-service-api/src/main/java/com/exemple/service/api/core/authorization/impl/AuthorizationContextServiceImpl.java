@@ -34,7 +34,7 @@ import com.exemple.service.api.core.authorization.AuthorizationException;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
-import com.exemple.service.resource.core.statement.LoginStatement;
+import com.exemple.service.resource.login.LoginField;
 import com.exemple.service.resource.login.LoginResource;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hazelcast.core.HazelcastInstance;
@@ -129,7 +129,7 @@ public class AuthorizationContextServiceImpl implements AuthorizationContextServ
     @Override
     public void verifyAccountId(UUID id, ApiSecurityContext securityContext) {
 
-        JsonNode login = loginResource.get(securityContext.getUserPrincipal().getName()).orElseGet(JsonNodeUtils::init).get(LoginStatement.ID);
+        JsonNode login = loginResource.get(securityContext.getUserPrincipal().getName()).orElseGet(JsonNodeUtils::init).get(LoginField.ID.field);
 
         if (!id.toString().equals(login.asText(null))) {
 

@@ -12,7 +12,6 @@ import org.testng.annotations.Test;
 
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
-import com.exemple.service.resource.core.statement.SubscriptionStatement;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @ContextConfiguration(classes = { ResourceTestConfiguration.class })
@@ -36,7 +35,7 @@ public class SubscriptionResourceTest extends AbstractTestNGSpringContextTests {
     public void get() {
 
         JsonNode subscription = resource.get(email).get();
-        assertThat(subscription.get(SubscriptionStatement.EMAIL).textValue(), is(email));
+        assertThat(subscription.get(SubscriptionField.EMAIL.field).textValue(), is(email));
 
     }
 
