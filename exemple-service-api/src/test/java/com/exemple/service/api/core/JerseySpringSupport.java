@@ -16,7 +16,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
 @WebAppConfiguration
-@ContextConfiguration(classes = { ApiTestConfiguration.class })
+@ContextConfiguration(classes = ApiTestConfiguration.class)
 @ActiveProfiles("noSecurity")
 public abstract class JerseySpringSupport extends AbstractTestNGSpringContextTests {
 

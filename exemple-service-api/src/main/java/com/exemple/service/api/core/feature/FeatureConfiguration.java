@@ -29,8 +29,6 @@ public class FeatureConfiguration extends ResourceConfig {
         packages(
                 // exception provider
                 "com.exemple.service.api.core.exception",
-                // actuate
-                "com.exemple.service.api.core.actuate",
                 // account
                 "com.exemple.service.api.account",
                 // connexion

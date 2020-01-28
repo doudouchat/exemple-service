@@ -162,15 +162,6 @@ public class AuthorizationTest extends JerseySpringSupport {
     }
 
     @Test
-    public void authorizedHealth() throws Exception {
-
-        Response response = target("/health").request(MediaType.APPLICATION_JSON).get();
-
-        assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
-
-    }
-
-    @Test
     public void authorizedGetAccount() throws Exception {
 
         String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe").withAudience("exemple")

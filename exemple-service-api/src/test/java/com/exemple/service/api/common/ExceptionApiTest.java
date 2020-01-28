@@ -19,7 +19,6 @@ import org.testng.annotations.Test;
 import com.exemple.service.api.account.AccountApiTest;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.JerseySpringSupport;
-import com.exemple.service.api.core.actuate.HealthApiTest;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.account.exception.AccountServiceException;
@@ -53,7 +52,7 @@ public class ExceptionApiTest extends JerseySpringSupport {
     @Test
     public void notAcceptable() {
 
-        Response response = target(HealthApiTest.URL).request(MediaType.TEXT_HTML).get();
+        Response response = target(AccountApiTest.URL + "/" + UUID.randomUUID()).request(MediaType.TEXT_HTML).get();
 
         assertThat(response.getStatus(), is(Status.NOT_ACCEPTABLE.getStatusCode()));
 

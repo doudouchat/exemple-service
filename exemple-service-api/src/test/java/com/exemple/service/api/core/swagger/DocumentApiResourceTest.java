@@ -67,10 +67,7 @@ public class DocumentApiResourceTest extends JerseySpringSupport {
                 hasJsonField("Stock", hasJsonField("type", "object"),
                         hasJsonField("properties", hasJsonField("increment", hasJsonField("type", "integer")))),
                 // Patch
-                hasJsonField("Patch", hasJsonField("$ref", baseUri + "/ws/v1/schemas/patch")),
-                // Health
-                hasJsonField("Health", hasJsonField("type", "object"),
-                        hasJsonField("properties", hasJsonField("status", hasJsonField("type", "string"))))
+                hasJsonField("Patch", hasJsonField("$ref", baseUri + "/ws/v1/schemas/patch"))
 
         )));
 

@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -18,7 +17,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.exemple.service.api.common.ManifestUtils;
+import com.exemple.service.api.core.ApiContext;
 import com.exemple.service.api.core.swagger.custom.DocumentApiCustom;
 import com.exemple.service.api.core.swagger.security.DocumentApiSecurity;
 import com.exemple.service.application.common.model.ApplicationDetail;
@@ -56,9 +55,6 @@ public class DocumentApiResource extends BaseOpenApiResource {
     private ServletConfig config;
 
     @Context
-    private ServletContext servletContext;
-
-    @Context
     private Application application;
 
     @Autowired(required = false)
@@ -69,6 +65,9 @@ public class DocumentApiResource extends BaseOpenApiResource {
 
     @Autowired
     private SchemaResource schemaResource;
+
+    @Autowired
+    private ApiContext apiContext;
 
     public DocumentApiResource() {
 
@@ -98,7 +97,7 @@ public class DocumentApiResource extends BaseOpenApiResource {
         headers.getRequestHeaders().put(APP_HOST, Collections.singletonList(uriInfo.getBaseUri().toString().replace("/ws", "")));
         headers.getRequestHeaders().put(APP, Collections.singletonList(app));
 
-        this.openApiConfiguration.getOpenAPI().getInfo().setVersion(ManifestUtils.version(servletContext));
+        this.openApiConfiguration.getOpenAPI().getInfo().setVersion(apiContext.getVersion());
 
         ApplicationDetail applicationDetail = applicationDetailService.get(app);
 

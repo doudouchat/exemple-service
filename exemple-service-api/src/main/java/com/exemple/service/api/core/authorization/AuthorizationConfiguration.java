@@ -10,6 +10,7 @@ import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
 
 @Configuration
+@Profile("!noSecurity")
 public class AuthorizationConfiguration {
 
     public static final String TOKEN_BLACK_LIST = "token.black_list";
@@ -27,7 +28,6 @@ public class AuthorizationConfiguration {
     private int connectionAttemptPeriod;
 
     @Bean
-    @Profile("!noSecurity")
     public HazelcastInstance hazelcastInstance() {
 
         ClientConfig config = new ClientConfig();
