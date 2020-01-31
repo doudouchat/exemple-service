@@ -6,6 +6,7 @@ import java.util.Properties;
 import javax.validation.Validator;
 
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -25,7 +26,7 @@ import com.exemple.service.api.core.authorization.AuthorizationConfiguration;
 
 @Configuration
 @Import(AuthorizationConfiguration.class)
-@ComponentScan(basePackages = "com.exemple.service.api")
+@ComponentScan(basePackages = "com.exemple.service.api", excludeFilters = @ComponentScan.Filter(SpringBootApplication.class))
 @ImportResource("classpath:exemple-service-api-security.xml")
 public class ApiConfiguration {
 

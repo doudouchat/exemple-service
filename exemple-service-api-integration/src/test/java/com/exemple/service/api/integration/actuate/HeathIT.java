@@ -12,7 +12,7 @@ import io.restassured.response.Response;
 
 public class HeathIT {
 
-    private static final String URL = "/ws/health";
+    private static final String URL = "/actuator/health";
 
     @Test
     public void health() {

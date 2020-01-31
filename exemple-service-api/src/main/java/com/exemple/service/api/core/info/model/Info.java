@@ -1,4 +1,4 @@
-package com.exemple.service.api.core.actuate.model;
+package com.exemple.service.api.core.info.model;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

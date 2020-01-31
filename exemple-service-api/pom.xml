@@ -10,6 +10,34 @@
 	<artifactId>exemple-service-api</artifactId>
 	<packaging>war</packaging>
 
+	<dependencyManagement>
+
+		<dependencies>
+
+			<!-- JERSEY -->
+
+			<dependency>
+				<groupId>org.glassfish.jersey</groupId>
+				<artifactId>jersey-bom</artifactId>
+				<version>2.30</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<!-- SPRING BOOT -->
+
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${org.springframework.boot-version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+		</dependencies>
+
+	</dependencyManagement>
+
 	<dependencies>
 
 		<!-- CUSTOMER -->
@@ -42,6 +70,24 @@
 			<groupId>exemple</groupId>
 			<artifactId>exemple-service-application</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+
+		<!-- SPRING BOOT -->
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- JERSEY -->
@@ -190,13 +236,6 @@
 			<artifactId>json-path</artifactId>
 		</dependency>
 
-		<!-- JCABI -->
-
-		<dependency>
-			<groupId>com.jcabi</groupId>
-			<artifactId>jcabi-manifests</artifactId>
-		</dependency>
-
 		<!-- JSR303 -->
 
 		<dependency>
@@ -315,6 +354,13 @@
 
 	<build>
 
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
 		<testResources>
 			<testResource>
 				<directory>src/test/resources</directory>
@@ -372,6 +418,15 @@
 				<configuration>
 					<serverPort>${authorization.port}</serverPort>
 					<logLevel>WARN</logLevel>
+				</configuration>
+			</plugin>
+
+			<!-- VERSION -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<configuration>
+					<processDependencyManagement>false</processDependencyManagement>
 				</configuration>
 			</plugin>
 

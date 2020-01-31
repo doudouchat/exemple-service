@@ -44,7 +44,7 @@ public class InfoIT {
     @Test
     public void info() {
 
-        Response response = JsonRestTemplate.given().get("/ws/info");
+        Response response = JsonRestTemplate.given().get("/actuator/info");
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
         assertThat(response.jsonPath().getString("version"), is(notNullValue()));
