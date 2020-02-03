@@ -1,9 +1,9 @@
 package com.exemple.service.api.core;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-@Configuration
+@Component
 public class ApiContext {
 
     @Value("${info.version:nc}")
