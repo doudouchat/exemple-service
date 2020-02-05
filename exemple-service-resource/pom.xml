@@ -131,14 +131,6 @@
 			<artifactId>hamcrest-jackson</artifactId>
 		</dependency>
 
-		<!-- GOOGLE GUAVA -->
-
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>25.1-jre</version>
-		</dependency>
-
 		<!-- EXCEPTION LAMBDA -->
 
 		<dependency>
@@ -146,11 +138,11 @@
 			<artifactId>throwing-function</artifactId>
 		</dependency>
 
-		<!-- ACHILLE -->
+		<!-- CASSANDRA EMBEDDED -->
 
 		<dependency>
-			<groupId>info.archinnov</groupId>
-			<artifactId>achilles-embedded</artifactId>
+			<groupId>com.github.nosan</groupId>
+			<artifactId>embedded-cassandra</artifactId>
 		</dependency>
 
 	</dependencies>

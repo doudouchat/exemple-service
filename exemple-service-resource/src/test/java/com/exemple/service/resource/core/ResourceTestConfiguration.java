@@ -1,5 +1,7 @@
 package com.exemple.service.resource.core;
 
+import java.util.Arrays;
+
 import javax.annotation.PostConstruct;
 import javax.validation.Validator;
 
@@ -16,29 +18,32 @@ import org.springframework.validation.beanvalidation.MethodValidationPostProcess
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.exemple.service.resource.core.cassandra.ResourceCassandraConfiguration;
-
-import info.archinnov.achilles.embedded.CassandraEmbeddedServerBuilder;
-import info.archinnov.achilles.embedded.CassandraShutDownHook;
+import com.github.nosan.embedded.cassandra.EmbeddedCassandraFactory;
+import com.github.nosan.embedded.cassandra.api.Cassandra;
+import com.github.nosan.embedded.cassandra.api.connection.CassandraConnection;
+import com.github.nosan.embedded.cassandra.api.connection.DefaultCassandraConnectionFactory;
+import com.github.nosan.embedded.cassandra.api.cql.CqlDataSet;
+import com.github.nosan.embedded.cassandra.artifact.Artifact;
 
 @Configuration
 @Import(ResourceConfiguration.class)
 public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
 
-    private CassandraShutDownHook cassandraShutDownHook = new CassandraShutDownHook();
-
     @Value("${resource.cassandra.port}")
     private int port;
 
-    @Bean(initMethod = "buildServer")
-    public CassandraEmbeddedServerBuilder embeddedServer() {
+    @Value("${resource.cassandra.version}")
+    private String version;
 
-        System.setProperty("cassandra.unsafesystem", "true");
-        System.setProperty("com.datastax.driver.FORCE_NIO", "true");
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    public Cassandra embeddedServer() {
 
-        return CassandraEmbeddedServerBuilder.builder().withScript("cassandra/keyspace.cql").withScript("cassandra/test.cql")
-                .withScript("cassandra/exec.cql").withClusterName("test").withCQLPort(port).withShutdownHook(cassandraShutDownHook)
-                .cleanDataFilesAtStartup(true);
+        EmbeddedCassandraFactory cassandraFactory = new EmbeddedCassandraFactory();
+        cassandraFactory.setArtifact(Artifact.ofVersion(version));
+        cassandraFactory.setPort(port);
+        cassandraFactory.getJvmOptions().addAll(Arrays.asList("-Xms64m", "-Xmx64m"));
 
+        return cassandraFactory.create();
     }
 
     @Bean
@@ -57,14 +62,22 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
     @DependsOn("embeddedServer")
     public CqlSession session() {
 
-        return super.session();
+        CqlSession session = super.session();
+        session.setSchemaMetadataEnabled(true);
+
+        return session;
     }
 
     @PostConstruct
     public void initKeyspace() {
 
-        ResourceExecutionContext.get().setKeyspace("test");
+        DefaultCassandraConnectionFactory cassandraConnectionFactory = new DefaultCassandraConnectionFactory();
 
+        try (CassandraConnection connection = cassandraConnectionFactory.create(embeddedServer())) {
+            CqlDataSet.ofClasspaths("cassandra/keyspace.cql", "cassandra/test.cql", "cassandra/exec.cql").forEachStatement(connection::execute);
+        }
+
+        ResourceExecutionContext.get().setKeyspace("test");
     }
 
     @Bean
