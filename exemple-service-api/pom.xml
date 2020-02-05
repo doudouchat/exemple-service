@@ -210,6 +210,18 @@
 			<artifactId>spring-kafka-test</artifactId>
 		</dependency>
 
+		<!-- HAZELCAST -->
+
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-spring</artifactId>
+		</dependency>
+
 		<!-- JWT TOKEN -->
 
 		<dependency>
