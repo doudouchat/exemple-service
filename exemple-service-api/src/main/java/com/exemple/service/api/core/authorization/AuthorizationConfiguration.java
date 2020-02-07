@@ -21,11 +21,11 @@ public class AuthorizationConfiguration {
     @Value("${api.authorization.hazelcast.connectionTimeout:10000}")
     private int connectionTimeout;
 
-    @Value("${api.authorization.hazelcast.connectionAttemptLimit:5}")
-    private int connectionAttemptLimit;
+    @Value("${api.authorization.hazelcast.initialBackoffMillis:2000}")
+    private int initialBackoffMillis;
 
-    @Value("${api.authorization.hazelcast.connectionAttemptPeriod:5000}")
-    private int connectionAttemptPeriod;
+    @Value("${api.authorization.hazelcast.maxBackoffMillis:6000}")
+    private int maxBackoffMillis;
 
     @Bean
     public HazelcastInstance hazelcastInstance() {
@@ -33,8 +33,8 @@ public class AuthorizationConfiguration {
         ClientConfig config = new ClientConfig();
         config.getNetworkConfig().addAddress(addresses);
         config.getNetworkConfig().setConnectionTimeout(connectionTimeout);
-        config.getNetworkConfig().setConnectionAttemptLimit(connectionAttemptLimit);
-        config.getNetworkConfig().setConnectionAttemptPeriod(connectionAttemptPeriod);
+        config.getConnectionStrategyConfig().getConnectionRetryConfig().setInitialBackoffMillis(initialBackoffMillis);
+        config.getConnectionStrategyConfig().getConnectionRetryConfig().setMaxBackoffMillis(maxBackoffMillis);
 
         return HazelcastClient.newHazelcastClient(config);
     }
