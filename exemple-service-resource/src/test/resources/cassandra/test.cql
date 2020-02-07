@@ -1,6 +1,4 @@
-USE test;
-
-CREATE TYPE address (
+CREATE TYPE test.address (
 	street text,
 	city text,
 	zip text,
@@ -9,17 +7,17 @@ CREATE TYPE address (
 	note text
 );
 
-CREATE TYPE child (
+CREATE TYPE test.child (
 	birthday date
 );
 
-CREATE TYPE cgu (
+CREATE TYPE test.cgu (
 	code text,
 	version text,
 	note text
 );
 
-CREATE TABLE account ( 
+CREATE TABLE test.account ( 
 	id UUID PRIMARY KEY,
 	email text,
 	status text,
@@ -42,7 +40,7 @@ CREATE TABLE account (
 	content blob
 );
 
-CREATE TABLE login (
+CREATE TABLE test.login (
 	id UUID,
 	login text PRIMARY KEY,
 	password text,
@@ -50,11 +48,11 @@ CREATE TABLE login (
 	note text
 );
 
-CREATE TABLE subscription (
+CREATE TABLE test.subscription (
 	email text PRIMARY KEY
 );
 
-CREATE TABLE account_history ( 
+CREATE TABLE test.account_history ( 
 	id UUID,
 	field text,
 	date timestamp,
@@ -62,18 +60,18 @@ CREATE TABLE account_history (
 	PRIMARY KEY ((id), field)
 );
 
-CREATE TYPE schema_label_type (
+CREATE TYPE test.schema_label_type (
 	type text,
 	description text,
 	labels map<text, text>
 );
 
-CREATE TABLE parameter ( 
+CREATE TABLE test.parameter ( 
 	app text PRIMARY KEY,
 	histories map<text, boolean>
 );
 
-CREATE TABLE resource_schema ( 
+CREATE TABLE test.resource_schema ( 
 	app text,
 	version text,
 	resource text,
@@ -83,18 +81,18 @@ CREATE TABLE resource_schema (
 	PRIMARY KEY ((app), resource, version)
 );
 
-CREATE TABLE account_schema ( 
+CREATE TABLE test.account_schema ( 
 	app text PRIMARY KEY,
 	labels map<text, frozen<schema_label_type>>
 );
 
-CREATE INDEX IF NOT EXISTS account_status
-	ON account ( status );
+CREATE INDEX account_status
+	ON test.account ( status );
 	
-CREATE INDEX IF NOT EXISTS login_id
-	ON login ( id );
+CREATE INDEX login_id
+	ON test.login ( id );
 	
-CREATE TABLE stock ( 
+CREATE TABLE test.stock ( 
 	store text,
 	product text,
 	quantity counter,

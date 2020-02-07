@@ -1,10 +1,8 @@
-USE test;
+INSERT INTO test.account (id, lastname, firstname) VALUES (6ab09bec-e68e-48d9-a5f8-97e6fb4c9b47, 'KRUIKSWIJK','Steven') USING TTL 86400 AND TIMESTAMP 123456789;
 
-INSERT INTO account (id, lastname, firstname) VALUES (6ab09bec-e68e-48d9-a5f8-97e6fb4c9b47, 'KRUIKSWIJK','Steven') USING TTL 86400 AND TIMESTAMP 123456789;
+SELECT * FROM test.account;
 
-SELECT * FROM account;
-
-INSERT INTO parameter (app, histories) VALUES (
+INSERT INTO test.parameter (app, histories) VALUES (
 	'default',  
 	{ 	'lastname' : true,
   		'address' : false,
@@ -17,7 +15,7 @@ INSERT INTO parameter (app, histories) VALUES (
   	}
 );
 
-INSERT INTO resource_schema (app, version, resource, content) VALUES (
+INSERT INTO test.resource_schema (app, version, resource, content) VALUES (
 	'app1',
 	'v1',
 	'account',textAsBlob(
