@@ -85,12 +85,12 @@
 
 		<dependency>
 			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast</artifactId>
+			<artifactId>hazelcast-spring</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-spring</artifactId>
+			<artifactId>hazelcast-client</artifactId>
 		</dependency>
 
 		<!-- ASPECTJ -->

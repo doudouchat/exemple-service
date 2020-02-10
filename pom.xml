@@ -213,13 +213,19 @@
 			<dependency>
 				<groupId>com.hazelcast</groupId>
 				<artifactId>hazelcast</artifactId>
-				<version>4.0</version>
+				<version>3.12.6</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.hazelcast</groupId>
+				<artifactId>hazelcast-client</artifactId>
+				<version>3.12.6</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.hazelcast</groupId>
 				<artifactId>hazelcast-spring</artifactId>
-				<version>4.0</version>
+				<version>3.12.6</version>
 			</dependency>
 
 			<!-- ZOOKEEPER -->
