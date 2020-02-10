@@ -52,7 +52,7 @@
 		<org.slf4j-version>1.7.30</org.slf4j-version>
 		<datastax-version>4.4.0</datastax-version>
 		<com.fasterxml.jackson-version>2.10.2</com.fasterxml.jackson-version>
-		<groovy-version>2.5.9</groovy-version>
+		<groovy-version>3.0.0</groovy-version>
 		<cassandra-version>3.11.5</cassandra-version>
 		<zookeeper-version>3.5.6</zookeeper-version>
 		<mock.server-version>5.9.0</mock.server-version>
