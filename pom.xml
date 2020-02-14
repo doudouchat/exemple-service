@@ -54,7 +54,7 @@
 		<com.fasterxml.jackson-version>2.10.2</com.fasterxml.jackson-version>
 		<groovy-version>3.0.0</groovy-version>
 		<cassandra-version>3.11.5</cassandra-version>
-		<zookeeper-version>3.5.6</zookeeper-version>
+		<zookeeper-version>3.5.7</zookeeper-version>
 		<mock.server-version>5.9.0</mock.server-version>
 		<!-- SONAR -->
 
