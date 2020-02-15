@@ -53,7 +53,7 @@
 		<datastax-version>4.4.0</datastax-version>
 		<com.fasterxml.jackson-version>2.10.2</com.fasterxml.jackson-version>
 		<groovy-version>3.0.0</groovy-version>
-		<cassandra-version>3.11.5</cassandra-version>
+		<cassandra-version>3.11.6</cassandra-version>
 		<zookeeper-version>3.5.7</zookeeper-version>
 		<mock.server-version>5.9.0</mock.server-version>
 		<!-- SONAR -->
@@ -915,25 +915,5 @@
 
 		</plugins>
 	</build>
-
-	<profiles>
-
-		<profile>
-			<id>windows</id>
-			<activation>
-				<os>
-					<family>windows</family>
-				</os>
-			</activation>
-
-			<properties>
-
-				<cassandra-version>3.11.4</cassandra-version>
-
-			</properties>
-
-		</profile>
-
-	</profiles>
 
 </project>
