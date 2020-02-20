@@ -34,7 +34,6 @@ import io.swagger.v3.oas.integration.api.OpenApiContext;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
-import io.swagger.v3.oas.models.servers.ServerVariables;
 
 @Path("/{app}/openapi.{type:json|yaml}")
 public class DocumentApiResource extends BaseOpenApiResource {
@@ -73,12 +72,6 @@ public class DocumentApiResource extends BaseOpenApiResource {
 
         OpenAPI openAPI = new OpenAPI();
 
-        Server server = new Server();
-        server.setUrl("{host}");
-        ServerVariables serverVariables = new ServerVariables();
-        server.setVariables(serverVariables);
-        openAPI.addServersItem(server);
-
         Info info = new Info();
         info.title("Api documentation");
         info.description("Api documentation");
@@ -94,10 +87,17 @@ public class DocumentApiResource extends BaseOpenApiResource {
     public Response getOpenApi(@Context HttpHeaders headers, @Context UriInfo uriInfo, @PathParam("type") String type, @PathParam("app") String app)
             throws Exception {
 
-        headers.getRequestHeaders().put(APP_HOST, Collections.singletonList(uriInfo.getBaseUri().toString().replace("/ws", "")));
+        String host = uriInfo.getBaseUri().getPath().replace("/ws", "");
+
         headers.getRequestHeaders().put(APP, Collections.singletonList(app));
+        headers.getRequestHeaders().put(APP_HOST, Collections.singletonList(host));
 
         this.openApiConfiguration.getOpenAPI().getInfo().setVersion(apiContext.getVersion());
+
+        Server server = new Server();
+        server.setUrl(host);
+
+        this.openApiConfiguration.getOpenAPI().addServersItem(server);
 
         ApplicationDetail applicationDetail = applicationDetailService.get(app);
 

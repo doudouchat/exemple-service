@@ -12,11 +12,7 @@ import org.springframework.stereotype.Component;
 import com.exemple.service.api.core.ApiContext;
 import com.exemple.service.api.core.info.model.Info;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 @Path("/")
-@OpenAPIDefinition(tags = @Tag(name = "info"))
 @Component
 public class InfoApi {
 

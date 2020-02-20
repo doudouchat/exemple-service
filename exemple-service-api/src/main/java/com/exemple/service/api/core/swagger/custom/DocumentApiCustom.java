@@ -21,9 +21,6 @@ import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
-import io.swagger.v3.oas.models.servers.Server;
-import io.swagger.v3.oas.models.servers.ServerVariable;
-import io.swagger.v3.oas.models.servers.ServerVariables;
 
 public class DocumentApiCustom extends AbstractSpecFilter {
 
@@ -117,8 +114,6 @@ public class DocumentApiCustom extends AbstractSpecFilter {
     public Optional<OpenAPI> filterOpenAPI(OpenAPI openAPI, Map<String, List<String>> params, Map<String, String> cookies,
             Map<String, List<String>> headers) {
 
-        String host = headers.get(DocumentApiResource.APP_HOST).stream().findFirst().orElseThrow(IllegalArgumentException::new);
-
         headers.entrySet().stream()
 
                 .filter((Map.Entry<String, List<String>> header) -> StringUtils.startsWith(header.getKey(), DocumentApiResource.RESOURCE))
@@ -140,16 +135,6 @@ public class DocumentApiCustom extends AbstractSpecFilter {
                     });
 
                 });
-
-        openAPI.getServers().stream().findFirst().ifPresent((Server server) -> {
-
-            ServerVariables serverVariables = server.getVariables();
-
-            ServerVariable hostVariable = new ServerVariable();
-            hostVariable.setDefault(host);
-            hostVariable.setDescription("Host Server");
-            serverVariables.addServerVariable("host", hostVariable);
-        });
 
         return Optional.of(openAPI);
     }

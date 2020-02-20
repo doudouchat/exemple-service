@@ -52,22 +52,20 @@ public class DocumentApiResourceTest extends JerseySpringSupport {
 
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
 
-        String baseUri = target(URL).getUri().toString().replace(URL, "");
-
         ObjectMapper mapper = new ObjectMapper();
         JsonNode responseBody = mapper.readTree(response.readEntity(String.class));
 
         assertThat(responseBody, notNullValue());
         assertThat(responseBody, hasJsonField("components", hasJsonField("schemas",
                 // Account
-                hasJsonField("Account.v1", hasJsonField("$ref", baseUri + "/ws/v1/schemas/account/test/v1")),
+                hasJsonField("Account.v1", hasJsonField("$ref", "/ws/v1/schemas/account/test/v1")),
                 // Account
-                hasJsonField("Account.v2", hasJsonField("$ref", baseUri + "/ws/v1/schemas/account/test/v2")),
+                hasJsonField("Account.v2", hasJsonField("$ref", "/ws/v1/schemas/account/test/v2")),
                 // Stock
                 hasJsonField("Stock", hasJsonField("type", "object"),
                         hasJsonField("properties", hasJsonField("increment", hasJsonField("type", "integer")))),
                 // Patch
-                hasJsonField("Patch", hasJsonField("$ref", baseUri + "/ws/v1/schemas/patch"))
+                hasJsonField("Patch", hasJsonField("$ref", "/ws/v1/schemas/patch"))
 
         )));
 
