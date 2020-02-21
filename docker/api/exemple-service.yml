@@ -23,4 +23,4 @@ api:
          clientSecret: secret
    swagger:
       authorization:
-         path: http://localhost:8084/ExempleAuthorization
+         path: http://localhost:8086/ExempleAuthorization
