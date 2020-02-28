@@ -1,6 +1,5 @@
 package com.exemple.service.schema.filter.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.resource.schema.SchemaResource;
@@ -11,8 +10,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 @Component
 public class SchemaFilterImpl implements SchemaFilter {
 
-    @Autowired
-    private SchemaResource schemaResource;
+    private final SchemaResource schemaResource;
+
+    public SchemaFilterImpl(SchemaResource schemaResource) {
+
+        this.schemaResource = schemaResource;
+    }
 
     @Override
     public JsonNode filter(String app, String version, String resource, JsonNode form) {

@@ -16,7 +16,6 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.model.ApplicationBeanParam;
@@ -43,11 +42,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Component
 public class StockApi {
 
-    @Autowired
-    private StockService service;
+    private final StockService service;
 
-    @Autowired
-    private ApplicationDetailService applicationDetailService;
+    private final ApplicationDetailService applicationDetailService;
+
+    public StockApi(StockService service, ApplicationDetailService applicationDetailService) {
+
+        this.service = service;
+        this.applicationDetailService = applicationDetailService;
+    }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)

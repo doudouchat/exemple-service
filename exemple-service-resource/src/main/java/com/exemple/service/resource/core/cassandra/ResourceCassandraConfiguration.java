@@ -20,14 +20,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 @Configuration
 public class ResourceCassandraConfiguration {
 
-    @Value("${resource.cassandra.addresses}")
-    private String[] addresses;
+    private final String[] addresses;
 
-    @Value("${resource.cassandra.port}")
-    private int port;
+    private final int port;
 
-    @Value("${resource.cassandra.local_data_center}")
-    private String localDataCenter;
+    private final String localDataCenter;
+
+    public ResourceCassandraConfiguration(@Value("${resource.cassandra.addresses}") String[] addresses, @Value("${resource.cassandra.port}") int port,
+            @Value("${resource.cassandra.local_data_center}") String localDataCenter) {
+
+        this.addresses = addresses.clone();
+        this.port = port;
+        this.localDataCenter = localDataCenter;
+    }
 
     @Bean
     public CqlSession session() {

@@ -31,13 +31,14 @@ public class DataEventListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(DataEventListener.class);
 
-    @Value("${event.timeout:3000}")
-    private Long timeout;
+    private final Long timeout;
 
-    private KafkaTemplate<String, JsonNode> template;
+    private final KafkaTemplate<String, JsonNode> template;
 
-    public DataEventListener(KafkaTemplate<String, JsonNode> template) {
+    public DataEventListener(KafkaTemplate<String, JsonNode> template, @Value("${event.timeout:3000}") Long timeout) {
+
         this.template = template;
+        this.timeout = timeout;
     }
 
     @EventListener

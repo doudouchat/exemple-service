@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.core.ApiContext;
 import com.exemple.service.api.core.swagger.custom.DocumentApiCustom;
@@ -36,6 +37,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
 
 @Path("/{app}/openapi.{type:json|yaml}")
+@Component
 public class DocumentApiResource extends BaseOpenApiResource {
 
     public static final String APP_HOST = "app_host";
@@ -56,19 +58,15 @@ public class DocumentApiResource extends BaseOpenApiResource {
     @Context
     private Application application;
 
-    @Autowired(required = false)
     private DocumentApiSecurity documentApiSecurity;
 
-    @Autowired
-    private ApplicationDetailService applicationDetailService;
+    private final ApplicationDetailService applicationDetailService;
 
-    @Autowired
-    private SchemaResource schemaResource;
+    private final SchemaResource schemaResource;
 
-    @Autowired
-    private ApiContext apiContext;
+    private final ApiContext apiContext;
 
-    public DocumentApiResource() {
+    public DocumentApiResource(ApplicationDetailService applicationDetailService, SchemaResource schemaResource, ApiContext apiContext) {
 
         OpenAPI openAPI = new OpenAPI();
 
@@ -78,7 +76,15 @@ public class DocumentApiResource extends BaseOpenApiResource {
         openAPI.setInfo(info);
 
         this.openApiConfiguration = new SwaggerConfiguration().filterClass(DocumentApiCustom.class.getName()).openAPI(openAPI);
+        this.applicationDetailService = applicationDetailService;
+        this.schemaResource = schemaResource;
+        this.apiContext = apiContext;
 
+    }
+
+    @Autowired(required = false)
+    public void setDocumentApiSecurity(DocumentApiSecurity documentApiSecurity) {
+        this.documentApiSecurity = documentApiSecurity;
     }
 
     @GET

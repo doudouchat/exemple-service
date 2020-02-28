@@ -4,6 +4,7 @@ import org.mockserver.client.MockServerClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 
 import com.hazelcast.config.Config;
@@ -11,7 +12,8 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 
 @Configuration
-public class AuthorizationTestConfiguration extends AuthorizationConfiguration {
+@Import(AuthorizationConfiguration.class)
+public class AuthorizationTestConfiguration {
 
     @Value("${api.authorization.port}")
     private int authorizationPort;

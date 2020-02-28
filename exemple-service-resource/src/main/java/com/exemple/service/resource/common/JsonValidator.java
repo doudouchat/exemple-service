@@ -94,7 +94,7 @@ public class JsonValidator {
 
             if (javaType.equals(String.class) || javaType.equals(java.time.Instant.class)) {
 
-                valueString = "'" + valueString + "'";
+                valueString = new StringBuilder().append("'").append(valueString).append("'").toString();
 
                 if (JsonNodeType.STRING != type) {
                     throw new JsonValidatorException(dataType.asCql(false, true), node);

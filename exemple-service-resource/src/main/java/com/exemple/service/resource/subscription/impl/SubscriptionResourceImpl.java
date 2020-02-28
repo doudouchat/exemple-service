@@ -27,6 +27,7 @@ public class SubscriptionResourceImpl implements SubscriptionResource {
     private final JsonQueryBuilder jsonQueryBuilder;
 
     public SubscriptionResourceImpl(CqlSession session) {
+
         this.session = session;
         this.jsonQueryBuilder = new JsonQueryBuilder(session, SUBSCRIPTION_TABLE);
     }

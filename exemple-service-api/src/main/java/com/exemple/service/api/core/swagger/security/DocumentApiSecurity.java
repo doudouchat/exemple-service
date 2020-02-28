@@ -17,8 +17,12 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 @Profile("!noSecurity")
 public class DocumentApiSecurity {
 
-    @Value("${api.swagger.authorization.path:}")
-    private String path;
+    private final String path;
+
+    public DocumentApiSecurity(@Value("${api.swagger.authorization.path:}") String path) {
+
+        this.path = path;
+    }
 
     public Map<String, SecurityScheme> buildSecurityScheme() {
 

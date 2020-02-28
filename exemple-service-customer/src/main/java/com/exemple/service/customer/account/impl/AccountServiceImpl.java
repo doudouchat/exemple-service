@@ -21,16 +21,17 @@ public class AccountServiceImpl implements AccountService {
 
     private static final String ACCOUNT = "account";
 
-    private AccountResource accountResource;
+    private final AccountResource accountResource;
 
-    private AccountValidation accountValidation;
+    private final AccountValidation accountValidation;
 
-    private SchemaFilter schemaFilter;
+    private final SchemaFilter schemaFilter;
 
-    private ApplicationEventPublisher applicationEventPublisher;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public AccountServiceImpl(AccountResource accountResource, AccountValidation accountValidation, SchemaFilter schemaFilter,
             ApplicationEventPublisher applicationEventPublisher) {
+
         this.accountResource = accountResource;
         this.accountValidation = accountValidation;
         this.schemaFilter = schemaFilter;

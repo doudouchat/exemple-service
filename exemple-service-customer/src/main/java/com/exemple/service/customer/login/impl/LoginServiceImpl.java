@@ -15,13 +15,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 @Service
 public class LoginServiceImpl implements LoginService {
 
-    private LoginResource loginResource;
+    private final LoginResource loginResource;
 
-    private LoginValidation loginValidation;
+    private final LoginValidation loginValidation;
 
-    private SchemaFilter schemaFilter;
+    private final SchemaFilter schemaFilter;
 
     public LoginServiceImpl(LoginResource loginResource, LoginValidation loginValidation, SchemaFilter schemaFilter) {
+
         this.loginResource = loginResource;
         this.loginValidation = loginValidation;
         this.schemaFilter = schemaFilter;

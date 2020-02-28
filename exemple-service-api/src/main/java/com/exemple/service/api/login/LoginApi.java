@@ -24,14 +24,13 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.PatchUtils;
 import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.security.ApiSecurityContext;
-import com.exemple.service.api.core.authorization.AuthorizationContextService;
+import com.exemple.service.api.core.authorization.AuthorizationCheckService;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.customer.login.exception.LoginServiceException;
@@ -60,17 +59,21 @@ public class LoginApi {
 
     private static final String LOGIN_SCHEMA = "Login";
 
-    @Autowired
-    private LoginService loginService;
+    private final LoginService loginService;
 
-    @Autowired
-    private SchemaValidation schemaValidation;
+    private final SchemaValidation schemaValidation;
 
-    @Autowired
-    private AuthorizationContextService authorizationContextService;
+    private final AuthorizationCheckService authorizationCheckService;
 
     @Context
     private ContainerRequestContext servletContext;
+
+    public LoginApi(LoginService loginService, SchemaValidation schemaValidation, AuthorizationCheckService authorizationCheckService) {
+
+        this.loginService = loginService;
+        this.schemaValidation = schemaValidation;
+        this.authorizationCheckService = authorizationCheckService;
+    }
 
     @HEAD
     @Path("/{login}")
@@ -78,11 +81,11 @@ public class LoginApi {
             @SecurityRequirement(name = DocumentApiResource.OAUTH2_CLIENT_CREDENTIALS) })
     @RolesAllowed("login:head")
     public Response check(@NotBlank @PathParam("login") String login,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) ApplicationBeanParam applicationBeanParam) {
+            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) ApplicationBeanParam applicationBeanParam) throws LoginServiceException {
 
         if (!loginService.exist(login)) {
 
-            return Response.status(Status.NOT_FOUND).build();
+            throw new LoginServiceNotFoundException();
         }
 
         return Response.status(Status.NO_CONTENT).build();
@@ -128,7 +131,7 @@ public class LoginApi {
     public Response update(@NotNull @PathParam("login") String login, @NotNull @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws LoginServiceException {
 
-        authorizationContextService.verifyLogin(login, (ApiSecurityContext) servletContext.getSecurityContext());
+        authorizationCheckService.verifyLogin(login, (ApiSecurityContext) servletContext.getSecurityContext());
 
         JsonNode source = loginService.get(login, schemaBeanParam.getApp(), schemaBeanParam.getVersion());
 
@@ -158,7 +161,7 @@ public class LoginApi {
     public JsonNode get(@NotNull @PathParam("login") String login,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws LoginServiceException {
 
-        authorizationContextService.verifyLogin(login, (ApiSecurityContext) servletContext.getSecurityContext());
+        authorizationCheckService.verifyLogin(login, (ApiSecurityContext) servletContext.getSecurityContext());
 
         return loginService.get(login, schemaBeanParam.getApp(), schemaBeanParam.getVersion());
 
@@ -171,7 +174,7 @@ public class LoginApi {
     @RolesAllowed("login:delete")
     public void delete(@NotNull @PathParam("login") String login) {
 
-        authorizationContextService.verifyLogin(login, (ApiSecurityContext) servletContext.getSecurityContext());
+        authorizationCheckService.verifyLogin(login, (ApiSecurityContext) servletContext.getSecurityContext());
 
         loginService.delete(login);
 

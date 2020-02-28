@@ -1,6 +1,5 @@
 package com.exemple.service.customer.core.validator.rule;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.customer.login.LoginService;
@@ -13,8 +12,12 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 @Component
 public class LoginValidator implements ValidatorService {
 
-    @Autowired
-    private LoginService loginService;
+    private final LoginService loginService;
+
+    public LoginValidator(LoginService loginService) {
+
+        this.loginService = loginService;
+    }
 
     @Override
     public void validate(String path, JsonNode form, JsonNode old, ValidationException validationException) {

@@ -7,6 +7,7 @@ import org.apache.commons.io.IOUtils;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -15,7 +16,8 @@ import com.exemple.service.resource.schema.impl.SchemaResourceImpl;
 import com.exemple.service.resource.schema.model.SchemaEntity;
 
 @Configuration
-public class SchemaTestConfiguration extends SchemaConfiguration {
+@Import(SchemaConfiguration.class)
+public class SchemaTestConfiguration {
 
     private Resource schema = new ClassPathResource("schema_test.json");
 

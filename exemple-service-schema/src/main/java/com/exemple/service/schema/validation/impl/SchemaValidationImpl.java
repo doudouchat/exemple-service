@@ -12,7 +12,6 @@ import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -31,14 +30,18 @@ public class SchemaValidationImpl implements SchemaValidation {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    @Autowired
-    private SchemaResource schemaResource;
+    private final SchemaResource schemaResource;
 
-    @Autowired
-    private Schema patchSchema;
+    private final Schema patchSchema;
 
-    @Autowired
-    private ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
+
+    public SchemaValidationImpl(SchemaResource schemaResource, Schema patchSchema, ApplicationContext applicationContext) {
+
+        this.schemaResource = schemaResource;
+        this.patchSchema = patchSchema;
+        this.applicationContext = applicationContext;
+    }
 
     @Override
     public void validate(String app, String version, String resource, JsonNode form, JsonNode old) {

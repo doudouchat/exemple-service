@@ -19,7 +19,6 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.model.SchemaBeanParam;
@@ -48,8 +47,12 @@ public class SubscriptionApi {
 
     private static final String SUBSCRIPTION_SCHEMA = "Subscription";
 
-    @Autowired
-    private SubscriptionService service;
+    private final SubscriptionService service;
+
+    public SubscriptionApi(SubscriptionService service) {
+
+        this.service = service;
+    }
 
     @GET
     @Path("/{email}")

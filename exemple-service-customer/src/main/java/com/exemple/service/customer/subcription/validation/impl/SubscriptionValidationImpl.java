@@ -1,6 +1,5 @@
 package com.exemple.service.customer.subcription.validation.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
@@ -12,8 +11,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 @Validated
 class SubscriptionValidationImpl implements SubscriptionValidation {
 
-    @Autowired
-    private SchemaValidation schemaValidation;
+    private final SchemaValidation schemaValidation;
+
+    public SubscriptionValidationImpl(SchemaValidation schemaValidation) {
+
+        this.schemaValidation = schemaValidation;
+    }
 
     @Override
     public void validate(JsonNode form, JsonNode old, String app, String version) {

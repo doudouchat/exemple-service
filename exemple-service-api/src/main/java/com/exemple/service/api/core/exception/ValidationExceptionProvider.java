@@ -14,19 +14,24 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Iterables;
 
 @Provider
+@Component
 public class ValidationExceptionProvider implements ExceptionMapper<ConstraintViolationException> {
 
-    @Autowired
-    private MessageSource messageSource;
+    private final MessageSource messageSource;
 
     @Context
     private ContainerRequestContext requestContext;
+
+    public ValidationExceptionProvider(MessageSource messageSource) {
+
+        this.messageSource = messageSource;
+    }
 
     @Override
     public Response toResponse(ConstraintViolationException e) {

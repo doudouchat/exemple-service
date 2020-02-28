@@ -27,11 +27,15 @@ public class EventConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(EventConfiguration.class);
 
-    @Value("${event.kafka.bootstrap-servers}")
-    private String bootstrapServers;
+    private final String bootstrapServers;
 
-    @Value("${event.topic}")
-    private String defaultTopic;
+    private final String defaultTopic;
+
+    public EventConfiguration(@Value("${event.kafka.bootstrap-servers}") String bootstrapServers, @Value("${event.topic}") String defaultTopic) {
+
+        this.bootstrapServers = bootstrapServers;
+        this.defaultTopic = defaultTopic;
+    }
 
     @Bean(destroyMethod = "reset")
     public DefaultKafkaProducerFactory<String, JsonNode> producerFactory() {

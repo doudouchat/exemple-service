@@ -6,11 +6,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
@@ -33,10 +31,6 @@ import com.exemple.service.api.core.authorization.AuthorizationContextService;
 import com.exemple.service.api.core.authorization.AuthorizationException;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
-import com.exemple.service.resource.login.LoginField;
-import com.exemple.service.resource.login.LoginResource;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.hazelcast.core.HazelcastInstance;
 
 @Service
@@ -47,23 +41,19 @@ public class AuthorizationContextServiceImpl implements AuthorizationContextServ
 
     private final AuthorizationAlgorithmFactory authorizationAlgorithmFactory;
 
-    private final LoginResource loginResource;
-
     private final HazelcastInstance hazelcastInstance;
 
     private final ApplicationDetailService applicationDetailService;
 
-    @Value("${api.resourceId}")
-    private String resourceId;
+    private final String resourceId;
 
-    public AuthorizationContextServiceImpl(AuthorizationAlgorithmFactory authorizationAlgorithmFactory, LoginResource loginResource,
-            HazelcastInstance hazelcastInstance, ApplicationDetailService applicationDetailService) {
+    public AuthorizationContextServiceImpl(AuthorizationAlgorithmFactory authorizationAlgorithmFactory, HazelcastInstance hazelcastInstance,
+            ApplicationDetailService applicationDetailService, @Value("${api.resourceId}") String resourceId) {
 
         this.authorizationAlgorithmFactory = authorizationAlgorithmFactory;
-        this.loginResource = loginResource;
         this.hazelcastInstance = hazelcastInstance;
         this.applicationDetailService = applicationDetailService;
-
+        this.resourceId = resourceId;
     }
 
     static {
@@ -122,28 +112,6 @@ public class AuthorizationContextServiceImpl implements AuthorizationContextServ
                     securityContext.getPayload().getExpiresAt(), ChronoUnit.SECONDS.between(LocalDateTime.now(), Instant
                             .ofEpochSecond(securityContext.getPayload().getExpiresAt().getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime()),
                     TimeUnit.SECONDS);
-        }
-
-    }
-
-    @Override
-    public void verifyAccountId(UUID id, ApiSecurityContext securityContext) {
-
-        JsonNode login = loginResource.get(securityContext.getUserPrincipal().getName()).orElseGet(JsonNodeUtils::init).get(LoginField.ID.field);
-
-        if (!id.toString().equals(login.asText(null))) {
-
-            throw new ForbiddenException();
-        }
-
-    }
-
-    @Override
-    public void verifyLogin(String login, ApiSecurityContext securityContext) {
-
-        if (!login.equals(securityContext.getUserPrincipal().getName())) {
-
-            throw new ForbiddenException();
         }
 
     }

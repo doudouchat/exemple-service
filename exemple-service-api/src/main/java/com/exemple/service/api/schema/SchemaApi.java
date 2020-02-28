@@ -7,7 +7,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.application.common.model.ApplicationDetail;
@@ -22,11 +21,15 @@ import io.swagger.v3.oas.annotations.Operation;
 @Component
 public class SchemaApi {
 
-    @Autowired
-    private SchemaDescription service;
+    private final SchemaDescription service;
 
-    @Autowired
-    private ApplicationDetailService applicationDetailService;
+    private final ApplicationDetailService applicationDetailService;
+
+    public SchemaApi(SchemaDescription service, ApplicationDetailService applicationDetailService) {
+
+        this.service = service;
+        this.applicationDetailService = applicationDetailService;
+    }
 
     @GET
     @Path("/{resource}/{app}/{version}")

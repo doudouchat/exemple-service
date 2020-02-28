@@ -15,15 +15,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthorizationService {
 
-    @Value("${api.authorization.connectionTimeout:3000}")
-    private int connectionTimeout;
-
-    @Value("${api.authorization.socketTimeout:3000}")
-    private int socketTimeout;
-
     private final Client client;
 
-    public AuthorizationService() {
+    public AuthorizationService(@Value("${api.authorization.connectionTimeout:3000}") int connectionTimeout,
+            @Value("${api.authorization.socketTimeout:3000}") int socketTimeout) {
 
         client = ClientBuilder.newClient()
 
