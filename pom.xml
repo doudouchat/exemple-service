@@ -51,7 +51,7 @@
 		<org.springframework.boot-version>2.2.5.RELEASE</org.springframework.boot-version>
 		<org.slf4j-version>1.7.30</org.slf4j-version>
 		<datastax-version>4.5.0</datastax-version>
-		<com.fasterxml.jackson-version>2.10.2</com.fasterxml.jackson-version>
+		<com.fasterxml.jackson-version>2.10.3</com.fasterxml.jackson-version>
 		<groovy-version>3.0.1</groovy-version>
 		<cassandra-version>3.11.6</cassandra-version>
 		<zookeeper-version>3.5.7</zookeeper-version>
@@ -372,7 +372,7 @@
 			<dependency>
 				<groupId>com.fasterxml.jackson.jaxrs</groupId>
 				<artifactId>jackson-jaxrs-json-provider</artifactId>
-				<version>2.10.2.1</version>
+				<version>${com.fasterxml.jackson-version}</version>
 			</dependency>
 
 			<!-- ASPECTJ -->
