@@ -26,17 +26,18 @@ public class StockServiceImpl implements StockService {
 
     private static final Logger LOG = LoggerFactory.getLogger(StockServiceImpl.class);
 
-    @Value("${store.zookeeper.ttlMs.product:30000}")
-    private long productTtlMs;
+    private final long productTtlMs;
 
-    private CuratorFramework client;
+    private final CuratorFramework client;
 
-    private StockResource resource;
+    private final StockResource resource;
 
-    public StockServiceImpl(@Qualifier("stockCuratorFramework") CuratorFramework client, StockResource resource) {
-        super();
+    public StockServiceImpl(@Qualifier("stockCuratorFramework") CuratorFramework client, StockResource resource,
+            @Value("${store.zookeeper.ttlMs.product:30000}") long productTtlMs) {
+
         this.client = client;
         this.resource = resource;
+        this.productTtlMs = productTtlMs;
     }
 
     @Override

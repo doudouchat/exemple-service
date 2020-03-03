@@ -27,13 +27,12 @@ import javax.ws.rs.ext.Provider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.PatchUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.security.ApiSecurityContext;
-import com.exemple.service.api.core.authorization.AuthorizationContextService;
+import com.exemple.service.api.core.authorization.AuthorizationCheckService;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.account.context.AccountContext;
@@ -65,17 +64,21 @@ public class AccountApi {
 
     private static final String ACCOUNT_SCHEMA = "Account";
 
-    @Autowired
-    private AccountService service;
+    private final AccountService service;
 
-    @Autowired
-    private SchemaValidation schemaValidation;
+    private final SchemaValidation schemaValidation;
 
-    @Autowired
-    private AuthorizationContextService authorizationContextService;
+    private final AuthorizationCheckService authorizationCheckService;
 
     @Context
     private ContainerRequestContext servletContext;
+
+    public AccountApi(AccountService service, SchemaValidation schemaValidation, AuthorizationCheckService authorizationCheckService) {
+
+        this.service = service;
+        this.schemaValidation = schemaValidation;
+        this.authorizationCheckService = authorizationCheckService;
+    }
 
     @GET
     @Path("/{id}")
@@ -93,7 +96,7 @@ public class AccountApi {
     public JsonNode get(@NotNull @PathParam("id") UUID id, @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam)
             throws AccountServiceException {
 
-        authorizationContextService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
+        authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
 
         return service.get(id, schemaBeanParam.getApp(), schemaBeanParam.getVersion());
 
@@ -138,7 +141,7 @@ public class AccountApi {
     public Response update(@NotNull @PathParam("id") UUID id, @NotNull @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws AccountServiceException {
 
-        authorizationContextService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
+        authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
 
         schemaValidation.validatePatch(patch);
 

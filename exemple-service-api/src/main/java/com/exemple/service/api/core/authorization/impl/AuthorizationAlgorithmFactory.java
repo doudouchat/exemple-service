@@ -40,26 +40,27 @@ public class AuthorizationAlgorithmFactory {
 
     private final ConcurrentMap<String, Algorithm> algorithms;
 
-    @Value("${api.authorization.path}")
-    private String defaultPath;
+    private final String defaultPath;
 
-    @Value("${api.authorization.client.clientId}")
-    private String clientId;
+    private final String clientId;
 
-    @Value("${api.authorization.client.clientSecret}")
-    private String clientSecret;
+    private final String clientSecret;
 
     static {
 
         RSA_PUBLIC_KEY = Pattern.compile("-----BEGIN PUBLIC KEY-----(.*)-----END PUBLIC KEY-----", Pattern.DOTALL);
     }
 
-    public AuthorizationAlgorithmFactory(AuthorizationService authorizationService) throws NoSuchAlgorithmException {
+    public AuthorizationAlgorithmFactory(AuthorizationService authorizationService, @Value("${api.authorization.path}") String defaultPath,
+            @Value("${api.authorization.client.clientId}") String clientId, @Value("${api.authorization.client.clientSecret}") String clientSecret)
+            throws NoSuchAlgorithmException {
 
         this.authorizationService = authorizationService;
         this.keyFactory = KeyFactory.getInstance("RSA");
         this.algorithms = new ConcurrentHashMap<>();
-
+        this.defaultPath = defaultPath;
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
     }
 
     private Algorithm buildAlgorithm(String path) throws AuthorizationException {

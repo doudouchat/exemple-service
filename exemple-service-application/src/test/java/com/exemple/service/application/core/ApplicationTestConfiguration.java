@@ -5,11 +5,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 
 @Configuration
-public class ApplicationTestConfiguration extends ApplicationConfiguration {
+@Import(ApplicationConfiguration.class)
+public class ApplicationTestConfiguration {
 
     @Value("${application.zookeeper.port}")
     private int port;

@@ -88,13 +88,19 @@ public class DocumentApiCustom extends AbstractSpecFilter {
         if (version != null) {
 
             StringBuilder ref = new StringBuilder();
-            ref.append(host);
-            ref.append("ws/v1/schemas/");
-            ref.append(schema.getName().toLowerCase(Locale.getDefault()));
-            ref.append('/');
-            ref.append(app);
-            ref.append('/');
-            ref.append(version);
+            ref.append(host)
+
+                    .append("ws/v1/schemas/")
+
+                    .append(schema.getName().toLowerCase(Locale.getDefault()))
+
+                    .append('/')
+
+                    .append(app)
+
+                    .append('/')
+
+                    .append(version);
             schema.setName(WordUtils.capitalize(schema.getName()) + '.' + version);
             schema.$ref(ref.toString());
 

@@ -20,7 +20,7 @@ public class SchemaDescriptionImpl implements SchemaDescription {
 
     private final JsonNode patchSchema;
 
-    private SchemaResource schemaResource;
+    private final SchemaResource schemaResource;
 
     public SchemaDescriptionImpl(SchemaResource schemaResource) throws IOException {
 

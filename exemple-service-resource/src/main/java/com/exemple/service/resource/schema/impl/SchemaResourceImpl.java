@@ -31,6 +31,7 @@ public class SchemaResourceImpl implements SchemaResource {
     private final ConcurrentMap<String, ResourceSchemaMapper> mappers;
 
     public SchemaResourceImpl(CqlSession session) {
+
         this.session = session;
         this.mappers = new ConcurrentHashMap<>();
     }

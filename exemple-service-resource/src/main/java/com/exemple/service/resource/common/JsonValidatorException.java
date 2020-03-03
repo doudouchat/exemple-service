@@ -28,9 +28,7 @@ public class JsonValidatorException extends Exception {
     public String getMessage(String messageTemplate) {
 
         StringBuilder message = new StringBuilder();
-        message.append(messageTemplate.replace("{", "").replace("}", ""));
-        message.append('.');
-        message.append(getKey());
+        message.append(messageTemplate.replace("{", "").replace("}", "")).append('.').append(getKey());
 
         return message.toString();
     }

@@ -16,20 +16,27 @@ public class ApplicationConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationConfiguration.class);
 
-    @Value("${application.zookeeper.host}")
-    private String address;
+    private final String address;
 
-    @Value("${application.zookeeper.sessionTimeout:30000}")
-    private int sessionTimeout;
+    private final int sessionTimeout;
 
-    @Value("${application.zookeeper.connectionTimeout:10000}")
-    private int connectionTimeout;
+    private final int connectionTimeout;
 
-    @Value("${application.zookeeper.retry:3}")
-    private int retry;
+    private final int retry;
 
-    @Value("${application.zookeeper.sleepMsBetweenRetries:1000}")
-    private int sleepMsBetweenRetries;
+    private final int sleepMsBetweenRetries;
+
+    public ApplicationConfiguration(@Value("${application.zookeeper.host}") String address,
+            @Value("${application.zookeeper.sessionTimeout:30000}") int sessionTimeout,
+            @Value("${application.zookeeper.connectionTimeout:10000}") int connectionTimeout, @Value("${application.zookeeper.retry:3}") int retry,
+            @Value("${application.zookeeper.sleepMsBetweenRetries:1000}") int sleepMsBetweenRetries) {
+
+        this.address = address;
+        this.sessionTimeout = sessionTimeout;
+        this.connectionTimeout = connectionTimeout;
+        this.retry = retry;
+        this.sleepMsBetweenRetries = sleepMsBetweenRetries;
+    }
 
     @Bean(initMethod = "start", destroyMethod = "close")
     public CuratorFramework applicationCuratorFramework() {

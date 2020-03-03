@@ -16,20 +16,26 @@ public class StoreConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(StoreConfiguration.class);
 
-    @Value("${store.zookeeper.host}")
-    private String address;
+    private final String address;
 
-    @Value("${store.zookeeper.sessionTimeout:30000}")
-    private int sessionTimeout;
+    private final int sessionTimeout;
 
-    @Value("${store.zookeeper.connectionTimeout:10000}")
-    private int connectionTimeout;
+    private final int connectionTimeout;
 
-    @Value("${store.zookeeper.retry:3}")
-    private int retry;
+    private final int retry;
 
-    @Value("${store.zookeeper.sleepMsBetweenRetries:1000}")
-    private int sleepMsBetweenRetries;
+    private final int sleepMsBetweenRetries;
+
+    public StoreConfiguration(@Value("${store.zookeeper.host}") String address, @Value("${store.zookeeper.sessionTimeout:30000}") int sessionTimeout,
+            @Value("${store.zookeeper.connectionTimeout:10000}") int connectionTimeout, @Value("${store.zookeeper.retry:3}") int retry,
+            @Value("${store.zookeeper.sleepMsBetweenRetries:1000}") int sleepMsBetweenRetries) {
+
+        this.address = address;
+        this.sessionTimeout = sessionTimeout;
+        this.connectionTimeout = connectionTimeout;
+        this.retry = retry;
+        this.sleepMsBetweenRetries = sleepMsBetweenRetries;
+    }
 
     @Bean(initMethod = "start", destroyMethod = "close")
     public CuratorFramework storeCuratorFramework() {

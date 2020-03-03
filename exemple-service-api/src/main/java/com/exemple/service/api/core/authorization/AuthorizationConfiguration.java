@@ -15,17 +15,24 @@ public class AuthorizationConfiguration {
 
     public static final String TOKEN_BLACK_LIST = "token.black_list";
 
-    @Value("${api.authorization.hazelcast.addresses}")
-    private String[] addresses;
+    private final String[] addresses;
 
-    @Value("${api.authorization.hazelcast.connectionTimeout:10000}")
-    private int connectionTimeout;
+    private final int connectionTimeout;
 
-    @Value("${api.authorization.hazelcast.initialBackoffMillis:2000}")
-    private int initialBackoffMillis;
+    private final int initialBackoffMillis;
 
-    @Value("${api.authorization.hazelcast.maxBackoffMillis:6000}")
-    private int maxBackoffMillis;
+    private final int maxBackoffMillis;
+
+    public AuthorizationConfiguration(@Value("${api.authorization.hazelcast.addresses}") String[] addresses,
+            @Value("${api.authorization.hazelcast.connectionTimeout:10000}") int connectionTimeout,
+            @Value("${api.authorization.hazelcast.initialBackoffMillis:2000}") int initialBackoffMillis,
+            @Value("${api.authorization.hazelcast.maxBackoffMillis:6000}") int maxBackoffMillis) {
+
+        this.addresses = addresses.clone();
+        this.connectionTimeout = connectionTimeout;
+        this.initialBackoffMillis = initialBackoffMillis;
+        this.maxBackoffMillis = maxBackoffMillis;
+    }
 
     @Bean
     public HazelcastInstance hazelcastInstance() {

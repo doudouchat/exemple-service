@@ -18,9 +18,10 @@ public class StockResourceImpl implements StockResource {
 
     private static final String STOCK_TABLE = "stock";
 
-    private CqlSession session;
+    private final CqlSession session;
 
     public StockResourceImpl(CqlSession session) {
+
         this.session = session;
     }
 

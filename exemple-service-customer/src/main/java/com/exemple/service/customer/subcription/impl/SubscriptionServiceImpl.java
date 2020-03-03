@@ -18,16 +18,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 @Service
 public class SubscriptionServiceImpl implements SubscriptionService {
 
-    private SubscriptionResource subscriptionResource;
+    private final SubscriptionResource subscriptionResource;
 
-    private SubscriptionValidation subscriptionValidation;
+    private final SubscriptionValidation subscriptionValidation;
 
-    private SchemaFilter schemaFilter;
+    private final SchemaFilter schemaFilter;
 
-    private ApplicationEventPublisher applicationEventPublisher;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public SubscriptionServiceImpl(SubscriptionResource subscriptionResource, SubscriptionValidation subscriptionValidation,
             SchemaFilter schemaFilter, ApplicationEventPublisher applicationEventPublisher) {
+
         this.subscriptionResource = subscriptionResource;
         this.subscriptionValidation = subscriptionValidation;
         this.schemaFilter = schemaFilter;

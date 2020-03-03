@@ -6,11 +6,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApiContext {
 
-    @Value("${info.version:nc}")
-    private String version;
+    private final String version;
 
-    @Value("${info.buildTime:nc}")
-    private String buildTime;
+    private final String buildTime;
+
+    public ApiContext(@Value("${info.version:nc}") String version, @Value("${info.buildTime:nc}") String buildTime) {
+
+        this.version = version;
+        this.buildTime = buildTime;
+    }
 
     public String getVersion() {
         return version;

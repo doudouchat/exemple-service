@@ -11,7 +11,6 @@ import org.everit.json.schema.Validator;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -32,8 +31,12 @@ public class DependenciesValidator implements ValidatorService {
 
     private static final String CONTEXT_NOT_IMPLEMENTATION_MESSAGE = "SchemaValidationContext is not implemented";
 
-    @Autowired
-    private SchemaResource schemaResource;
+    private final SchemaResource schemaResource;
+
+    public DependenciesValidator(SchemaResource schemaResource) {
+
+        this.schemaResource = schemaResource;
+    }
 
     @Override
     public void validate(String value, JsonNode form, JsonNode old, ValidationException validationException) {
@@ -79,7 +82,7 @@ public class DependenciesValidator implements ValidatorService {
         }
     }
 
-    private static boolean isPresent(JsonNode form, String[] values) {
+    private static boolean isPresent(JsonNode form, String... values) {
 
         return Arrays.stream(values).map(value -> form.at("/" + value)).anyMatch(node -> JsonNodeType.MISSING != node.getNodeType());
     }

@@ -6,7 +6,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.glassfish.jersey.server.mvc.Template;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.core.ApiContext;
@@ -16,8 +15,12 @@ import com.exemple.service.api.core.info.model.Info;
 @Component
 public class InfoApi {
 
-    @Autowired
-    private ApiContext apiContext;
+    private final ApiContext apiContext;
+
+    public InfoApi(ApiContext apiContext) {
+
+        this.apiContext = apiContext;
+    }
 
     @GET
     @Template(name = "/info")
