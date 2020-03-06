@@ -11,13 +11,6 @@
 
 	<dependencies>
 
-		<!-- ZOOKEEPER -->
-
-		<dependency>
-			<groupId>org.apache.zookeeper</groupId>
-			<artifactId>zookeeper</artifactId>
-		</dependency>
-
 		<!-- SPRING FRAMEWORK -->
 
 		<dependency>
