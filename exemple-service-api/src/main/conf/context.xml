@@ -5,5 +5,10 @@
     	name="exemple-service-configuration" 
     	type="java.lang.String"
 		value="file:/usr/local/tomcat/etc/exemple-service.yml" />
+		
+    <Environment 
+    	name="spring.config.location" 
+    	type="java.lang.String"
+		value="classpath:default.yml" />
     
 </Context>
