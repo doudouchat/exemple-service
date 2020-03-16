@@ -60,9 +60,7 @@
 		<!-- force sonar to use jacoco -->
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<!-- property checked by sonar to locate jacoco UT/IT reports -->
-		<sonar.jacoco.reportPaths>${project.build.directory}/reports/jacoco-ut.exec</sonar.jacoco.reportPaths>
 		<sonar.jacoco.itReportPath>${project.build.directory}/../../target/reports/exemple-service.exec</sonar.jacoco.itReportPath>
-		<sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/../../target/reports/exemple-service.xml</sonar.coverage.jacoco.xmlReportPaths>
 		
 	</properties>
 
@@ -681,7 +679,6 @@
 							<phase>process-test-classes</phase>
 							<configuration>
 								<propertyName>jacoco.test.agent.argLine</propertyName>
-								<destFile>${sonar.jacoco.reportPaths}</destFile>
 							</configuration>
 						</execution>
 						<execution>
@@ -698,7 +695,7 @@
 						<execution>
 							<id>report</id>
 							<goals>
-								<goal>report-aggregate</goal>
+								<goal>report</goal>
 							</goals>
 							<phase>verify</phase>
 						</execution>
