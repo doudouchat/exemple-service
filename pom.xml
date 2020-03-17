@@ -706,7 +706,7 @@
 							</goals>
 							<phase>verify</phase>
 							<configuration>
-								<outputDirectory>${project.build.directory}/../../target/site/jacoco-aggregate</outputDirectory>
+								<outputDirectory>${project.build.directory}/../target/site/jacoco-aggregate</outputDirectory>
 							</configuration>
 						</execution>
 					</executions>
