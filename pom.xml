@@ -61,7 +61,7 @@
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<!-- property checked by sonar to locate jacoco UT/IT reports -->
 		<sonar.jacoco.itReportPath>${project.build.directory}/../../target/reports/exemple-service.exec</sonar.jacoco.itReportPath>
-		
+
 	</properties>
 
 	<dependencyManagement>
@@ -679,6 +679,9 @@
 							<phase>process-test-classes</phase>
 							<configuration>
 								<propertyName>jacoco.test.agent.argLine</propertyName>
+								<includes>
+									<include>com.exemple.service.*</include>
+								</includes>
 							</configuration>
 						</execution>
 						<execution>
@@ -697,17 +700,6 @@
 							<goals>
 								<goal>report</goal>
 							</goals>
-							<phase>verify</phase>
-						</execution>
-						<execution>
-							<id>report-aggregate</id>
-							<goals>
-								<goal>report-aggregate</goal>
-							</goals>
-							<phase>verify</phase>
-							<configuration>
-								<outputDirectory>${project.build.directory}/../target/site/jacoco-aggregate</outputDirectory>
-							</configuration>
 						</execution>
 					</executions>
 				</plugin>
@@ -835,11 +827,6 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<configuration>
-					<includes>
-						<include>com.exemple.service.*</include>
-					</includes>
-				</configuration>
 			</plugin>
 
 			<!-- HELPER -->
