@@ -54,7 +54,7 @@
 		<com.fasterxml.jackson-version>2.10.3</com.fasterxml.jackson-version>
 		<groovy-version>3.0.2</groovy-version>
 		<cassandra-version>3.11.6</cassandra-version>
-		<mock.server-version>5.9.0</mock.server-version>
+		<mock.server-version>5.10.0</mock.server-version>
 		<!-- SONAR -->
 
 		<!-- force sonar to use jacoco -->
