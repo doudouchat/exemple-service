@@ -45,6 +45,12 @@
 			<artifactId>exemple-service-resource</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.codehaus.groovy</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- APPLICATION -->
