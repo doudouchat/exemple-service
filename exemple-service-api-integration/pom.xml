@@ -227,9 +227,6 @@
 								<goal>integration-test</goal>
 								<goal>verify</goal>
 							</goals>
-							<configuration>
-								<encoding>${project.build.sourceEncoding}</encoding>
-							</configuration>
 						</execution>
 					</executions>
 				</plugin>
