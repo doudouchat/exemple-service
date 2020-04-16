@@ -15,9 +15,9 @@ import com.datastax.oss.driver.api.core.metadata.schema.TableMetadata;
 import com.datastax.oss.driver.api.core.type.DataType;
 import com.exemple.service.resource.common.JsonValidator;
 import com.exemple.service.resource.common.JsonValidatorException;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.common.util.MetadataSchemaUtils;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Streams;
 import com.pivovarit.function.ThrowingConsumer;
 
 public class JsonConstraintValidator implements ConstraintValidator<Json, JsonNode> {
@@ -68,7 +68,7 @@ public class JsonConstraintValidator implements ConstraintValidator<Json, JsonNo
 
     private void valid(JsonNode source) throws JsonValidatorException {
 
-        JsonNodeUtils.stream(source.fields()).forEach(ThrowingConsumer.sneaky(this::valid));
+        Streams.stream(source.fields()).forEach(ThrowingConsumer.sneaky(this::valid));
 
     }
 

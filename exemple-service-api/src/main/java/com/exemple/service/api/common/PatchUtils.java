@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.flipkart.zjsonpatch.JsonPatch;
+import com.google.common.collect.Streams;
 
 public final class PatchUtils {
 
@@ -20,7 +21,7 @@ public final class PatchUtils {
 
         BinaryOperator<JsonNode> function = (n1, n2) -> n2;
 
-        return JsonNodeUtils.stream(patch.elements()).reduce(JsonNodeUtils.init(), (JsonNode root, JsonNode p) -> {
+        return Streams.stream(patch.elements()).reduce(JsonNodeUtils.init(), (JsonNode root, JsonNode p) -> {
 
             diff(root, target, JsonPointer.compile(p.get("path").textValue()));
 

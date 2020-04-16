@@ -45,6 +45,13 @@
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 
+		<!-- GOOGLE GUAVA -->
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+
 		<!-- JSR303 -->
 
 		<dependency>

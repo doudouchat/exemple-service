@@ -47,6 +47,7 @@ import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.google.common.collect.Streams;
 
 @ContextConfiguration(classes = { ResourceTestConfiguration.class })
 public class AccountResourceTest extends AbstractTestNGSpringContextTests {
@@ -258,12 +259,12 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         assertThat(account.get("children").get("1"), is(model.get("children").get("1")));
         assertThat(account.get("children").get("2"), is(nullValue()));
 
-        Set<JsonNode> cgus = JsonNodeUtils.stream(account.get("cgus").elements()).collect(Collectors.toSet());
+        Set<JsonNode> cgus = Streams.stream(account.get("cgus").elements()).collect(Collectors.toSet());
 
         assertThat(cgus, hasSize(2));
-        assertThat(cgus, Matchers.hasItems(JsonNodeUtils.stream(model.get("cgus").elements()).collect(Collectors.toList()).toArray(new JsonNode[0])));
+        assertThat(cgus, Matchers.hasItems(Streams.stream(model.get("cgus").elements()).collect(Collectors.toList()).toArray(new JsonNode[0])));
         assertThat(cgus,
-                Matchers.hasItems(JsonNodeUtils.stream(this.account.get("cgus").elements()).collect(Collectors.toList()).toArray(new JsonNode[0])));
+                Matchers.hasItems(Streams.stream(this.account.get("cgus").elements()).collect(Collectors.toList()).toArray(new JsonNode[0])));
         assertThat(account.get("profiles"), is(model.get("profiles")));
         assertThat(account.get("phones").get("mobile"), is(model.get("phones").get("mobile")));
         assertThat(account.get("phones").get("job"), is(nullValue()));

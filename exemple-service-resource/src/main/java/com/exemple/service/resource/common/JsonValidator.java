@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Component;
 
@@ -17,9 +16,9 @@ import com.datastax.oss.driver.api.core.type.SetType;
 import com.datastax.oss.driver.api.core.type.TupleType;
 import com.datastax.oss.driver.api.core.type.UserDefinedType;
 import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.google.common.collect.Streams;
 import com.pivovarit.function.ThrowingConsumer;
 
 @Component
@@ -72,7 +71,7 @@ public class JsonValidator {
 
         validNodeType(value, JsonNodeType.OBJECT, key);
 
-        JsonNodeUtils.stream(value.fields()).forEach(ThrowingConsumer.sneaky((Entry<String, JsonNode> node) -> {
+        Streams.stream(value.fields()).forEach(ThrowingConsumer.sneaky((Entry<String, JsonNode> node) -> {
             DataType keyType = dataType.getKeyType();
             DataType valueType = dataType.getValueType();
 
@@ -122,7 +121,7 @@ public class JsonValidator {
 
     private void valid(UserDefinedType dataType, JsonNode value) {
 
-        JsonNodeUtils.stream(value.fields()).forEach(ThrowingConsumer.sneaky((Entry<String, JsonNode> node) -> valid(dataType, node)));
+        Streams.stream(value.fields()).forEach(ThrowingConsumer.sneaky((Entry<String, JsonNode> node) -> valid(dataType, node)));
 
     }
 
@@ -163,7 +162,7 @@ public class JsonValidator {
 
         validNodeType(value, JsonNodeType.ARRAY, key);
 
-        StreamSupport.stream(value.spliterator(), false).forEach(ThrowingConsumer.sneaky((JsonNode node) -> valid(type, key, node)));
+        Streams.stream(value).forEach(ThrowingConsumer.sneaky((JsonNode node) -> valid(type, key, node)));
     }
 
     private static void validNodeType(JsonNode value, JsonNodeType nodeType, String node) throws JsonValidatorException {

@@ -1,11 +1,6 @@
 package com.exemple.service.resource.common.util;
 
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,11 +44,6 @@ public final class JsonNodeUtils {
 
         return MAPPER.convertValue(data, JsonNode.class);
 
-    }
-
-    public static <T> Stream<T> stream(Iterator<T> source) {
-
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(source, Spliterator.ORDERED), false);
     }
 
 }

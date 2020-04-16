@@ -21,11 +21,11 @@ import com.datastax.oss.driver.api.querybuilder.update.Assignment;
 import com.datastax.oss.driver.api.querybuilder.update.UpdateStart;
 import com.datastax.oss.driver.api.querybuilder.update.UpdateWithAssignments;
 import com.datastax.oss.protocol.internal.ProtocolConstants;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.common.util.MetadataSchemaUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.google.common.collect.Streams;
 
 public class JsonQueryBuilder {
 
@@ -109,8 +109,7 @@ public class JsonQueryBuilder {
 
     private List<Assignment> updateSet(Map.Entry<String, JsonNode> node) {
 
-        return JsonNodeUtils.stream(node.getValue().elements()).map(v -> Assignment.appendSetElement(node.getKey(), json(v)))
-                .collect(Collectors.toList());
+        return Streams.stream(node.getValue().elements()).map(v -> Assignment.appendSetElement(node.getKey(), json(v))).collect(Collectors.toList());
 
     }
 

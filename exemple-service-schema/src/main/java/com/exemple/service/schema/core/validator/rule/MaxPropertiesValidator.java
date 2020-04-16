@@ -10,12 +10,12 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationException.ValidationExceptionModel;
 import com.exemple.service.schema.core.validator.ValidatorService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.google.common.collect.Streams;
 
 @Component
 public class MaxPropertiesValidator implements ValidatorService {
@@ -35,9 +35,9 @@ public class MaxPropertiesValidator implements ValidatorService {
 
             if (old != null) {
 
-                Map<String, JsonNode> mergeNode = JsonNodeUtils.stream(old.at(path).fields())
+                Map<String, JsonNode> mergeNode = Streams.stream(old.at(path).fields())
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-                JsonNodeUtils.stream(pathNode.fields()).forEach(n -> mergeNode.put(n.getKey(), n.getValue()));
+                Streams.stream(pathNode.fields()).forEach(n -> mergeNode.put(n.getKey(), n.getValue()));
 
                 filter(mergeNode.entrySet().iterator()).forEach(fields::add);
             }
@@ -55,7 +55,7 @@ public class MaxPropertiesValidator implements ValidatorService {
     }
 
     private static Stream<String> filter(Iterator<Entry<String, JsonNode>> fields) {
-        return JsonNodeUtils.stream(fields).filter(e -> JsonNodeType.NULL != e.getValue().getNodeType()).map(Map.Entry::getKey);
+        return Streams.stream(fields).filter(e -> JsonNodeType.NULL != e.getValue().getNodeType()).map(Map.Entry::getKey);
     }
 
 }

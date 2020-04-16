@@ -15,6 +15,7 @@ import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Streams;
 
 @Aspect
 @Component
@@ -40,7 +41,7 @@ public class AccountResourceAspect {
 
             if (JsonNodeType.ARRAY == e.getValue().getNodeType()) {
 
-                ((ObjectNode) source).replace(e.getKey(), JsonNodeUtils.create(JsonNodeUtils.stream(e.getValue().elements())
+                ((ObjectNode) source).replace(e.getKey(), JsonNodeUtils.create(Streams.stream(e.getValue().elements())
                         .filter(node -> JsonNodeType.NULL != node.getNodeType()).collect(Collectors.toList())));
 
                 filter(source.get(e.getKey()));

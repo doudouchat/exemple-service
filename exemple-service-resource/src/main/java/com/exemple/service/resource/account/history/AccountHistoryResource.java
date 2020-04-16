@@ -24,13 +24,13 @@ import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.exemple.service.resource.account.history.dao.AccountHistoryDao;
 import com.exemple.service.resource.account.history.mapper.AccountHistoryMapper;
 import com.exemple.service.resource.account.model.AccountHistory;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.common.util.StringHelper;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.parameter.ParameterResource;
 import com.exemple.service.resource.parameter.model.ParameterEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.google.common.collect.Streams;
 
 @Component
 public class AccountHistoryResource {
@@ -70,7 +70,7 @@ public class AccountHistoryResource {
         AccountHistory defaultHistory = new AccountHistory();
         defaultHistory.setDate(now.toInstant().minusNanos(1));
 
-        List<AccountHistory> accountHistories = JsonNodeUtils.stream(source.fields())
+        List<AccountHistory> accountHistories = Streams.stream(source.fields())
 
                 .filter(e -> historyFields.containsKey(e.getKey()))
 
@@ -82,15 +82,15 @@ public class AccountHistoryResource {
 
                         if (JsonNodeType.OBJECT == e.getValue().getNodeType()) {
 
-                            return JsonNodeUtils.stream(e.getValue().fields()).map(node -> Collections
+                            return Streams.stream(e.getValue().fields()).map(node -> Collections
                                     .singletonMap(e.getKey().concat("/").concat(node.getKey()), node.getValue()).entrySet().iterator().next());
                         }
 
                         if (JsonNodeType.ARRAY == e.getValue().getNodeType()) {
 
-                            return JsonNodeUtils.stream(e.getValue().elements()).map((JsonNode node) -> {
+                            return Streams.stream(e.getValue().elements()).map((JsonNode node) -> {
 
-                                String key = JsonNodeType.OBJECT == node.getNodeType() ? JsonNodeUtils.stream(node.elements())
+                                String key = JsonNodeType.OBJECT == node.getNodeType() ? Streams.stream(node.elements())
 
                                         .reduce("", (root, n) -> StringHelper.join(root, n.asText(), '.'), function) : node.asText();
 

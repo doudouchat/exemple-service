@@ -60,6 +60,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- GOOGLE GUAVA -->
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+
 		<!-- TEST -->
 
 		<dependency>

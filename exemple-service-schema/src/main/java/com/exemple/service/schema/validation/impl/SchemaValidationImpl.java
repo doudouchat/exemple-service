@@ -15,7 +15,6 @@ import org.json.JSONTokener;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionBuilder;
@@ -24,6 +23,7 @@ import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.google.common.collect.Streams;
 
 @Component
 public class SchemaValidationImpl implements SchemaValidation {
@@ -109,7 +109,7 @@ public class SchemaValidationImpl implements SchemaValidation {
     public void validatePatch(ArrayNode patch) {
 
         JSONArray jsonArray = new JSONArray();
-        JsonNodeUtils.stream(patch.elements()).forEach(n -> jsonArray.put(MAPPER.convertValue(n, Map.class)));
+        Streams.stream(patch.elements()).forEach(n -> jsonArray.put(MAPPER.convertValue(n, Map.class)));
 
         try {
             patchSchema.validate(jsonArray);
