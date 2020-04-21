@@ -297,6 +297,45 @@
 									</portNames>
 								</configuration>
 							</execution>
+							<execution>
+								<id>add-source</id>
+								<goals>
+									<goal>add-source</goal>
+								</goals>
+								<phase>pre-integration-test</phase>
+								<configuration>
+									<sources>
+										<source>${project.parent.basedir}/exemple-service-api/src/main/java</source>
+										<source>${project.parent.basedir}/exemple-service-resource/src/main/java</source>
+										<source>${project.parent.basedir}/exemple-service-customer/src/main/java</source>
+										<source>${project.parent.basedir}/exemple-service-schema/src/main/java</source>
+										<source>${project.parent.basedir}/exemple-service-application/src/main/java</source>
+										<source>${project.parent.basedir}/exemple-service-event/src/main/java</source>
+										<source>${project.parent.basedir}/exemple-service-store/src/main/java</source>
+									</sources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- JACOCO -->
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>report-integration</id>
+								<goals>
+									<goal>report-integration</goal>
+								</goals>
+								<configuration>
+									<dataFile>${sonar.jacoco.itReportPath}</dataFile>
+									<outputDirectory>${project.parent.reporting.outputDirectory}/jacoco-it</outputDirectory>
+									<excludes>
+										<exclude>com/exemple/service/api/integration/**</exclude>
+									</excludes>
+								</configuration>
+							</execution>
 						</executions>
 					</plugin>
 
@@ -417,6 +456,7 @@
 								<application.port>${application.port}</application.port>
 								<application.contextpath>${application.contextpath}</application.contextpath>
 							</systemPropertyVariables>
+							<argLine>${jacoco.it.agent.argLine}</argLine>
 						</configuration>
 					</plugin>
 
