@@ -2,44 +2,26 @@ package com.exemple.service.resource.core.cassandra.codec;
 
 import java.nio.ByteBuffer;
 
-import com.datastax.oss.driver.api.core.ProtocolVersion;
-import com.datastax.oss.driver.api.core.data.ByteUtils;
-import com.datastax.oss.driver.api.core.type.DataType;
-import com.datastax.oss.driver.api.core.type.DataTypes;
+import com.datastax.oss.driver.api.core.type.codec.MappingCodec;
 import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
+import com.datastax.oss.driver.api.core.type.codec.TypeCodecs;
 import com.datastax.oss.driver.api.core.type.reflect.GenericType;
 import com.datastax.oss.protocol.internal.util.Bytes;
 
-public class ByteCodec implements TypeCodec<byte[]> {
+public class ByteCodec extends MappingCodec<ByteBuffer, byte[]> implements TypeCodec<byte[]> {
 
-    @Override
-    public GenericType<byte[]> getJavaType() {
-        return GenericType.of(byte[].class);
+    public ByteCodec() {
+        super(TypeCodecs.BLOB, GenericType.of(byte[].class));
     }
 
     @Override
-    public DataType getCqlType() {
-        return DataTypes.BLOB;
-    }
-
-    @Override
-    public ByteBuffer encode(byte[] value, ProtocolVersion protocolVersion) {
-        return value != null ? ByteBuffer.wrap(value) : null;
-    }
-
-    @Override
-    public byte[] decode(ByteBuffer value, ProtocolVersion protocolVersion) {
+    protected byte[] innerToOuter(ByteBuffer value) {
         return value != null ? Bytes.getArray(value) : null;
     }
 
     @Override
-    public String format(byte[] value) {
-        return ByteUtils.toHexString(value);
-    }
-
-    @Override
-    public byte[] parse(String value) {
-        return ByteUtils.fromHexString(value).array();
+    protected ByteBuffer outerToInner(byte[] value) {
+        return value != null ? ByteBuffer.wrap(value) : null;
     }
 
 }
