@@ -9,13 +9,6 @@
 	</parent>
 	<artifactId>exemple-service-resource</artifactId>
 
-	<properties>
-
-		<!-- SONAR -->
-		<sonar.exclusions>**/core/cassandra/codec/JacksonJsonCodec.java</sonar.exclusions>
-
-	</properties>
-
 	<dependencies>
 
 		<!-- SPRING FRAMEWORK -->
