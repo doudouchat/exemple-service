@@ -708,14 +708,6 @@
 					</executions>
 				</plugin>
 
-				<!-- MAVEN ASSEMBLY -->
-				<!-- http://maven.apache.org/plugins/maven-assembly-plugin/ -->
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-assembly-plugin</artifactId>
-					<version>3.2.0</version>
-				</plugin>
-
 				<!-- RELEASE -->
 				<!-- http://maven.apache.org/maven-release/maven-release-plugin/ -->
 				<plugin>
