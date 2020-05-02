@@ -13,6 +13,7 @@ import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.login.LoginField;
 import com.exemple.service.resource.login.LoginResource;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 @Service
 @Profile("!noSecurity")
@@ -28,9 +29,9 @@ public class AuthorizationCheckServiceImpl implements AuthorizationCheckService 
     @Override
     public void verifyAccountId(UUID id, ApiSecurityContext securityContext) {
 
-        JsonNode login = loginResource.get(securityContext.getUserPrincipal().getName()).orElseGet(JsonNodeUtils::init).get(LoginField.ID.field);
+        JsonNode login = loginResource.get(securityContext.getUserPrincipal().getName()).orElseGet(JsonNodeUtils::init);
 
-        if (!id.toString().equals(login.asText(null))) {
+        if (!id.toString().equals(login.get(LoginField.ID.field).asText(null))) {
 
             throw new ForbiddenException();
         }
@@ -38,13 +39,26 @@ public class AuthorizationCheckServiceImpl implements AuthorizationCheckService 
     }
 
     @Override
-    public void verifyLogin(String login, ApiSecurityContext securityContext) {
+    public void verifyLogin(String username, ApiSecurityContext securityContext) {
 
-        if (!login.equals(securityContext.getUserPrincipal().getName())) {
+        if (!username.equals(securityContext.getUserPrincipal().getName())) {
 
-            throw new ForbiddenException();
+            JsonNode login = loginResource.get(username).orElseGet(JsonNodeUtils::init);
+
+            if (JsonNodeType.MISSING == login.path(LoginField.ID.field).getNodeType()) {
+
+                throw new ForbiddenException();
+
+            }
+
+            UUID id = UUID.fromString(login.get(LoginField.ID.field).textValue());
+            if (loginResource.get(id).stream().map(l -> l.get(LoginField.USERNAME.field).textValue())
+                    .noneMatch(securityContext.getUserPrincipal().getName()::equals)) {
+
+                throw new ForbiddenException();
+
+            }
         }
-
     }
 
 }

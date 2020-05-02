@@ -6,6 +6,7 @@ import static com.exemple.service.api.integration.account.v1.AccountNominalIT.VE
 import static com.exemple.service.api.integration.account.v1.AccountNominalIT.VERSION_HEADER_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,13 +27,15 @@ public class LoginIT {
 
     private static final String LOGIN = UUID.randomUUID() + "@gmail.com";
 
+    private static final UUID ID = UUID.randomUUID();
+
     @Test
     public void create() {
 
         Map<String, Object> body = new HashMap<>();
-        body.put("login", LOGIN);
+        body.put("username", LOGIN);
         body.put("password", "mdp");
-        body.put("id", UUID.randomUUID());
+        body.put("id", ID);
 
         Response response = JsonRestTemplate.given()
 
@@ -56,7 +59,23 @@ public class LoginIT {
 
     }
 
-    @Test(dependsOnMethods = "exist")
+    @Test(dependsOnMethods = "create")
+    public void get() {
+
+        Response response = JsonRestTemplate.given()
+
+                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, "v1")
+
+                .get(URL + "/{login}", LOGIN);
+        assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
+
+        assertThat(response.jsonPath().get("password"), is(nullValue()));
+        assertThat(response.jsonPath().getString("id"), is(ID.toString()));
+        assertThat(response.jsonPath().getString("username"), is(LOGIN));
+
+    }
+
+    @Test(dependsOnMethods = { "exist", "get" })
     public void update() {
 
         List<Map<String, Object>> patchs = new ArrayList<>();

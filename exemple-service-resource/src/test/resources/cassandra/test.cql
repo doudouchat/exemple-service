@@ -42,7 +42,7 @@ CREATE TABLE test.account (
 
 CREATE TABLE test.login (
 	id UUID,
-	login text PRIMARY KEY,
+	username text PRIMARY KEY,
 	password text,
 	enable boolean,
 	note text

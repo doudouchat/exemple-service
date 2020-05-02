@@ -93,7 +93,7 @@ public class IntegrationTestConfiguration {
         Set<String> loginFilter = new HashSet<>();
         loginFilter.add("id");
         loginFilter.add("enable");
-        loginFilter.add("login");
+        loginFilter.add("username");
         Map<String, Set<String>> loginRules = new HashMap<>();
         loginRules.put("login", Collections.singleton("/login"));
         loginRules.put("createOnly", Collections.singleton("/id"));

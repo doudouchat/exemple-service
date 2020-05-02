@@ -1,5 +1,6 @@
 package com.exemple.service.resource.login.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.aspectj.lang.annotation.AfterReturning;
@@ -18,6 +19,14 @@ public class LoginResourceAspect {
     public void afterReturning(Optional<JsonNode> source) {
 
         source.ifPresent(JsonNodeFilterUtils::clean);
+
+    }
+
+    @AfterReturning(pointcut = "execution(public java.util.List<com.fasterxml.jackson.databind.JsonNode> "
+            + "com.exemple.service.resource.login.LoginResource.*(..))", returning = "source")
+    public void afterReturning(List<JsonNode> source) {
+
+        source.forEach(JsonNodeFilterUtils::clean);
 
     }
 

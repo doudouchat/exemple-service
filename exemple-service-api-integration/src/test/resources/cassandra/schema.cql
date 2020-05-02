@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS account (
 
 CREATE TABLE IF NOT EXISTS login (
 	id UUID,
-	login text PRIMARY KEY,
+	username text PRIMARY KEY,
 	password text,
 	disabled boolean,
 	account_locked boolean,

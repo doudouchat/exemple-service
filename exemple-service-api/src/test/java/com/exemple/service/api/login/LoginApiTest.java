@@ -88,7 +88,7 @@ public class LoginApiTest extends JerseySpringSupport {
         String login = "jean.dupond@gmail.com";
 
         Map<String, Object> model = new HashMap<>();
-        model.put("login", login);
+        model.put("username", login);
         model.put("password", "jean.dupont");
         model.put("id", UUID.randomUUID());
 
