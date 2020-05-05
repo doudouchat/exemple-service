@@ -6,6 +6,7 @@ import static com.exemple.service.api.integration.account.v1.AccountNominalIT.VE
 import static com.exemple.service.api.integration.account.v1.AccountNominalIT.VERSION_HEADER_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +31,7 @@ public class LoginUpdateUsernameIT {
 
     private static final UUID ID = UUID.randomUUID();
 
-    @Test(dependsOnMethods = "create")
+    @Test
     public void update() {
 
         // create login
@@ -86,7 +87,7 @@ public class LoginUpdateUsernameIT {
                 .get(URL + "/{login}", NEW_LOGIN);
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
 
-        assertThat(response.jsonPath().get("password"), is("new_mdp"));
+        assertThat(response.jsonPath().get("password"), is(nullValue()));
         assertThat(response.jsonPath().getString("id"), is(ID.toString()));
         assertThat(response.jsonPath().getString("username"), is(NEW_LOGIN));
 

@@ -11,6 +11,7 @@
 			<class name="com.exemple.service.api.integration.account.v1.AccountNominalIT" />
 			<class name="com.exemple.service.api.integration.account.v1.AccountFailureIT" />
 			<class name="com.exemple.service.api.integration.login.v1.LoginIT" />
+			<class name="com.exemple.service.api.integration.login.v1.LoginUpdateUsernameIT" />
 			<class name="com.exemple.service.api.integration.subscription.v1.SubscriptionIT" />
 		</classes>
 	</test>
