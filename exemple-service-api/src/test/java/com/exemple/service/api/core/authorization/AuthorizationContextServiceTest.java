@@ -1,15 +1,10 @@
 package com.exemple.service.api.core.authorization;
 
+import static com.exemple.service.api.core.authorization.AuthorizationTestConfiguration.RSA256_ALGORITHM;
+import static com.exemple.service.api.core.authorization.AuthorizationTestConfiguration.TOKEN_KEY_RESPONSE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -36,7 +31,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.api.core.ApiTestConfiguration;
@@ -68,32 +62,6 @@ public class AuthorizationContextServiceTest extends AbstractTestNGSpringContext
         hazelcastInstance.getMap(AuthorizationConfiguration.TOKEN_BLACK_LIST).put(DEPRECATED_TOKEN_ID.toString(), Date.from(Instant.now()));
 
         authorizationClient.reset();
-    }
-
-    private static final Algorithm RSA256_ALGORITHM;
-
-    private static final Map<String, String> TOKEN_KEY_RESPONSE = new HashMap<>();
-
-    static {
-
-        KeyPairGenerator keyPairGenerator;
-        try {
-            keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
-
-        keyPairGenerator.initialize(1024);
-        KeyPair keypair = keyPairGenerator.genKeyPair();
-        PrivateKey privateKey = keypair.getPrivate();
-        PublicKey publicKey = keypair.getPublic();
-
-        RSA256_ALGORITHM = Algorithm.RSA256((RSAPublicKey) publicKey, (RSAPrivateKey) privateKey);
-
-        TOKEN_KEY_RESPONSE.put("alg", "SHA256withRSA");
-        TOKEN_KEY_RESPONSE.put("value",
-                "-----BEGIN PUBLIC KEY-----\n" + new String(Base64.encodeBase64(publicKey.getEncoded())) + "\n-----END PUBLIC KEY-----");
-
     }
 
     @DataProvider(name = "authorizedFailure")

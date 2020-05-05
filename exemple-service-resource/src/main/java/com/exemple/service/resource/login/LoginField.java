@@ -2,7 +2,7 @@ package com.exemple.service.resource.login;
 
 public enum LoginField {
 
-    ID("id"), LOGIN("login");
+    ID("id"), USERNAME("username");
 
     public final String field;
 

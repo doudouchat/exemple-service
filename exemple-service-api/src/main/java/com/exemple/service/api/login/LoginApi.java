@@ -110,7 +110,7 @@ public class LoginApi {
         loginService.save(source, schemaBeanParam.getApp(), schemaBeanParam.getVersion());
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
-        builder.path(source.get(LoginField.LOGIN.field).textValue());
+        builder.path(source.get(LoginField.USERNAME.field).textValue());
         return Response.created(builder.build()).build();
 
     }

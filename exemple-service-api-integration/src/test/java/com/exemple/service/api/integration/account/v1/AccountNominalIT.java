@@ -92,7 +92,7 @@ public class AccountNominalIT extends AbstractTestNGSpringContextTests {
     public void createLogin() {
 
         LOGIN_BODY = new HashMap<>();
-        LOGIN_BODY.put("login", ACCOUNT_BODY.get("email"));
+        LOGIN_BODY.put("username", ACCOUNT_BODY.get("email"));
         LOGIN_BODY.put("password", "mdp");
         LOGIN_BODY.put("id", ID);
 

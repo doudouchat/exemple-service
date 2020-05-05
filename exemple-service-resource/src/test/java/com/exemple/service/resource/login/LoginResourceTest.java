@@ -2,8 +2,10 @@ package com.exemple.service.resource.login;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -15,7 +17,6 @@ import org.testng.annotations.Test;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.exemple.service.resource.login.exception.LoginResourceExistException;
-import com.exemple.service.resource.login.model.Login;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 
@@ -27,17 +28,20 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
 
     private Map<String, Object> source;
 
-    private String login;
+    private String username;
+
+    private UUID id;
 
     @Test
     public void save() throws LoginResourceExistException {
 
-        login = UUID.randomUUID() + "@gmail.com";
+        username = UUID.randomUUID() + "@gmail.com";
+        id = UUID.randomUUID();
 
         source = new HashMap<>();
         source.put("password", "jean.dupont");
-        source.put("id", UUID.randomUUID());
-        source.put("login", login);
+        source.put("id", id);
+        source.put("username", username);
         source.put("enable", true);
 
         resource.save(JsonNodeUtils.create(source));
@@ -50,7 +54,7 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         Map<String, Object> source = new HashMap<>();
         source.put("password", "jean.dupont");
         source.put("id", UUID.randomUUID());
-        source.put("login", login);
+        source.put("username", username);
 
         resource.save(JsonNodeUtils.create(source));
 
@@ -59,63 +63,85 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
     @Test(dependsOnMethods = "save")
     public void get() {
 
-        JsonNode login0 = resource.get(login).get();
-        assertThat(login0.get(LoginField.LOGIN.field).textValue(), is(login));
+        JsonNode login0 = resource.get(username).get();
+        assertThat(login0.get(LoginField.USERNAME.field).textValue(), is(username));
         assertThat(login0.get(LoginField.ID.field).textValue(), is(source.get("id").toString()));
         assertThat(login0.get("password").textValue(), is(source.get("password")));
         assertThat(login0.get("enable").booleanValue(), is(source.get("enable")));
         assertThat(login0.path("note").getNodeType(), is(JsonNodeType.MISSING));
     }
 
-    @Test(dependsOnMethods = "get")
-    public void delete() {
+    @Test(dependsOnMethods = "save")
+    public void getById() throws LoginResourceExistException {
 
-        resource.delete(login);
-        assertThat(resource.get(login).isPresent(), is(false));
+        Map<String, Object> source = new HashMap<>();
+        source.put("password", "jean.dupont");
+        source.put("id", id);
+        source.put("username", UUID.randomUUID() + "@gmail.com");
+        source.put("enable", true);
+
+        resource.save(JsonNodeUtils.create(source));
+
+        List<JsonNode> logins = resource.get(id);
+        assertThat(logins.size(), is(2));
+
+        JsonNode login1 = logins.stream().filter(l -> username.equals(l.get(LoginField.USERNAME.field).textValue())).findFirst().get();
+        assertThat(login1, is(notNullValue()));
+        assertThat(login1.get(LoginField.ID.field).textValue(), is(id.toString()));
+        assertThat(login1.get("password").textValue(), is(this.source.get("password")));
+        assertThat(login1.get("enable").booleanValue(), is(this.source.get("enable")));
+        assertThat(login1.path("note").getNodeType(), is(JsonNodeType.MISSING));
+
+        JsonNode login2 = logins.stream().filter(l -> source.get("username").equals(l.get(LoginField.USERNAME.field).textValue())).findFirst().get();
+        assertThat(login2, is(notNullValue()));
+        assertThat(login2.get(LoginField.ID.field).textValue(), is(id.toString()));
+        assertThat(login2.get("password").textValue(), is(source.get("password")));
+        assertThat(login2.get("enable").booleanValue(), is(source.get("enable")));
+        assertThat(login2.path("note").getNodeType(), is(JsonNodeType.MISSING));
     }
 
-    @Test
+    @Test(dependsOnMethods = { "get", "getById" })
     public void update() {
-
-        UUID id = UUID.randomUUID();
-
-        Login source1 = new Login();
-        source1.setPassword("jean.dupont");
-        source1.setId(id);
-        source1.setEnable(true);
-
-        String login1 = UUID.randomUUID() + "@gmail.com";
-
-        resource.save(login1, JsonNodeUtils.create(source1));
-
-        Login source2 = new Login();
-        source2.setPassword("jean.dupont");
-        source2.setId(id);
-        source2.setEnable(true);
-
-        String login2 = UUID.randomUUID() + "@gmail.com";
-
-        resource.save(login2, JsonNodeUtils.create(source2));
-
-        // update
 
         Map<String, Object> source = new HashMap<>();
         source.put("password", "jean.dupont2");
         source.put("enable", false);
 
-        resource.save(login1, JsonNodeUtils.create(source));
+        resource.save(username, JsonNodeUtils.create(source));
 
-        JsonNode data1 = resource.get(login1).get();
-        assertThat(data1.get(LoginField.LOGIN.field).textValue(), is(login1));
-        assertThat(data1.get(LoginField.ID.field).textValue(), is(id.toString()));
-        assertThat(data1.get("password").textValue(), is(source.get("password")));
-        assertThat(data1.get("enable").booleanValue(), is(source.get("enable")));
+        JsonNode data = resource.get(username).get();
+        assertThat(data.get(LoginField.USERNAME.field).textValue(), is(username));
+        assertThat(data.get(LoginField.ID.field).textValue(), is(id.toString()));
+        assertThat(data.get("password").textValue(), is(source.get("password")));
+        assertThat(data.get("enable").booleanValue(), is(source.get("enable")));
 
-        JsonNode data2 = resource.get(login2).get();
-        assertThat(data2.get(LoginField.LOGIN.field).textValue(), is(login2));
-        assertThat(data2.get(LoginField.ID.field).textValue(), is(id.toString()));
-        assertThat(data2.get("password").textValue(), is(source.get("password")));
-        assertThat(data2.get("enable").booleanValue(), is(source.get("enable")));
+    }
+
+    @Test(dependsOnMethods = "update")
+    public void replaceUsername() {
+
+        Map<String, Object> source = new HashMap<>();
+        source.put("username", UUID.randomUUID() + "@gmail.com");
+        source.put("password", "jean.dupont3");
+        source.put("enable", true);
+
+        resource.save(username, JsonNodeUtils.create(source));
+
+        this.username = source.get("username").toString();
+
+        JsonNode data = resource.get(username).get();
+        assertThat(data.get(LoginField.USERNAME.field).textValue(), is(username));
+        assertThat(data.get(LoginField.ID.field).textValue(), is(id.toString()));
+        assertThat(data.get("password").textValue(), is(source.get("password")));
+        assertThat(data.get("enable").booleanValue(), is(source.get("enable")));
+
+    }
+
+    @Test(dependsOnMethods = "replaceUsername")
+    public void delete() {
+
+        resource.delete(username);
+        assertThat(resource.get(username).isPresent(), is(false));
     }
 
 }

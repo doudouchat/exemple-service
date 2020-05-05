@@ -18,4 +18,5 @@ public interface LoginService {
     void delete(@NotBlank String login);
 
     JsonNode get(@NotBlank String login, @NotBlank String app, @NotBlank String version) throws LoginServiceNotFoundException;
+
 }

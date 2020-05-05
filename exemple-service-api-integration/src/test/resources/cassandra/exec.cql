@@ -10,6 +10,6 @@ INSERT INTO parameter (app, histories) VALUES (
   		'phones' : true }
 );
 
-INSERT INTO login (login) VALUES (
+INSERT INTO login (username) VALUES (
 	'jean.dupond@gmail.com'
 );
