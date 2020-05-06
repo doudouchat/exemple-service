@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.exemple.service.resource.common.util.JsonNodeUtils;
@@ -101,7 +102,7 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = { "get", "getById" })
-    public void update() {
+    public void update() throws LoginResourceExistException {
 
         Map<String, Object> source = new HashMap<>();
         source.put("password", "jean.dupont2");
@@ -117,13 +118,40 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
 
     }
 
-    @Test(dependsOnMethods = "update")
-    public void replaceUsername() {
+    @Test(dependsOnMethods = "update", expectedExceptions = LoginResourceExistException.class)
+    public void replaceUsernameFailure() throws LoginResourceExistException {
 
         Map<String, Object> source = new HashMap<>();
-        source.put("username", UUID.randomUUID() + "@gmail.com");
-        source.put("password", "jean.dupont3");
-        source.put("enable", true);
+        source.put("password", "jean.dupont");
+        source.put("id", UUID.randomUUID());
+        source.put("username", username);
+
+        resource.save(username, JsonNodeUtils.create(source));
+    }
+
+    @DataProvider(name = "replaceUsername")
+    public static Object[][] replaceUsername() {
+
+        Map<String, Object> source1 = new HashMap<>();
+        source1.put("username", UUID.randomUUID() + "@gmail.com");
+        source1.put("password", "jean.dupont3");
+        source1.put("enable", true);
+
+        Map<String, Object> source2 = new HashMap<>();
+        source2.put("username", UUID.randomUUID() + "@gmail.com");
+
+        return new Object[][] {
+
+                { source1, "jean.dupont3" },
+
+                { source2, "jean.dupont3" }
+
+        };
+
+    }
+
+    @Test(dependsOnMethods = "replaceUsernameFailure", dataProvider = "replaceUsername")
+    public void replaceUsername(Map<String, Object> source, String expectedPassword) throws LoginResourceExistException {
 
         resource.save(username, JsonNodeUtils.create(source));
 
@@ -132,8 +160,7 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         JsonNode data = resource.get(username).get();
         assertThat(data.get(LoginField.USERNAME.field).textValue(), is(username));
         assertThat(data.get(LoginField.ID.field).textValue(), is(id.toString()));
-        assertThat(data.get("password").textValue(), is(source.get("password")));
-        assertThat(data.get("enable").booleanValue(), is(source.get("enable")));
+        assertThat(data.get("password").textValue(), is(expectedPassword));
 
     }
 

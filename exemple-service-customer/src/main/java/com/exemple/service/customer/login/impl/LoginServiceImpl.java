@@ -34,13 +34,17 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public void save(String login, JsonNode source, String app, String version) throws LoginServiceNotFoundException {
+    public void save(String login, JsonNode source, String app, String version) throws LoginServiceException {
 
         JsonNode old = loginResource.get(login).orElseThrow(LoginServiceNotFoundException::new);
 
         loginValidation.validate(source, old, app, version);
 
-        loginResource.save(login, source);
+        try {
+            loginResource.save(login, source);
+        } catch (LoginResourceExistException e) {
+            throw new LoginServiceExistException(e);
+        }
 
     }
 
