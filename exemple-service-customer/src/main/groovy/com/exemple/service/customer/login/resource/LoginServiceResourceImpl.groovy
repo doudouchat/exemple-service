@@ -22,7 +22,7 @@ class LoginServiceResourceImpl implements LoginServiceResource {
 
     @Override
     Map<String, Object> updateLogin(Map<String, Object> source) {
-        if (source.containsKey(PASSWORD)) {
+        if (source && source.containsKey(PASSWORD)) {
             source.put(PASSWORD, '{bcrypt}' + BCrypt.hashpw(source.get(PASSWORD), BCrypt.gensalt()))
         }
         source

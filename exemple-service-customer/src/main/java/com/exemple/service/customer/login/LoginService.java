@@ -13,7 +13,7 @@ public interface LoginService {
 
     void save(@NotNull JsonNode source, @NotBlank String app, @NotBlank String version) throws LoginServiceException;
 
-    void save(@NotBlank String login, @NotNull JsonNode source, @NotBlank String app, @NotBlank String version) throws LoginServiceNotFoundException;
+    void save(@NotBlank String login, @NotNull JsonNode source, @NotBlank String app, @NotBlank String version) throws LoginServiceException;
 
     void delete(@NotBlank String login);
 
