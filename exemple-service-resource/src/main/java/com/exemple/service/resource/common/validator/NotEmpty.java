@@ -14,14 +14,12 @@ import javax.validation.constraints.NotNull;
 @Target({ ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Constraint(validatedBy = JsonConstraintValidator.class)
+@Constraint(validatedBy = NotEmptyConstraintValidator.class)
 @ReportAsSingleViolation
 @NotNull
-public @interface Json {
+public @interface NotEmpty {
 
-    String table();
-
-    String message() default "{javax.validation.constraints.jsonNode}";
+    String message() default "{javax.validation.constraints.NotEmpty.jsonNode.message}";
 
     Class<?>[] groups() default {};
 
