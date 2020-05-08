@@ -5,7 +5,6 @@ import java.util.function.BinaryOperator;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.flipkart.zjsonpatch.JsonPatch;
 import com.google.common.collect.Streams;
 
@@ -38,23 +37,22 @@ public final class PatchUtils {
     private static void diff(JsonNode root, JsonNode target, JsonPointer pointer) {
 
         JsonNode node = target.path(pointer.getMatchingProperty());
-        if (JsonNodeType.OBJECT == node.getNodeType()) {
+        if (node.isObject()) {
             JsonPointer p1 = JsonPointer.compile("/".concat(pointer.getMatchingProperty()));
             JsonPointer p2 = JsonPointer.compile("/".concat(pointer.tail().getMatchingProperty()));
 
-            if (JsonNodeType.MISSING == root.path(pointer.getMatchingProperty()).getNodeType()) {
+            if (root.path(pointer.getMatchingProperty()).isMissingNode()) {
                 JsonNodeUtils.set(root, JsonNodeUtils.init(), pointer.getMatchingProperty());
             }
             node = target.at(p1.append(p2));
             if (!p2.getMatchingProperty().isEmpty()) {
-                JsonNodeUtils.set(root.get(pointer.getMatchingProperty()), JsonNodeType.MISSING == node.getNodeType() ? null : node,
-                        p2.getMatchingProperty());
+                JsonNodeUtils.set(root.get(pointer.getMatchingProperty()), node.isMissingNode() ? null : node, p2.getMatchingProperty());
             } else {
                 JsonNodeUtils.set(root, target.at(p1), p1.getMatchingProperty());
             }
 
         } else {
-            JsonNodeUtils.set(root, JsonNodeType.MISSING == node.getNodeType() ? null : node, pointer.getMatchingProperty());
+            JsonNodeUtils.set(root, node.isMissingNode() ? null : node, pointer.getMatchingProperty());
         }
 
     }

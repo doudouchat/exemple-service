@@ -14,7 +14,6 @@ import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationException.ValidationExceptionModel;
 import com.exemple.service.schema.core.validator.ValidatorService;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.common.collect.Streams;
 
 @Component
@@ -29,7 +28,7 @@ public class MaxPropertiesValidator implements ValidatorService {
 
         JsonNode pathNode = form.at(path);
 
-        if (JsonNodeType.OBJECT == pathNode.getNodeType() && !validationException.contains(path)) {
+        if (pathNode.isObject() && !validationException.contains(path)) {
 
             Set<String> fields = filter(pathNode.fields()).collect(Collectors.toSet());
 
@@ -55,7 +54,7 @@ public class MaxPropertiesValidator implements ValidatorService {
     }
 
     private static Stream<String> filter(Iterator<Entry<String, JsonNode>> fields) {
-        return Streams.stream(fields).filter(e -> JsonNodeType.NULL != e.getValue().getNodeType()).map(Map.Entry::getKey);
+        return Streams.stream(fields).filter(e -> !e.getValue().isNull()).map(Map.Entry::getKey);
     }
 
 }

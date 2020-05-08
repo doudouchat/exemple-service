@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Streams;
 
@@ -39,10 +38,10 @@ public class AccountResourceAspect {
 
         JsonNodeFilterUtils.filter(source, (Map.Entry<String, JsonNode> e) -> {
 
-            if (JsonNodeType.ARRAY == e.getValue().getNodeType()) {
+            if (e.getValue().isArray()) {
 
-                ((ObjectNode) source).replace(e.getKey(), JsonNodeUtils.create(Streams.stream(e.getValue().elements())
-                        .filter(node -> JsonNodeType.NULL != node.getNodeType()).collect(Collectors.toList())));
+                ((ObjectNode) source).replace(e.getKey(),
+                        JsonNodeUtils.create(Streams.stream(e.getValue().elements()).filter(node -> !node.isNull()).collect(Collectors.toList())));
 
                 filter(source.get(e.getKey()));
             }

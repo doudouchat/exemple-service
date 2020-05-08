@@ -29,7 +29,6 @@ import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.parameter.ParameterResource;
 import com.exemple.service.resource.parameter.model.ParameterEntity;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.common.collect.Streams;
 
 @Component
@@ -80,17 +79,17 @@ public class AccountHistoryResource {
 
                     if (historyFields.get(e.getKey())) {
 
-                        if (JsonNodeType.OBJECT == e.getValue().getNodeType()) {
+                        if (e.getValue().isObject()) {
 
                             return Streams.stream(e.getValue().fields()).map(node -> Collections
                                     .singletonMap(e.getKey().concat("/").concat(node.getKey()), node.getValue()).entrySet().iterator().next());
                         }
 
-                        if (JsonNodeType.ARRAY == e.getValue().getNodeType()) {
+                        if (e.getValue().isArray()) {
 
                             return Streams.stream(e.getValue().elements()).map((JsonNode node) -> {
 
-                                String key = JsonNodeType.OBJECT == node.getNodeType() ? Streams.stream(node.elements())
+                                String key = node.isObject() ? Streams.stream(node.elements())
 
                                         .reduce("", (root, n) -> StringHelper.join(root, n.asText(), '.'), function) : node.asText();
 

@@ -13,7 +13,6 @@ import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.login.LoginField;
 import com.exemple.service.resource.login.LoginResource;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 @Service
 @Profile("!noSecurity")
@@ -45,7 +44,7 @@ public class AuthorizationCheckServiceImpl implements AuthorizationCheckService 
 
             JsonNode login = loginResource.get(username).orElseGet(JsonNodeUtils::init);
 
-            if (JsonNodeType.MISSING == login.path(LoginField.ID.field).getNodeType()) {
+            if (login.path(LoginField.ID.field).isMissingNode()) {
 
                 throw new ForbiddenException();
 

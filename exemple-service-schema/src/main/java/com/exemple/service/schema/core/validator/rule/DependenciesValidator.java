@@ -22,7 +22,6 @@ import com.exemple.service.schema.validation.SchemaValidationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 @Component
 public class DependenciesValidator implements ValidatorService {
@@ -84,7 +83,7 @@ public class DependenciesValidator implements ValidatorService {
 
     private static boolean isPresent(JsonNode form, String... values) {
 
-        return Arrays.stream(values).map(value -> form.at("/" + value)).anyMatch(node -> JsonNodeType.MISSING != node.getNodeType());
+        return Arrays.stream(values).map(value -> form.at("/" + value)).anyMatch(node -> !node.isMissingNode());
     }
 
 }

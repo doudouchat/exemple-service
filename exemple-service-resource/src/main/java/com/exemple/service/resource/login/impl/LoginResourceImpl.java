@@ -25,7 +25,6 @@ import com.exemple.service.resource.login.LoginField;
 import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.login.exception.LoginResourceExistException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 @Service
 @Validated
@@ -52,7 +51,7 @@ public class LoginResourceImpl implements LoginResource {
     @Override
     public void save(String username, JsonNode source) throws LoginResourceExistException {
 
-        if (source.path(LoginField.USERNAME.field).getNodeType() == JsonNodeType.MISSING) {
+        if (source.path(LoginField.USERNAME.field).isMissingNode()) {
 
             Update update = updateLogin(username, source);
 

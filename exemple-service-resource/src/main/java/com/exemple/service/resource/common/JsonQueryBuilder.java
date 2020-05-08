@@ -24,7 +24,6 @@ import com.datastax.oss.protocol.internal.ProtocolConstants;
 import com.exemple.service.resource.common.util.MetadataSchemaUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.common.collect.Streams;
 
 public class JsonQueryBuilder {
@@ -76,7 +75,7 @@ public class JsonQueryBuilder {
 
     private List<Assignment> updateMap(MapType type, Map.Entry<String, JsonNode> node) {
 
-        if (JsonNodeType.NULL == node.getValue().getNodeType()) {
+        if (node.getValue().isNull()) {
 
             return Collections.singletonList(Assignment.setColumn(node.getKey(), json(node.getValue())));
 

@@ -7,7 +7,6 @@ import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationException.ValidationExceptionModel;
 import com.exemple.service.schema.core.validator.ValidatorService;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 @Component
 public class LoginValidator implements ValidatorService {
@@ -24,7 +23,7 @@ public class LoginValidator implements ValidatorService {
 
         JsonNode unique = form.at(path);
 
-        if (JsonNodeType.STRING == unique.getNodeType() && !validationException.contains(path)) {
+        if (unique.isTextual() && !validationException.contains(path)) {
 
             JsonNode oldUnique = null;
             if (old != null) {
