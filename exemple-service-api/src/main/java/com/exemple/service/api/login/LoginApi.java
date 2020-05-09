@@ -35,6 +35,7 @@ import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.customer.login.exception.LoginServiceException;
 import com.exemple.service.customer.login.exception.LoginServiceNotFoundException;
+import com.exemple.service.resource.common.validator.NotEmpty;
 import com.exemple.service.resource.login.LoginField;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -128,7 +129,7 @@ public class LoginApi {
 
     })
     @RolesAllowed("login:update")
-    public Response update(@NotNull @PathParam("login") String login, @NotNull @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch,
+    public Response update(@NotNull @PathParam("login") String login, @NotEmpty @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws LoginServiceException {
 
         authorizationCheckService.verifyLogin(login, (ApiSecurityContext) servletContext.getSecurityContext());

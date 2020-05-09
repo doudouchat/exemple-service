@@ -3,6 +3,7 @@ package com.exemple.service.api.common;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import java.util.Collections;
 import java.util.UUID;
 
 import javax.ws.rs.client.Entity;
@@ -10,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,9 +61,23 @@ public class ExceptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void JsonException() throws AccountServiceException {
+    public void JsonException() {
 
         Response response = target(AccountApiTest.URL).request(MediaType.APPLICATION_JSON).post(Entity.json("toto"));
+
+        assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+
+    }
+
+    @Test
+    public void JsonEmptyException() {
+
+        Response response = target(AccountApiTest.URL + "/" + UUID.randomUUID()).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
+                .request(MediaType.APPLICATION_JSON)
+
+                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
+
+                .method("PATCH", Entity.json(Collections.EMPTY_LIST));
 
         assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
 

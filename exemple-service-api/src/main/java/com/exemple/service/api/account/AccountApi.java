@@ -39,6 +39,7 @@ import com.exemple.service.customer.account.context.AccountContext;
 import com.exemple.service.customer.account.exception.AccountServiceException;
 import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
 import com.exemple.service.resource.account.AccountField;
+import com.exemple.service.resource.common.validator.NotEmpty;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -138,7 +139,7 @@ public class AccountApi {
 
     })
     @RolesAllowed("account:update")
-    public Response update(@NotNull @PathParam("id") UUID id, @NotNull @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch,
+    public Response update(@NotNull @PathParam("id") UUID id, @NotEmpty @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws AccountServiceException {
 
         authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());

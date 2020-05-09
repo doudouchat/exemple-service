@@ -348,8 +348,8 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         assertThat(histories, is(hasSize(1)));
     }
 
-    @DataProvider(name = "failures")
-    public static Object[][] failure() {
+    @DataProvider(name = "propertyFailures")
+    public static Object[][] propertyFailures() {
 
         return new Object[][] {
                 // text failure
@@ -394,7 +394,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
     }
 
-    @Test(dataProvider = "failures", expectedExceptions = ConstraintViolationException.class)
+    @Test(dataProvider = "propertyFailures", expectedExceptions = ConstraintViolationException.class)
     public void saveFailure(String property, Object value) {
 
         JsonNode node = JsonNodeUtils.clone(JsonNodeUtils.create(new Account()));
@@ -403,10 +403,21 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         resource.save(UUID.randomUUID(), node);
     }
 
-    @Test(expectedExceptions = ConstraintViolationException.class)
-    public void saveFailure() {
+    @DataProvider(name = "failures")
+    public static Object[][] failures() {
 
-        resource.save(UUID.randomUUID(), null);
+        return new Object[][] {
+                // null
+                { null },
+                // empty
+                { JsonNodeUtils.init() } };
+
+    }
+
+    @Test(dataProvider = "failures", expectedExceptions = ConstraintViolationException.class)
+    public void updateFailure(JsonNode account) {
+
+        resource.update(UUID.randomUUID(), account);
     }
 
     @Test

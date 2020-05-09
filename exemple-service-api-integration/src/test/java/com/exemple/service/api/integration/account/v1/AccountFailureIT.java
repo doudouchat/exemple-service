@@ -107,7 +107,7 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
     }
 
     @DataProvider(name = "updateFailure")
-    private static Object[][] updateFailure() {
+    private static Object[][] updatePatchFailures() {
 
         Map<String, Object> patch0 = new HashMap<>();
         patch0.put("op", "replace");
@@ -235,6 +235,24 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
 
                 .get(ACCOUNT_URL + "/{id}", UUID.randomUUID());
         assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND.value()));
+
+    }
+
+    @Test(dependsOnMethods = "com.exemple.service.api.integration.account.v1.AccountNominalIT.updateSuccess")
+    public void updateFailure() {
+
+        LOG.debug("{}", JsonRestTemplate.given()
+
+                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, VERSION_HEADER_VALUE)
+
+                .get(ACCOUNT_URL + "/{id}", ID));
+
+        Response response = JsonRestTemplate.given()
+
+                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, VERSION_HEADER_VALUE)
+
+                .body(Collections.EMPTY_LIST).patch(ACCOUNT_URL + "/{id}", ID);
+        assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
 
     }
 

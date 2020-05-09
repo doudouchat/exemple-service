@@ -44,23 +44,18 @@ public class JsonConstraintValidator implements ConstraintValidator<Json, JsonNo
 
         boolean valid = true;
 
-        if (source != null) {
+        try {
 
-            try {
+            valid(source);
 
-                valid(source);
+        } catch (JsonValidatorException e) {
 
-            } catch (JsonValidatorException e) {
+            valid = false;
 
-                valid = false;
+            LOG.trace(e.getMessage(messageTemplate), e);
 
-                LOG.trace(e.getMessage(messageTemplate), e);
-
-                context.disableDefaultConstraintViolation();
-                context.buildConstraintViolationWithTemplate(e.getMessage(this.messageTemplate)).addPropertyNode(e.getNode())
-                        .addConstraintViolation();
-            }
-
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate(e.getMessage(this.messageTemplate)).addPropertyNode(e.getNode()).addConstraintViolation();
         }
 
         return valid;
