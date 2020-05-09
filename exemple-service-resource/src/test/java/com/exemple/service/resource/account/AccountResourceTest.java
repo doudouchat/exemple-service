@@ -21,8 +21,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.validation.ConstraintViolationException;
-
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -346,78 +344,6 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
                 .collect(Collectors.toList());
 
         assertThat(histories, is(hasSize(1)));
-    }
-
-    @DataProvider(name = "propertyFailures")
-    public static Object[][] propertyFailures() {
-
-        return new Object[][] {
-                // text failure
-                { "lastname", 10 },
-                // int failure
-                { "age", "age" },
-                // field unknown
-                { "nc", "nc" },
-                // date failure
-                { "birthday", "2019-02-30" }, { "birthday", "aaa" },
-                // timestamp failure
-                { "creation_date", "2019-02-30T10:00:00Z" }, { "creation_date", "aaa" },
-                // boolean failure
-                { "subscription_1", 10 },
-                // map failure
-                { "addresses", 10 },
-                // map int failure
-                { "addresses", Collections.singletonMap("home", Collections.singletonMap("floor", "toto")) },
-                // map field unknown
-                { "addresses", Collections.singletonMap("home", Collections.singletonMap("nc", "toto")) },
-                // map boolean failure
-                { "addresses", Collections.singletonMap("home", Collections.singletonMap("enable", "toto")) },
-                // map date failure
-                { "children", Collections.singletonMap("1", Collections.singletonMap("birthday", "2019-02-30")) },
-                { "children", Collections.singletonMap("1", Collections.singletonMap("birthday", "aaa")) },
-                // map index int failure
-                { "children", Collections.singletonMap("aaa", Collections.singletonMap("birthday", "2001-01-01")) },
-                // map index timestamp failure
-                { "notes", Collections.singletonMap("2019-02-30T10:00:00Z", "note 1") }, { "notes", Collections.singletonMap("aaa", "note 1") },
-                // set failure
-                { "cgus", 10 },
-                // list failure
-                { "preferences", 10 },
-                // tuple int failure
-                { "preferences", Arrays.asList(Arrays.asList("pref2", "value2", "aaa", "2002-01-01 00:00:00.000Z")) },
-                // tuple timestamp failure
-                { "preferences", Arrays.asList(Arrays.asList("pref2", "value2", 100, "aaa")) },
-                // tuple too fields
-                { "preferences", Arrays.asList(Arrays.asList("pref2", "value2", 100, "2002-01-01 00:00:00.000Z", "new")) },
-                // tuple fields missing
-                { "preferences", Arrays.asList(Arrays.asList("pref2", "value2", 100)) } };
-
-    }
-
-    @Test(dataProvider = "propertyFailures", expectedExceptions = ConstraintViolationException.class)
-    public void saveFailure(String property, Object value) {
-
-        JsonNode node = JsonNodeUtils.clone(JsonNodeUtils.create(new Account()));
-        JsonNodeUtils.set(node, value, property);
-
-        resource.save(UUID.randomUUID(), node);
-    }
-
-    @DataProvider(name = "failures")
-    public static Object[][] failures() {
-
-        return new Object[][] {
-                // null
-                { null },
-                // empty
-                { JsonNodeUtils.init() } };
-
-    }
-
-    @Test(dataProvider = "failures", expectedExceptions = ConstraintViolationException.class)
-    public void updateFailure(JsonNode account) {
-
-        resource.update(UUID.randomUUID(), account);
     }
 
     @Test
