@@ -22,14 +22,6 @@ public final class JsonNodeUtils {
         return node;
     }
 
-    public static JsonNode init(String field) {
-
-        ObjectNode node = (ObjectNode) init();
-        node.set(field, null);
-
-        return node;
-    }
-
     public static JsonNode init() {
 
         return MAPPER.createObjectNode();

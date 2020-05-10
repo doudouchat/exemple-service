@@ -4,21 +4,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
 public class Account {
 
     private Object email;
-
-    private Object lastname;
-
-    private Object firstname;
 
     private Object birthday;
 
     private Object age;
 
-    private Object subscription_1;
+    private Object enabled;
 
     private Object address;
 
@@ -40,24 +34,6 @@ public class Account {
 
     private List<Object> preferences;
 
-    private Object content;
-
-    public Object getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(Object lastname) {
-        this.lastname = lastname;
-    }
-
-    public Object getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(Object firstname) {
-        this.firstname = firstname;
-    }
-
     public Object getBirthday() {
         return birthday;
     }
@@ -74,12 +50,12 @@ public class Account {
         this.age = age;
     }
 
-    public Object getSubscription_1() {
-        return subscription_1;
+    public Object getEnabled() {
+        return enabled;
     }
 
-    public void setSubscription_1(Object subscription_1) {
-        this.subscription_1 = subscription_1;
+    public void setEnabled(Object enabled) {
+        this.enabled = enabled;
     }
 
     public Map<String, Address> getAddresses() {
@@ -88,12 +64,6 @@ public class Account {
 
     public void setAddresses(Map<String, Address> addresses) {
         this.addresses = addresses;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this).append("lastname", lastname).append("firstname", firstname).append("birthday", birthday).append("age", age)
-                .append("subscription_1", subscription_1).append("addresses", addresses).toString();
     }
 
     public Object getEmail() {
@@ -174,14 +144,6 @@ public class Account {
 
     public void setPreferences(List<Object> preferences) {
         this.preferences = preferences;
-    }
-
-    public Object getContent() {
-        return content;
-    }
-
-    public void setContent(Object content) {
-        this.content = content;
     }
 
 }

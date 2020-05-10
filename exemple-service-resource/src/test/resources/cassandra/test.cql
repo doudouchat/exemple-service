@@ -21,8 +21,6 @@ CREATE TABLE test.account (
 	id UUID PRIMARY KEY,
 	email text,
 	status text,
-	lastname text, 
-	firstname text, 
 	birthday date,
 	address address,	
 	addresses map<text, frozen<address>>,
@@ -32,12 +30,9 @@ CREATE TABLE test.account (
 	profils set<text>,
 	cgus set<frozen<cgu>>,
 	age int,
-	subscription_1 boolean,
+	enabled boolean,
 	creation_date timestamp,
-	preferences list<frozen<tuple<text, text, int, timestamp>>>,
-	phones2 map<text, text>,
-	cgus2 set<text>,
-	content blob
+	preferences list<frozen<tuple<text, text, int, timestamp>>>
 );
 
 CREATE TABLE test.login (
@@ -57,6 +52,10 @@ CREATE TABLE test.account_history (
 	field text,
 	date timestamp,
 	value text,
+	application text,
+	version text,
+	user text,
+	previous_value text,
 	PRIMARY KEY ((id), field)
 );
 
@@ -64,11 +63,6 @@ CREATE TYPE test.schema_label_type (
 	type text,
 	description text,
 	labels map<text, text>
-);
-
-CREATE TABLE test.parameter ( 
-	app text PRIMARY KEY,
-	histories map<text, boolean>
 );
 
 CREATE TABLE test.resource_schema ( 
@@ -97,4 +91,23 @@ CREATE TABLE test.stock (
 	product text,
 	quantity counter,
 	PRIMARY KEY ((store, product))
+);
+
+CREATE TABLE test.exemple ( 
+	id UUID PRIMARY KEY,
+	email text, 
+	birthday date,
+	address address,	
+	addresses map<text, frozen<address>>,
+	children map<int, frozen<child>>,
+	phones map<text, text>,
+	notes map<timestamp, text>,
+	profils set<text>,
+	cgus set<frozen<cgu>>,
+	age int,
+	enabled boolean,
+	creation_date timestamp,
+	preferences list<frozen<tuple<text, text, int, timestamp>>>,
+	phones2 map<text, text>,
+	content blob
 );

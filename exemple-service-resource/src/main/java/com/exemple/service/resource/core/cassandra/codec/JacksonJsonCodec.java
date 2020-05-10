@@ -45,7 +45,7 @@ public class JacksonJsonCodec<T> extends MappingCodec<ByteBuffer, T> implements 
     @Override
     protected T innerToOuter(ByteBuffer value) {
         try {
-            return objectMapper.readValue(Bytes.getArray(value), toJacksonJavaType());
+            return value != null ? objectMapper.readValue(Bytes.getArray(value), toJacksonJavaType()) : null;
         } catch (IOException e) {
             throw new IllegalArgumentException(e.getMessage(), e);
         }

@@ -23,6 +23,15 @@ public class AccountHistory {
 
     private JsonNode value;
 
+    private String application;
+
+    private String version;
+
+    private String user;
+
+    @CqlName("previous_value")
+    private JsonNode previousValue;
+
     public UUID getId() {
         return id;
     }
@@ -53,6 +62,38 @@ public class AccountHistory {
 
     public void setValue(JsonNode value) {
         this.value = value;
+    }
+
+    public String getApplication() {
+        return application;
+    }
+
+    public void setApplication(String application) {
+        this.application = application;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public JsonNode getPreviousValue() {
+        return previousValue;
+    }
+
+    public void setPreviousValue(JsonNode previousValue) {
+        this.previousValue = previousValue;
     }
 
 }

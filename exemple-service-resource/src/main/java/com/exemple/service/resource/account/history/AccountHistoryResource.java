@@ -2,17 +2,14 @@ package com.exemple.service.resource.account.history;
 
 import java.time.OffsetDateTime;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,13 +20,12 @@ import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.exemple.service.resource.account.history.dao.AccountHistoryDao;
 import com.exemple.service.resource.account.history.mapper.AccountHistoryMapper;
+import com.exemple.service.resource.account.impl.AccountResourceImpl;
 import com.exemple.service.resource.account.model.AccountHistory;
-import com.exemple.service.resource.common.util.StringHelper;
+import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
+import com.exemple.service.resource.common.util.MetadataSchemaUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
-import com.exemple.service.resource.parameter.ParameterResource;
-import com.exemple.service.resource.parameter.model.ParameterEntity;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Streams;
 
 @Component
 public class AccountHistoryResource {
@@ -38,13 +34,10 @@ public class AccountHistoryResource {
 
     private final CqlSession session;
 
-    private final ParameterResource parameterResource;
-
     private final ConcurrentMap<String, AccountHistoryMapper> mappers;
 
-    public AccountHistoryResource(CqlSession session, ParameterResource parameterResource) {
+    public AccountHistoryResource(CqlSession session) {
         this.session = session;
-        this.parameterResource = parameterResource;
         this.mappers = new ConcurrentHashMap<>();
 
     }
@@ -54,62 +47,38 @@ public class AccountHistoryResource {
         return dao().findById(id).all();
     }
 
+    public AccountHistory findByIdAndField(UUID id, String field) {
+
+        return dao().findByIdAndField(id, field);
+    }
+
     public Collection<BoundStatement> createHistories(final UUID id, JsonNode source, OffsetDateTime now) {
-
-        BinaryOperator<String> function = (n1, n2) -> n2;
-
-        ParameterEntity parameter = parameterResource.get("default").orElseThrow(IllegalArgumentException::new);
-
-        LOG.debug("parameters history {} {}", parameter.getApplication(), parameter.getHistories());
-
-        Map<String, Boolean> historyFields = parameter.getHistories();
 
         Map<String, AccountHistory> histories = findById(id).stream().collect(Collectors.toMap(AccountHistory::getField, Function.identity()));
 
         AccountHistory defaultHistory = new AccountHistory();
         defaultHistory.setDate(now.toInstant().minusNanos(1));
 
-        List<AccountHistory> accountHistories = Streams.stream(source.fields())
+        PreparedStatement prepared = session.prepare("INSERT INTO " + ResourceExecutionContext.get().keyspace()
+                + ".account_history (id,date,field,value,previous_value,application,version,user) VALUES (?,?,?,?,?,?,?,?)");
 
-                .filter(e -> historyFields.containsKey(e.getKey()))
+        return MetadataSchemaUtils.transformColumnToLine(session, AccountResourceImpl.ACCOUNT_TABLE, source).stream()
 
-                .filter(e -> now.toInstant().isAfter(histories.getOrDefault(e.getKey(), defaultHistory).getDate()))
+                .filter(line -> now.toInstant().isAfter(histories.getOrDefault(line.getKey(), defaultHistory).getDate()))
 
-                .flatMap((Map.Entry<String, JsonNode> e) -> {
+                .map((Map.Entry<String, JsonNode> line) -> {
 
-                    if (historyFields.get(e.getKey())) {
-
-                        if (e.getValue().isObject()) {
-
-                            return Streams.stream(e.getValue().fields()).map(node -> Collections
-                                    .singletonMap(e.getKey().concat("/").concat(node.getKey()), node.getValue()).entrySet().iterator().next());
-                        }
-
-                        if (e.getValue().isArray()) {
-
-                            return Streams.stream(e.getValue().elements()).map((JsonNode node) -> {
-
-                                String key = node.isObject() ? Streams.stream(node.elements())
-
-                                        .reduce("", (root, n) -> StringHelper.join(root, n.asText(), '.'), function) : node.asText();
-
-                                return Collections.singletonMap(e.getKey().concat("/").concat(key), node).entrySet().iterator().next();
-                            });
-                        }
-
-                    }
-
-                    return Stream.of(e);
-
-                })
-
-                .map((Map.Entry<String, JsonNode> e) -> {
+                    JsonNodeFilterUtils.clean(line.getValue());
 
                     AccountHistory history = new AccountHistory();
                     history.setId(id);
-                    history.setField(e.getKey());
+                    history.setField(line.getKey());
                     history.setDate(now.toInstant());
-                    history.setValue(e.getValue());
+                    history.setValue(line.getValue());
+                    history.setApplication(ResourceExecutionContext.get().getApplication());
+                    history.setVersion(ResourceExecutionContext.get().getVersion());
+                    history.setUser(ResourceExecutionContext.get().getPrincipal().getName());
+                    history.setPreviousValue(histories.getOrDefault(line.getKey(), defaultHistory).getValue());
 
                     return history;
                 })
@@ -117,16 +86,10 @@ public class AccountHistoryResource {
                 .filter((AccountHistory history) -> !Objects.equals(history.getValue(),
                         histories.getOrDefault(history.getField(), defaultHistory).getValue()))
 
-                .collect(Collectors.toList());
-
-        PreparedStatement prepared = session
-                .prepare("INSERT INTO " + ResourceExecutionContext.get().keyspace() + ".account_history (id,date,field,value) VALUES (?,?,?,?)");
-
-        return accountHistories.stream()
-
                 .map((AccountHistory history) -> {
                     LOG.debug("save history account {} {} {}", history.getId(), history.getField(), history.getValue());
-                    return prepared.bind(history.getId(), history.getDate(), history.getField(), history.getValue());
+                    return prepared.bind(history.getId(), history.getDate(), history.getField(), history.getValue(), history.getPreviousValue(),
+                            history.getApplication(), history.getVersion(), history.getUser());
                 }).collect(Collectors.toList());
     }
 

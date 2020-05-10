@@ -83,6 +83,8 @@ public class MaxPropertiesValidatorTest extends AbstractTestNGSpringContextTests
 
         JsonNode model2 = JsonNodeUtils.create(Collections.singletonMap("addresses", holidays));
 
+        JsonNode model3 = JsonNodeUtils.create(Collections.singletonMap("addresses", null));
+
         ValidationException validationException = new ValidationException();
         validationException.add(new ValidationException.ValidationExceptionModel("/addresses", "error", "message"));
 
@@ -90,7 +92,7 @@ public class MaxPropertiesValidatorTest extends AbstractTestNGSpringContextTests
                 // not exceeded
                 { model1, old1, new ValidationException(), 0 },
                 // not exceeded
-                { JsonNodeUtils.init("addresses"), null, new ValidationException(), 0 },
+                { model3, null, new ValidationException(), 0 },
                 // not exceeded
                 { model2, JsonNodeUtils.init(), validationException, 1 }, };
     }
