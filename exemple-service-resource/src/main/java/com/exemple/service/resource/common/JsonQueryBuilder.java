@@ -21,6 +21,7 @@ import com.datastax.oss.driver.api.querybuilder.update.Assignment;
 import com.datastax.oss.driver.api.querybuilder.update.UpdateStart;
 import com.datastax.oss.driver.api.querybuilder.update.UpdateWithAssignments;
 import com.datastax.oss.protocol.internal.ProtocolConstants;
+import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
 import com.exemple.service.resource.common.util.MetadataSchemaUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -41,11 +42,15 @@ public class JsonQueryBuilder {
 
     public Insert insert(JsonNode source) {
 
+        JsonNodeFilterUtils.clean(source);
+
         return QueryBuilder.insertInto(ResourceExecutionContext.get().keyspace(), this.table).json(source, session.getContext().getCodecRegistry());
 
     }
 
     public UpdateWithAssignments update(JsonNode source) {
+
+        JsonNodeFilterUtils.cleanArray(source);
 
         TableMetadata tableMetadata = MetadataSchemaUtils.getTableMetadata(session, table);
 
@@ -116,4 +121,5 @@ public class JsonQueryBuilder {
 
         return QueryBuilder.function("fromJson", QueryBuilder.literal(source, session.getContext().getCodecRegistry()));
     }
+
 }

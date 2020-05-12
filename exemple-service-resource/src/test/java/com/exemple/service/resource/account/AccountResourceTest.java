@@ -120,6 +120,9 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         this.id = UUID.randomUUID();
 
         this.account = resource.save(id, account);
+
+        JsonNodeFilterUtils.clean(account);
+
         assertThat(this.account.get("email"), is(account.get("email")));
         assertThat(this.account.get("lastname"), is(account.get("lastname")));
         assertThat(this.account.get("birthday"), is(account.get("birthday")));

@@ -1,5 +1,6 @@
 package com.exemple.service.resource.common.util;
 
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -39,9 +40,23 @@ public final class JsonNodeFilterUtils {
         });
     }
 
+    public static void cleanArray(JsonNode source) {
+
+        filter(source, (Map.Entry<String, JsonNode> e) -> {
+
+            if (e.getValue().isArray()) {
+
+                ((ObjectNode) source).replace(e.getKey(),
+                        JsonNodeUtils.create(Streams.stream(e.getValue().elements()).filter(node -> !node.isNull()).collect(Collectors.toList())));
+
+                cleanArray(source.get(e.getKey()));
+            }
+        });
+    }
+
     public static void filter(JsonNode source, Consumer<Entry<String, JsonNode>> action) {
 
-        if (source != null && source.isObject()) {
+        if (source.isObject()) {
             Streams.stream(JsonNodeUtils.clone(source).fields()).forEach(action);
         }
     }
