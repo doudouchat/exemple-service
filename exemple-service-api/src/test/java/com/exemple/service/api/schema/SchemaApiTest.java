@@ -46,7 +46,7 @@ public class SchemaApiTest extends JerseySpringSupport {
         String app = "default";
         String version = "v1";
 
-        Mockito.when(service.get(Mockito.eq(app), Mockito.eq(version), Mockito.eq(resource))).thenReturn(JsonNodeUtils.init("$schema"));
+        Mockito.when(service.get(Mockito.eq(app), Mockito.eq(version), Mockito.eq(resource))).thenReturn(JsonNodeUtils.init());
 
         Response response = target(URL + "/" + resource + "/" + app + "/" + version).request(MediaType.APPLICATION_JSON).get();
 
@@ -62,7 +62,7 @@ public class SchemaApiTest extends JerseySpringSupport {
 
         String resource = "patch";
 
-        Mockito.when(service.getPatch()).thenReturn(JsonNodeUtils.init("$schema"));
+        Mockito.when(service.getPatch()).thenReturn(JsonNodeUtils.init());
 
         Response response = target(URL + "/" + resource).request(MediaType.APPLICATION_JSON).get();
 

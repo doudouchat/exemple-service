@@ -4,6 +4,7 @@
 	<test name="ut">
 		<packages>
 			<package name="com.exemple.service.resource.common.validator" />
+			<package name="com.exemple.service.resource.common" />
 			<package name="com.exemple.service.resource.account" />
 			<package name="com.exemple.service.resource.login" />
 			<package name="com.exemple.service.resource.schema" />

@@ -32,13 +32,16 @@ public class CreateOnlyValidatorTest extends AbstractTestNGSpringContextTests {
         Map<String, Object> old1 = new HashMap<>();
         old1.put("id", "ID2");
 
+        Map<String, Object> model2 = new HashMap<>();
+        model2.put("id", null);
+
         return new Object[][] {
                 // id different
                 { JsonNodeUtils.create(model1), JsonNodeUtils.create(old1) },
                 // id different
                 { JsonNodeUtils.create(model1), JsonNodeUtils.init() },
                 // id null
-                { JsonNodeUtils.init("id"), JsonNodeUtils.create(old1) },
+                { JsonNodeUtils.create(model2), JsonNodeUtils.create(old1) },
                 //
         };
     }

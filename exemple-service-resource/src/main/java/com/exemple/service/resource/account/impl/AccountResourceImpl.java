@@ -34,7 +34,7 @@ public class AccountResourceImpl implements AccountResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(AccountResourceImpl.class);
 
-    private static final String ACCOUNT_TABLE = "account";
+    public static final String ACCOUNT_TABLE = "account";
 
     private final CqlSession session;
 

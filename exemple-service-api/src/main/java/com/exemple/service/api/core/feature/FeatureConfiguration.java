@@ -15,7 +15,6 @@ import org.springframework.validation.beanvalidation.MessageSourceResourceBundle
 
 import com.exemple.service.api.core.authorization.AuthorizationFilter;
 import com.exemple.service.api.core.filter.ExecutionContextResponseFilter;
-import com.exemple.service.api.core.keyspace.KeyspaceFilter;
 import com.exemple.service.api.core.listener.ApiEventListener;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -65,10 +64,6 @@ public class FeatureConfiguration extends ResourceConfig {
                         .register(RolesAllowedDynamicFeature.class)
 
                         .register(AuthorizationFilter.class)
-
-                        // keyspace
-
-                        .register(KeyspaceFilter.class)
 
                         // logging
 

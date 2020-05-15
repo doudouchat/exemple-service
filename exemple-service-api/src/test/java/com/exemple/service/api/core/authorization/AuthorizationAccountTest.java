@@ -126,7 +126,7 @@ public class AuthorizationAccountTest extends JerseySpringSupport {
         String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe").withAudience("exemple")
                 .withArrayClaim("scope", new String[] { "account:read" }).sign(RSA256_ALGORITHM);
 
-        Mockito.when(accountService.get(Mockito.eq(ID), Mockito.eq("test"), Mockito.eq("v1"))).thenReturn(JsonNodeUtils.init("email"));
+        Mockito.when(accountService.get(Mockito.eq(ID), Mockito.eq("test"), Mockito.eq("v1"))).thenReturn(JsonNodeUtils.init());
         Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(Optional.of(JsonNodeUtils.create(Collections.singletonMap("id", ID))));
 
         Response response = target(AccountApiTest.URL + "/" + ID).request(MediaType.APPLICATION_JSON)
@@ -156,7 +156,7 @@ public class AuthorizationAccountTest extends JerseySpringSupport {
         Response response = target(AccountApiTest.URL).request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
-                .post(Entity.json(JsonNodeUtils.init("email").toString()));
+                .post(Entity.json(JsonNodeUtils.init().toString()));
 
         Mockito.verify(accountService).save(Mockito.any(JsonNode.class), Mockito.eq("test"), Mockito.eq("v1"));
 
@@ -174,7 +174,7 @@ public class AuthorizationAccountTest extends JerseySpringSupport {
         String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe").withAudience("exemple")
                 .withArrayClaim("scope", new String[] { "account:read" }).sign(RSA256_ALGORITHM);
 
-        Mockito.when(accountService.get(Mockito.eq(ID), Mockito.eq("test"), Mockito.eq("v1"))).thenReturn(JsonNodeUtils.init("email"));
+        Mockito.when(accountService.get(Mockito.eq(ID), Mockito.eq("test"), Mockito.eq("v1"))).thenReturn(JsonNodeUtils.init());
         Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(Optional.of(JsonNodeUtils.create(Collections.singletonMap("id", ID))));
 
         Response response = target(AccountApiTest.URL + "/" + ID).request(MediaType.APPLICATION_JSON)
@@ -191,6 +191,5 @@ public class AuthorizationAccountTest extends JerseySpringSupport {
         assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH));
 
     }
-
 
 }

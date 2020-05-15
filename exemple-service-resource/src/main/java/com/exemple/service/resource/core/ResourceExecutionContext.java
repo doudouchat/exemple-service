@@ -1,5 +1,6 @@
 package com.exemple.service.resource.core;
 
+import java.security.Principal;
 import java.time.OffsetDateTime;
 
 import org.springframework.util.Assert;
@@ -11,6 +12,12 @@ public final class ResourceExecutionContext {
     private OffsetDateTime date = OffsetDateTime.now();
 
     private String keyspace;
+
+    private Principal principal = () -> "anonymous";
+
+    private String application;
+
+    private String version;
 
     private ResourceExecutionContext() {
 
@@ -47,5 +54,29 @@ public final class ResourceExecutionContext {
 
     public void setKeyspace(String keyspace) {
         this.keyspace = keyspace;
+    }
+
+    public Principal getPrincipal() {
+        return principal;
+    }
+
+    public void setPrincipal(Principal principal) {
+        this.principal = principal;
+    }
+
+    public String getApplication() {
+        return application;
+    }
+
+    public void setApplication(String application) {
+        this.application = application;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

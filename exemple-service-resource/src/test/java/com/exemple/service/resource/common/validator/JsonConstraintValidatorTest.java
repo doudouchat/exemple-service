@@ -16,7 +16,6 @@ import javax.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -24,7 +23,6 @@ import com.exemple.service.resource.account.AccountResource;
 import com.exemple.service.resource.account.model.Account;
 import com.exemple.service.resource.account.model.Address;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -33,14 +31,6 @@ public class JsonConstraintValidatorTest extends AbstractTestNGSpringContextTest
 
     @Autowired
     private AccountResource resource;
-
-    @AfterClass
-    public void executionContextDestroy() {
-
-        ResourceExecutionContext.destroy();
-
-        ResourceExecutionContext.get().setKeyspace("test");
-    }
 
     @Test
     public void success() {
@@ -76,7 +66,7 @@ public class JsonConstraintValidatorTest extends AbstractTestNGSpringContextTest
 
         return new Object[][] {
                 // text failure
-                { "lastname", 10 },
+                { "email", 10 },
                 // int failure
                 { "age", "age" },
                 // field unknown
@@ -86,7 +76,7 @@ public class JsonConstraintValidatorTest extends AbstractTestNGSpringContextTest
                 // timestamp failure
                 { "creation_date", "2019-02-30T10:00:00Z" }, { "creation_date", "aaa" },
                 // boolean failure
-                { "subscription_1", 10 },
+                { "enabled", 10 },
                 // map failure
                 { "addresses", 10 },
                 // map int failure

@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.exemple.service.api.common.security.ApiSecurityContext;
+import com.exemple.service.resource.core.ResourceExecutionContext;
 
 @Priority(Priorities.AUTHENTICATION)
 public class AuthorizationFilter implements ContainerRequestFilter, ContainerResponseFilter {
@@ -24,6 +25,8 @@ public class AuthorizationFilter implements ContainerRequestFilter, ContainerRes
         try {
 
             ApiSecurityContext context = service.buildContext(requestContext.getHeaders());
+
+            ResourceExecutionContext.get().setPrincipal(context.getUserPrincipal());
 
             requestContext.setSecurityContext(context);
 

@@ -62,7 +62,7 @@ public class AccountApiTest extends JerseySpringSupport {
 
         UUID id = UUID.randomUUID();
 
-        Mockito.when(service.get(Mockito.eq(id), Mockito.eq("test"), Mockito.eq("v1"))).thenReturn(JsonNodeUtils.init("email"));
+        Mockito.when(service.get(Mockito.eq(id), Mockito.eq("test"), Mockito.eq("v1"))).thenReturn(JsonNodeUtils.init());
 
         Response response = target(URL + "/" + id).request(MediaType.APPLICATION_JSON)
 
@@ -162,7 +162,7 @@ public class AccountApiTest extends JerseySpringSupport {
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
 
-                .post(Entity.json(JsonNodeUtils.init("email").toString()));
+                .post(Entity.json(JsonNodeUtils.init().toString()));
 
         Mockito.verify(service).save(Mockito.any(JsonNode.class), Mockito.eq("test"), Mockito.eq("v1"));
 
@@ -217,7 +217,7 @@ public class AccountApiTest extends JerseySpringSupport {
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
 
-                .post(Entity.json(JsonNodeUtils.init("email").toString()));
+                .post(Entity.json(JsonNodeUtils.init().toString()));
 
         Mockito.verify(service).save(Mockito.any(JsonNode.class), Mockito.eq("test"), Mockito.eq("v1"));
 
