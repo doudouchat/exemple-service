@@ -84,6 +84,7 @@ public class IntegrationTestConfiguration {
         accountSchema.setApplication(AccountNominalIT.APP_HEADER_VALUE);
         accountSchema.setVersion(AccountNominalIT.VERSION_HEADER_VALUE);
         accountSchema.setResource("account");
+        accountSchema.setProfile("user");
         accountSchema.setContent(IOUtils.toByteArray(new ClassPathResource("account.json").getInputStream()));
         accountSchema.setFilters(accountFilter);
         accountSchema.setRules(accountRules);
@@ -102,6 +103,7 @@ public class IntegrationTestConfiguration {
         loginSchema.setApplication(AccountNominalIT.APP_HEADER_VALUE);
         loginSchema.setVersion(AccountNominalIT.VERSION_HEADER_VALUE);
         loginSchema.setResource("login");
+        loginSchema.setProfile("user");
         loginSchema.setContent(IOUtils.toByteArray(new ClassPathResource("login.json").getInputStream()));
         loginSchema.setFilters(loginFilter);
         loginSchema.setRules(loginRules);
@@ -118,6 +120,7 @@ public class IntegrationTestConfiguration {
         subscriptionSchema.setApplication(AccountNominalIT.APP_HEADER_VALUE);
         subscriptionSchema.setVersion(AccountNominalIT.VERSION_HEADER_VALUE);
         subscriptionSchema.setResource("subscription");
+        subscriptionSchema.setProfile("user");
         subscriptionSchema.setContent(IOUtils.toByteArray(new ClassPathResource("subscription.json").getInputStream()));
         subscriptionSchema.setFilters(subscriptionFilter);
         subscriptionSchema.setRules(subscriptionRules);

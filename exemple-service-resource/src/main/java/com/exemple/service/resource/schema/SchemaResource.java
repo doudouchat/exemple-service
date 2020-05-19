@@ -7,12 +7,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.exemple.service.resource.schema.model.SchemaEntity;
+import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
 
 public interface SchemaResource {
 
-    SchemaEntity get(@NotBlank String app, @NotBlank String version, @NotBlank String resource);
+    SchemaEntity get(@NotBlank String app, @NotBlank String version, @NotBlank String resource, @NotBlank String profile);
 
-    Map<String, List<String>> allVersions(@NotBlank String app);
+    Map<String, List<SchemaVersionProfileEntity>> allVersions(@NotBlank String app);
 
     void save(@NotNull SchemaEntity resourceSchema);
 

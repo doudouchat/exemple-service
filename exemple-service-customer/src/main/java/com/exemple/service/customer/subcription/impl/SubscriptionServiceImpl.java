@@ -36,12 +36,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public boolean save(String email, JsonNode source, String app, String version) {
+    public boolean save(String email, JsonNode source, String app, String version, String profile) {
 
         JsonNode subscription = JsonNodeUtils.clone(source);
         JsonNodeUtils.set(subscription, email, SubscriptionField.EMAIL.field);
 
-        subscriptionValidation.validate(subscription, null, app, version);
+        subscriptionValidation.validate(subscription, null, app, version, profile);
 
         boolean created = !subscriptionResource.get(email).isPresent();
 
@@ -56,10 +56,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public JsonNode get(String email, String app, String version) throws SubscriptionServiceNotFoundException {
+    public JsonNode get(String email, String app, String version, String profile) throws SubscriptionServiceNotFoundException {
 
         JsonNode source = subscriptionResource.get(email).orElseThrow(SubscriptionServiceNotFoundException::new);
 
-        return schemaFilter.filter(app, version, "subscription", source);
+        return schemaFilter.filter(app, version, "subscription", profile, source);
     }
 }

@@ -67,10 +67,11 @@ CREATE TABLE IF NOT EXISTS resource_schema (
 	app text,
 	version text,
 	resource text,
+	profile text,
 	content blob,
 	filter set<text>,
 	rule map<text, frozen<set<text>>>,
-	PRIMARY KEY ((app), resource, version)
+	PRIMARY KEY ((app), resource, version, profile)
 );
        
 CREATE INDEX IF NOT EXISTS account_status

@@ -37,6 +37,8 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
 
     private static final String VERSION = "default";
 
+    private static final String PROFILE = "default";
+
     @BeforeMethod
     private void before() {
 
@@ -63,7 +65,7 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
 
         Mockito.when(resource.get(email)).thenReturn(subscription);
 
-        boolean created = service.save(email, JsonNodeUtils.init(), APP, VERSION);
+        boolean created = service.save(email, JsonNodeUtils.init(), APP, VERSION, PROFILE);
 
         Mockito.verify(resource).save(Mockito.eq(email), Mockito.any(JsonNode.class));
 
@@ -76,12 +78,11 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
 
         String email = "jean@gmail.com";
 
-        Mockito.when(
-                schemaFilter.filter(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(JsonNode.class)))
-                .thenReturn(JsonNodeUtils.init());
+        Mockito.when(schemaFilter.filter(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class),
+                Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.init());
         Mockito.when(resource.get(Mockito.eq(email))).thenReturn(Optional.of(JsonNodeUtils.init()));
 
-        JsonNode data = service.get(email, APP, VERSION);
+        JsonNode data = service.get(email, APP, VERSION, PROFILE);
 
         assertThat(data, is(JsonNodeUtils.init()));
 
@@ -94,7 +95,7 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
 
         Mockito.when(resource.get(Mockito.eq(email))).thenReturn(Optional.empty());
 
-        service.get(email, APP, VERSION);
+        service.get(email, APP, VERSION, PROFILE);
 
     }
 }

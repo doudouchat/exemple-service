@@ -54,9 +54,10 @@ public class SchemaFilterTest extends AbstractTestNGSpringContextTests {
         String app = RandomStringUtils.random(15);
         SchemaEntity resourceSchema = new SchemaEntity();
         resourceSchema.setFilters(filters);
-        Mockito.when(schemaResource.get(Mockito.eq(app), Mockito.eq("default"), Mockito.eq("schema_test"))).thenReturn(resourceSchema);
+        Mockito.when(schemaResource.get(Mockito.eq(app), Mockito.eq("default"), Mockito.eq("schema_test"), Mockito.eq("default")))
+                .thenReturn(resourceSchema);
 
-        JsonNode newData = schemaFilter.filter(app, "default", "schema_test", MAPPER.convertValue(data, JsonNode.class));
+        JsonNode newData = schemaFilter.filter(app, "default", "schema_test", "default", MAPPER.convertValue(data, JsonNode.class));
         assertThat(newData, hasJsonField("field1", "value1"));
         assertThat(newData, not(hasJsonField("field2")));
         assertThat(newData, hasJsonField("field3", hasJsonField("object2", "value2")));
@@ -73,9 +74,10 @@ public class SchemaFilterTest extends AbstractTestNGSpringContextTests {
         SchemaEntity resourceSchema = new SchemaEntity();
         resourceSchema.setFilters(Collections.singleton(" ,field1"));
 
-        Mockito.when(schemaResource.get(Mockito.eq(app), Mockito.eq("default"), Mockito.eq("schema_test"))).thenReturn(resourceSchema);
+        Mockito.when(schemaResource.get(Mockito.eq(app), Mockito.eq("default"), Mockito.eq("schema_test"), Mockito.eq("default")))
+                .thenReturn(resourceSchema);
 
-        schemaFilter.filter(app, "default", "schema_test", MAPPER.convertValue(data, JsonNode.class));
+        schemaFilter.filter(app, "default", "schema_test", "default", MAPPER.convertValue(data, JsonNode.class));
 
     }
 

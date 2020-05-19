@@ -34,11 +34,11 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public void save(String login, JsonNode source, String app, String version) throws LoginServiceException {
+    public void save(String login, JsonNode source, String app, String version, String profile) throws LoginServiceException {
 
         JsonNode old = loginResource.get(login).orElseThrow(LoginServiceNotFoundException::new);
 
-        loginValidation.validate(source, old, app, version);
+        loginValidation.validate(source, old, app, version, profile);
 
         try {
             loginResource.save(login, source);
@@ -49,9 +49,9 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public void save(JsonNode source, String app, String version) throws LoginServiceException {
+    public void save(JsonNode source, String app, String version, String profile) throws LoginServiceException {
 
-        loginValidation.validate(source, null, app, version);
+        loginValidation.validate(source, null, app, version, profile);
 
         try {
             loginResource.save(source);
@@ -69,11 +69,11 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public JsonNode get(String login, String app, String version) throws LoginServiceNotFoundException {
+    public JsonNode get(String login, String app, String version, String profile) throws LoginServiceNotFoundException {
 
         JsonNode source = loginResource.get(login).orElseThrow(LoginServiceNotFoundException::new);
 
-        return schemaFilter.filter(app, version, "login", source);
+        return schemaFilter.filter(app, version, "login", profile, source);
     }
 
 }

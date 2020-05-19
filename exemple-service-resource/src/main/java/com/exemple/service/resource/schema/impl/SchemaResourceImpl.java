@@ -19,6 +19,7 @@ import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.dao.ResourceSchemaDao;
 import com.exemple.service.resource.schema.mapper.ResourceSchemaMapper;
 import com.exemple.service.resource.schema.model.SchemaEntity;
+import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
 
 @Service
 @Validated
@@ -38,9 +39,9 @@ public class SchemaResourceImpl implements SchemaResource {
 
     @Override
     @Cacheable("schema_resource")
-    public SchemaEntity get(String app, String version, String resource) {
+    public SchemaEntity get(String app, String version, String resource, String profile) {
 
-        SchemaEntity resourceSchema = dao().findByApplicationAndResourceAndVersion(app, resource, version);
+        SchemaEntity resourceSchema = dao().findByApplicationAndResourceAndVersionAndProfile(app, resource, version, profile);
 
         if (resourceSchema == null) {
             resourceSchema = new SchemaEntity();
@@ -55,13 +56,13 @@ public class SchemaResourceImpl implements SchemaResource {
 
     @Override
     @Cacheable("schema_resources")
-    public Map<String, List<String>> allVersions(String app) {
+    public Map<String, List<SchemaVersionProfileEntity>> allVersions(String app) {
 
-        Map<String, List<String>> versions = new HashMap<>();
+        Map<String, List<SchemaVersionProfileEntity>> versions = new HashMap<>();
 
         dao().findByApplication(app).all().forEach((SchemaEntity resource) -> {
             versions.putIfAbsent(resource.getResource(), new ArrayList<>());
-            versions.get(resource.getResource()).add(resource.getVersion());
+            versions.get(resource.getResource()).add(new SchemaVersionProfileEntity(resource.getVersion(), resource.getProfile()));
         });
 
         return versions;

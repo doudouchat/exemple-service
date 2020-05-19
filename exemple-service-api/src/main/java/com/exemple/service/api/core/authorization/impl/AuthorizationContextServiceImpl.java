@@ -90,11 +90,12 @@ public class AuthorizationContextServiceImpl implements AuthorizationContextServ
 
             Principal principal = () -> ObjectUtils.defaultIfNull(payload.getSubject(), clientId);
 
-            return new ApiSecurityContext(principal, "https", payload.getClaim("scope").asList(String.class), payload);
+            return new ApiSecurityContext(principal, "https", payload.getClaim("scope").asList(String.class), payload.getClaim("profile").asString(),
+                    payload);
 
         }
 
-        return new ApiSecurityContext(() -> "anonymous", "http", Collections.emptyList(), null);
+        return new ApiSecurityContext(() -> "anonymous", "http", Collections.emptyList(), null, null);
     }
 
     @Override

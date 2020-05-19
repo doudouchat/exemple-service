@@ -1,9 +1,10 @@
 SELECT * FROM test.account;
 
-INSERT INTO test.resource_schema (app, version, resource, content) VALUES (
+INSERT INTO test.resource_schema (app, version, resource, profile, content) VALUES (
 	'app1',
 	'v1',
-	'account',textAsBlob(
+	'account',
+	'example', textAsBlob(
 	'{
 		"$schema": "http://json-schema.org/draft-07/schema",
 		"properties": {

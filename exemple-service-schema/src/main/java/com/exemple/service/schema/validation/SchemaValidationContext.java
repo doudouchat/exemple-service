@@ -10,6 +10,8 @@ public final class SchemaValidationContext {
 
     private String resource;
 
+    private String profile;
+
     private SchemaValidationContext() {
 
     }
@@ -50,6 +52,14 @@ public final class SchemaValidationContext {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public String getProfile() {
+        return profile;
+    }
+
+    public void setProfile(String profile) {
+        this.profile = profile;
     }
 
 }

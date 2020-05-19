@@ -18,19 +18,22 @@ public class ApiSecurityContext implements SecurityContext {
 
     private final Payload payload;
 
-    private ApiSecurityContext(Principal principal, String scheme, Predicate<String> containsRole, Payload payload) {
+    private final String profile;
+
+    private ApiSecurityContext(Principal principal, String scheme, Predicate<String> containsRole, Payload payload, String profile) {
         this.principal = principal;
         this.scheme = scheme;
         this.containsRole = containsRole;
         this.payload = payload;
+        this.profile = profile;
     }
 
-    public ApiSecurityContext(Principal principal, String scheme, Collection<String> roles, Payload payload) {
-        this(principal, scheme, roles::contains, payload);
+    public ApiSecurityContext(Principal principal, String scheme, Collection<String> roles, String profile, Payload payload) {
+        this(principal, scheme, roles::contains, payload, profile);
     }
 
     public ApiSecurityContext(Principal principal, String scheme) {
-        this(principal, scheme, (String role) -> true, null);
+        this(principal, scheme, (String role) -> true, null, null);
     }
 
     @Override
@@ -55,6 +58,10 @@ public class ApiSecurityContext implements SecurityContext {
 
     public Payload getPayload() {
         return payload;
+    }
+
+    public String getProfile() {
+        return profile;
     }
 
 }

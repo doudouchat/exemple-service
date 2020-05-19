@@ -22,7 +22,7 @@ public class SchemaDescriptionTest extends AbstractTestNGSpringContextTests {
     @Test
     public void get() {
 
-        JsonNode schema = service.get("default", "default", "schema_test");
+        JsonNode schema = service.get("default", "default", "schema_test", "default");
 
         assertThat(schema, is(notNullValue()));
         assertThat(schema, hasJsonField("$schema", "http://json-schema.org/draft-07/schema"));

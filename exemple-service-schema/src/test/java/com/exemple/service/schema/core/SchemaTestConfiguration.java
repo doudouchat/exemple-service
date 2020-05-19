@@ -27,12 +27,14 @@ public class SchemaTestConfiguration {
 
         SchemaEntity unknownResourceSchema = new SchemaEntity();
         unknownResourceSchema.setContent(SchemaResourceImpl.SCHEMA_DEFAULT.getBytes());
-        Mockito.when(resource.get(Mockito.eq("unknown"), Mockito.eq("unknown"), Mockito.eq("schema_test"))).thenReturn(unknownResourceSchema);
+        Mockito.when(resource.get(Mockito.eq("unknown"), Mockito.eq("unknown"), Mockito.eq("schema_test"), Mockito.eq("unknown")))
+                .thenReturn(unknownResourceSchema);
 
         SchemaEntity defaultResourceSchema = new SchemaEntity();
         defaultResourceSchema.setContent(IOUtils.toByteArray(schema.getInputStream()));
         defaultResourceSchema.setRules(Collections.singletonMap("dependencies", Collections.singleton("opt_in_email")));
-        Mockito.when(resource.get(Mockito.eq("default"), Mockito.eq("default"), Mockito.eq("schema_test"))).thenReturn(defaultResourceSchema);
+        Mockito.when(resource.get(Mockito.eq("default"), Mockito.eq("default"), Mockito.eq("schema_test"), Mockito.eq("default")))
+                .thenReturn(defaultResourceSchema);
 
         return resource;
     }

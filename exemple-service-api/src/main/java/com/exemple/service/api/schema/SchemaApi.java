@@ -32,17 +32,17 @@ public class SchemaApi {
     }
 
     @GET
-    @Path("/{resource}/{app}/{version}")
+    @Path("/{resource}/{app}/{version}/{profile}")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(hidden = true)
     public JsonNode get(@NotNull @PathParam("resource") String resource, @NotNull @PathParam("app") String app,
-            @NotNull @PathParam("version") String version) {
+            @NotNull @PathParam("version") String version, @NotNull @PathParam("profile") String profile) {
 
         ApplicationDetail applicationDetail = applicationDetailService.get(app);
 
         ResourceExecutionContext.get().setKeyspace(applicationDetail.getKeyspace());
 
-        return service.get(app, version, resource);
+        return service.get(app, version, resource, profile);
 
     }
 

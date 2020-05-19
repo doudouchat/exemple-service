@@ -44,9 +44,10 @@ public class SchemaValidationImpl implements SchemaValidation {
     }
 
     @Override
-    public void validate(String app, String version, String resource, JsonNode form, JsonNode old) {
+    public void validate(String app, String version, String resource, String profile, JsonNode form, JsonNode old) {
 
-        JSONObject rawSchema = new JSONObject(new JSONTokener(new ByteArrayInputStream(schemaResource.get(app, version, resource).getContent())));
+        JSONObject rawSchema = new JSONObject(
+                new JSONTokener(new ByteArrayInputStream(schemaResource.get(app, version, resource, profile).getContent())));
 
         @SuppressWarnings("unchecked")
         Map<String, Object> formMap = MAPPER.convertValue(form, Map.class);
@@ -74,7 +75,7 @@ public class SchemaValidationImpl implements SchemaValidation {
 
         }
 
-        Map<String, Set<String>> rules = schemaResource.get(app, version, resource).getRules();
+        Map<String, Set<String>> rules = schemaResource.get(app, version, resource, profile).getRules();
         rules.entrySet().forEach(rule -> rule.getValue().forEach((String p) -> {
             ValidatorService validatorService = applicationContext.getBean(rule.getKey().concat("Validator"), ValidatorService.class);
             validatorService.validate(p, form, old, validationException);
