@@ -22,9 +22,6 @@ import org.springframework.stereotype.Component;
 import com.exemple.service.api.core.ApiContext;
 import com.exemple.service.api.core.swagger.custom.DocumentApiCustom;
 import com.exemple.service.api.core.swagger.security.DocumentApiSecurity;
-import com.exemple.service.application.common.model.ApplicationDetail;
-import com.exemple.service.application.detail.ApplicationDetailService;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
 
@@ -62,13 +59,11 @@ public class DocumentApiResource extends BaseOpenApiResource {
 
     private DocumentApiSecurity documentApiSecurity;
 
-    private final ApplicationDetailService applicationDetailService;
-
     private final SchemaResource schemaResource;
 
     private final ApiContext apiContext;
 
-    public DocumentApiResource(ApplicationDetailService applicationDetailService, SchemaResource schemaResource, ApiContext apiContext) {
+    public DocumentApiResource(SchemaResource schemaResource, ApiContext apiContext) {
 
         OpenAPI openAPI = new OpenAPI();
 
@@ -78,7 +73,6 @@ public class DocumentApiResource extends BaseOpenApiResource {
         openAPI.setInfo(info);
 
         this.openApiConfiguration = new SwaggerConfiguration().filterClass(DocumentApiCustom.class.getName()).openAPI(openAPI);
-        this.applicationDetailService = applicationDetailService;
         this.schemaResource = schemaResource;
         this.apiContext = apiContext;
 
@@ -106,10 +100,6 @@ public class DocumentApiResource extends BaseOpenApiResource {
         server.setUrl(host);
 
         this.openApiConfiguration.getOpenAPI().addServersItem(server);
-
-        ApplicationDetail applicationDetail = applicationDetailService.get(app);
-
-        ResourceExecutionContext.get().setKeyspace(applicationDetail.getKeyspace());
 
         schemaResource.allVersions(app).forEach(
                 (String resource, List<SchemaVersionProfileEntity> versions) -> headers.getRequestHeaders().put(RESOURCE + resource, versions.stream()

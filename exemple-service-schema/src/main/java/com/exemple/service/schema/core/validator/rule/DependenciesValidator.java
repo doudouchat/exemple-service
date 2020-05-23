@@ -12,8 +12,9 @@ import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
+import com.exemple.service.context.ServiceContext;
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionBuilder;
@@ -28,8 +29,6 @@ public class DependenciesValidator implements ValidatorService {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private static final String CONTEXT_NOT_IMPLEMENTATION_MESSAGE = "SchemaValidationContext is not implemented";
-
     private final SchemaResource schemaResource;
 
     public DependenciesValidator(SchemaResource schemaResource) {
@@ -40,16 +39,12 @@ public class DependenciesValidator implements ValidatorService {
     @Override
     public void validate(String value, JsonNode form, JsonNode old, ValidationException validationException) {
 
-        SchemaValidationContext context = SchemaValidationContext.get();
+        ServiceContext context = ServiceContextExecution.context();
 
         String app = context.getApp();
         String version = context.getVersion();
-        String resource = context.getResource();
+        String resource = SchemaValidationContext.get().getResource();
         String profile = context.getProfile();
-
-        Assert.notNull(app, CONTEXT_NOT_IMPLEMENTATION_MESSAGE);
-        Assert.notNull(version, CONTEXT_NOT_IMPLEMENTATION_MESSAGE);
-        Assert.notNull(resource, CONTEXT_NOT_IMPLEMENTATION_MESSAGE);
 
         String[] values = StringUtils.split(value, ",");
         String path = values[0];

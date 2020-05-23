@@ -1,6 +1,5 @@
 package com.exemple.service.api.core.authorization;
 
-import static com.exemple.service.api.common.security.ApiProfile.USER_PROFILE;
 import static com.exemple.service.api.core.authorization.AuthorizationTestConfiguration.RSA256_ALGORITHM;
 import static com.exemple.service.api.core.authorization.AuthorizationTestConfiguration.TOKEN_KEY_RESPONSE;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -93,8 +92,7 @@ public class AuthorizationLoginTest extends JerseySpringSupport {
         model.put("password", "jean.dupont");
         model.put("id", ID);
 
-        Mockito.when(loginService.get(Mockito.eq("john_doe"), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile)))
-                .thenReturn(JsonNodeUtils.create(model));
+        Mockito.when(loginService.get(Mockito.eq("john_doe"))).thenReturn(JsonNodeUtils.create(model));
 
         Response response = target(LoginApiTest.URL + "/" + "john_doe").request(MediaType.APPLICATION_JSON)
 
@@ -102,7 +100,7 @@ public class AuthorizationLoginTest extends JerseySpringSupport {
 
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
 
-        Mockito.verify(loginService).get(Mockito.eq("john_doe"), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile));
+        Mockito.verify(loginService).get(Mockito.eq("john_doe"));
 
         assertThat(testFilter.context.getUserPrincipal().getName(), is("john_doe"));
         assertThat(testFilter.context.isSecure(), is(true));
@@ -123,8 +121,7 @@ public class AuthorizationLoginTest extends JerseySpringSupport {
         Mockito.when(loginResource.get(Mockito.eq("jack_doe"))).thenReturn(Optional.of(JsonNodeUtils.create(model)));
         Mockito.when(loginResource.get(Mockito.eq(ID)))
                 .thenReturn(Collections.singletonList(JsonNodeUtils.create(Collections.singletonMap("username", "john_doe"))));
-        Mockito.when(loginService.get(Mockito.eq("jack_doe"), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile)))
-                .thenReturn(JsonNodeUtils.create(model));
+        Mockito.when(loginService.get(Mockito.eq("jack_doe"))).thenReturn(JsonNodeUtils.create(model));
 
         Response response = target(LoginApiTest.URL + "/" + "jack_doe").request(MediaType.APPLICATION_JSON)
 
@@ -132,7 +129,7 @@ public class AuthorizationLoginTest extends JerseySpringSupport {
 
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
 
-        Mockito.verify(loginService).get(Mockito.eq("jack_doe"), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile));
+        Mockito.verify(loginService).get(Mockito.eq("jack_doe"));
 
         assertThat(testFilter.context.getUserPrincipal().getName(), is("john_doe"));
         assertThat(testFilter.context.isSecure(), is(true));
@@ -171,8 +168,7 @@ public class AuthorizationLoginTest extends JerseySpringSupport {
         Mockito.when(loginResource.get(Mockito.eq("jack_doe"))).thenReturn(Optional.of(JsonNodeUtils.create(model)));
         Mockito.when(loginResource.get(Mockito.eq(ID)))
                 .thenReturn(Collections.singletonList(JsonNodeUtils.create(Collections.singletonMap("username", "jack_doe"))));
-        Mockito.when(loginService.get(Mockito.eq("jack_doe"), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile)))
-                .thenReturn(JsonNodeUtils.create(model));
+        Mockito.when(loginService.get(Mockito.eq("jack_doe"))).thenReturn(JsonNodeUtils.create(model));
 
         Response response = target(LoginApiTest.URL + "/" + "jack_doe").request(MediaType.APPLICATION_JSON)
 

@@ -62,7 +62,7 @@ public class StockApi {
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) ApplicationBeanParam applicationBeanParam,
             @NotNull @Valid @Parameter(schema = @Schema(implementation = Stock.class)) Stock stock) throws InsufficientStockException {
 
-        ApplicationDetail applicationDetail = applicationDetailService.get(applicationBeanParam.getApp());
+        ApplicationDetail applicationDetail = applicationDetailService.get(applicationBeanParam.app);
 
         return service.update("/" + applicationDetail.getCompany(), "/" + store, "/" + product, stock.getIncrement());
 
@@ -80,7 +80,7 @@ public class StockApi {
 
         Stock stock = new Stock();
 
-        ApplicationDetail applicationDetail = applicationDetailService.get(applicationBeanParam.getApp());
+        ApplicationDetail applicationDetail = applicationDetailService.get(applicationBeanParam.app);
 
         stock.setAmount(service.get("/" + applicationDetail.getCompany(), "/" + store, "/" + product));
 

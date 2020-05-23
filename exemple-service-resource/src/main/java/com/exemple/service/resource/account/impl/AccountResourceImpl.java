@@ -20,6 +20,7 @@ import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.insert.Insert;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
 import com.datastax.oss.driver.api.querybuilder.update.Update;
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.account.AccountField;
 import com.exemple.service.resource.account.AccountResource;
 import com.exemple.service.resource.account.history.AccountHistoryResource;
@@ -54,7 +55,7 @@ public class AccountResourceImpl implements AccountResource {
 
         LOG.debug("save account {} {}", id, source);
 
-        OffsetDateTime now = ResourceExecutionContext.get().getDate();
+        OffsetDateTime now = ServiceContextExecution.context().getDate();
 
         JsonNode accountNode = JsonNodeUtils.clone(source);
         JsonNodeUtils.set(accountNode, id, AccountField.ID.field);
@@ -75,7 +76,7 @@ public class AccountResourceImpl implements AccountResource {
 
         LOG.debug("update account {} {}", id, source);
 
-        OffsetDateTime now = ResourceExecutionContext.get().getDate();
+        OffsetDateTime now = ServiceContextExecution.context().getDate();
 
         Update update = jsonQueryBuilder.update(source).whereColumn(AccountField.ID.field).isEqualTo(QueryBuilder.literal(id));
 

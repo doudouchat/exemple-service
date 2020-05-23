@@ -23,8 +23,6 @@ import javax.ws.rs.ext.Provider;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.model.SchemaBeanParam;
-import com.exemple.service.api.common.security.ApiSecurityContext;
-import com.exemple.service.api.core.authorization.AuthorizationContextService;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.subcription.SubscriptionService;
 import com.exemple.service.customer.subcription.exception.SubscriptionServiceException;
@@ -52,15 +50,12 @@ public class SubscriptionApi {
 
     private final SubscriptionService service;
 
-    private final AuthorizationContextService authorizationContextService;
-
     @Context
     private ContainerRequestContext servletContext;
 
-    public SubscriptionApi(SubscriptionService service, AuthorizationContextService authorizationContextService) {
+    public SubscriptionApi(SubscriptionService service) {
 
         this.service = service;
-        this.authorizationContextService = authorizationContextService;
     }
 
     @GET
@@ -78,8 +73,7 @@ public class SubscriptionApi {
     public JsonNode get(@NotNull @PathParam("email") String email,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws SubscriptionServiceException {
 
-        return service.get(email, schemaBeanParam.getApp(), schemaBeanParam.getVersion(),
-                this.authorizationContextService.getUserProfile((ApiSecurityContext) servletContext.getSecurityContext()));
+        return service.get(email);
 
     }
 
@@ -101,8 +95,7 @@ public class SubscriptionApi {
             @NotNull @Parameter(schema = @Schema(ref = SUBSCRIPTION_SCHEMA)) JsonNode subscription,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam, @Context UriInfo uriInfo) {
 
-        boolean created = service.save(email, subscription, schemaBeanParam.getApp(), schemaBeanParam.getVersion(),
-                this.authorizationContextService.getUserProfile((ApiSecurityContext) servletContext.getSecurityContext()));
+        boolean created = service.save(email, subscription);
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
         builder.path(email);

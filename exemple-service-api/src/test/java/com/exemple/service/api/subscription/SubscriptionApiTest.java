@@ -1,6 +1,5 @@
 package com.exemple.service.api.subscription;
 
-import static com.exemple.service.api.common.security.ApiProfile.USER_PROFILE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -60,8 +59,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
         String email = "jean.dupond@gmail.com";
 
-        Mockito.when(service.save(Mockito.eq(email), Mockito.any(JsonNode.class), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile)))
-                .thenReturn(created);
+        Mockito.when(service.save(Mockito.eq(email), Mockito.any(JsonNode.class))).thenReturn(created);
 
         Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
 
@@ -69,7 +67,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
                 .put(Entity.json(JsonNodeUtils.init().toString()));
 
-        Mockito.verify(service).save(Mockito.eq(email), Mockito.any(JsonNode.class), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile));
+        Mockito.verify(service).save(Mockito.eq(email), Mockito.any(JsonNode.class));
 
         assertThat(response.getStatus(), is(expectedStatus.getStatusCode()));
 
@@ -80,7 +78,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
         String email = "jean.dupond@gmail.com";
 
-        Mockito.when(service.get(Mockito.eq(email), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile))).thenReturn(JsonNodeUtils.init());
+        Mockito.when(service.get(Mockito.eq(email))).thenReturn(JsonNodeUtils.init());
 
         Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
 
@@ -88,7 +86,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
                 .get();
 
-        Mockito.verify(service).get(Mockito.eq(email), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile));
+        Mockito.verify(service).get(Mockito.eq(email));
 
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
 
@@ -99,8 +97,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
         String email = "jean.dupond@gmail.com";
 
-        Mockito.when(service.get(Mockito.eq(email), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile)))
-                .thenThrow(new SubscriptionServiceNotFoundException());
+        Mockito.when(service.get(Mockito.eq(email))).thenThrow(new SubscriptionServiceNotFoundException());
 
         Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
 
@@ -108,7 +105,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
                 .get();
 
-        Mockito.verify(service).get(Mockito.eq(email), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile));
+        Mockito.verify(service).get(Mockito.eq(email));
 
         assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
 

@@ -44,12 +44,6 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private SchemaResource schemaResource;
 
-    private static final String APP = "default";
-
-    private static final String VERSION = "default";
-
-    private static final String PROFILE = "default";
-
     @BeforeMethod
     private void before() {
 
@@ -79,7 +73,7 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
         Mockito.when(schemaFilter.filter(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class),
                 Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.create(model));
 
-        JsonNode account = service.save(JsonNodeUtils.create(model), APP, VERSION, PROFILE);
+        JsonNode account = service.save(JsonNodeUtils.create(model));
         assertThat(account, is(notNullValue()));
 
         assertThat(account, hasJsonField("email", "jean.dupont@gmail.com"));
@@ -104,7 +98,7 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
         Mockito.when(schemaFilter.filter(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class),
                 Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.create(model));
 
-        JsonNode account = service.save(id, JsonNodeUtils.create(model), APP, VERSION, PROFILE);
+        JsonNode account = service.save(id, JsonNodeUtils.create(model));
 
         // Mockito.verify(resource).get(Mockito.eq(id));
         // Mockito.verify(resource).update(Mockito.eq(id), Mockito.any(JsonNode.class));
@@ -130,7 +124,7 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
                 Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.create(model));
         Mockito.when(resource.get(Mockito.eq(id))).thenReturn(Optional.of(JsonNodeUtils.create(model)));
 
-        JsonNode account = service.get(id, APP, VERSION, PROFILE);
+        JsonNode account = service.get(id);
         assertThat(account, is(notNullValue()));
 
         assertThat(account, hasJsonField("email", "jean.dupont@gmail.com"));
@@ -146,8 +140,8 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
 
         Mockito.when(resource.get(Mockito.eq(id))).thenReturn(Optional.of(JsonNodeUtils.init()));
 
-        service.get(id, APP, VERSION, PROFILE);
-        service.get(id, APP, VERSION, PROFILE);
+        service.get(id);
+        service.get(id);
 
     }
 
@@ -162,7 +156,7 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
 
         Mockito.when(resource.get(Mockito.eq(id))).thenReturn(Optional.empty());
 
-        service.get(id, APP, VERSION, PROFILE);
+        service.get(id);
 
     }
 

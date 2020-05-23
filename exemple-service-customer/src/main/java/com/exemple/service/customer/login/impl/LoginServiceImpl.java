@@ -2,6 +2,8 @@ package com.exemple.service.customer.login.impl;
 
 import org.springframework.stereotype.Service;
 
+import com.exemple.service.context.ServiceContext;
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.customer.login.exception.LoginServiceException;
 import com.exemple.service.customer.login.exception.LoginServiceExistException;
@@ -34,11 +36,13 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public void save(String login, JsonNode source, String app, String version, String profile) throws LoginServiceException {
+    public void save(String login, JsonNode source) throws LoginServiceException {
+
+        ServiceContext context = ServiceContextExecution.context();
 
         JsonNode old = loginResource.get(login).orElseThrow(LoginServiceNotFoundException::new);
 
-        loginValidation.validate(source, old, app, version, profile);
+        loginValidation.validate(source, old, context.getApp(), context.getVersion(), context.getProfile());
 
         try {
             loginResource.save(login, source);
@@ -49,9 +53,11 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public void save(JsonNode source, String app, String version, String profile) throws LoginServiceException {
+    public void save(JsonNode source) throws LoginServiceException {
 
-        loginValidation.validate(source, null, app, version, profile);
+        ServiceContext context = ServiceContextExecution.context();
+
+        loginValidation.validate(source, null, context.getApp(), context.getVersion(), context.getProfile());
 
         try {
             loginResource.save(source);
@@ -69,11 +75,13 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public JsonNode get(String login, String app, String version, String profile) throws LoginServiceNotFoundException {
+    public JsonNode get(String login) throws LoginServiceNotFoundException {
+
+        ServiceContext context = ServiceContextExecution.context();
 
         JsonNode source = loginResource.get(login).orElseThrow(LoginServiceNotFoundException::new);
 
-        return schemaFilter.filter(app, version, "login", profile, source);
+        return schemaFilter.filter(context.getApp(), context.getVersion(), "login", context.getProfile(), source);
     }
 
 }

@@ -3,13 +3,14 @@ package com.exemple.service.customer.subcription.impl;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import com.exemple.service.context.ServiceContext;
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.subcription.SubscriptionService;
 import com.exemple.service.customer.subcription.exception.SubscriptionServiceNotFoundException;
 import com.exemple.service.customer.subcription.validation.SubscriptionValidation;
 import com.exemple.service.event.model.EventData;
 import com.exemple.service.event.model.EventType;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.subscription.SubscriptionField;
 import com.exemple.service.resource.subscription.SubscriptionResource;
 import com.exemple.service.schema.filter.SchemaFilter;
@@ -36,19 +37,21 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public boolean save(String email, JsonNode source, String app, String version, String profile) {
+    public boolean save(String email, JsonNode source) {
+
+        ServiceContext context = ServiceContextExecution.context();
 
         JsonNode subscription = JsonNodeUtils.clone(source);
         JsonNodeUtils.set(subscription, email, SubscriptionField.EMAIL.field);
 
-        subscriptionValidation.validate(subscription, null, app, version, profile);
+        subscriptionValidation.validate(subscription, null, context.getApp(), context.getVersion(), context.getProfile());
 
         boolean created = !subscriptionResource.get(email).isPresent();
 
         subscriptionResource.save(email, source);
 
-        EventData eventData = new EventData(subscription, "subscription", EventType.CREATE, app, version,
-                ResourceExecutionContext.get().getDate().toString());
+        EventData eventData = new EventData(subscription, "subscription", EventType.CREATE, context.getApp(), context.getVersion(),
+                context.getDate().toString());
         applicationEventPublisher.publishEvent(eventData);
 
         return created;
@@ -56,10 +59,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public JsonNode get(String email, String app, String version, String profile) throws SubscriptionServiceNotFoundException {
+    public JsonNode get(String email) throws SubscriptionServiceNotFoundException {
+
+        ServiceContext context = ServiceContextExecution.context();
 
         JsonNode source = subscriptionResource.get(email).orElseThrow(SubscriptionServiceNotFoundException::new);
 
-        return schemaFilter.filter(app, version, "subscription", profile, source);
+        return schemaFilter.filter(context.getApp(), context.getVersion(), "subscription", context.getProfile(), source);
     }
 }

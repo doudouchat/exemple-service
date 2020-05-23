@@ -4,6 +4,8 @@ import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.exemple.service.context.ServiceContext;
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.account.AccountResource;
 import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.schema.SchemaResource;
@@ -13,6 +15,15 @@ import com.exemple.service.schema.validation.SchemaValidation;
 
 @Configuration
 public class CustomerTestConfiguration extends CustomerConfiguration {
+
+    static {
+
+        ServiceContext context = ServiceContextExecution.context();
+        context.setApp("default");
+        context.setProfile("default");
+        context.setVersion("default");
+
+    }
 
     @Bean
     public AccountResource accountResource() {

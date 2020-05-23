@@ -9,9 +9,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.springframework.stereotype.Component;
 
-import com.exemple.service.application.common.model.ApplicationDetail;
-import com.exemple.service.application.detail.ApplicationDetailService;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.schema.description.SchemaDescription;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -23,12 +20,9 @@ public class SchemaApi {
 
     private final SchemaDescription service;
 
-    private final ApplicationDetailService applicationDetailService;
-
-    public SchemaApi(SchemaDescription service, ApplicationDetailService applicationDetailService) {
+    public SchemaApi(SchemaDescription service) {
 
         this.service = service;
-        this.applicationDetailService = applicationDetailService;
     }
 
     @GET
@@ -37,10 +31,6 @@ public class SchemaApi {
     @Operation(hidden = true)
     public JsonNode get(@NotNull @PathParam("resource") String resource, @NotNull @PathParam("app") String app,
             @NotNull @PathParam("version") String version, @NotNull @PathParam("profile") String profile) {
-
-        ApplicationDetail applicationDetail = applicationDetailService.get(app);
-
-        ResourceExecutionContext.get().setKeyspace(applicationDetail.getKeyspace());
 
         return service.get(app, version, resource, profile);
 
