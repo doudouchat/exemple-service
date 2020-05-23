@@ -18,9 +18,9 @@ public class SchemaFilterImpl implements SchemaFilter {
     }
 
     @Override
-    public JsonNode filter(String app, String version, String resource, JsonNode form) {
+    public JsonNode filter(String app, String version, String resource, String profile, JsonNode form) {
 
-        String[] filter = schemaResource.get(app, version, resource).getFilters().toArray(new String[0]);
+        String[] filter = schemaResource.get(app, version, resource, profile).getFilters().toArray(new String[0]);
 
         return FilterBuilder.filter(form, filter);
 

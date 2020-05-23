@@ -59,27 +59,16 @@ CREATE TABLE test.account_history (
 	PRIMARY KEY ((id), field)
 );
 
-CREATE TYPE test.schema_label_type (
-	type text,
-	description text,
-	labels map<text, text>
-);
-
 CREATE TABLE test.resource_schema ( 
 	app text,
 	version text,
 	resource text,
+	profile text,
 	content blob,
 	filter set<text>,
 	rule map<text, frozen<set<text>>>,
-	PRIMARY KEY ((app), resource, version)
+	PRIMARY KEY ((app), resource, version, profile)
 );
-
-CREATE TABLE test.account_schema ( 
-	app text PRIMARY KEY,
-	labels map<text, frozen<schema_label_type>>
-);
-
 CREATE INDEX account_status
 	ON test.account ( status );
 	

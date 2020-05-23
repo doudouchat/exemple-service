@@ -10,6 +10,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -22,6 +23,8 @@ import javax.ws.rs.ext.Provider;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.model.SchemaBeanParam;
+import com.exemple.service.api.common.security.ApiSecurityContext;
+import com.exemple.service.api.core.authorization.AuthorizationContextService;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.subcription.SubscriptionService;
 import com.exemple.service.customer.subcription.exception.SubscriptionServiceException;
@@ -49,9 +52,15 @@ public class SubscriptionApi {
 
     private final SubscriptionService service;
 
-    public SubscriptionApi(SubscriptionService service) {
+    private final AuthorizationContextService authorizationContextService;
+
+    @Context
+    private ContainerRequestContext servletContext;
+
+    public SubscriptionApi(SubscriptionService service, AuthorizationContextService authorizationContextService) {
 
         this.service = service;
+        this.authorizationContextService = authorizationContextService;
     }
 
     @GET
@@ -69,7 +78,8 @@ public class SubscriptionApi {
     public JsonNode get(@NotNull @PathParam("email") String email,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws SubscriptionServiceException {
 
-        return service.get(email, schemaBeanParam.getApp(), schemaBeanParam.getVersion());
+        return service.get(email, schemaBeanParam.getApp(), schemaBeanParam.getVersion(),
+                this.authorizationContextService.getUserProfile((ApiSecurityContext) servletContext.getSecurityContext()));
 
     }
 
@@ -91,7 +101,8 @@ public class SubscriptionApi {
             @NotNull @Parameter(schema = @Schema(ref = SUBSCRIPTION_SCHEMA)) JsonNode subscription,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam, @Context UriInfo uriInfo) {
 
-        boolean created = service.save(email, subscription, schemaBeanParam.getApp(), schemaBeanParam.getVersion());
+        boolean created = service.save(email, subscription, schemaBeanParam.getApp(), schemaBeanParam.getVersion(),
+                this.authorizationContextService.getUserProfile((ApiSecurityContext) servletContext.getSecurityContext()));
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
         builder.path(email);

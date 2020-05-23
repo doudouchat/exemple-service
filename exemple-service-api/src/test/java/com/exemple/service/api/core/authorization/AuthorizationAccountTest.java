@@ -1,5 +1,6 @@
 package com.exemple.service.api.core.authorization;
 
+import static com.exemple.service.api.common.security.ApiProfile.USER_PROFILE;
 import static com.exemple.service.api.core.authorization.AuthorizationTestConfiguration.RSA256_ALGORITHM;
 import static com.exemple.service.api.core.authorization.AuthorizationTestConfiguration.TOKEN_KEY_RESPONSE;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -126,14 +127,15 @@ public class AuthorizationAccountTest extends JerseySpringSupport {
         String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe").withAudience("exemple")
                 .withArrayClaim("scope", new String[] { "account:read" }).sign(RSA256_ALGORITHM);
 
-        Mockito.when(accountService.get(Mockito.eq(ID), Mockito.eq("test"), Mockito.eq("v1"))).thenReturn(JsonNodeUtils.init());
+        Mockito.when(accountService.get(Mockito.eq(ID), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile)))
+                .thenReturn(JsonNodeUtils.init());
         Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(Optional.of(JsonNodeUtils.create(Collections.singletonMap("id", ID))));
 
         Response response = target(AccountApiTest.URL + "/" + ID).request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token).get();
 
-        Mockito.verify(accountService).get(Mockito.eq(ID), Mockito.eq("test"), Mockito.eq("v1"));
+        Mockito.verify(accountService).get(Mockito.eq(ID), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile));
         Mockito.verify(loginResource).get(Mockito.eq("john_doe"));
 
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
@@ -150,7 +152,7 @@ public class AuthorizationAccountTest extends JerseySpringSupport {
         String token = JWT.create().withClaim("client_id", "clientId1").withAudience("exemple")
                 .withArrayClaim("scope", new String[] { "account:create" }).sign(RSA256_ALGORITHM);
 
-        Mockito.when(accountService.save(Mockito.any(JsonNode.class), Mockito.eq("test"), Mockito.eq("v1")))
+        Mockito.when(accountService.save(Mockito.any(JsonNode.class), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile)))
                 .thenReturn(JsonNodeUtils.create(Collections.singletonMap("id", UUID.randomUUID())));
 
         Response response = target(AccountApiTest.URL).request(MediaType.APPLICATION_JSON)
@@ -158,7 +160,7 @@ public class AuthorizationAccountTest extends JerseySpringSupport {
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
                 .post(Entity.json(JsonNodeUtils.init().toString()));
 
-        Mockito.verify(accountService).save(Mockito.any(JsonNode.class), Mockito.eq("test"), Mockito.eq("v1"));
+        Mockito.verify(accountService).save(Mockito.any(JsonNode.class), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile));
 
         assertThat(response.getStatus(), is(Status.CREATED.getStatusCode()));
 
@@ -174,14 +176,15 @@ public class AuthorizationAccountTest extends JerseySpringSupport {
         String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe").withAudience("exemple")
                 .withArrayClaim("scope", new String[] { "account:read" }).sign(RSA256_ALGORITHM);
 
-        Mockito.when(accountService.get(Mockito.eq(ID), Mockito.eq("test"), Mockito.eq("v1"))).thenReturn(JsonNodeUtils.init());
+        Mockito.when(accountService.get(Mockito.eq(ID), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile)))
+                .thenReturn(JsonNodeUtils.init());
         Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(Optional.of(JsonNodeUtils.create(Collections.singletonMap("id", ID))));
 
         Response response = target(AccountApiTest.URL + "/" + ID).request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token).get();
 
-        Mockito.verify(accountService).get(Mockito.eq(ID), Mockito.eq("test"), Mockito.eq("v1"));
+        Mockito.verify(accountService).get(Mockito.eq(ID), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile));
         Mockito.verify(loginResource).get(Mockito.eq("john_doe"));
 
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));

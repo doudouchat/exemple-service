@@ -29,6 +29,9 @@ public class SchemaEntity implements Serializable {
     @ClusteringColumn(1)
     private String version;
 
+    @ClusteringColumn(2)
+    private String profile;
+
     private byte[] content;
 
     @CqlName("filter")
@@ -59,6 +62,14 @@ public class SchemaEntity implements Serializable {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public String getProfile() {
+        return profile;
+    }
+
+    public void setProfile(String profile) {
+        this.profile = profile;
     }
 
     public byte[] getContent() {

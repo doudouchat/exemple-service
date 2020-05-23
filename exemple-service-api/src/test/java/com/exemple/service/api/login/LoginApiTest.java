@@ -1,6 +1,7 @@
 package com.exemple.service.api.login;
 
 import static com.exemple.service.api.common.model.ApplicationBeanParam.APP_HEADER;
+import static com.exemple.service.api.common.security.ApiProfile.USER_PROFILE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -92,7 +93,7 @@ public class LoginApiTest extends JerseySpringSupport {
         model.put("password", "jean.dupont");
         model.put("id", UUID.randomUUID());
 
-        Mockito.doNothing().when(service).save(Mockito.any(JsonNode.class), Mockito.eq("test"), Mockito.eq("v1"));
+        Mockito.doNothing().when(service).save(Mockito.any(JsonNode.class), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile));
 
         Response response = target(URL).request(MediaType.APPLICATION_JSON)
 
@@ -100,7 +101,7 @@ public class LoginApiTest extends JerseySpringSupport {
 
                 .post(Entity.json(JsonNodeUtils.create(model)));
 
-        Mockito.verify(service).save(Mockito.any(JsonNode.class), Mockito.eq("test"), Mockito.eq("v1"));
+        Mockito.verify(service).save(Mockito.any(JsonNode.class), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile));
 
         assertThat(response.getStatus(), is(Status.CREATED.getStatusCode()));
         URI baseUri = target(URL).getUri();
@@ -117,7 +118,8 @@ public class LoginApiTest extends JerseySpringSupport {
         model.put("password", "jean.dupont");
         model.put("id", UUID.randomUUID());
 
-        Mockito.when(service.get(Mockito.eq(login), Mockito.eq("test"), Mockito.eq("v1"))).thenReturn(JsonNodeUtils.create(model));
+        Mockito.when(service.get(Mockito.eq(login), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile)))
+                .thenReturn(JsonNodeUtils.create(model));
 
         Map<String, Object> patch = new HashMap<>();
         patch.put("op", "add");
@@ -131,8 +133,9 @@ public class LoginApiTest extends JerseySpringSupport {
 
                 .method("PATCH", Entity.json(MAPPER.writeValueAsString(Collections.singletonList(patch))));
 
-        Mockito.verify(service).save(Mockito.eq(login), Mockito.any(JsonNode.class), Mockito.eq("test"), Mockito.eq("v1"));
-        Mockito.verify(service).get(Mockito.eq(login), Mockito.eq("test"), Mockito.eq("v1"));
+        Mockito.verify(service).save(Mockito.eq(login), Mockito.any(JsonNode.class), Mockito.eq("test"), Mockito.eq("v1"),
+                Mockito.eq(USER_PROFILE.profile));
+        Mockito.verify(service).get(Mockito.eq(login), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile));
 
         assertThat(response.getStatus(), is(Status.NO_CONTENT.getStatusCode()));
 
@@ -143,7 +146,8 @@ public class LoginApiTest extends JerseySpringSupport {
 
         String login = "jean.dupond@gmail.com";
 
-        Mockito.when(service.get(Mockito.eq(login), Mockito.eq("test"), Mockito.eq("v1"))).thenThrow(new LoginServiceNotFoundException());
+        Mockito.when(service.get(Mockito.eq(login), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile)))
+                .thenThrow(new LoginServiceNotFoundException());
 
         Map<String, Object> patch = new HashMap<>();
         patch.put("op", "add");
@@ -157,8 +161,9 @@ public class LoginApiTest extends JerseySpringSupport {
 
                 .method("PATCH", Entity.json(MAPPER.writeValueAsString(Collections.singletonList(patch))));
 
-        Mockito.verify(service).get(Mockito.eq(login), Mockito.eq("test"), Mockito.eq("v1"));
-        Mockito.verify(service, Mockito.never()).save(Mockito.eq(login), Mockito.any(JsonNode.class), Mockito.eq("test"), Mockito.eq("v1"));
+        Mockito.verify(service).get(Mockito.eq(login), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile));
+        Mockito.verify(service, Mockito.never()).save(Mockito.eq(login), Mockito.any(JsonNode.class), Mockito.eq("test"), Mockito.eq("v1"),
+                Mockito.eq(USER_PROFILE.profile));
 
         assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
 
@@ -173,7 +178,8 @@ public class LoginApiTest extends JerseySpringSupport {
         model.put("password", "jean.dupont");
         model.put("id", UUID.randomUUID());
 
-        Mockito.when(service.get(Mockito.eq(login), Mockito.eq("test"), Mockito.eq("v1"))).thenReturn(JsonNodeUtils.create(model));
+        Mockito.when(service.get(Mockito.eq(login), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile)))
+                .thenReturn(JsonNodeUtils.create(model));
 
         Response response = target(URL + "/" + login).request(MediaType.APPLICATION_JSON)
 
@@ -181,7 +187,7 @@ public class LoginApiTest extends JerseySpringSupport {
 
                 .get();
 
-        Mockito.verify(service).get(Mockito.eq(login), Mockito.eq("test"), Mockito.eq("v1"));
+        Mockito.verify(service).get(Mockito.eq(login), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile));
 
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
 
@@ -192,7 +198,8 @@ public class LoginApiTest extends JerseySpringSupport {
 
         String login = "jean.dupond@gmail.com";
 
-        Mockito.when(service.get(Mockito.eq(login), Mockito.eq("test"), Mockito.eq("v1"))).thenThrow(new LoginServiceNotFoundException());
+        Mockito.when(service.get(Mockito.eq(login), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile)))
+                .thenThrow(new LoginServiceNotFoundException());
 
         Response response = target(URL + "/" + login).request(MediaType.APPLICATION_JSON)
 
@@ -200,7 +207,7 @@ public class LoginApiTest extends JerseySpringSupport {
 
                 .get();
 
-        Mockito.verify(service).get(Mockito.eq(login), Mockito.eq("test"), Mockito.eq("v1"));
+        Mockito.verify(service).get(Mockito.eq(login), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile));
 
         assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
 

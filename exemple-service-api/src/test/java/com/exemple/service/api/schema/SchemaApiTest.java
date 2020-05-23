@@ -45,12 +45,13 @@ public class SchemaApiTest extends JerseySpringSupport {
         String resource = "account";
         String app = "default";
         String version = "v1";
+        String profile = "user";
 
-        Mockito.when(service.get(Mockito.eq(app), Mockito.eq(version), Mockito.eq(resource))).thenReturn(JsonNodeUtils.init());
+        Mockito.when(service.get(Mockito.eq(app), Mockito.eq(version), Mockito.eq(resource), Mockito.eq(profile))).thenReturn(JsonNodeUtils.init());
 
-        Response response = target(URL + "/" + resource + "/" + app + "/" + version).request(MediaType.APPLICATION_JSON).get();
+        Response response = target(URL + "/" + resource + "/" + app + "/" + version + "/" + profile).request(MediaType.APPLICATION_JSON).get();
 
-        Mockito.verify(service).get(app, version, resource);
+        Mockito.verify(service).get(app, version, resource, profile);
 
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
         assertThat(response.getEntity(), is(notNullValue()));
@@ -79,13 +80,14 @@ public class SchemaApiTest extends JerseySpringSupport {
         String resource = "account";
         String app = "default";
         String version = "v1";
+        String profile = "user";
 
-        Mockito.when(service.get(Mockito.eq(app), Mockito.eq(version), Mockito.eq(resource)))
+        Mockito.when(service.get(Mockito.eq(app), Mockito.eq(version), Mockito.eq(resource), Mockito.eq(profile)))
                 .thenThrow(new NotFoundApplicationException(app, new Exception()));
 
-        Response response = target(URL + "/" + resource + "/" + app + "/" + version).request(MediaType.APPLICATION_JSON).get();
+        Response response = target(URL + "/" + resource + "/" + app + "/" + version + "/" + profile).request(MediaType.APPLICATION_JSON).get();
 
-        Mockito.verify(service).get(app, version, resource);
+        Mockito.verify(service).get(app, version, resource, profile);
 
         assertThat(response.getStatus(), is(Status.FORBIDDEN.getStatusCode()));
 

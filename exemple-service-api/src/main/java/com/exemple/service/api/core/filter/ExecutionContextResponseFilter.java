@@ -25,7 +25,7 @@ public class ExecutionContextResponseFilter implements ContainerRequestFilter, C
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
-        
+
         ResourceExecutionContext.get().setDate(OffsetDateTime.now());
 
         if (requestContext.getHeaders().containsKey(ApplicationBeanParam.APP_HEADER)) {

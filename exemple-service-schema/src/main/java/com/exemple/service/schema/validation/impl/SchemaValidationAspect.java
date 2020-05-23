@@ -13,15 +13,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 @Component
 public class SchemaValidationAspect {
 
-    @Before("execution(public void com.exemple.service.schema.validation.SchemaValidation.validate(*, *, *, *, *)) "
-            + "&& args(app, version, resource, form, old)")
-    public void beforeValidate(String app, String version, String resource, JsonNode form, JsonNode old) {
+    @Before("execution(public void com.exemple.service.schema.validation.SchemaValidation.validate(*, *, *, *, *, *)) "
+            + "&& args(app, version, resource, profile, form, old)")
+    public void beforeValidate(String app, String version, String resource, String profile, JsonNode form, JsonNode old) {
 
         SchemaValidationContext context = SchemaValidationContext.get();
 
         context.setApp(app);
         context.setVersion(version);
         context.setResource(resource);
+        context.setProfile(profile);
     }
 
     @After("execution(public void com.exemple.service.schema.validation.SchemaValidation.validate(..))")

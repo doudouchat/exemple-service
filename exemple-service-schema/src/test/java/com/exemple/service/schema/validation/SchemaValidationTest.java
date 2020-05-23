@@ -50,7 +50,7 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
         model.put("opt_in_email", true);
         model.put("civility", "Mr");
 
-        validation.validate("default", "default", "schema_test", MAPPER.convertValue(model, JsonNode.class), null);
+        validation.validate("default", "default", "schema_test", "default", MAPPER.convertValue(model, JsonNode.class), null);
 
     }
 
@@ -165,7 +165,7 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
 
         try {
 
-            validation.validate("default", "default", "schema_test", MAPPER.convertValue(model, JsonNode.class),
+            validation.validate("default", "default", "schema_test", "default", MAPPER.convertValue(model, JsonNode.class),
                     MAPPER.convertValue(new HashMap<>(), JsonNode.class));
 
             Assert.fail("expected ValidationException");
@@ -192,7 +192,7 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
 
         try {
 
-            validation.validate("unknown", "unknown", "schema_test", MAPPER.convertValue(model, JsonNode.class),
+            validation.validate("unknown", "unknown", "schema_test", "unknown", MAPPER.convertValue(model, JsonNode.class),
                     MAPPER.convertValue(new HashMap<>(), JsonNode.class));
 
             Assert.fail("expected ValidationException");

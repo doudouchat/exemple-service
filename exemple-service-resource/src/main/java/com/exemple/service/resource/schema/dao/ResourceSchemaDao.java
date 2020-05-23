@@ -12,7 +12,7 @@ import com.exemple.service.resource.schema.model.SchemaEntity;
 public interface ResourceSchemaDao {
 
     @Select
-    SchemaEntity findByApplicationAndResourceAndVersion(String application, String resource, String version);
+    SchemaEntity findByApplicationAndResourceAndVersionAndProfile(String application, String resource, String version, String profile);
 
     @Select
     PagingIterable<SchemaEntity> findByApplication(String application);

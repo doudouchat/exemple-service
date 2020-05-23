@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -26,12 +26,13 @@ public class DependenciesValidatorTest extends AbstractTestNGSpringContextTests 
     @Autowired
     private DependenciesValidator validator;
 
-    @BeforeMethod
+    @BeforeClass
     private void before() {
 
         SchemaValidationContext.get().setApp("default");
         SchemaValidationContext.get().setVersion("default");
         SchemaValidationContext.get().setResource("schema_test");
+        SchemaValidationContext.get().setProfile("default");
 
     }
 

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public interface SchemaValidation {
 
-    void validate(String app, String version, String resource, JsonNode form, JsonNode old);
+    void validate(String app, String version, String resource, String profile, JsonNode form, JsonNode old);
 
     void validate(Schema schema, JsonNode target);
 

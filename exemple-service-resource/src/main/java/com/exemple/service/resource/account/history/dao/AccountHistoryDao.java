@@ -12,7 +12,7 @@ public interface AccountHistoryDao {
 
     @Select
     PagingIterable<AccountHistory> findById(UUID id);
-    
+
     @Select
     AccountHistory findByIdAndField(UUID id, String field);
 }
