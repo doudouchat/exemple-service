@@ -93,13 +93,9 @@ public final class JsonRestTemplate {
 
             int counter = COUNTER.incrementAndGet();
 
-            try {
-                String log = RequestPrinter.print(requestSpec, requestSpec.getMethod(), requestSpec.getURI(), LogDetail.ALL, Collections.emptySet(),
-                        new PrintStream(new NullOutputStream(), true, StandardCharsets.UTF_8.name()), true);
-                LOG.debug("Request {}\n{}", counter, log);
-            } catch (UnsupportedEncodingException e) {
-                throw new IllegalStateException(e);
-            }
+            String requestLog = RequestPrinter.print(requestSpec, requestSpec.getMethod(), requestSpec.getURI(), LogDetail.ALL,
+                    Collections.emptySet(), buildLogPrint(), true);
+            LOG.debug("Request {}\n{}", counter, requestLog);
 
             OffsetDateTime start = OffsetDateTime.now();
 
@@ -109,15 +105,19 @@ public final class JsonRestTemplate {
 
             long duration = ChronoUnit.MILLIS.between(start, end);
 
+            String responseLog = ResponsePrinter.print(response, response, buildLogPrint(), LogDetail.ALL, true, Collections.emptySet());
+            LOG.debug("Response {} {}ms\n{}", counter, duration, responseLog);
+
+            return response;
+        }
+
+        private static PrintStream buildLogPrint() {
+
             try {
-                String log = ResponsePrinter.print(response, response, new PrintStream(new NullOutputStream(), true, StandardCharsets.UTF_8.name()),
-                        LogDetail.ALL, true, Collections.emptySet());
-                LOG.debug("Response {} {}ms\n{}", counter, duration, log);
+                return new PrintStream(NullOutputStream.NULL_OUTPUT_STREAM, true, StandardCharsets.UTF_8.name());
             } catch (UnsupportedEncodingException e) {
                 throw new IllegalStateException(e);
             }
-
-            return response;
         }
 
     }
