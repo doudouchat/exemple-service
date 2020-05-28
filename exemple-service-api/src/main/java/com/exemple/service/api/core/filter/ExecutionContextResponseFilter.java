@@ -9,43 +9,42 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.lang3.ObjectUtils;
 
 import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.api.common.model.SchemaBeanParam;
-import com.exemple.service.application.common.model.ApplicationDetail;
-import com.exemple.service.application.detail.ApplicationDetailService;
+import com.exemple.service.api.common.security.ApiProfile;
+import com.exemple.service.api.common.security.ApiSecurityContext;
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 
 @Priority(Priorities.USER)
 public class ExecutionContextResponseFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
-    @Autowired
-    private ApplicationDetailService applicationDetailService;
-
     @Override
     public void filter(ContainerRequestContext requestContext) {
 
-        ResourceExecutionContext.get().setDate(OffsetDateTime.now());
+        ServiceContextExecution.context().setDate(OffsetDateTime.now());
+        ServiceContextExecution.context().setApp(requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER));
+        ServiceContextExecution.context().setVersion(requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER));
+        ServiceContextExecution.context().setProfile(getUserProfile((ApiSecurityContext) requestContext.getSecurityContext()));
 
-        if (requestContext.getHeaders().containsKey(ApplicationBeanParam.APP_HEADER)) {
+    }
 
-            ApplicationDetail applicationDetail = applicationDetailService.get(requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER));
+    private static String getUserProfile(ApiSecurityContext securityContext) {
 
-            ResourceExecutionContext.get().setKeyspace(applicationDetail.getKeyspace());
-            ResourceExecutionContext.get().setApplication(requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER));
-        }
+        return getProfile(securityContext, ApiProfile.USER_PROFILE.profile);
+    }
 
-        if (requestContext.getHeaders().containsKey(SchemaBeanParam.VERSION_HEADER)) {
+    private static String getProfile(ApiSecurityContext securityContext, String defaultProfile) {
 
-            ResourceExecutionContext.get().setVersion(requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER));
-        }
-
+        return ObjectUtils.defaultIfNull(securityContext.getProfile(), defaultProfile);
     }
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
 
+        ServiceContextExecution.destroy();
         ResourceExecutionContext.destroy();
 
     }

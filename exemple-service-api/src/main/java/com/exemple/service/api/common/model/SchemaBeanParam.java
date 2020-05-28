@@ -12,7 +12,7 @@ public class SchemaBeanParam extends ApplicationBeanParam {
 
     @NotBlank
     @Parameter(name = VERSION_HEADER, in = ParameterIn.HEADER)
-    private final String version;
+    public final String version;
 
     public SchemaBeanParam(@HeaderParam(APP_HEADER) String app, @HeaderParam(VERSION_HEADER) String version) {
 
@@ -20,10 +20,6 @@ public class SchemaBeanParam extends ApplicationBeanParam {
 
         this.version = version;
 
-    }
-
-    public String getVersion() {
-        return version;
     }
 
 }

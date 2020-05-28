@@ -25,6 +25,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.account.history.AccountHistoryResource;
 import com.exemple.service.resource.account.model.Account;
 import com.exemple.service.resource.account.model.AccountHistory;
@@ -32,7 +33,6 @@ import com.exemple.service.resource.account.model.Address;
 import com.exemple.service.resource.account.model.Cgu;
 import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -56,10 +56,10 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
     public void initExecutionContextDate() {
 
         OffsetDateTime now = OffsetDateTime.now();
-        ResourceExecutionContext.get().setDate(now);
-        ResourceExecutionContext.get().setPrincipal(() -> "user");
-        ResourceExecutionContext.get().setApplication("test");
-        ResourceExecutionContext.get().setVersion("v1");
+        ServiceContextExecution.context().setDate(now);
+        ServiceContextExecution.context().setPrincipal(() -> "user");
+        ServiceContextExecution.context().setApp("test");
+        ServiceContextExecution.context().setVersion("v1");
 
     }
 
@@ -98,14 +98,14 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         System.out.println(accountHistoryResource.findByIdAndField(id, "addresses/home").getValue());
 
         assertHistory(accountHistoryResource.findByIdAndField(id, "email"), expected.get("email"),
-                ResourceExecutionContext.get().getDate().toInstant());
+                ServiceContextExecution.context().getDate().toInstant());
         assertHistory(accountHistoryResource.findByIdAndField(id, "addresses/home"), expected.get("addresses").get("home"),
-                ResourceExecutionContext.get().getDate().toInstant());
+                ServiceContextExecution.context().getDate().toInstant());
         assertHistory(accountHistoryResource.findByIdAndField(id, "addresses/job"), expected.get("addresses").get("job"),
-                ResourceExecutionContext.get().getDate().toInstant());
+                ServiceContextExecution.context().getDate().toInstant());
         assertHistory(accountHistoryResource.findByIdAndField(id, "cgus"), expected.get("cgus"),
-                ResourceExecutionContext.get().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "id"), id.toString(), ResourceExecutionContext.get().getDate().toInstant());
+                ServiceContextExecution.context().getDate().toInstant());
+        assertHistory(accountHistoryResource.findByIdAndField(id, "id"), id.toString(), ServiceContextExecution.context().getDate().toInstant());
 
     }
 
@@ -167,14 +167,15 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
         assertHistory(accountHistoryResource.findByIdAndField(id, "email"), previousHistoryEmail.getValue(), previousHistoryEmail.getDate());
         assertHistory(accountHistoryResource.findByIdAndField(id, "addresses/home"), expected.get("addresses").get("home"),
-                previousHistoryHome.getValue(), ResourceExecutionContext.get().getDate().toInstant());
+                previousHistoryHome.getValue(), ServiceContextExecution.context().getDate().toInstant());
         assertHistory(accountHistoryResource.findByIdAndField(id, "addresses/job"), JsonNodeType.NULL, previousHistoryJob.getValue(),
-                ResourceExecutionContext.get().getDate().toInstant());
+                ServiceContextExecution.context().getDate().toInstant());
         assertHistory(accountHistoryResource.findByIdAndField(id, "addresses/holidays"), expected.get("addresses").get("holidays"),
-                ResourceExecutionContext.get().getDate().toInstant());
+                ServiceContextExecution.context().getDate().toInstant());
         assertHistory(accountHistoryResource.findByIdAndField(id, "cgus"), expected.get("cgus"), previousHistoryCgus.getValue(),
-                ResourceExecutionContext.get().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "age"), expected.get("age"), ResourceExecutionContext.get().getDate().toInstant());
+                ServiceContextExecution.context().getDate().toInstant());
+        assertHistory(accountHistoryResource.findByIdAndField(id, "age"), expected.get("age"),
+                ServiceContextExecution.context().getDate().toInstant());
         assertHistory(accountHistoryResource.findByIdAndField(id, "id"), previousHistoryId.getValue(), previousHistoryId.getDate());
     }
 
@@ -199,8 +200,8 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         assertThat(histories, is(hasSize(8)));
 
         assertHistory(accountHistoryResource.findByIdAndField(id, "addresses"), JsonNodeType.NULL,
-                ResourceExecutionContext.get().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "age"), JsonNodeType.NULL, ResourceExecutionContext.get().getDate().toInstant());
+                ServiceContextExecution.context().getDate().toInstant());
+        assertHistory(accountHistoryResource.findByIdAndField(id, "age"), JsonNodeType.NULL, ServiceContextExecution.context().getDate().toInstant());
 
     }
 

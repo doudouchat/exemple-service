@@ -65,8 +65,6 @@ public class JsonQueryBuilderTest extends AbstractTestNGSpringContextTests {
     public void executionContextDestroy() {
 
         ResourceExecutionContext.destroy();
-
-        ResourceExecutionContext.get().setKeyspace("test");
     }
 
     @Test

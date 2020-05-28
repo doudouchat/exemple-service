@@ -1,6 +1,5 @@
 package com.exemple.service.api.common;
 
-import static com.exemple.service.api.common.security.ApiProfile.USER_PROFILE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -89,14 +88,13 @@ public class ExceptionApiTest extends JerseySpringSupport {
 
         UUID id = UUID.randomUUID();
 
-        Mockito.when(service.get(Mockito.eq(id), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile)))
-                .thenThrow(new AccountServiceException());
+        Mockito.when(service.get(Mockito.eq(id))).thenThrow(new AccountServiceException());
 
         Response response = target(AccountApiTest.URL + "/" + id).request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").get();
 
-        Mockito.verify(service).get(Mockito.eq(id), Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq(USER_PROFILE.profile));
+        Mockito.verify(service).get(Mockito.eq(id));
 
         assertThat(response.getStatus(), is(Status.INTERNAL_SERVER_ERROR.getStatusCode()));
 

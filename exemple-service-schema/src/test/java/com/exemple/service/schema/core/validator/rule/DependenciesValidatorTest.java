@@ -14,6 +14,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.core.SchemaTestConfiguration;
@@ -29,10 +30,10 @@ public class DependenciesValidatorTest extends AbstractTestNGSpringContextTests 
     @BeforeClass
     private void before() {
 
-        SchemaValidationContext.get().setApp("default");
-        SchemaValidationContext.get().setVersion("default");
+        ServiceContextExecution.context().setApp("default");
+        ServiceContextExecution.context().setVersion("default");
         SchemaValidationContext.get().setResource("schema_test");
-        SchemaValidationContext.get().setProfile("default");
+        ServiceContextExecution.context().setProfile("default");
 
     }
 

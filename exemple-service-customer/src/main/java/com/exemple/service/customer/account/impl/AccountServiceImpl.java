@@ -5,6 +5,8 @@ import java.util.UUID;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import com.exemple.service.context.ServiceContext;
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.account.exception.AccountServiceException;
 import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
@@ -12,7 +14,6 @@ import com.exemple.service.customer.account.validation.AccountValidation;
 import com.exemple.service.event.model.EventData;
 import com.exemple.service.event.model.EventType;
 import com.exemple.service.resource.account.AccountResource;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.schema.filter.SchemaFilter;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -39,40 +40,46 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public JsonNode save(JsonNode source, String app, String version, String profile) throws AccountServiceException {
+    public JsonNode save(JsonNode source) throws AccountServiceException {
 
-        accountValidation.validate(source, null, app, version, profile);
+        ServiceContext context = ServiceContextExecution.context();
+
+        accountValidation.validate(source, null, context.getApp(), context.getVersion(), context.getProfile());
 
         UUID id = UUID.randomUUID();
 
         JsonNode account = accountResource.save(id, source);
 
-        EventData eventData = new EventData(account, ACCOUNT, EventType.CREATE, app, version, ResourceExecutionContext.get().getDate().toString());
+        EventData eventData = new EventData(account, ACCOUNT, EventType.CREATE, context.getApp(), context.getVersion(), context.getDate().toString());
         applicationEventPublisher.publishEvent(eventData);
 
-        return schemaFilter.filter(app, version, ACCOUNT, profile, account);
+        return schemaFilter.filter(context.getApp(), context.getVersion(), ACCOUNT, context.getProfile(), account);
     }
 
     @Override
-    public JsonNode save(UUID id, JsonNode source, String app, String version, String profile) throws AccountServiceException {
+    public JsonNode save(UUID id, JsonNode source) throws AccountServiceException {
+
+        ServiceContext context = ServiceContextExecution.context();
 
         JsonNode old = accountResource.get(id).orElseThrow(AccountServiceNotFoundException::new);
 
-        accountValidation.validate(source, old, app, version, profile);
+        accountValidation.validate(source, old, context.getApp(), context.getVersion(), context.getProfile());
 
         JsonNode account = accountResource.update(id, source);
 
-        EventData eventData = new EventData(account, ACCOUNT, EventType.UPDATE, app, version, ResourceExecutionContext.get().getDate().toString());
+        EventData eventData = new EventData(account, ACCOUNT, EventType.UPDATE, context.getApp(), context.getVersion(), context.getDate().toString());
         applicationEventPublisher.publishEvent(eventData);
 
-        return schemaFilter.filter(app, version, ACCOUNT, profile, account);
+        return schemaFilter.filter(context.getApp(), context.getVersion(), ACCOUNT, context.getProfile(), account);
     }
 
     @Override
-    public JsonNode get(UUID id, String app, String version, String profile) throws AccountServiceNotFoundException {
+    public JsonNode get(UUID id) throws AccountServiceNotFoundException {
+
+        ServiceContext context = ServiceContextExecution.context();
 
         JsonNode account = accountResource.get(id).orElseThrow(AccountServiceNotFoundException::new);
 
-        return schemaFilter.filter(app, version, ACCOUNT, profile, account);
+        return schemaFilter.filter(context.getApp(), context.getVersion(), ACCOUNT, context.getProfile(), account);
     }
 }

@@ -24,8 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.exemple.service.resource.schema.impl.SchemaResourceImpl;
 import com.exemple.service.resource.schema.model.SchemaEntity;
@@ -42,6 +44,13 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
     private SchemaResource resource;
 
     private byte[] schemaResource;
+
+    @BeforeMethod
+    public void resetResourceContext() {
+
+        ResourceExecutionContext.destroy();
+
+    }
 
     @Test
     public void save() throws IOException {

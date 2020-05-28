@@ -12,16 +12,12 @@ public class ApplicationBeanParam {
 
     @NotBlank
     @Parameter(name = APP_HEADER, in = ParameterIn.HEADER)
-    private final String app;
+    public final String app;
 
     public ApplicationBeanParam(@HeaderParam(APP_HEADER) String app) {
 
         this.app = app;
 
-    }
-
-    public String getApp() {
-        return app;
     }
 
 }

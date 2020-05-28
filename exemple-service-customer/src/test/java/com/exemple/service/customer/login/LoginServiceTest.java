@@ -37,12 +37,6 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private SchemaFilter schemaFilter;
 
-    private static final String APP = "default";
-
-    private static final String VERSION = "default";
-
-    private static final String PROFILE = "default";
-
     @BeforeMethod
     private void before() {
 
@@ -70,7 +64,7 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
         model.put("login", "jean@gmail.com");
         model.put("password", "jean.dupont");
 
-        service.save(JsonNodeUtils.create(model), APP, VERSION, PROFILE);
+        service.save(JsonNodeUtils.create(model));
 
     }
 
@@ -83,7 +77,7 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
         model.put("login", "jean@gmail.com");
         model.put("password", "jean.dupont");
 
-        service.save(JsonNodeUtils.create(model), APP, VERSION, PROFILE);
+        service.save(JsonNodeUtils.create(model));
 
     }
 
@@ -97,7 +91,7 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
 
         Mockito.when(resource.get(Mockito.eq(login))).thenReturn(Optional.of(JsonNodeUtils.create(model)));
 
-        service.save(login, JsonNodeUtils.create(model), APP, VERSION, PROFILE);
+        service.save(login, JsonNodeUtils.create(model));
 
         // Mockito.verify(resource).save(Mockito.eq(login), Mockito.any(JsonNode.class));
 
@@ -113,7 +107,7 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
 
         Mockito.when(resource.get(Mockito.eq(login))).thenReturn(Optional.empty());
 
-        service.save(login, JsonNodeUtils.create(model), APP, VERSION, PROFILE);
+        service.save(login, JsonNodeUtils.create(model));
 
     }
 
@@ -130,7 +124,7 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
 
         Mockito.when(resource.get(Mockito.eq(login))).thenReturn(Optional.of(JsonNodeUtils.create(model)));
 
-        service.save(login, JsonNodeUtils.create(model), APP, VERSION, PROFILE);
+        service.save(login, JsonNodeUtils.create(model));
 
     }
 
@@ -146,7 +140,7 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
                 Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.create(model));
         Mockito.when(resource.get(Mockito.eq(login))).thenReturn(Optional.of(JsonNodeUtils.create(model)));
 
-        JsonNode data = service.get(login, APP, VERSION, PROFILE);
+        JsonNode data = service.get(login);
 
         assertThat(data, is(notNullValue()));
         assertThat(data, hasJsonField("password", (String) model.get("password")));
@@ -160,7 +154,7 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
 
         Mockito.when(resource.get(Mockito.eq(login))).thenReturn(Optional.empty());
 
-        service.get(login, APP, VERSION, PROFILE);
+        service.get(login);
 
     }
 

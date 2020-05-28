@@ -3,6 +3,7 @@ package com.exemple.service.resource.core;
 import javax.annotation.PostConstruct;
 import javax.validation.Validator;
 
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +16,9 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.exemple.service.application.common.model.ApplicationDetail;
+import com.exemple.service.application.detail.ApplicationDetailService;
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.core.cassandra.ResourceCassandraConfiguration;
 import com.github.nosan.embedded.cassandra.EmbeddedCassandraFactory;
 import com.github.nosan.embedded.cassandra.api.Cassandra;
@@ -75,6 +79,18 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
         return session;
     }
 
+    @Bean
+    public ApplicationDetailService ApplicationDetailService() {
+
+        ApplicationDetailService service = Mockito.mock(ApplicationDetailService.class);
+
+        ApplicationDetail detail = new ApplicationDetail();
+        detail.setKeyspace("test");
+        Mockito.when(service.get(Mockito.anyString())).thenReturn(detail);
+
+        return service;
+    }
+
     @PostConstruct
     public void initKeyspace() {
 
@@ -84,7 +100,7 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
             CqlDataSet.ofClasspaths("cassandra/keyspace.cql", "cassandra/test.cql", "cassandra/exec.cql").forEachStatement(connection::execute);
         }
 
-        ResourceExecutionContext.get().setKeyspace("test");
+        ServiceContextExecution.context().setApp("test");
     }
 
     @Bean

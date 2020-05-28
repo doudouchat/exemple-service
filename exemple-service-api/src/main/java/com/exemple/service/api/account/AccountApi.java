@@ -33,7 +33,6 @@ import com.exemple.service.api.common.PatchUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
-import com.exemple.service.api.core.authorization.AuthorizationContextService;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.account.context.AccountContext;
@@ -72,18 +71,14 @@ public class AccountApi {
 
     private final AuthorizationCheckService authorizationCheckService;
 
-    private final AuthorizationContextService authorizationContextService;
-
     @Context
     private ContainerRequestContext servletContext;
 
-    public AccountApi(AccountService service, SchemaValidation schemaValidation, AuthorizationCheckService authorizationCheckService,
-            AuthorizationContextService authorizationContextService) {
+    public AccountApi(AccountService service, SchemaValidation schemaValidation, AuthorizationCheckService authorizationCheckService) {
 
         this.service = service;
         this.schemaValidation = schemaValidation;
         this.authorizationCheckService = authorizationCheckService;
-        this.authorizationContextService = authorizationContextService;
     }
 
     @GET
@@ -104,8 +99,7 @@ public class AccountApi {
 
         authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
 
-        return service.get(id, schemaBeanParam.getApp(), schemaBeanParam.getVersion(),
-                this.authorizationContextService.getUserProfile((ApiSecurityContext) servletContext.getSecurityContext()));
+        return service.get(id);
 
     }
 
@@ -124,8 +118,7 @@ public class AccountApi {
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam, @Context UriInfo uriInfo)
             throws AccountServiceException {
 
-        JsonNode source = service.save(account, schemaBeanParam.getApp(), schemaBeanParam.getVersion(),
-                this.authorizationContextService.getUserProfile((ApiSecurityContext) servletContext.getSecurityContext()));
+        JsonNode source = service.save(account);
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
         builder.path(source.get(AccountField.ID.field).textValue());
@@ -153,13 +146,11 @@ public class AccountApi {
 
         schemaValidation.validatePatch(patch);
 
-        JsonNode source = service.get(id, schemaBeanParam.getApp(), schemaBeanParam.getVersion(),
-                this.authorizationContextService.getUserProfile((ApiSecurityContext) servletContext.getSecurityContext()));
+        JsonNode source = service.get(id);
         JsonNode account = PatchUtils.diff(patch, source);
         LOG.debug("account update {}", account);
 
-        service.save(id, account, schemaBeanParam.getApp(), schemaBeanParam.getVersion(),
-                this.authorizationContextService.getUserProfile((ApiSecurityContext) servletContext.getSecurityContext()));
+        service.save(id, account);
 
         return Response.status(Status.NO_CONTENT).build();
 

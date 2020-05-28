@@ -31,7 +31,6 @@ import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
-import com.exemple.service.api.core.authorization.AuthorizationContextService;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.customer.login.exception.LoginServiceException;
@@ -67,18 +66,14 @@ public class LoginApi {
 
     private final AuthorizationCheckService authorizationCheckService;
 
-    private final AuthorizationContextService authorizationContextService;
-
     @Context
     private ContainerRequestContext servletContext;
 
-    public LoginApi(LoginService loginService, SchemaValidation schemaValidation, AuthorizationCheckService authorizationCheckService,
-            AuthorizationContextService authorizationContextService) {
+    public LoginApi(LoginService loginService, SchemaValidation schemaValidation, AuthorizationCheckService authorizationCheckService) {
 
         this.loginService = loginService;
         this.schemaValidation = schemaValidation;
         this.authorizationCheckService = authorizationCheckService;
-        this.authorizationContextService = authorizationContextService;
     }
 
     @HEAD
@@ -113,8 +108,7 @@ public class LoginApi {
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam, @Context UriInfo uriInfo)
             throws LoginServiceException {
 
-        loginService.save(source, schemaBeanParam.getApp(), schemaBeanParam.getVersion(),
-                this.authorizationContextService.getUserProfile((ApiSecurityContext) servletContext.getSecurityContext()));
+        loginService.save(source);
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
         builder.path(source.get(LoginField.USERNAME.field).textValue());
@@ -140,15 +134,13 @@ public class LoginApi {
 
         authorizationCheckService.verifyLogin(login, (ApiSecurityContext) servletContext.getSecurityContext());
 
-        JsonNode source = loginService.get(login, schemaBeanParam.getApp(), schemaBeanParam.getVersion(),
-                this.authorizationContextService.getUserProfile((ApiSecurityContext) servletContext.getSecurityContext()));
+        JsonNode source = loginService.get(login);
 
         schemaValidation.validatePatch(patch);
 
         JsonNode data = PatchUtils.diff(patch, source);
 
-        loginService.save(login, data, schemaBeanParam.getApp(), schemaBeanParam.getVersion(),
-                this.authorizationContextService.getUserProfile((ApiSecurityContext) servletContext.getSecurityContext()));
+        loginService.save(login, data);
 
         return Response.status(Status.NO_CONTENT).build();
 
@@ -172,8 +164,7 @@ public class LoginApi {
 
         authorizationCheckService.verifyLogin(login, (ApiSecurityContext) servletContext.getSecurityContext());
 
-        return loginService.get(login, schemaBeanParam.getApp(), schemaBeanParam.getVersion(),
-                this.authorizationContextService.getUserProfile((ApiSecurityContext) servletContext.getSecurityContext()));
+        return loginService.get(login);
 
     }
 
@@ -182,7 +173,8 @@ public class LoginApi {
     @Operation(tags = "login", security = { @SecurityRequirement(name = DocumentApiResource.BEARER_AUTH),
             @SecurityRequirement(name = DocumentApiResource.OAUTH2_PASS) })
     @RolesAllowed("login:delete")
-    public void delete(@NotNull @PathParam("login") String login) {
+    public void delete(@NotNull @PathParam("login") String login,
+            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) ApplicationBeanParam applicationBeanParam) {
 
         authorizationCheckService.verifyLogin(login, (ApiSecurityContext) servletContext.getSecurityContext());
 

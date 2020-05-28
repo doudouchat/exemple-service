@@ -19,10 +19,7 @@ public class SchemaValidationAspect {
 
         SchemaValidationContext context = SchemaValidationContext.get();
 
-        context.setApp(app);
-        context.setVersion(version);
         context.setResource(resource);
-        context.setProfile(profile);
     }
 
     @After("execution(public void com.exemple.service.schema.validation.SchemaValidation.validate(..))")

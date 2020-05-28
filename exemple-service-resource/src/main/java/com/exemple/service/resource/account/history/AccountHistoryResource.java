@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.account.history.dao.AccountHistoryDao;
 import com.exemple.service.resource.account.history.mapper.AccountHistoryMapper;
 import com.exemple.service.resource.account.impl.AccountResourceImpl;
@@ -75,9 +76,9 @@ public class AccountHistoryResource {
                     history.setField(line.getKey());
                     history.setDate(now.toInstant());
                     history.setValue(line.getValue());
-                    history.setApplication(ResourceExecutionContext.get().getApplication());
-                    history.setVersion(ResourceExecutionContext.get().getVersion());
-                    history.setUser(ResourceExecutionContext.get().getPrincipal().getName());
+                    history.setApplication(ServiceContextExecution.context().getApp());
+                    history.setVersion(ServiceContextExecution.context().getVersion());
+                    history.setUser(ServiceContextExecution.context().getPrincipal().getName());
                     history.setPreviousValue(histories.getOrDefault(line.getKey(), defaultHistory).getValue());
 
                     return history;

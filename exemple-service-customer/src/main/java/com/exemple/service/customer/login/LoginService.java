@@ -11,14 +11,12 @@ public interface LoginService {
 
     boolean exist(String login);
 
-    void save(@NotNull JsonNode source, @NotBlank String app, @NotBlank String version, @NotBlank String profile) throws LoginServiceException;
+    void save(@NotNull JsonNode source) throws LoginServiceException;
 
-    void save(@NotBlank String login, @NotNull JsonNode source, @NotBlank String app, @NotBlank String version, @NotBlank String profile)
-            throws LoginServiceException;
+    void save(@NotBlank String login, @NotNull JsonNode source) throws LoginServiceException;
 
     void delete(@NotBlank String login);
 
-    JsonNode get(@NotBlank String login, @NotBlank String app, @NotBlank String version, @NotBlank String profile)
-            throws LoginServiceNotFoundException;
+    JsonNode get(@NotBlank String login) throws LoginServiceNotFoundException;
 
 }
