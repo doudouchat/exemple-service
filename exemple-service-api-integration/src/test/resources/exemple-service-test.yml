@@ -8,10 +8,12 @@ resource:
       member: 127.0.0.1:${hazelcast.port}
 store:
    zookeeper:
-      host: 127.0.0.1:${zmp.clientPort}
+      host: 127.0.0.1:${zookeeper.port}
+      sleepMsBetweenRetries: 10000
 application:
    zookeeper:
-      host: 127.0.0.1:${zmp.clientPort}
+      host: 127.0.0.1:${zookeeper.port}
+      sleepMsBetweenRetries: 10000
 api:
    resourceId: exemple
    authorization:
@@ -21,3 +23,6 @@ api:
       client:
          clientId: resource
          clientSecret: secret
+   embedded:
+      zookeeper:
+         port: ${zookeeper.port}
