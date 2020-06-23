@@ -14,6 +14,11 @@ application:
    zookeeper:
       host: 127.0.0.1:${zookeeper.port}
       sleepMsBetweenRetries: 10000
+event:
+   kafka:
+      bootstrap-servers: localhost:${kafka.port}
+   topic: test
+   timeout: 10000
 api:
    resourceId: exemple
    authorization:
@@ -26,3 +31,7 @@ api:
    embedded:
       zookeeper:
          port: ${zookeeper.port}
+      kafka:
+         port: ${kafka.port}
+         defaultTopic: test
+         dir: ${project.build.directory}/kafka

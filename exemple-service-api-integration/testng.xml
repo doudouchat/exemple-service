@@ -20,4 +20,9 @@
 			<package name="com.exemple.service.api.integration.stock.v1" />
 		</packages>
 	</test>
+	<test name="swagger">
+		<packages>
+			<package name="com.exemple.service.api.integration.swagger" />
+		</packages>
+	</test>
 </suite>
