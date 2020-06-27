@@ -39,6 +39,7 @@ public class LoginUpdateUsernameIT {
         Map<String, Object> body = new HashMap<>();
         body.put("username", LOGIN);
         body.put("password", "mdp");
+        body.put("plain_password", "mdp");
         body.put("id", ID);
 
         Response create = JsonRestTemplate.given()
@@ -55,7 +56,7 @@ public class LoginUpdateUsernameIT {
 
         Map<String, Object> patch1 = new HashMap<>();
         patch1.put("op", "add");
-        patch1.put("path", "/password");
+        patch1.put("path", "/plain_password");
         patch1.put("value", "new_mdp");
 
         patchs.add(patch1);
@@ -78,7 +79,7 @@ public class LoginUpdateUsernameIT {
     }
 
     @Test(dependsOnMethods = "update")
-    public void getNewLogin() {
+    public void getLoginSuccess() {
 
         Response response = JsonRestTemplate.given()
 
@@ -88,13 +89,14 @@ public class LoginUpdateUsernameIT {
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
 
         assertThat(response.jsonPath().get("password"), is(nullValue()));
+        assertThat(response.jsonPath().get("plain_password"), is("new_mdp"));
         assertThat(response.jsonPath().getString("id"), is(ID.toString()));
         assertThat(response.jsonPath().getString("username"), is(NEW_LOGIN));
 
     }
 
     @Test(dependsOnMethods = "update")
-    public void getOldLogin() {
+    public void getLoginFailure() {
 
         Response response = JsonRestTemplate.given()
 

@@ -95,6 +95,7 @@ public class IntegrationTestConfiguration {
         loginFilter.add("id");
         loginFilter.add("enable");
         loginFilter.add("username");
+        loginFilter.add("plain_password");
         Map<String, Set<String>> loginRules = new HashMap<>();
         loginRules.put("login", Collections.singleton("/username"));
         loginRules.put("createOnly", Collections.singleton("/id"));
