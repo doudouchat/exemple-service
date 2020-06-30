@@ -19,6 +19,9 @@
 			"type": "string",
 			"writeOnly": true
 		},
+		"plain_password": {
+			"type": "string"
+		},
 		"enable": {
 			"type": "boolean"
 		}

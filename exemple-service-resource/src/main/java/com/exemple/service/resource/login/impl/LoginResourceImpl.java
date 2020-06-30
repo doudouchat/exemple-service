@@ -1,6 +1,5 @@
 package com.exemple.service.resource.login.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -10,9 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.BatchStatementBuilder;
-import com.datastax.oss.driver.api.core.cql.BatchType;
-import com.datastax.oss.driver.api.core.cql.BatchableStatement;
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.insert.Insert;
@@ -61,15 +57,9 @@ public class LoginResourceImpl implements LoginResource {
 
             String newUsername = source.get(LoginField.USERNAME.field).textValue();
 
-            BatchStatementBuilder batch = new BatchStatementBuilder(BatchType.LOGGED);
-            batch.addStatements(replaceUsername(username, newUsername, source));
+            this.replaceUsername(username, newUsername);
 
-            Row resultLogin = session.execute(batch.build()).one();
-            boolean notExistLogin = resultLogin.getBoolean(0);
-
-            if (!notExistLogin) {
-                throw new LoginResourceExistException(resultLogin.getString(1));
-            }
+            this.updateLoginExceptUsername(newUsername, source);
 
             this.delete(username);
 
@@ -111,26 +101,31 @@ public class LoginResourceImpl implements LoginResource {
         return jsonQueryBuilder.insert(source).ifNotExists();
     }
 
-    private List<BatchableStatement<?>> replaceUsername(String previousUsername, String nextUsername, JsonNode source) {
-
-        List<BatchableStatement<?>> statements = new ArrayList<>();
+    private void replaceUsername(String previousUsername, String nextUsername) throws LoginResourceExistException {
 
         JsonNode login = getByUsername(previousUsername);
         JsonNodeUtils.set(login, nextUsername, LoginField.USERNAME.field);
-        statements.add(insertLogin(login).build());
 
-        JsonNode sourceExceptUsername = JsonNodeUtils.clone(source, LoginField.USERNAME.field);
-        if (!sourceExceptUsername.isEmpty()) {
-            statements.add(updateLogin(nextUsername, sourceExceptUsername).build());
+        Row resultLogin = session.execute(insertLogin(login).build()).one();
+        boolean notExistLogin = resultLogin.getBoolean(0);
+
+        if (!notExistLogin) {
+            throw new LoginResourceExistException(resultLogin.getString(1));
         }
-
-        return statements;
 
     }
 
     private Update updateLogin(String username, JsonNode source) {
 
         return jsonQueryBuilder.update(source).whereColumn(LoginField.USERNAME.field).isEqualTo(QueryBuilder.literal(username));
+    }
+
+    private void updateLoginExceptUsername(String username, JsonNode source) {
+
+        JsonNode sourceExceptUsername = JsonNodeUtils.clone(source, LoginField.USERNAME.field);
+        if (!sourceExceptUsername.isEmpty()) {
+            session.execute(updateLogin(username, sourceExceptUsername).build());
+        }
     }
 
     private JsonNode getByUsername(String username) {
