@@ -95,8 +95,6 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
         accountHistoryResource.findByIdAndField(id, "email");
 
-        System.out.println(accountHistoryResource.findByIdAndField(id, "addresses/home").getValue());
-
         assertHistory(accountHistoryResource.findByIdAndField(id, "email"), expected.get("email"),
                 ServiceContextExecution.context().getDate().toInstant());
         assertHistory(accountHistoryResource.findByIdAndField(id, "addresses/home"), expected.get("addresses").get("home"),

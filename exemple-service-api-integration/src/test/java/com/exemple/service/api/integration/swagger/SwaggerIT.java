@@ -26,4 +26,22 @@ public class SwaggerIT extends AbstractTestNGSpringContextTests {
 
     }
 
+    @Test
+    public void schema() {
+
+        Response response = JsonRestTemplate.given().get("/ws/v1/schemas/account/" + APP_HEADER_VALUE + "/v1/user");
+
+        assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
+
+    }
+
+    @Test
+    public void patch() {
+
+        Response response = JsonRestTemplate.given().get("/ws/v1/schemas/patch");
+
+        assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
+
+    }
+
 }

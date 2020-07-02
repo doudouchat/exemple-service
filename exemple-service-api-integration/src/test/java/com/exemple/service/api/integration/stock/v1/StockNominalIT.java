@@ -65,4 +65,30 @@ public class StockNominalIT extends AbstractTestNGSpringContextTests {
 
     }
 
+    @Test(dependsOnMethods = "getSuccess")
+    public void getFailure() {
+
+        Response response = JsonRestTemplate.given()
+
+                .header(APP_HEADER, APP_HEADER_VALUE)
+
+                .get(STOCK_URL, store, "product#" + UUID.randomUUID());
+
+        assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND.value()));
+
+    }
+
+    @Test(dependsOnMethods = "getSuccess")
+    public void updateFailure() {
+
+        Response response = JsonRestTemplate.given().body(Collections.singletonMap("increment", -100))
+
+                .header(APP_HEADER, APP_HEADER_VALUE)
+
+                .post(STOCK_URL, store, product);
+        assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
+        assertThat(response.getBody().asString(), is("Stock /test_company/" + store + "/" + product + ":13 is insufficient for qunatity -100"));
+
+    }
+
 }
