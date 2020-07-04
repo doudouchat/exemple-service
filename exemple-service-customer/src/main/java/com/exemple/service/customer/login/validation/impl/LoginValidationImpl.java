@@ -13,14 +13,24 @@ class LoginValidationImpl implements LoginValidation {
 
     private final SchemaValidation schemaValidation;
 
+    private static final String RESSOURCE = "login";
+
     public LoginValidationImpl(SchemaValidation schemaValidation) {
 
         this.schemaValidation = schemaValidation;
     }
 
     @Override
+    public void validate(JsonNode form, String app, String version, String profile) {
+
+        schemaValidation.validate(app, version, RESSOURCE, profile, form, null);
+    }
+
+    @Override
     public void validate(JsonNode form, JsonNode old, String app, String version, String profile) {
 
-        schemaValidation.validate(app, version, "login", profile, form, old);
+        schemaValidation.validate(app, version, RESSOURCE, profile, form, old);
+
     }
+
 }

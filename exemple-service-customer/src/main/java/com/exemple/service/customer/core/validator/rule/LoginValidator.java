@@ -23,21 +23,13 @@ public class LoginValidator implements ValidatorService {
 
         JsonNode unique = form.at(path);
 
-        if (unique.isTextual() && !validationException.contains(path)) {
+        if (unique.isTextual() && !validationException.contains(path) && loginService.exist(unique.textValue())) {
 
-            JsonNode oldUnique = null;
-            if (old != null) {
-                oldUnique = old.at(path);
-            }
+            ValidationExceptionModel exception = new ValidationExceptionModel(path, "login",
+                    "[".concat(unique.textValue()).concat("] already exists"));
 
-            if ((oldUnique == null || !unique.equals(oldUnique)) && loginService.exist(unique.textValue())) {
+            validationException.add(exception);
 
-                ValidationExceptionModel exception = new ValidationExceptionModel(path, "login",
-                        "[".concat(unique.textValue()).concat("] already exists"));
-
-                validationException.add(exception);
-
-            }
         }
 
     }

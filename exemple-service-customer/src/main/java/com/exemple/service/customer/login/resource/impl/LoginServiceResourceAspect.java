@@ -37,13 +37,13 @@ public class LoginServiceResourceAspect {
         joinPoint.proceed(new Object[] { source });
     }
 
-    @Around("execution(public void com.exemple.service.resource.login.LoginResource.save(*, *)) " + "&& args (login,source)")
-    public void updateLogin(ProceedingJoinPoint joinPoint, String login, JsonNode source) throws Throwable {
+    @Around("execution(public boolean com.exemple.service.resource.login.LoginResource.save(*, *)) " + "&& args (login,source)")
+    public boolean updateLogin(ProceedingJoinPoint joinPoint, String login, JsonNode source) throws Throwable {
 
         @SuppressWarnings("unchecked")
         Map<String, Object> sourceMap = MAPPER.convertValue(source, Map.class);
         source = JsonNodeUtils.create(loginServiceResource.updateLogin(sourceMap));
-        joinPoint.proceed(new Object[] { login, source });
+        return (boolean) joinPoint.proceed(new Object[] { login, source });
     }
 
 }

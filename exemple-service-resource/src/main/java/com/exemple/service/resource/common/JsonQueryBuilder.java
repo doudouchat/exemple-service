@@ -48,6 +48,14 @@ public class JsonQueryBuilder {
 
     }
 
+    public Insert copy(JsonNode source, JsonNode override) {
+
+        MetadataSchemaUtils.merge(session, table, source, override);
+
+        return insert(source);
+
+    }
+
     public UpdateWithAssignments update(JsonNode source) {
 
         JsonNodeFilterUtils.cleanArray(source);

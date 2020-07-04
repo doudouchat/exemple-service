@@ -19,7 +19,6 @@ import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.schema.common.exception.ValidationException;
-import com.fasterxml.jackson.databind.JsonNode;
 
 @ContextConfiguration(classes = { CustomerTestConfiguration.class })
 public class LoginValidatorTest extends AbstractTestNGSpringContextTests {
@@ -37,29 +36,17 @@ public class LoginValidatorTest extends AbstractTestNGSpringContextTests {
 
     }
 
-    @DataProvider(name = "notUnique")
-    private static Object[][] notUnique() {
+    @Test
+    public void notUnique() {
 
-        Map<String, Object> model1 = new HashMap<>();
-        model1.put("email", "jean.dupond@gmail.com");
-
-        return new Object[][] {
-                // email not unique
-                { model1, null },
-                // email not unique && old
-                { model1, JsonNodeUtils.init() }
-                //
-        };
-    }
-
-    @Test(dataProvider = "notUnique")
-    public void notUnique(Map<String, Object> model, JsonNode old) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("email", "jean.dupond@gmail.com");
 
         Mockito.when(loginResource.get(Mockito.eq((String) model.get("email")))).thenReturn(Optional.of(JsonNodeUtils.init()));
 
         ValidationException validationException = new ValidationException();
 
-        loginValidator.validate("/email", JsonNodeUtils.create(model), old, validationException);
+        loginValidator.validate("/email", JsonNodeUtils.create(model), null, validationException);
 
         assertThat(validationException.getAllExceptions().size(), is(1));
         assertThat(validationException.getAllExceptions().get(0).getPath(), is("/email"));
@@ -71,35 +58,29 @@ public class LoginValidatorTest extends AbstractTestNGSpringContextTests {
     @DataProvider(name = "unique")
     private static Object[][] unique() {
 
-        Map<String, Object> model1 = new HashMap<>();
-        model1.put("email", "jean.dupond@gmail.com");
-
-        Map<String, Object> old1 = new HashMap<>();
-        old1.put("email", "jean.dupond@gmail.com");
+        Map<String, Object> model = new HashMap<>();
+        model.put("email", "jean.dupond@gmail.com");
 
         ValidationException validationException = new ValidationException();
         validationException.add(new ValidationException.ValidationExceptionModel("/email", "error", "message"));
 
         return new Object[][] {
-                // email unique
-                { model1, null, Optional.empty(), new ValidationException(), 0 },
-                // email and old equals
-                { model1, JsonNodeUtils.create(old1), Optional.of(JsonNodeUtils.init()), new ValidationException(), 0 },
+                // email is unique
+                { model, new ValidationException(), 0 },
                 // email empty
-                { new HashMap<>(), null, Optional.of(JsonNodeUtils.init()), new ValidationException(), 0 },
+                { new HashMap<>(), new ValidationException(), 0 },
                 // email has already exception
-                { model1, null, Optional.of(JsonNodeUtils.init()), validationException, 1 },
+                { model, validationException, 1 },
                 //
         };
     }
 
     @Test(dataProvider = "unique")
-    public void unique(Map<String, Object> model, JsonNode old, Optional<JsonNode> response, ValidationException validationException,
-            int expectedExceptionSize) {
+    public void unique(Map<String, Object> model, ValidationException validationException, int expectedExceptionSize) {
 
-        Mockito.when(loginResource.get(Mockito.eq((String) model.get("email")))).thenReturn(response);
+        Mockito.when(loginResource.get(Mockito.eq((String) model.get("email")))).thenReturn(Optional.empty());
 
-        loginValidator.validate("/email", JsonNodeUtils.create(model), old, validationException);
+        loginValidator.validate("/email", JsonNodeUtils.create(model), null, validationException);
 
         assertThat(validationException.getAllExceptions().size(), is(expectedExceptionSize));
 

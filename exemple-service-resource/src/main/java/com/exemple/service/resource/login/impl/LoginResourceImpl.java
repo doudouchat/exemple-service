@@ -15,7 +15,6 @@ import com.datastax.oss.driver.api.querybuilder.insert.Insert;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
 import com.datastax.oss.driver.api.querybuilder.update.Update;
 import com.exemple.service.resource.common.JsonQueryBuilder;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.login.LoginField;
 import com.exemple.service.resource.login.LoginResource;
@@ -45,7 +44,7 @@ public class LoginResourceImpl implements LoginResource {
     }
 
     @Override
-    public void save(String username, JsonNode source) throws LoginResourceExistException {
+    public boolean save(String username, JsonNode source) throws LoginResourceExistException {
 
         if (source.path(LoginField.USERNAME.field).isMissingNode()) {
 
@@ -53,15 +52,15 @@ public class LoginResourceImpl implements LoginResource {
 
             session.execute(update.build());
 
+            return false;
+
         } else {
 
-            String newUsername = source.get(LoginField.USERNAME.field).textValue();
+            Insert insert = jsonQueryBuilder.copy(getByUsername(username), source).ifNotExists();
 
-            this.replaceUsername(username, newUsername);
+            this.save(insert);
 
-            this.updateLoginExceptUsername(newUsername, source);
-
-            this.delete(username);
+            return true;
 
         }
 
@@ -70,14 +69,9 @@ public class LoginResourceImpl implements LoginResource {
     @Override
     public void save(JsonNode source) throws LoginResourceExistException {
 
-        Insert insert = insertLogin(source);
+        Insert insert = jsonQueryBuilder.insert(source).ifNotExists();
 
-        Row resultLogin = session.execute(insert.build()).one();
-        boolean notExistLogin = resultLogin.getBoolean(0);
-
-        if (!notExistLogin) {
-            throw new LoginResourceExistException(resultLogin.getString(1));
-        }
+        save(insert);
     }
 
     @Override
@@ -96,36 +90,19 @@ public class LoginResourceImpl implements LoginResource {
         return session.execute(select.build()).all().stream().map((Row row) -> row.get(0, JsonNode.class)).collect(Collectors.toList());
     }
 
-    private Insert insertLogin(JsonNode source) {
+    private void save(Insert insert) throws LoginResourceExistException {
 
-        return jsonQueryBuilder.insert(source).ifNotExists();
-    }
-
-    private void replaceUsername(String previousUsername, String nextUsername) throws LoginResourceExistException {
-
-        JsonNode login = getByUsername(previousUsername);
-        JsonNodeUtils.set(login, nextUsername, LoginField.USERNAME.field);
-
-        Row resultLogin = session.execute(insertLogin(login).build()).one();
+        Row resultLogin = session.execute(insert.build()).one();
         boolean notExistLogin = resultLogin.getBoolean(0);
 
         if (!notExistLogin) {
             throw new LoginResourceExistException(resultLogin.getString(1));
         }
-
     }
 
     private Update updateLogin(String username, JsonNode source) {
 
         return jsonQueryBuilder.update(source).whereColumn(LoginField.USERNAME.field).isEqualTo(QueryBuilder.literal(username));
-    }
-
-    private void updateLoginExceptUsername(String username, JsonNode source) {
-
-        JsonNode sourceExceptUsername = JsonNodeUtils.clone(source, LoginField.USERNAME.field);
-        if (!sourceExceptUsername.isEmpty()) {
-            session.execute(updateLogin(username, sourceExceptUsername).build());
-        }
     }
 
     private JsonNode getByUsername(String username) {
