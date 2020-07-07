@@ -101,25 +101,50 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         assertThat(login2.path("note").getNodeType(), is(JsonNodeType.MISSING));
     }
 
-    @Test(dependsOnMethods = { "get", "getById" })
-    public void update() throws LoginResourceExistException {
+    @DataProvider(name = "update")
+    public static Object[][] update() {
 
-        Map<String, Object> source = new HashMap<>();
-        source.put("password", "jean.dupont2");
-        source.put("enable", false);
+        Map<String, Object> source1 = new HashMap<>();
+        source1.put("password", "jean.dupont2");
+        source1.put("enable", false);
 
-        resource.save(username, JsonNodeUtils.create(source));
+        Map<String, Object> source2 = new HashMap<>();
+        source2.put("username", UUID.randomUUID() + "@gmail.com");
+        source2.put("password", "jean.dupont3");
 
-        JsonNode data = resource.get(username).get();
-        assertThat(data.get(LoginField.USERNAME.field).textValue(), is(username));
-        assertThat(data.get(LoginField.ID.field).textValue(), is(id.toString()));
-        assertThat(data.get("password").textValue(), is(source.get("password")));
-        assertThat(data.get("enable").booleanValue(), is(source.get("enable")));
+        Map<String, Object> source3 = new HashMap<>();
+        source3.put("username", UUID.randomUUID() + "@gmail.com");
+
+        return new Object[][] {
+
+                { source1, "jean.dupont2", false },
+
+                { source2, "jean.dupont3", true },
+
+                { source3, "jean.dupont3", true }
+
+        };
 
     }
 
-    @Test(dependsOnMethods = "update", expectedExceptions = LoginResourceExistException.class)
-    public void replaceUsernameFailure() throws LoginResourceExistException {
+    @Test(dependsOnMethods = { "get", "getById" }, dataProvider = "update")
+    public void update(Map<String, Object> source, String expectedPassword, boolean expectedCreated) throws LoginResourceExistException {
+
+        boolean created = resource.save(username, JsonNodeUtils.create(source));
+        this.username = (String) source.getOrDefault("username", this.username);
+
+        JsonNode data = resource.get(username).get();
+
+        assertThat(data.get(LoginField.USERNAME.field).textValue(), is(username));
+        assertThat(data.get(LoginField.ID.field).textValue(), is(id.toString()));
+        assertThat(data.get("password").textValue(), is(expectedPassword));
+        assertThat(data.get("enable").booleanValue(), is(false));
+        assertThat(created, is(expectedCreated));
+
+    }
+
+    @Test(dependsOnMethods = { "get", "getById" }, expectedExceptions = LoginResourceExistException.class)
+    public void updateFailure() throws LoginResourceExistException {
 
         Map<String, Object> source = new HashMap<>();
         source.put("password", "jean.dupont");
@@ -129,42 +154,7 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         resource.save(username, JsonNodeUtils.create(source));
     }
 
-    @DataProvider(name = "replaceUsername")
-    public static Object[][] replaceUsername() {
-
-        Map<String, Object> source1 = new HashMap<>();
-        source1.put("username", UUID.randomUUID() + "@gmail.com");
-        source1.put("password", "jean.dupont3");
-        source1.put("enable", true);
-
-        Map<String, Object> source2 = new HashMap<>();
-        source2.put("username", UUID.randomUUID() + "@gmail.com");
-
-        return new Object[][] {
-
-                { source1, "jean.dupont3" },
-
-                { source2, "jean.dupont3" }
-
-        };
-
-    }
-
-    @Test(dependsOnMethods = "replaceUsernameFailure", dataProvider = "replaceUsername")
-    public void replaceUsername(Map<String, Object> source, String expectedPassword) throws LoginResourceExistException {
-
-        resource.save(username, JsonNodeUtils.create(source));
-
-        this.username = source.get("username").toString();
-
-        JsonNode data = resource.get(username).get();
-        assertThat(data.get(LoginField.USERNAME.field).textValue(), is(username));
-        assertThat(data.get(LoginField.ID.field).textValue(), is(id.toString()));
-        assertThat(data.get("password").textValue(), is(expectedPassword));
-
-    }
-
-    @Test(dependsOnMethods = "replaceUsername")
+    @Test(dependsOnMethods = { "update", "updateFailure" })
     public void delete() {
 
         resource.delete(username);

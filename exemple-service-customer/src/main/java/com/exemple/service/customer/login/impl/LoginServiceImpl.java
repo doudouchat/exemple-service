@@ -44,10 +44,15 @@ public class LoginServiceImpl implements LoginService {
 
         loginValidation.validate(source, old, context.getApp(), context.getVersion(), context.getProfile());
 
+        boolean created;
         try {
-            loginResource.save(login, source);
+            created = loginResource.save(login, source);
         } catch (LoginResourceExistException e) {
             throw new LoginServiceExistException(e);
+        }
+
+        if (created) {
+            loginResource.delete(login);
         }
 
     }
@@ -57,7 +62,7 @@ public class LoginServiceImpl implements LoginService {
 
         ServiceContext context = ServiceContextExecution.context();
 
-        loginValidation.validate(source, null, context.getApp(), context.getVersion(), context.getProfile());
+        loginValidation.validate(source, context.getApp(), context.getVersion(), context.getProfile());
 
         try {
             loginResource.save(source);

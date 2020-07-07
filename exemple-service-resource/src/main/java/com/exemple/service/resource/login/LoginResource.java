@@ -16,7 +16,7 @@ public interface LoginResource {
 
     Optional<JsonNode> get(@NotBlank String username);
 
-    void save(@NotBlank String username, @NotEmpty @Json(table = "login") JsonNode source) throws LoginResourceExistException;
+    boolean save(@NotBlank String username, @NotEmpty @Json(table = "login") JsonNode source) throws LoginResourceExistException;
 
     void save(@Json(table = "login") JsonNode source) throws LoginResourceExistException;
 

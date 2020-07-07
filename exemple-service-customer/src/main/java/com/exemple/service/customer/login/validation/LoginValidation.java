@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public interface LoginValidation {
 
-    void validate(@NotNull JsonNode form, JsonNode old, @NotBlank String app, @NotBlank String version, @NotBlank String profile);
+    void validate(@NotNull JsonNode form, @NotBlank String app, @NotBlank String version, @NotBlank String profile);
+
+    void validate(@NotNull JsonNode form, @NotNull JsonNode old, @NotBlank String app, @NotBlank String version, @NotBlank String profile);
 
 }
