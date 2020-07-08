@@ -18,7 +18,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.exemple.service.customer.account.context.AccountContext;
 import com.exemple.service.customer.account.exception.AccountServiceException;
 import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
 import com.exemple.service.customer.account.model.Account;
@@ -54,7 +53,6 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
     @AfterClass
     private void afterClass() {
 
-        AccountContext.destroy();
         Mockito.reset(schemaResource);
 
     }
