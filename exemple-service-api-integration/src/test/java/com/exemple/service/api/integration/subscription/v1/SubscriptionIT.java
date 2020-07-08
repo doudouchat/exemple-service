@@ -51,6 +51,19 @@ public class SubscriptionIT {
 
     }
 
+    @Test(dependsOnMethods = "createSubscription")
+    public void updateSubscription() {
+
+        Response response = JsonRestTemplate.given()
+
+                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, "v1")
+
+                .body(Collections.emptyMap()).put(URL + "/{email}", EMAIL);
+
+        assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+
+    }
+
     @Test
     public void createSubscriptionFailure() {
 
@@ -64,5 +77,17 @@ public class SubscriptionIT {
         assertThat(response.jsonPath().getList("code").get(0), is("login"));
         assertThat(response.jsonPath().getList("path").get(0), is("/email"));
 
+    }
+
+    @Test
+    public void readSubscriptionFailure() {
+
+        Response response = JsonRestTemplate.given()
+
+                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, VERSION_HEADER_VALUE)
+
+                .get(URL + "/{email}", AccountNominalIT.ACCOUNT_BODY.get("email"));
+
+        assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND.value()));
     }
 }
