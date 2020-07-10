@@ -227,6 +227,7 @@ public class AccountNominalIT extends AbstractTestNGSpringContextTests {
         assertThat(responseGet.jsonPath().getString("lastname"), is(patch0.get("value")));
         assertThat(responseGet.jsonPath().getString("firstname"), is(patch1.get("value")));
         assertThat(responseGet.jsonPath().getString("email"), is(ACCOUNT_BODY.get("email")));
+        assertThat(responseGet.jsonPath().getString("update_date"), is(notNullValue()));
 
     }
 

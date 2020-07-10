@@ -8,15 +8,8 @@
         http://www.springframework.org/schema/lang/spring-lang.xsd">
 
 	<lang:groovy id="accountServiceResource"
-		script-source="classpath:com/exemple/service/customer/account/resource/AccountServiceResourceImpl.groovy">
-	</lang:groovy>
-
-	<lang:groovy id="accountValidationCustom"
-		script-source="classpath:com/exemple/service/customer/account/validation/AccountValidationCustomImpl.groovy">
+		script-source="classpath:contexts/test/AccountServiceResourceImpl.groovy">
 	</lang:groovy>
 	
-	<lang:groovy id="loginServiceResource"
-		script-source="classpath:com/exemple/service/customer/login/resource/LoginServiceResourceImpl.groovy">
-	</lang:groovy>
 
 </beans>

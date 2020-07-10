@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS account (
 	optin_mobile boolean,
 	mobile text,
 	creation_date timestamp,
+	update_date timestamp,
 	preferences list<frozen<map<text, text>>>
 );
 

@@ -1,11 +1,9 @@
 package com.exemple.service.customer.login.resource
 
 import org.mindrot.jbcrypt.BCrypt
-import org.springframework.stereotype.Component
 
 import groovy.transform.CompileDynamic
 
-@Component
 @CompileDynamic
 class LoginServiceResourceImpl implements LoginServiceResource {
 
@@ -27,5 +25,4 @@ class LoginServiceResourceImpl implements LoginServiceResource {
         }
         source
     }
-
 }

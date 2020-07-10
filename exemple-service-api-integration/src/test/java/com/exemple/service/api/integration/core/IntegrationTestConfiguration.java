@@ -70,6 +70,7 @@ public class IntegrationTestConfiguration {
         accountFilter.add("civility");
         accountFilter.add("mobile");
         accountFilter.add("creation_date");
+        accountFilter.add("update_date");
         accountFilter.add("birthday");
         accountFilter.add("addresses[*[city,street]]");
         accountFilter.add("cgus[code,version]");

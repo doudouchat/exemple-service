@@ -6,6 +6,9 @@ resource:
    hazelcast:
       port: ${hazelcast.port}
       member: 127.0.0.1:${hazelcast.port}
+customer: 
+   contexts: 
+      path: ${project.build.testOutputDirectory}/contexts
 store:
    zookeeper:
       host: 127.0.0.1:${zookeeper.port}
