@@ -13,14 +13,13 @@ class AccountServiceResourceImpl implements AccountServiceResource {
     private static final String CREATION_DATE = 'creation_date'
 
     @Override
-    Map<String, Object> save(UUID id, Map<String, Object> account) {
+    Map<String, Object> save(Map<String, Object> account) {
         account.put(CREATION_DATE, OffsetDateTime.now().toString())
         account
     }
 
     @Override
-    Map<String, Object> saveOrUpdateAccount(UUID id, Map<String, Object> account) {
+    Map<String, Object> update(Map<String, Object> account) {
         account
     }
-
 }

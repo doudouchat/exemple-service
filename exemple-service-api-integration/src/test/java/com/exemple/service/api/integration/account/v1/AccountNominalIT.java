@@ -2,6 +2,7 @@ package com.exemple.service.api.integration.account.v1;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.util.ArrayList;
@@ -138,6 +139,8 @@ public class AccountNominalIT extends AbstractTestNGSpringContextTests {
         assertThat(response.jsonPath().getString("email"), is(ACCOUNT_BODY.get("email")));
         assertThat(response.jsonPath().getBoolean("optin_mobile"), is(ACCOUNT_BODY.get("optin_mobile")));
         assertThat(response.jsonPath().getString("birthday"), is(ACCOUNT_BODY.get("birthday")));
+        assertThat(response.jsonPath().getString("creation_date"), is(notNullValue()));
+
     }
 
     @Test(dependsOnMethods = "getSuccess")
