@@ -164,6 +164,10 @@
 				<directory>src/test/resources</directory>
 				<filtering>true</filtering>
 			</testResource>
+			<testResource>
+				<directory>src/test/resources/contexts/test_company</directory>
+				<filtering>true</filtering>
+			</testResource>
 		</testResources>
 
 		<pluginManagement>

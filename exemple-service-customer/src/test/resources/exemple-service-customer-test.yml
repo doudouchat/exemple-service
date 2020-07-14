@@ -1,0 +1,4 @@
+customer: 
+   contexts: 
+      path: ${project.build.testOutputDirectory}/contexts
+      delay: 1000

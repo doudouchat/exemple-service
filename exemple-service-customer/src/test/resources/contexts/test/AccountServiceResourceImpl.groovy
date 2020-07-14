@@ -1,6 +1,6 @@
 package com.exemple.service.customer.account.resource
 
-import com.exemple.service.context.ServiceContextExecution;
+import java.time.OffsetDateTime
 
 import groovy.transform.CompileDynamic
 
@@ -11,7 +11,8 @@ class AccountServiceResourceImpl implements AccountServiceResource {
 
     @Override
     Map<String, Object> save(Map<String, Object> account) {
-        account.put(CREATION_DATE, ServiceContextExecution.context().date.toString())
+        account.clear()
+        account.put("TEST_KEY", "TEST_VALUE")
         account
     }
 
