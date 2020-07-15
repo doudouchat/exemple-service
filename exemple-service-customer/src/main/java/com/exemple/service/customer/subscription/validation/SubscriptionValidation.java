@@ -1,4 +1,4 @@
-package com.exemple.service.customer.subcription.validation;
+package com.exemple.service.customer.subscription.validation;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

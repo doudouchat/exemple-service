@@ -18,8 +18,8 @@ import org.testng.annotations.Test;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
-import com.exemple.service.customer.subcription.SubscriptionService;
-import com.exemple.service.customer.subcription.exception.SubscriptionServiceNotFoundException;
+import com.exemple.service.customer.subscription.SubscriptionService;
+import com.exemple.service.customer.subscription.exception.SubscriptionServiceNotFoundException;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 

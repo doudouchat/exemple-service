@@ -1,4 +1,4 @@
-package com.exemple.service.customer.subcription.exception;
+package com.exemple.service.customer.subscription.exception;
 
 public class SubscriptionServiceException extends Exception {
 

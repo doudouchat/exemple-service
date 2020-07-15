@@ -1,9 +1,9 @@
-package com.exemple.service.customer.subcription.validation.impl;
+package com.exemple.service.customer.subscription.validation.impl;
 
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
-import com.exemple.service.customer.subcription.validation.SubscriptionValidation;
+import com.exemple.service.customer.subscription.validation.SubscriptionValidation;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
 
