@@ -24,9 +24,9 @@ import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
-import com.exemple.service.customer.subcription.SubscriptionService;
-import com.exemple.service.customer.subcription.exception.SubscriptionServiceException;
-import com.exemple.service.customer.subcription.exception.SubscriptionServiceNotFoundException;
+import com.exemple.service.customer.subscription.SubscriptionService;
+import com.exemple.service.customer.subscription.exception.SubscriptionServiceException;
+import com.exemple.service.customer.subscription.exception.SubscriptionServiceNotFoundException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;

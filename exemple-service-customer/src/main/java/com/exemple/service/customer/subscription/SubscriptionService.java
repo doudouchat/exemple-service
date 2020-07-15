@@ -1,9 +1,9 @@
-package com.exemple.service.customer.subcription;
+package com.exemple.service.customer.subscription;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.exemple.service.customer.subcription.exception.SubscriptionServiceNotFoundException;
+import com.exemple.service.customer.subscription.exception.SubscriptionServiceNotFoundException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public interface SubscriptionService {

@@ -14,8 +14,8 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.exemple.service.customer.core.CustomerTestConfiguration;
-import com.exemple.service.customer.subcription.SubscriptionService;
-import com.exemple.service.customer.subcription.exception.SubscriptionServiceNotFoundException;
+import com.exemple.service.customer.subscription.SubscriptionService;
+import com.exemple.service.customer.subscription.exception.SubscriptionServiceNotFoundException;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.subscription.SubscriptionResource;
 import com.exemple.service.schema.filter.SchemaFilter;

@@ -19,7 +19,7 @@ import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.login.LoginService;
-import com.exemple.service.customer.subcription.SubscriptionService;
+import com.exemple.service.customer.subscription.SubscriptionService;
 import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.schema.description.SchemaDescription;
