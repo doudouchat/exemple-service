@@ -14,7 +14,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.exemple.service.customer.core.CustomerTestConfiguration;
-import com.exemple.service.customer.subscription.SubscriptionService;
 import com.exemple.service.customer.subscription.exception.SubscriptionServiceNotFoundException;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.subscription.SubscriptionResource;
@@ -60,8 +59,6 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
         Mockito.when(resource.get(email)).thenReturn(subscription);
 
         boolean created = service.save(email, JsonNodeUtils.init());
-
-        Mockito.verify(resource).save(Mockito.eq(email), Mockito.any(JsonNode.class));
 
         assertThat(created, is(expectedCreated));
 

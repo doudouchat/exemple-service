@@ -6,6 +6,7 @@ import static com.exemple.service.api.integration.account.v1.AccountNominalIT.VE
 import static com.exemple.service.api.integration.account.v1.AccountNominalIT.VERSION_HEADER_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 import java.util.Collections;
 import java.util.UUID;
@@ -48,6 +49,7 @@ public class SubscriptionIT {
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
         assertThat(response.jsonPath().getString("email"), is(EMAIL));
+        assertThat(response.jsonPath().getString("subscription_date"), is(notNullValue()));
 
     }
 

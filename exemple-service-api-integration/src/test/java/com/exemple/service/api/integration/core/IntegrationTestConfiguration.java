@@ -114,6 +114,7 @@ public class IntegrationTestConfiguration {
 
         Set<String> subscriptionFilter = new HashSet<>();
         subscriptionFilter.add("email");
+        subscriptionFilter.add("subscription_date");
 
         Map<String, Set<String>> subscriptionRules = new HashMap<>();
         subscriptionRules.put("login", Collections.singleton("/email"));

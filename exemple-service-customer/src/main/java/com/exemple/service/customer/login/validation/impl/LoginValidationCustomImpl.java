@@ -1,4 +1,4 @@
-package com.exemple.service.customer.account.validation.impl;
+package com.exemple.service.customer.login.validation.impl;
 
 import java.util.Map;
 
@@ -8,13 +8,13 @@ import com.exemple.service.customer.common.ValidationCustom;
 import com.exemple.service.customer.core.script.CustomerScriptFactory;
 
 @Component
-public class AccountValidationCustomImpl implements ValidationCustom {
+public class LoginValidationCustomImpl implements ValidationCustom {
 
-    private static final String BEAN_NAME = "accountValidationCustom";
+    private static final String BEAN_NAME = "loginValidationCustom";
 
     private final CustomerScriptFactory scriptFactory;
 
-    public AccountValidationCustomImpl(CustomerScriptFactory scriptFactory) {
+    public LoginValidationCustomImpl(CustomerScriptFactory scriptFactory) {
         this.scriptFactory = scriptFactory;
     }
 

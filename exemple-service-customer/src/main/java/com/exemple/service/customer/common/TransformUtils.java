@@ -1,6 +1,7 @@
 package com.exemple.service.customer.common;
 
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import com.exemple.service.resource.common.util.JsonNodeUtils;
@@ -24,6 +25,17 @@ public final class TransformUtils {
         } else {
             return JsonNodeUtils.init();
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void transform(JsonNode source1, JsonNode source2, BiConsumer<Map<String, Object>, Map<String, Object>> service) {
+
+        Map<String, Object> formMap = MAPPER.convertValue(source1, Map.class);
+        Map<String, Object> oldMap = null;
+        if (source2 != null) {
+            oldMap = MAPPER.convertValue(source2, Map.class);
+        }
+        service.accept(formMap, oldMap);
     }
 
 }
