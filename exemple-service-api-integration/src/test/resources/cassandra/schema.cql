@@ -50,7 +50,8 @@ CREATE TABLE IF NOT EXISTS login (
 );
 
 CREATE TABLE IF NOT EXISTS subscription (
-	email text PRIMARY KEY
+	email text PRIMARY KEY,
+	subscription_date timestamp,
 );
 
 CREATE TABLE IF NOT EXISTS account_history ( 

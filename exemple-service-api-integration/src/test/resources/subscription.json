@@ -6,6 +6,11 @@
 			"type": "string",
 			"format": "email",
 			"login": true
+		},
+		"subscription_date": {
+			"type": "string",
+			"format": "date-time",
+			"readOnly": true
 		}
 	}
 }

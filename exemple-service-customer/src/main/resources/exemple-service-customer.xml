@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:lang="http://www.springframework.org/schema/lang"
 	xsi:schemaLocation="
         http://www.springframework.org/schema/beans 
         http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -14,9 +15,21 @@
 	<lang:groovy id="accountValidationCustom"
 		script-source="classpath:com/exemple/service/customer/account/validation/AccountValidationCustomImpl.groovy">
 	</lang:groovy>
-	
+
 	<lang:groovy id="loginServiceResource"
 		script-source="classpath:com/exemple/service/customer/login/resource/LoginServiceResourceImpl.groovy">
+	</lang:groovy>
+
+	<lang:groovy id="loginValidationCustom"
+		script-source="classpath:com/exemple/service/customer/login/validation/LoginValidationCustomImpl.groovy">
+	</lang:groovy>
+
+	<lang:groovy id="subscriptionServiceResource"
+		script-source="classpath:com/exemple/service/customer/subscription/resource/SubscriptionServiceResourceImpl.groovy">
+	</lang:groovy>
+
+	<lang:groovy id="subscriptionValidationCustom"
+		script-source="classpath:com/exemple/service/customer/subscription/validation/SubscriptionValidationCustomImpl.groovy">
 	</lang:groovy>
 
 </beans>

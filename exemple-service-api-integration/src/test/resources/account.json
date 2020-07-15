@@ -55,7 +55,12 @@
 		"creation_date": {
 			"type": "string",
 			"format": "date-time",
-			"writeOnly": true
+			"readOnly": true
+		},
+		"update_date": {
+			"type": "string",
+			"format": "date-time",
+			"readOnly": true
 		},
 		"optin_mobile": {
 			"type": "boolean"
