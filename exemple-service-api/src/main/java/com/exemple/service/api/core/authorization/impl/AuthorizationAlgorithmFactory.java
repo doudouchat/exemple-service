@@ -26,6 +26,7 @@ import org.springframework.util.Assert;
 
 import com.auth0.jwt.algorithms.Algorithm;
 import com.exemple.service.api.core.authorization.AuthorizationException;
+import com.exemple.service.api.core.authorization.AuthorizationService;
 import com.pivovarit.function.ThrowingFunction;
 
 @Component

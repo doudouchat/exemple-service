@@ -9,12 +9,14 @@ import javax.naming.NamingException;
 import org.mockito.Mockito;
 import org.osjava.sj.SimpleJndi;
 import org.osjava.sj.loader.JndiLoader;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jndi.JndiObjectFactoryBean;
 
+import com.exemple.service.api.core.authorization.AuthorizationService;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.customer.account.AccountService;
@@ -68,6 +70,12 @@ public class ApiTestConfiguration extends ApiConfiguration {
     @Bean
     public LoginResource loginResource() {
         return Mockito.mock(LoginResource.class);
+    }
+
+    @Bean(name = "authorizationServiceImpl")
+    @ConditionalOnNotWebApplication
+    public AuthorizationService AuthorizationService() {
+        return Mockito.mock(AuthorizationService.class);
     }
 
     @Bean

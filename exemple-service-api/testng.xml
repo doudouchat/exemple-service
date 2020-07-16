@@ -8,12 +8,14 @@
 	</test>
 	<test name="ut api">
 		<packages>
-			<package name="com.exemple.service.api.account" />
 			<package name="com.exemple.service.api.schema" />
-			<package name="com.exemple.service.api.login" />
 			<package name="com.exemple.service.api.stock" />
 			<package name="com.exemple.service.api.subscription" />
 		</packages>
+		<classes>
+			<class name="com.exemple.service.api.account.AccountApiTest" />
+			<class name="com.exemple.service.api.login.LoginApiTest" />
+		</classes>
 	</test>
 	<test name="ut info">
 		<packages>
@@ -25,12 +27,16 @@
 			<class name="com.exemple.service.api.core.swagger.DocumentApiResourceTest" />
 		</classes>
 	</test>
-	<test name="ut security">
+	<test name="ut api secure">
+		<classes>
+			<class name="com.exemple.service.api.account.AccountApiSecureTest" />
+			<class name="com.exemple.service.api.login.LoginApiSecureTest" />
+			<class name="com.exemple.service.api.core.swagger.DocumentApiResourceSecureTest" />
+		</classes>
+	</test>
+	<test name="ut authorization">
 		<packages>
 			<package name="com.exemple.service.api.core.authorization" />
 		</packages>
-		<classes>
-			<class name="com.exemple.service.api.core.swagger.DocumentApiResourceSecureTest" />
-		</classes>
 	</test>
 </suite>

@@ -351,6 +351,11 @@
 			<artifactId>mockserver-netty</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.mock-server</groupId>
+			<artifactId>mockserver-client-java</artifactId>
+		</dependency>
+
 		<!-- CURATOR -->
 
 		<dependency>
@@ -425,16 +430,6 @@
 					<systemPropertyVariables>
 						<mockserver.logLevel>DEBUG</mockserver.logLevel>
 					</systemPropertyVariables>
-				</configuration>
-			</plugin>
-
-			<!-- MOCK SERVER -->
-			<plugin>
-				<groupId>org.mock-server</groupId>
-				<artifactId>mockserver-maven-plugin</artifactId>
-				<configuration>
-					<serverPort>${authorization.port}</serverPort>
-					<logLevel>WARN</logLevel>
 				</configuration>
 			</plugin>
 
