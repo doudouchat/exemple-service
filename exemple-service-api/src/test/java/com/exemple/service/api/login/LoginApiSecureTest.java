@@ -1,4 +1,4 @@
-package com.exemple.service.api.core.authorization;
+package com.exemple.service.api.login;
 
 import static com.exemple.service.api.core.authorization.AuthorizationTestConfiguration.RSA256_ALGORITHM;
 import static com.exemple.service.api.core.authorization.AuthorizationTestConfiguration.TOKEN_KEY_RESPONSE;
@@ -24,24 +24,21 @@ import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 import org.mockserver.model.JsonBody;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.auth0.jwt.JWT;
 import com.exemple.service.api.common.model.SchemaBeanParam;
-import com.exemple.service.api.core.JerseySpringSupport;
+import com.exemple.service.api.core.JerseySpringSupportSecure;
 import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration.TestFilter;
 import com.exemple.service.api.core.authorization.impl.AuthorizationAlgorithmFactory;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
-import com.exemple.service.api.login.LoginApiTest;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.login.LoginResource;
 
-@ActiveProfiles(inheritProfiles = false)
-public class AuthorizationLoginTest extends JerseySpringSupport {
+public class LoginApiSecureTest extends JerseySpringSupportSecure {
 
     private TestFilter testFilter = new TestFilter();
 

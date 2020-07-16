@@ -12,12 +12,14 @@ import org.glassfish.jersey.logging.LoggingFeature;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.exemple.service.api.core.authorization.AuthorizationService;
+
 @Service
-public class AuthorizationService {
+public class AuthorizationServiceImpl implements AuthorizationService {
 
     private final Client client;
 
-    public AuthorizationService(@Value("${api.authorization.connectionTimeout:3000}") int connectionTimeout,
+    public AuthorizationServiceImpl(@Value("${api.authorization.connectionTimeout:3000}") int connectionTimeout,
             @Value("${api.authorization.socketTimeout:3000}") int socketTimeout) {
 
         client = ClientBuilder.newClient()
@@ -42,6 +44,7 @@ public class AuthorizationService {
 
     }
 
+    @Override
     public Response tokenKey(String path, String username, String password) {
 
         return client.target(path + "/oauth/token_key").request()

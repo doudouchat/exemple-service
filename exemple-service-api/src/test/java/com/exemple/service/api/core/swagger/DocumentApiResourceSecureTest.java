@@ -10,16 +10,14 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.server.ResourceConfig;
-import org.springframework.test.context.ActiveProfiles;
 import org.testng.annotations.Test;
 
-import com.exemple.service.api.core.JerseySpringSupport;
+import com.exemple.service.api.core.JerseySpringSupportSecure;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@ActiveProfiles(inheritProfiles = false)
-public class DocumentApiResourceSecureTest extends JerseySpringSupport {
+public class DocumentApiResourceSecureTest extends JerseySpringSupportSecure {
 
     @Override
     protected ResourceConfig configure() {

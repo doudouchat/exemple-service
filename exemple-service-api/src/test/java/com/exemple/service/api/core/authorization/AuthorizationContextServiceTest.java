@@ -12,17 +12,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.commons.codec.binary.Base64;
-import org.mockserver.client.MockServerClient;
-import org.mockserver.model.Header;
-import org.mockserver.model.HttpRequest;
-import org.mockserver.model.HttpResponse;
-import org.mockserver.model.JsonBody;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -49,19 +47,20 @@ public class AuthorizationContextServiceTest extends AbstractTestNGSpringContext
     @Autowired
     private HazelcastInstance hazelcastInstance;
 
-    private static final UUID DEPRECATED_TOKEN_ID = UUID.randomUUID();
-
     @Autowired
-    private MockServerClient authorizationClient;
+    private AuthorizationService authorizationService;
+
+    private static final UUID DEPRECATED_TOKEN_ID = UUID.randomUUID();
 
     @BeforeMethod
     private void before() {
+
+        Mockito.reset(authorizationService);
 
         authorizationAlgorithmFactory.resetAlgorithm();
 
         hazelcastInstance.getMap(AuthorizationConfiguration.TOKEN_BLACK_LIST).put(DEPRECATED_TOKEN_ID.toString(), Date.from(Instant.now()));
 
-        authorizationClient.reset();
     }
 
     @DataProvider(name = "authorizedFailure")
@@ -97,9 +96,12 @@ public class AuthorizationContextServiceTest extends AbstractTestNGSpringContext
     @Test(dataProvider = "authorizedFailure", expectedExceptions = AuthorizationException.class)
     public void authorizedFailure(String token, Map<String, String> tokenKey, Status status) throws AuthorizationException {
 
-        authorizationClient.when(HttpRequest.request().withMethod("GET").withPath("/oauth/token_key"))
-                .respond(HttpResponse.response().withHeaders(new Header("Content-Type", "application/json;charset=UTF-8"))
-                        .withBody(JsonBody.json(tokenKey)).withStatusCode(status.getStatusCode()));
+        Response responseMock = Mockito.mock(Response.class);
+        Mockito.when(responseMock.getStatus()).thenReturn(status.getStatusCode());
+        Mockito.when(responseMock.readEntity(new GenericType<Map<String, String>>() {
+        })).thenReturn(tokenKey);
+
+        Mockito.when(authorizationService.tokenKey(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(responseMock);
 
         MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
         headers.putSingle("Authorization", "Bearer " + token);
@@ -115,9 +117,12 @@ public class AuthorizationContextServiceTest extends AbstractTestNGSpringContext
         String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe").withAudience("exemple")
                 .withArrayClaim("scope", new String[] { "account:write" }).withJWTId(UUID.randomUUID().toString()).sign(RSA256_ALGORITHM);
 
-        authorizationClient.when(HttpRequest.request().withMethod("GET").withPath("/oauth/token_key"))
-                .respond(HttpResponse.response().withHeaders(new Header("Content-Type", "application/json;charset=UTF-8"))
-                        .withBody(JsonBody.json(TOKEN_KEY_RESPONSE)).withStatusCode(200));
+        Response responseMock = Mockito.mock(Response.class);
+        Mockito.when(responseMock.getStatus()).thenReturn(Status.OK.getStatusCode());
+        Mockito.when(responseMock.readEntity(new GenericType<Map<String, String>>() {
+        })).thenReturn(TOKEN_KEY_RESPONSE);
+
+        Mockito.when(authorizationService.tokenKey(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(responseMock);
 
         MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
         headers.putSingle("Authorization", "Bearer " + token);
@@ -138,9 +143,12 @@ public class AuthorizationContextServiceTest extends AbstractTestNGSpringContext
                 .withArrayClaim("scope", new String[] { "account:write" }).withClaim("singleUse", true).withJWTId(UUID.randomUUID().toString())
                 .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.DAYS))).sign(RSA256_ALGORITHM);
 
-        authorizationClient.when(HttpRequest.request().withMethod("GET").withPath("/oauth/token_key"))
-                .respond(HttpResponse.response().withHeaders(new Header("Content-Type", "application/json;charset=UTF-8"))
-                        .withBody(JsonBody.json(TOKEN_KEY_RESPONSE)).withStatusCode(200));
+        Response responseMock = Mockito.mock(Response.class);
+        Mockito.when(responseMock.getStatus()).thenReturn(Status.OK.getStatusCode());
+        Mockito.when(responseMock.readEntity(new GenericType<Map<String, String>>() {
+        })).thenReturn(TOKEN_KEY_RESPONSE);
+
+        Mockito.when(authorizationService.tokenKey(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(responseMock);
 
         MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
         headers.putSingle("Authorization", "Bearer " + token);
@@ -159,9 +167,12 @@ public class AuthorizationContextServiceTest extends AbstractTestNGSpringContext
                 .withArrayClaim("scope", new String[] { "account:write" }).withClaim("singleUse", true).withJWTId(UUID.randomUUID().toString())
                 .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.DAYS))).sign(RSA256_ALGORITHM);
 
-        authorizationClient.when(HttpRequest.request().withMethod("GET").withPath("/oauth/token_key"))
-                .respond(HttpResponse.response().withHeaders(new Header("Content-Type", "application/json;charset=UTF-8"))
-                        .withBody(JsonBody.json(TOKEN_KEY_RESPONSE)).withStatusCode(200));
+        Response responseMock = Mockito.mock(Response.class);
+        Mockito.when(responseMock.getStatus()).thenReturn(Status.OK.getStatusCode());
+        Mockito.when(responseMock.readEntity(new GenericType<Map<String, String>>() {
+        })).thenReturn(TOKEN_KEY_RESPONSE);
+
+        Mockito.when(authorizationService.tokenKey(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(responseMock);
 
         MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
         headers.putSingle("Authorization", "Bearer " + token);

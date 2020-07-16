@@ -16,11 +16,15 @@ import javax.ws.rs.core.SecurityContext;
 
 import org.apache.commons.codec.binary.Base64;
 import org.mockserver.client.MockServerClient;
+import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 
 import com.auth0.jwt.algorithms.Algorithm;
 import com.hazelcast.config.Config;
@@ -29,11 +33,12 @@ import com.hazelcast.core.HazelcastInstance;
 
 @Configuration
 @Import(AuthorizationConfiguration.class)
+@Profile("!noSecurity")
 public class AuthorizationTestConfiguration {
 
     public static final Algorithm RSA256_ALGORITHM;
 
-    public static final Map<String, Object> TOKEN_KEY_RESPONSE = new HashMap<>();
+    public static final Map<String, String> TOKEN_KEY_RESPONSE = new HashMap<>();
 
     static {
 
@@ -57,15 +62,12 @@ public class AuthorizationTestConfiguration {
 
     }
 
-    @Value("${api.authorization.port}")
-    private int authorizationPort;
-
     @Value("${api.authorization.hazelcast.port}")
     private int port;
 
     @Bean
     @Primary
-    public HazelcastInstance hazelcastInstance() {
+    public HazelcastInstance hazelcastInstanceServer() {
 
         Config config = new Config();
         config.getNetworkConfig().setPort(port);
@@ -75,15 +77,26 @@ public class AuthorizationTestConfiguration {
         return Hazelcast.newHazelcastInstance(config);
     }
 
+    @Value("${api.authorization.port}")
+    private int authorizationPort;
+
     @Bean(destroyMethod = "stop")
-    @Primary
-    public MockServerClient authorizationServer() {
+    @ConditionalOnWebApplication
+    public ClientAndServer authorizationServer() {
+        return ClientAndServer.startClientAndServer(authorizationPort);
+    }
+
+    @Bean(destroyMethod = "stop")
+    @DependsOn("authorizationServer")
+    @ConditionalOnWebApplication
+    public MockServerClient authorizationClient() {
+
         return new MockServerClient("localhost", authorizationPort);
     }
 
     public static class TestFilter implements ContainerRequestFilter {
 
-        SecurityContext context;
+        public SecurityContext context;
 
         @Override
         public void filter(ContainerRequestContext requestContext) {
