@@ -1,5 +1,6 @@
 package com.exemple.service.api.core.authorization.impl;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.ws.rs.ForbiddenException;
@@ -30,10 +31,7 @@ public class AuthorizationCheckServiceImpl implements AuthorizationCheckService 
 
         JsonNode login = loginResource.get(securityContext.getUserPrincipal().getName()).orElseGet(JsonNodeUtils::init);
 
-        if (!id.toString().equals(login.get(LoginField.ID.field).asText(null))) {
-
-            throw new ForbiddenException();
-        }
+        checkIfAccountIdAndLoginIdAreIdentical(id, login);
 
     }
 
@@ -44,19 +42,36 @@ public class AuthorizationCheckServiceImpl implements AuthorizationCheckService 
 
             JsonNode login = loginResource.get(username).orElseGet(JsonNodeUtils::init);
 
-            if (login.path(LoginField.ID.field).isMissingNode()) {
-
-                throw new ForbiddenException();
-
-            }
+            checkIfLoginIdIsPresent(login);
 
             UUID id = UUID.fromString(login.get(LoginField.ID.field).textValue());
-            if (loginResource.get(id).stream().map(l -> l.get(LoginField.USERNAME.field).textValue())
-                    .noneMatch(securityContext.getUserPrincipal().getName()::equals)) {
+            checkIfUsernameExistInLogin(securityContext.getUserPrincipal().getName(), loginResource.get(id));
+        }
+    }
 
-                throw new ForbiddenException();
+    private static void checkIfAccountIdAndLoginIdAreIdentical(UUID id, JsonNode login) {
 
-            }
+        if (!id.toString().equals(login.get(LoginField.ID.field).asText(null))) {
+
+            throw new ForbiddenException();
+        }
+    }
+
+    private static void checkIfLoginIdIsPresent(JsonNode login) {
+
+        if (login.path(LoginField.ID.field).isMissingNode()) {
+
+            throw new ForbiddenException();
+
+        }
+    }
+
+    private static void checkIfUsernameExistInLogin(String username, List<JsonNode> logins) {
+
+        if (logins.stream().map(l -> l.get(LoginField.USERNAME.field).textValue()).noneMatch(username::equals)) {
+
+            throw new ForbiddenException();
+
         }
     }
 
