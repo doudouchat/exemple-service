@@ -1,12 +1,16 @@
 package com.exemple.service.resource.common.util;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Map.Entry;
-import java.util.function.Consumer;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Streams;
 
 public final class JsonNodeFilterUtils {
@@ -15,50 +19,49 @@ public final class JsonNodeFilterUtils {
 
     }
 
-    public static void clean(JsonNode source) {
+    public static JsonNode clean(JsonNode source) {
 
-        filter(source, (Entry<String, JsonNode> e) -> {
-            if (e.getValue().isNull()) {
-                ((ObjectNode) source).remove(e.getKey());
-            }
+        BiPredicate<JsonNode, Entry<String, JsonNode>> predicate = (root, node) -> !node.getValue().isNull();
 
-            if (e.getValue().isObject()) {
-
-                clean(source.get(e.getKey()));
-
-            }
-
-            if (e.getValue().isArray()) {
-
-                ((ObjectNode) source).replace(e.getKey(), JsonNodeUtils.create(Streams.stream(e.getValue().elements()).map((JsonNode node) -> {
-                    clean(node);
-                    return node;
-                }).filter((JsonNode node) -> !node.isNull()).collect(Collectors.toList())));
-
-                clean(source.get(e.getKey()));
-            }
-        });
+        return filter(source, predicate);
     }
 
-    public static void cleanArray(JsonNode source) {
+    public static JsonNode cleanArray(JsonNode source) {
 
-        filter(source, (Map.Entry<String, JsonNode> e) -> {
+        BiPredicate<JsonNode, Entry<String, JsonNode>> predicate = (root, node) -> !root.isArray() || !node.getValue().isNull();
 
-            if (e.getValue().isArray()) {
-
-                ((ObjectNode) source).replace(e.getKey(),
-                        JsonNodeUtils.create(Streams.stream(e.getValue().elements()).filter(node -> !node.isNull()).collect(Collectors.toList())));
-
-                cleanArray(source.get(e.getKey()));
-            }
-        });
+        return filter(source, predicate);
     }
 
-    public static void filter(JsonNode source, Consumer<Entry<String, JsonNode>> action) {
+    public static JsonNode filter(JsonNode source, BiPredicate<JsonNode, Entry<String, JsonNode>> predicate) {
+        return filter(Maps.immutableEntry(null, source), new ObjectMapper().createObjectNode(), predicate);
+    }
 
-        if (source.isObject()) {
-            Streams.stream(JsonNodeUtils.clone(source).fields()).forEach(action);
+    private static JsonNode filter(Entry<String, JsonNode> source, ObjectNode root, BiPredicate<JsonNode, Entry<String, JsonNode>> predicate) {
+
+        if (source.getValue().isObject()) {
+
+            Streams.stream(source.getValue().fields()).filter(node -> predicate.test(source.getValue(), node))
+                    .forEach(node -> root.set(node.getKey(), filter(node, new ObjectMapper().createObjectNode(), predicate)));
+
+            return root;
         }
+
+        if (source.getValue().isArray()) {
+
+            ArrayNode arrayNode = JsonNodeFactory.instance.arrayNode();
+            List<JsonNode> nodes = Streams.stream(source.getValue().elements())
+                    .filter(node -> predicate.test(source.getValue(), Maps.immutableEntry(null, node)))
+                    .map(node -> filter(Maps.immutableEntry(null, node), new ObjectMapper().createObjectNode(), predicate))
+                    .collect(Collectors.toList());
+            arrayNode.addAll(nodes);
+
+            return arrayNode;
+        }
+
+        root.set(source.getKey(), source.getValue());
+
+        return root.get(source.getKey());
     }
 
 }

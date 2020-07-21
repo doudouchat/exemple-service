@@ -9,6 +9,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -27,6 +28,7 @@ import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
 import com.exemple.service.resource.common.util.MetadataSchemaUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class AccountHistoryResource {
@@ -53,12 +55,23 @@ public class AccountHistoryResource {
         return dao().findByIdAndField(id, field);
     }
 
-    public Collection<BoundStatement> createHistories(final UUID id, JsonNode source, OffsetDateTime now) {
+    public Collection<BoundStatement> saveHistories(final UUID id, JsonNode source, OffsetDateTime now) {
+
+        return this.createHistories(id, source, now, new ObjectMapper().nullNode());
+    }
+
+    public Collection<BoundStatement> updateHistories(final UUID id, JsonNode source, OffsetDateTime now) {
+
+        return this.createHistories(id, source, now, null);
+    }
+
+    public Collection<BoundStatement> createHistories(final UUID id, JsonNode source, OffsetDateTime now, JsonNode previousDefaultValue) {
 
         Map<String, AccountHistory> histories = findById(id).stream().collect(Collectors.toMap(AccountHistory::getField, Function.identity()));
 
         AccountHistory defaultHistory = new AccountHistory();
         defaultHistory.setDate(now.toInstant().minusNanos(1));
+        defaultHistory.setValue(new ObjectMapper().nullNode());
 
         PreparedStatement prepared = session.prepare("INSERT INTO " + ResourceExecutionContext.get().keyspace()
                 + ".account_history (id,date,field,value,previous_value,application,version,user) VALUES (?,?,?,?,?,?,?,?)");
@@ -69,13 +82,11 @@ public class AccountHistoryResource {
 
                 .map((Map.Entry<String, JsonNode> line) -> {
 
-                    JsonNodeFilterUtils.clean(line.getValue());
-
                     AccountHistory history = new AccountHistory();
                     history.setId(id);
                     history.setField(line.getKey());
                     history.setDate(now.toInstant());
-                    history.setValue(line.getValue());
+                    history.setValue(JsonNodeFilterUtils.clean(line.getValue()));
                     history.setApplication(ServiceContextExecution.context().getApp());
                     history.setVersion(ServiceContextExecution.context().getVersion());
                     history.setUser(ServiceContextExecution.context().getPrincipal().getName());
@@ -84,14 +95,19 @@ public class AccountHistoryResource {
                     return history;
                 })
 
-                .filter((AccountHistory history) -> !Objects.equals(history.getValue(),
-                        histories.getOrDefault(history.getField(), defaultHistory).getValue()))
+                .filter(checkIfPreviousValueIsDifferent(histories, previousDefaultValue))
 
                 .map((AccountHistory history) -> {
                     LOG.debug("save history account {} {} {}", history.getId(), history.getField(), history.getValue());
                     return prepared.bind(history.getId(), history.getDate(), history.getField(), history.getValue(), history.getPreviousValue(),
                             history.getApplication(), history.getVersion(), history.getUser());
                 }).collect(Collectors.toList());
+    }
+
+    private static Predicate<AccountHistory> checkIfPreviousValueIsDifferent(Map<String, AccountHistory> histories, JsonNode defaultValue) {
+
+        return (AccountHistory history) -> !Objects.equals(history.getValue(),
+                histories.containsKey(history.getField()) ? histories.get(history.getField()).getValue() : defaultValue);
     }
 
     private AccountHistoryDao dao() {

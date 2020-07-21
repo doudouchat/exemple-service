@@ -42,9 +42,8 @@ public class JsonQueryBuilder {
 
     public Insert insert(JsonNode source) {
 
-        JsonNodeFilterUtils.clean(source);
-
-        return QueryBuilder.insertInto(ResourceExecutionContext.get().keyspace(), this.table).json(source, session.getContext().getCodecRegistry());
+        return QueryBuilder.insertInto(ResourceExecutionContext.get().keyspace(), this.table).json(JsonNodeFilterUtils.clean(source),
+                session.getContext().getCodecRegistry());
 
     }
 
@@ -58,14 +57,12 @@ public class JsonQueryBuilder {
 
     public UpdateWithAssignments update(JsonNode source) {
 
-        JsonNodeFilterUtils.cleanArray(source);
-
         TableMetadata tableMetadata = MetadataSchemaUtils.getTableMetadata(session, table);
 
         UpdateStart update = QueryBuilder.update(ResourceExecutionContext.get().keyspace(), this.table);
 
         List<Assignment> assignments = new ArrayList<>();
-        source.fields().forEachRemaining((Map.Entry<String, JsonNode> node) -> {
+        JsonNodeFilterUtils.cleanArray(source).fields().forEachRemaining((Map.Entry<String, JsonNode> node) -> {
 
             DataType type = tableMetadata.getColumn(node.getKey()).get().getType();
 

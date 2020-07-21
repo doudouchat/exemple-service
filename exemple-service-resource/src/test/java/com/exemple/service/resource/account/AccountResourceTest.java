@@ -82,7 +82,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         this.account = resource.save(id, JsonNodeUtils.create(model));
 
         JsonNode expected = JsonNodeUtils.create(model);
-        JsonNodeFilterUtils.clean(expected);
+        expected = JsonNodeFilterUtils.clean(expected);
 
         assertThat(this.account.get("email"), is(expected.get("email")));
         assertThat(this.account.get("addresses"), is(expected.get("addresses")));
@@ -153,7 +153,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         this.account = resource.update(id, JsonNodeUtils.create(model));
 
         JsonNode expected = JsonNodeUtils.create(model);
-        JsonNodeFilterUtils.clean(expected);
+        expected = JsonNodeFilterUtils.clean(expected);
 
         assertThat(this.account.get("addresses"), is(expected.get("addresses")));
         assertThat(this.account.get("age"), is(expected.get("age")));
@@ -226,7 +226,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
         assertThat(accountHistory.getValue(), is(expectedValue));
         assertThat(accountHistory.getDate(), is(expectedDate));
-        assertThat(accountHistory.getPreviousValue(), is(nullValue()));
+        assertThat(accountHistory.getPreviousValue().getNodeType(), is(JsonNodeType.NULL));
         assertHistory(accountHistory);
 
     }
@@ -244,7 +244,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
         assertThat(accountHistory.getValue().textValue(), is(expectedValue));
         assertThat(accountHistory.getDate(), is(expectedDate));
-        assertThat(accountHistory.getPreviousValue(), is(nullValue()));
+        assertThat(accountHistory.getPreviousValue().getNodeType(), is(JsonNodeType.NULL));
         assertHistory(accountHistory);
 
     }

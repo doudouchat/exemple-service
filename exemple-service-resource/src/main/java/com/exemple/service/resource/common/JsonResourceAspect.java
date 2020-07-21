@@ -2,8 +2,10 @@ package com.exemple.service.resource.common;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
@@ -14,29 +16,33 @@ import com.fasterxml.jackson.databind.JsonNode;
 @Component
 public class JsonResourceAspect {
 
-    @AfterReturning(pointcut = "@within(org.springframework.stereotype.Service) "
-            + "&& execution(public com.fasterxml.jackson.databind.JsonNode com.exemple.service.resource..*.*(..))", returning = "source")
-    public void afterReturning(JsonNode source) {
+    @Around("@within(org.springframework.stereotype.Service) "
+            + "&& execution(public com.fasterxml.jackson.databind.JsonNode com.exemple.service.resource..*.*(..))")
+    public JsonNode returnJsonNode(ProceedingJoinPoint joinPoint) throws Throwable {
 
-        JsonNodeFilterUtils.clean(source);
-
-    }
-
-    @AfterReturning(pointcut = "@within(org.springframework.stereotype.Service) "
-            + "&& execution(public java.util.Optional<com.fasterxml.jackson.databind.JsonNode> "
-            + "com.exemple.service.resource..*.*(..))", returning = "source")
-    public void afterReturning(Optional<JsonNode> source) {
-
-        source.ifPresent(JsonNodeFilterUtils::clean);
+        return JsonNodeFilterUtils.clean((JsonNode) joinPoint.proceed());
 
     }
 
-    @AfterReturning(pointcut = "@within(org.springframework.stereotype.Service) "
-            + "&& execution(public java.util.List<com.fasterxml.jackson.databind.JsonNode> "
-            + "com.exemple.service.resource..*.*(..))", returning = "source")
-    public void afterReturning(List<JsonNode> source) {
+    @Around("@within(org.springframework.stereotype.Service) && execution(public java.util.Optional<com.fasterxml.jackson.databind.JsonNode> "
+            + "com.exemple.service.resource..*.*(..))")
+    public Optional<JsonNode> returnOptionalJsonNode(ProceedingJoinPoint joinPoint) throws Throwable {
 
-        source.forEach(JsonNodeFilterUtils::clean);
+        @SuppressWarnings("unchecked")
+        Optional<JsonNode> source = (Optional<JsonNode>) joinPoint.proceed();
+        if (source.isPresent()) {
+            return Optional.of(JsonNodeFilterUtils.clean(source.get()));
+        }
+
+        return source;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Around("@within(org.springframework.stereotype.Service) && execution(public java.util.List<com.fasterxml.jackson.databind.JsonNode> "
+            + "com.exemple.service.resource..*.*(..))")
+    public List<JsonNode> returnListofJsonNode(ProceedingJoinPoint joinPoint) throws Throwable {
+
+        return ((List<JsonNode>) joinPoint.proceed()).stream().map(JsonNodeFilterUtils::clean).collect(Collectors.toList());
 
     }
 

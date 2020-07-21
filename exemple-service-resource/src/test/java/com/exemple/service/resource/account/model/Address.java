@@ -14,6 +14,10 @@ public class Address {
 
     private final Object enable = null;
 
+    public Address(Object street, Object city) {
+        this(street, city, null, null);
+    }
+
     public Address(Object street, Object city, Object zip, Object floor) {
         this.street = street;
         this.city = city;

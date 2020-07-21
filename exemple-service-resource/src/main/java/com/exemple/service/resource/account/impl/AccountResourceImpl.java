@@ -63,7 +63,7 @@ public class AccountResourceImpl implements AccountResource {
 
         BatchStatementBuilder batch = new BatchStatementBuilder(BatchType.LOGGED);
         batch.addStatement(account.build());
-        accountHistoryResource.createHistories(id, accountNode, now).forEach(batch::addStatements);
+        accountHistoryResource.saveHistories(id, accountNode, now).forEach(batch::addStatements);
 
         session.execute(batch.build());
 
@@ -83,7 +83,7 @@ public class AccountResourceImpl implements AccountResource {
         BatchStatementBuilder batch = new BatchStatementBuilder(BatchType.LOGGED);
         batch.setConsistencyLevel(DefaultConsistencyLevel.QUORUM);
         batch.addStatement(update.build());
-        accountHistoryResource.createHistories(id, source, now).forEach(batch::addStatements);
+        accountHistoryResource.updateHistories(id, source, now).forEach(batch::addStatements);
 
         session.execute(batch.build());
 

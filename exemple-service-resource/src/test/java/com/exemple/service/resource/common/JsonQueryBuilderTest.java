@@ -122,10 +122,10 @@ public class JsonQueryBuilderTest extends AbstractTestNGSpringContextTests {
         session.execute(resource.insert(JsonNodeUtils.create(model)).build());
 
         this.exemple = get(id);
-        JsonNodeFilterUtils.clean(this.exemple);
+        this.exemple = JsonNodeFilterUtils.clean(this.exemple);
 
         JsonNode expected = JsonNodeUtils.create(model);
-        JsonNodeFilterUtils.clean(expected);
+        expected = JsonNodeFilterUtils.clean(expected);
 
         assertThat(this.exemple.get("email"), is(expected.get("email")));
         assertThat(this.exemple.get("birthday"), is(expected.get("birthday")));
@@ -222,12 +222,10 @@ public class JsonQueryBuilderTest extends AbstractTestNGSpringContextTests {
 
         session.execute(resource.update(JsonNodeUtils.create(patch)).whereColumn("id").isEqualTo(QueryBuilder.literal(id)).build());
 
-        this.exemple = get(id);
-
-        JsonNodeFilterUtils.clean(this.exemple);
+        this.exemple = JsonNodeFilterUtils.clean(get(id));
 
         JsonNode expected = JsonNodeUtils.create(patch);
-        JsonNodeFilterUtils.clean(expected);
+        expected = JsonNodeFilterUtils.clean(expected);
 
         String property = patch.keySet().iterator().next();
         assertThat(this.exemple.get(property), is(expected.get(property)));
@@ -268,14 +266,12 @@ public class JsonQueryBuilderTest extends AbstractTestNGSpringContextTests {
         session.execute(resource.update(JsonNodeUtils.create(Collections.singletonMap(property, patch))).whereColumn("id")
                 .isEqualTo(QueryBuilder.literal(id)).build());
 
-        this.exemple = get(id);
-
-        JsonNodeFilterUtils.clean(this.exemple);
+        this.exemple = JsonNodeFilterUtils.clean(get(id));
 
         previousValues.addAll(patch);
 
         JsonNode expected = JsonNodeUtils.create(Collections.singletonMap(property, previousValues));
-        JsonNodeFilterUtils.clean(expected);
+        expected = JsonNodeFilterUtils.clean(expected);
 
         assertThat(this.exemple.get(property).size(), is(expected.get(property).size()));
         assertThat(this.exemple.get(property), Matchers.hasItems(Iterators.toArray(((ArrayNode) expected.get(property)).elements(), JsonNode.class)));
@@ -296,10 +292,10 @@ public class JsonQueryBuilderTest extends AbstractTestNGSpringContextTests {
         session.execute(resource.copy(this.exemple, JsonNodeUtils.create(model)).build());
 
         JsonNode expected = get(id);
-        JsonNodeFilterUtils.clean(expected);
+        expected = JsonNodeFilterUtils.clean(expected);
 
         JsonNode actual = JsonNodeUtils.create(model);
-        JsonNodeFilterUtils.clean(actual);
+        actual = JsonNodeFilterUtils.clean(actual);
 
         assertThat(actual.get("email"), is(expected.get("email")));
         assertThat(actual.get("birthday"), is(expected.get("birthday")));
