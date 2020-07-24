@@ -49,7 +49,7 @@
 		<org.springframework-version>5.2.8.RELEASE</org.springframework-version>
 		<org.springframework.security-version>5.3.3.RELEASE</org.springframework.security-version>
 		<org.springframework.batch-version>4.0.1.RELEASE</org.springframework.batch-version>
-		<org.springframework.kafka-version>2.5.3.RELEASE</org.springframework.kafka-version>
+		<org.springframework.kafka-version>2.5.4.RELEASE</org.springframework.kafka-version>
 		<org.springframework.boot-version>2.3.1.RELEASE</org.springframework.boot-version>
 		<org.slf4j-version>1.7.30</org.slf4j-version>
 		<datastax-version>4.7.2</datastax-version>
