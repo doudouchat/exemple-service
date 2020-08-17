@@ -11,10 +11,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
+import com.datastax.oss.driver.api.core.type.codec.ExtraTypeCodecs;
 import com.datastax.oss.driver.api.core.type.codec.registry.MutableCodecRegistry;
-import com.exemple.service.resource.core.cassandra.codec.ByteCodec;
-import com.exemple.service.resource.core.cassandra.codec.JacksonJsonCodec;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Configuration
@@ -45,11 +43,9 @@ public class ResourceCassandraConfiguration {
     @PostConstruct
     public void init() {
 
-        TypeCodec<JsonNode> jsonNodeCodec = new JacksonJsonCodec<>(JsonNode.class);
-
         MutableCodecRegistry registry = (MutableCodecRegistry) session().getContext().getCodecRegistry();
-        registry.register(jsonNodeCodec);
-        registry.register(new ByteCodec());
+        registry.register(ExtraTypeCodecs.json(JsonNode.class));
+        registry.register(ExtraTypeCodecs.BLOB_TO_ARRAY);
 
     }
 
