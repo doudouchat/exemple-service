@@ -13,7 +13,7 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.metadata.schema.TableMetadata;
 import com.datastax.oss.driver.api.core.type.DataType;
 import com.datastax.oss.driver.api.core.type.MapType;
-import com.datastax.oss.driver.api.core.type.SetType;
+import com.datastax.oss.driver.api.querybuilder.Literal;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.insert.Insert;
 import com.datastax.oss.driver.api.querybuilder.term.Term;
@@ -69,12 +69,15 @@ public class JsonQueryBuilder {
             String cqlName = type.asCql(false, true);
             LOG.trace("{} column:{} type:{} value:{}", tableMetadata.getName(), node.getKey(), cqlName, node.getValue());
 
-            if (type instanceof MapType) {
-                assignments.addAll(updateMap((MapType) type, node));
-            } else if (type instanceof SetType) {
-                assignments.addAll(updateSet(node));
-            } else {
-                assignments.add(Assignment.setColumn(node.getKey(), json(node.getValue())));
+            switch (type.getProtocolCode()) {
+                case ProtocolConstants.DataType.MAP:
+                    assignments.addAll(updateMap((MapType) type, node));
+                    break;
+                case ProtocolConstants.DataType.SET:
+                    assignments.addAll(updateSet(node));
+                    break;
+                default:
+                    assignments.add(Assignment.setColumn(node.getKey(), json(node.getValue())));
             }
 
         });
@@ -94,18 +97,14 @@ public class JsonQueryBuilder {
             List<Assignment> assignments = new ArrayList<>();
             node.getValue().fields().forEachRemaining((Map.Entry<String, JsonNode> e) -> {
 
-                Object key = e.getKey();
-                if (type.getKeyType().getProtocolCode() == ProtocolConstants.DataType.INT) {
-                    key = session.getContext().getCodecRegistry().codecFor(type.getKeyType()).parse(e.getKey());
-                }
-
+                Literal key = buildLiteral(type, e.getKey());
                 if (!e.getValue().isNull()) {
 
-                    assignments.add(Assignment.appendMapEntry(node.getKey(), QueryBuilder.literal(key), json(e.getValue())));
+                    assignments.add(Assignment.appendMapEntry(node.getKey(), key, json(e.getValue())));
 
                 } else {
 
-                    assignments.add(Assignment.removeSetElement(node.getKey(), QueryBuilder.literal(key)));
+                    assignments.add(Assignment.removeSetElement(node.getKey(), key));
                 }
 
             });
@@ -118,8 +117,17 @@ public class JsonQueryBuilder {
 
     private List<Assignment> updateSet(Map.Entry<String, JsonNode> node) {
 
-        return Streams.stream(node.getValue().elements()).map(v -> Assignment.appendSetElement(node.getKey(), json(v))).collect(Collectors.toList());
+        return Streams.stream(node.getValue()).map(v -> Assignment.appendSetElement(node.getKey(), json(v))).collect(Collectors.toList());
 
+    }
+
+    private Literal buildLiteral(MapType type, String value) {
+
+        Object key = value;
+        if (type.getKeyType().getProtocolCode() == ProtocolConstants.DataType.INT) {
+            key = session.getContext().getCodecRegistry().codecFor(type.getKeyType()).parse(value);
+        }
+        return QueryBuilder.literal(key);
     }
 
     private Term json(JsonNode source) {

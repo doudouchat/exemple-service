@@ -1,7 +1,6 @@
 package com.exemple.service.resource.common.util;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -16,6 +15,7 @@ import com.datastax.oss.driver.api.core.type.SetType;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Streams;
 
 public final class MetadataSchemaUtils {
@@ -42,8 +42,8 @@ public final class MetadataSchemaUtils {
 
                     if (type instanceof MapType && e.getValue().isObject()) {
 
-                        return Streams.stream(e.getValue().fields()).map(node -> Collections
-                                .singletonMap(e.getKey().concat("/").concat(node.getKey()), node.getValue()).entrySet().iterator().next());
+                        return Streams.stream(e.getValue().fields())
+                                .map(node -> Maps.immutableEntry(e.getKey().concat("/").concat(node.getKey()), node.getValue()));
                     }
 
                     return Stream.of(e);
