@@ -1,6 +1,5 @@
 package com.exemple.service.resource.schema.impl;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,12 +19,24 @@ import com.exemple.service.resource.schema.dao.ResourceSchemaDao;
 import com.exemple.service.resource.schema.mapper.ResourceSchemaMapper;
 import com.exemple.service.resource.schema.model.SchemaEntity;
 import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 @Validated
 public class SchemaResourceImpl implements SchemaResource {
 
-    public static final String SCHEMA_DEFAULT = "{\"$schema\": \"http://json-schema.org/draft-07/schema\",\"additionalProperties\": false}";
+    public static final JsonNode SCHEMA_DEFAULT;
+
+    static {
+
+        Map<String, Object> defaultSchema = new HashMap<>();
+        defaultSchema.put("$schema", "http://json-schema.org/draft-07/schema");
+        defaultSchema.put("additionalProperties", false);
+
+        SCHEMA_DEFAULT = new ObjectMapper().convertValue(defaultSchema, JsonNode.class);
+
+    }
 
     private final CqlSession session;
 
@@ -48,7 +59,7 @@ public class SchemaResourceImpl implements SchemaResource {
         }
 
         if (resourceSchema.getContent() == null) {
-            resourceSchema.setContent(SCHEMA_DEFAULT.getBytes(StandardCharsets.UTF_8));
+            resourceSchema.setContent(SCHEMA_DEFAULT);
         }
 
         return resourceSchema;

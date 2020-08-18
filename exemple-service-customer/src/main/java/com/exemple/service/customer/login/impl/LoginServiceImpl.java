@@ -5,14 +5,18 @@ import org.springframework.stereotype.Service;
 import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.login.LoginService;
-import com.exemple.service.customer.login.exception.LoginServiceException;
-import com.exemple.service.customer.login.exception.LoginServiceExistException;
 import com.exemple.service.customer.login.exception.LoginServiceNotFoundException;
 import com.exemple.service.customer.login.validation.LoginValidation;
+import com.exemple.service.resource.login.LoginField;
 import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.login.exception.LoginResourceExistException;
+import com.exemple.service.schema.common.exception.ValidationException;
+import com.exemple.service.schema.common.exception.ValidationExceptionModel;
 import com.exemple.service.schema.filter.SchemaFilter;
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.flipkart.zjsonpatch.JsonPatch;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -36,29 +40,35 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public void save(String login, JsonNode source) throws LoginServiceException {
+    public void save(String login, ArrayNode patch) throws LoginServiceNotFoundException {
 
         ServiceContext context = ServiceContextExecution.context();
 
         JsonNode old = loginResource.get(login).orElseThrow(LoginServiceNotFoundException::new);
 
+        JsonNode source = JsonPatch.apply(patch, old);
+
         loginValidation.validate(source, old, context.getApp(), context.getVersion(), context.getProfile());
 
-        boolean created;
-        try {
-            created = loginResource.save(login, source);
-        } catch (LoginResourceExistException e) {
-            throw new LoginServiceExistException(e);
-        }
+        if (!login.equals(source.path(LoginField.USERNAME.field).textValue())) {
 
-        if (created) {
+            try {
+                loginResource.save(source);
+            } catch (LoginResourceExistException e) {
+                throw buildValidationException(e);
+            }
+
             loginResource.delete(login);
+
+        } else {
+
+            loginResource.update(source);
         }
 
     }
 
     @Override
-    public void save(JsonNode source) throws LoginServiceException {
+    public void save(JsonNode source) {
 
         ServiceContext context = ServiceContextExecution.context();
 
@@ -67,7 +77,7 @@ public class LoginServiceImpl implements LoginService {
         try {
             loginResource.save(source);
         } catch (LoginResourceExistException e) {
-            throw new LoginServiceExistException(e);
+            throw buildValidationException(e);
         }
 
     }
@@ -87,6 +97,18 @@ public class LoginServiceImpl implements LoginService {
         JsonNode source = loginResource.get(login).orElseThrow(LoginServiceNotFoundException::new);
 
         return schemaFilter.filter(context.getApp(), context.getVersion(), "login", context.getProfile(), source);
+    }
+
+    private static ValidationException buildValidationException(LoginResourceExistException exception) {
+
+        ValidationException validationException = new ValidationException();
+
+        ValidationExceptionModel cause = new ValidationExceptionModel(JsonPointer.compile(JsonPointer.SEPARATOR + LoginField.USERNAME.field), "login",
+                "[".concat(exception.getLogin()).concat("] already exists"));
+
+        validationException.add(cause);
+
+        return validationException;
     }
 
 }

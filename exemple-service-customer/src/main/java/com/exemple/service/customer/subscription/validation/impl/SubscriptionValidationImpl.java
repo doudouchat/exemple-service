@@ -19,8 +19,9 @@ class SubscriptionValidationImpl implements SubscriptionValidation {
     }
 
     @Override
-    public void validate(JsonNode form, JsonNode old, String app, String version, String profile) {
+    public void validate(JsonNode form, String app, String version, String profile) {
 
-        schemaValidation.validate(app, version, "subscription", profile, form, old);
+        schemaValidation.validate(app, version, "subscription", profile, form);
     }
+
 }

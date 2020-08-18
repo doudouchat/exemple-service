@@ -30,8 +30,7 @@
 		},
 		"email": {
 			"type": "string",
-			"format": "email",
-			"login": true
+			"format": "email"
 		},
 		"civility": {
 			"type": "string",

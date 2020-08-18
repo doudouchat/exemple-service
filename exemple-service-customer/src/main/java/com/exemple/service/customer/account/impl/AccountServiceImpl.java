@@ -16,6 +16,8 @@ import com.exemple.service.event.model.EventType;
 import com.exemple.service.resource.account.AccountResource;
 import com.exemple.service.schema.filter.SchemaFilter;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.flipkart.zjsonpatch.JsonPatch;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -44,7 +46,7 @@ public class AccountServiceImpl implements AccountService {
 
         ServiceContext context = ServiceContextExecution.context();
 
-        accountValidation.validate(source, null, context.getApp(), context.getVersion(), context.getProfile());
+        accountValidation.validate(source, context.getApp(), context.getVersion(), context.getProfile());
 
         UUID id = UUID.randomUUID();
 
@@ -57,15 +59,17 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public JsonNode save(UUID id, JsonNode source) throws AccountServiceException {
+    public JsonNode save(UUID id, ArrayNode patch) throws AccountServiceException {
 
         ServiceContext context = ServiceContextExecution.context();
 
         JsonNode old = accountResource.get(id).orElseThrow(AccountServiceNotFoundException::new);
 
+        JsonNode source = JsonPatch.apply(patch, old);
+
         accountValidation.validate(source, old, context.getApp(), context.getVersion(), context.getProfile());
 
-        JsonNode account = accountResource.update(id, source);
+        JsonNode account = accountResource.save(id, source);
 
         EventData eventData = new EventData(account, ACCOUNT, EventType.UPDATE, context.getApp(), context.getVersion(), context.getDate().toString());
         applicationEventPublisher.publishEvent(eventData);

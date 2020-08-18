@@ -2,16 +2,15 @@ package com.exemple.service.resource.schema.model;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.LinkedHashSet;
 import java.util.Set;
-
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.stream.Collectors;
 
 import com.datastax.oss.driver.api.mapper.annotations.ClusteringColumn;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
+import com.fasterxml.jackson.databind.JsonNode;
 
 @Entity
 @CqlName("resource_schema")
@@ -32,13 +31,13 @@ public class SchemaEntity implements Serializable {
     @ClusteringColumn(2)
     private String profile;
 
-    private byte[] content;
+    private JsonNode content;
 
     @CqlName("filter")
     private Set<String> filters = Collections.emptySet();
 
-    @CqlName("rule")
-    private Map<String, Set<String>> rules = Collections.emptyMap();
+    @CqlName("patch")
+    private Set<JsonNode> patchs = Collections.emptySet();
 
     public String getApplication() {
         return application;
@@ -72,28 +71,28 @@ public class SchemaEntity implements Serializable {
         this.profile = profile;
     }
 
-    public byte[] getContent() {
-        return ObjectUtils.clone(content);
+    public JsonNode getContent() {
+        return content;
     }
 
-    public void setContent(byte[] content) {
-        this.content = ObjectUtils.clone(content);
+    public void setContent(JsonNode content) {
+        this.content = content;
     }
 
     public Set<String> getFilters() {
-        return new HashSet<>(filters);
+        return new LinkedHashSet<>(filters);
     }
 
     public void setFilters(Set<String> filters) {
-        this.filters = new HashSet<>(filters);
+        this.filters = new LinkedHashSet<>(filters);
     }
 
-    public Map<String, Set<String>> getRules() {
-        return rules;
+    public Set<JsonNode> getPatchs() {
+        return patchs.stream().collect(Collectors.toSet());
     }
 
-    public void setRules(Map<String, Set<String>> rules) {
-        this.rules = rules;
+    public void setPatchs(Set<JsonNode> patchs) {
+        this.patchs = patchs.stream().collect(Collectors.toSet());
     }
 
 }

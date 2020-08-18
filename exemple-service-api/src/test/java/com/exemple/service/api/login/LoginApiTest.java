@@ -30,6 +30,7 @@ import com.exemple.service.customer.login.exception.LoginServiceNotFoundExceptio
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class LoginApiTest extends JerseySpringSupport {
 
@@ -113,12 +114,6 @@ public class LoginApiTest extends JerseySpringSupport {
 
         String login = "jean.dupond@gmail.com";
 
-        Map<String, Object> model = new HashMap<>();
-        model.put("password", "jean.dupont");
-        model.put("id", UUID.randomUUID());
-
-        Mockito.when(service.get(Mockito.eq(login))).thenReturn(JsonNodeUtils.create(model));
-
         Map<String, Object> patch = new HashMap<>();
         patch.put("op", "add");
         patch.put("path", "/password");
@@ -131,36 +126,9 @@ public class LoginApiTest extends JerseySpringSupport {
 
                 .method("PATCH", Entity.json(MAPPER.writeValueAsString(Collections.singletonList(patch))));
 
-        Mockito.verify(service).save(Mockito.eq(login), Mockito.any(JsonNode.class));
-        Mockito.verify(service).get(Mockito.eq(login));
+        Mockito.verify(service).save(Mockito.eq(login), Mockito.any(ArrayNode.class));
 
         assertThat(response.getStatus(), is(Status.NO_CONTENT.getStatusCode()));
-
-    }
-
-    @Test
-    public void updateFailure() throws Exception {
-
-        String login = "jean.dupond@gmail.com";
-
-        Mockito.when(service.get(Mockito.eq(login))).thenThrow(new LoginServiceNotFoundException());
-
-        Map<String, Object> patch = new HashMap<>();
-        patch.put("op", "add");
-        patch.put("path", "/password");
-        patch.put("value", "mdp");
-
-        Response response = target(URL + "/" + login).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
-                .request(MediaType.APPLICATION_JSON)
-
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
-
-                .method("PATCH", Entity.json(MAPPER.writeValueAsString(Collections.singletonList(patch))));
-
-        Mockito.verify(service).get(Mockito.eq(login));
-        Mockito.verify(service, Mockito.never()).save(Mockito.eq(login), Mockito.any(JsonNode.class));
-
-        assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
 
     }
 

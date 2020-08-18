@@ -23,7 +23,7 @@ class LoginValidationImpl implements LoginValidation {
     @Override
     public void validate(JsonNode form, String app, String version, String profile) {
 
-        schemaValidation.validate(app, version, RESSOURCE, profile, form, null);
+        schemaValidation.validate(app, version, RESSOURCE, profile, form);
     }
 
     @Override

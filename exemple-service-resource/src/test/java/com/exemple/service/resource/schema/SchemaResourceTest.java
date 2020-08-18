@@ -9,7 +9,6 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +26,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.exemple.service.resource.schema.impl.SchemaResourceImpl;
@@ -40,10 +40,12 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
 
     private static final Logger LOG = LoggerFactory.getLogger(SchemaResource.class);
 
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     @Autowired
     private SchemaResource resource;
 
-    private byte[] schemaResource;
+    private JsonNode schemaResource;
 
     @BeforeMethod
     public void resetResourceContext() {
@@ -55,7 +57,7 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
     @Test
     public void save() throws IOException {
 
-        schemaResource = IOUtils.toByteArray(new ClassPathResource("test.json").getInputStream());
+        schemaResource = MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("test.json").getInputStream()));
 
         SchemaEntity resourceSchema = new SchemaEntity();
         resourceSchema.setApplication("app1");
@@ -64,7 +66,7 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
         resourceSchema.setProfile("example");
         resourceSchema.setContent(schemaResource);
         resourceSchema.setFilters(Collections.singleton("filter"));
-        resourceSchema.setRules(Collections.singletonMap("login", Collections.singleton("email")));
+        resourceSchema.setPatchs(Collections.singleton(JsonNodeUtils.create(Collections.singletonMap("op", "add"))));
 
         resource.save(resourceSchema);
 
@@ -73,13 +75,13 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
     @Test(dependsOnMethods = "save")
     public void get() throws IOException {
 
-        byte[] schemaResource = resource.get("app1", "v1", "account", "example").getContent();
+        JsonNode schemaResource = resource.get("app1", "v1", "account", "example").getContent();
 
         assertThat(schemaResource, not(nullValue()));
 
-        LOG.debug(IOUtils.toString(schemaResource, "utf-8"));
+        LOG.debug(schemaResource.toPrettyString());
 
-        assertThat(Arrays.equals(schemaResource, this.schemaResource), is(Boolean.TRUE));
+        assertThat(schemaResource, is(this.schemaResource));
 
     }
 
@@ -92,17 +94,17 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
         resourceSchema.setResource("account");
         resourceSchema.setProfile("example");
         resourceSchema.setFilters(Collections.singleton("filter"));
-        resourceSchema.setRules(Collections.singletonMap("login", Collections.singleton("email")));
+        resourceSchema.setPatchs(Collections.singleton(JsonNodeUtils.init()));
 
         resource.update(resourceSchema);
 
-        byte[] schemaResource = resource.get("app1", "v1", "account", "example").getContent();
+        JsonNode schemaResource = resource.get("app1", "v1", "account", "example").getContent();
 
         assertThat(schemaResource, not(nullValue()));
 
-        LOG.debug(IOUtils.toString(schemaResource, "utf-8"));
+        LOG.debug(schemaResource.toPrettyString());
 
-        assertThat(Arrays.equals(schemaResource, SchemaResourceImpl.SCHEMA_DEFAULT.getBytes()), is(Boolean.TRUE));
+        assertThat(schemaResource, is(SchemaResourceImpl.SCHEMA_DEFAULT));
 
     }
 
@@ -149,20 +151,17 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
 
         resource.save(resourceSchema);
 
-        byte[] schemaResource = resource.get(resourceSchema.getApplication(), version, resourceSchema.getResource(), resourceSchema.getProfile())
+        JsonNode schemaResource = resource.get(resourceSchema.getApplication(), version, resourceSchema.getResource(), resourceSchema.getProfile())
                 .getContent();
 
         assertThat(schemaResource, not(nullValue()));
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode schema = mapper.readTree(schemaResource);
-        assertThat(schema, is(mapper.readTree(SchemaResourceImpl.SCHEMA_DEFAULT.getBytes())));
+        assertThat(schemaResource, is((SchemaResourceImpl.SCHEMA_DEFAULT)));
 
         schemaResource = resource
                 .get(resourceSchema.getApplication(), UUID.randomUUID().toString(), resourceSchema.getResource(), resourceSchema.getProfile())
                 .getContent();
-        schema = mapper.readTree(schemaResource);
         assertThat(schemaResource, not(nullValue()));
-        assertThat(schema, is(mapper.readTree(SchemaResourceImpl.SCHEMA_DEFAULT.getBytes())));
+        assertThat(schemaResource, is(SchemaResourceImpl.SCHEMA_DEFAULT));
 
     }
 
@@ -185,20 +184,20 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "save")
-    public void getRule() {
+    public void getPatch() {
 
-        Map<String, Set<String>> filter = resource.get("app1", "v1", "account", "example").getRules();
+        Set<JsonNode> patchs = resource.get("app1", "v1", "account", "example").getPatchs();
 
-        assertThat(filter.get("login"), hasItem("email"));
+        patchs.forEach(patch -> assertThat(patch.get("op").textValue(), is("add")));
 
     }
 
     @Test(dependsOnMethods = "save")
-    public void getRuleEmpty() {
+    public void getPatchEmpty() {
 
-        Map<String, Set<String>> filter = resource.get("app1", UUID.randomUUID().toString(), "account", "example").getRules();
+        Set<JsonNode> patchs = resource.get("app1", UUID.randomUUID().toString(), "account", "example").getPatchs();
 
-        assertThat(filter.isEmpty(), is(true));
+        assertThat(patchs.isEmpty(), is(true));
 
     }
 }

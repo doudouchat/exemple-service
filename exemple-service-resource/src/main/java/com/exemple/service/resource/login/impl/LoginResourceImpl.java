@@ -13,7 +13,6 @@ import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.insert.Insert;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
-import com.datastax.oss.driver.api.querybuilder.update.Update;
 import com.exemple.service.resource.common.JsonQueryBuilder;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.login.LoginField;
@@ -42,28 +41,13 @@ public class LoginResourceImpl implements LoginResource {
 
         return Optional.ofNullable(getByUsername(username));
     }
-
+    
     @Override
-    public boolean save(String username, JsonNode source) throws LoginResourceExistException {
+    public void update(JsonNode source) {
 
-        if (source.path(LoginField.USERNAME.field).isMissingNode()) {
+        Insert insert = jsonQueryBuilder.insert(source);
 
-            Update update = updateLogin(username, source);
-
-            session.execute(update.build());
-
-            return false;
-
-        } else {
-
-            Insert insert = jsonQueryBuilder.copy(getByUsername(username), source).ifNotExists();
-
-            this.save(insert);
-
-            return true;
-
-        }
-
+        session.execute(insert.build());
     }
 
     @Override
@@ -71,7 +55,12 @@ public class LoginResourceImpl implements LoginResource {
 
         Insert insert = jsonQueryBuilder.insert(source).ifNotExists();
 
-        save(insert);
+        Row resultLogin = session.execute(insert.build()).one();
+        boolean notExistLogin = resultLogin.getBoolean(0);
+
+        if (!notExistLogin) {
+            throw new LoginResourceExistException(resultLogin.getString(1));
+        }
     }
 
     @Override
@@ -88,21 +77,6 @@ public class LoginResourceImpl implements LoginResource {
                 .isEqualTo(QueryBuilder.literal(id));
 
         return session.execute(select.build()).all().stream().map((Row row) -> row.get(0, JsonNode.class)).collect(Collectors.toList());
-    }
-
-    private void save(Insert insert) throws LoginResourceExistException {
-
-        Row resultLogin = session.execute(insert.build()).one();
-        boolean notExistLogin = resultLogin.getBoolean(0);
-
-        if (!notExistLogin) {
-            throw new LoginResourceExistException(resultLogin.getString(1));
-        }
-    }
-
-    private Update updateLogin(String username, JsonNode source) {
-
-        return jsonQueryBuilder.update(source).whereColumn(LoginField.USERNAME.field).isEqualTo(QueryBuilder.literal(username));
     }
 
     private JsonNode getByUsername(String username) {

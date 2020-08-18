@@ -4,7 +4,7 @@ INSERT INTO test.resource_schema (app, version, resource, profile, content) VALU
 	'app1',
 	'v1',
 	'account',
-	'example', textAsBlob(
+	'example',
 	'{
 		"$schema": "http://json-schema.org/draft-07/schema",
 		"properties": {
@@ -13,5 +13,5 @@ INSERT INTO test.resource_schema (app, version, resource, profile, content) VALU
 				"readOnly": true
 			}
 		}
-	}')
+	}'
 );

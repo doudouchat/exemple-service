@@ -4,13 +4,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.everit.json.schema.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +26,13 @@ import org.testng.annotations.Test;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.schema.common.SchemaBuilder;
 import com.exemple.service.schema.common.exception.ValidationException;
-import com.exemple.service.schema.common.exception.ValidationException.ValidationExceptionModel;
+import com.exemple.service.schema.common.exception.ValidationExceptionModel;
 import com.exemple.service.schema.core.SchemaTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.flipkart.zjsonpatch.JsonPatch;
 
 @ContextConfiguration(classes = { SchemaTestConfiguration.class })
 public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
@@ -47,7 +49,6 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
 
         ServiceContextExecution.context().setApp("default");
         ServiceContextExecution.context().setVersion("default");
-        SchemaValidationContext.get().setResource("schema_test");
         ServiceContextExecution.context().setProfile("default");
 
     }
@@ -62,58 +63,87 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
         model.put("opt_in_email", true);
         model.put("civility", "Mr");
 
-        validation.validate("default", "default", "schema_test", "default", MAPPER.convertValue(model, JsonNode.class), null);
+        validation.validate("default", "default", "schema_test", "default", MAPPER.convertValue(model, JsonNode.class));
 
     }
 
     @DataProvider(name = "failures")
     private static Object[][] failure() {
 
-        Map<String, Object> model1 = new HashMap<>();
-        model1.put("opt_in_email", true);
+        ObjectNode patch1 = MAPPER.createObjectNode();
+        patch1.put("op", "replace");
+        patch1.put("path", "/opt_in_email");
+        patch1.put("value", true);
 
-        Map<String, Object> model2 = new HashMap<>();
-        model2.put("firstname", null);
+        ObjectNode patch2 = MAPPER.createObjectNode();
+        patch2.put("op", "remove");
+        patch2.put("path", "/firstname");
 
-        Map<String, Object> model3 = new HashMap<>();
-        List<Map<String, Object>> cgus = new ArrayList<>();
         Map<String, Object> cgu1 = new HashMap<>();
         cgu1.put("code", "code_1");
         cgu1.put("version", "v1");
-        cgus.add(cgu1);
-        cgus.add(cgu1);
-        model3.put("cgus", cgus);
 
-        Map<String, Object> model4 = new HashMap<>();
-        cgus = new ArrayList<>();
         Map<String, Object> cgu2 = new HashMap<>();
         cgu2.put("code", "code_1");
         cgu2.put("version", "v2");
         Map<String, Object> cgu3 = new HashMap<>();
         cgu3.put("code", "code_2");
         cgu3.put("version", "v1");
-        cgus.add(cgu1);
-        cgus.add(cgu2);
-        cgus.add(cgu3);
-        model4.put("cgus", cgus);
 
-        Map<String, Object> model5 = new HashMap<>();
-        model5.put("birthday", "2018-02-30");
+        ObjectNode patch31 = MAPPER.createObjectNode();
+        patch31.put("op", "add");
+        patch31.put("path", "/cgus/0");
+        patch31.set("value", MAPPER.convertValue(cgu1, JsonNode.class));
 
-        Map<String, Object> model6 = new HashMap<>();
-        model6.put("creation_date", "2018-02-30T12:00:00Z");
+        ObjectNode patch32 = MAPPER.createObjectNode();
+        patch32.put("op", "add");
+        patch32.put("path", "/cgus/1");
+        patch32.set("value", MAPPER.convertValue(cgu1, JsonNode.class));
 
-        Map<String, Object> model7 = new HashMap<>();
-        model7.put("id", UUID.randomUUID().toString());
+        ObjectNode patch41 = MAPPER.createObjectNode();
+        patch41.put("op", "add");
+        patch41.put("path", "/cgus/0");
+        patch41.set("value", MAPPER.convertValue(cgu1, JsonNode.class));
 
-        Map<String, Object> model8 = new HashMap<>();
-        model8.put("email", "toto");
+        ObjectNode patch42 = MAPPER.createObjectNode();
+        patch42.put("op", "add");
+        patch42.put("path", "/cgus/1");
+        patch42.set("value", MAPPER.convertValue(cgu2, JsonNode.class));
 
-        Map<String, Object> model9 = new HashMap<>();
-        model9.put("nc", "nc");
+        ObjectNode patch43 = MAPPER.createObjectNode();
+        patch43.put("op", "add");
+        patch43.put("path", "/cgus/2");
+        patch43.set("value", MAPPER.convertValue(cgu3, JsonNode.class));
 
-        Map<String, Object> model10 = new HashMap<>();
-        model10.put("firstname", " ");
+        ObjectNode patch5 = MAPPER.createObjectNode();
+        patch5.put("op", "add");
+        patch5.put("path", "/birthday");
+        patch5.put("value", "2018-02-30");
+
+        ObjectNode patch6 = MAPPER.createObjectNode();
+        patch6.put("op", "add");
+        patch6.put("path", "/creation_date");
+        patch6.put("value", "2018-02-30T12:00:00Z");
+
+        ObjectNode patch7 = MAPPER.createObjectNode();
+        patch7.put("op", "add");
+        patch7.put("path", "/id");
+        patch7.put("value", UUID.randomUUID().toString());
+
+        ObjectNode patch8 = MAPPER.createObjectNode();
+        patch8.put("op", "add");
+        patch8.put("path", "/email");
+        patch8.put("value", "toto");
+
+        ObjectNode patch9 = MAPPER.createObjectNode();
+        patch9.put("op", "add");
+        patch9.put("path", "/nc");
+        patch9.put("value", "nc");
+
+        ObjectNode patch10 = MAPPER.createObjectNode();
+        patch10.put("op", "add");
+        patch10.put("path", "/firstname");
+        patch10.put("value", " ");
 
         Map<String, Object> holidays = new HashMap<>();
 
@@ -121,68 +151,247 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
         holiday.put("city", "Paris");
         holiday.put("street", "rue de la paix");
 
+        Map<String, Object> home = new HashMap<>();
+        home.put("city", "Paris");
+
         holidays.put("holiday1", holiday);
         holidays.put("holiday2", holiday);
         holidays.put("holiday3", holiday);
 
-        Map<String, Object> model11 = new HashMap<>();
-        model11.put("addresses", holidays);
+        ObjectNode patch11 = MAPPER.createObjectNode();
+        patch11.put("op", "add");
+        patch11.put("path", "/addresses/home");
+        patch11.set("value", MAPPER.convertValue(home, JsonNode.class));
 
-        Map<String, Object> model12 = new HashMap<>();
-        model12.put("nc", null);
+        ObjectNode patch12 = MAPPER.createObjectNode();
+        patch12.put("op", "add");
+        patch12.put("path", "/addresses");
+        patch12.set("value", MAPPER.convertValue(holidays, JsonNode.class));
 
-        Map<String, Object> model13 = new HashMap<>();
-        model13.put("email", "");
+        ObjectNode patch13 = MAPPER.createObjectNode();
+        patch13.put("op", "add");
+        patch13.put("path", "/email");
+        patch13.put("value", "");
 
-        Map<String, Object> model14 = new HashMap<>();
-        model14.put("civility", "Mlle");
+        ObjectNode patch14 = MAPPER.createObjectNode();
+        patch14.put("op", "add");
+        patch14.put("path", "/civility");
+        patch14.put("value", "Mlle");
 
         return new Object[][] {
                 // email required
-                { "required", "/email", model1 },
+                { "required", "/email", patch1 },
                 // firstname required
-                { "required", "/firstname", model2 },
+                { "required", "/firstname", patch2 },
                 // unique cgu
-                { "uniqueItems", "/cgus", model3 },
+                { "uniqueItems", "/cgus", patch31, patch32 },
                 // max cgu
-                { "maxItems", "/cgus", model4 },
+                { "maxItems", "/cgus", patch41, patch42, patch43 },
                 // bad birthday
-                { "format", "/birthday", model5 },
-                // FIXME bad date
-                // bad creation date
-                // { "format", "/creation_date", model6 },
+                { "format", "/birthday", patch5 },
+                // FIXME bad creation date
+                // { "format", "/creation_date", patch6 },
                 // id read only
-                { "readOnly", "/id", model7 },
+                { "readOnly", "/id", patch7 },
                 // bad email
-                { "format", "/email", model8 },
+                { "format", "/email", patch8 },
                 // nc unknown
-                { "additionalProperties", "/nc", model9 },
+                { "additionalProperties", "/nc", patch9 },
                 // firstname blank
-                { "pattern", "/firstname", model10 },
+                { "pattern", "/firstname", patch10 },
+                // street required
+                { "required", "/addresses/home/street", patch11 },
                 // maxProperties
-                { "maxProperties", "/addresses", model11 },
-                // FIXME additionalProperties null
-                // nc unknown
-                // { "additionalProperties", "/nc", model12 },
-                // mail empty
-                { "format", "/email", model13 },
+                { "maxProperties", "/addresses", patch12 },
+                // email empty
+                { "format", "/email", patch13 },
                 // bad enum
-                { "enum", "/civility", model14 }
-                //
+                { "enum", "/civility", patch14 }
+
         };
     }
 
     @Test(dataProvider = "failures")
-    public void validationFailure(String expectedCode, String expectedPath, Map<String, Object> model) {
+    public void validationFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
+
+        Map<String, Object> origin = new HashMap<>();
+        origin.put("lastname", "Dupont");
+        origin.put("firstname", "Jean");
+        origin.put("opt_in_email", false);
+        origin.put("civility", "Mr");
+        origin.put("cgus", MAPPER.createArrayNode());
+        origin.put("addresses", MAPPER.createObjectNode());
+
+        JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+
+        ArrayNode patch = MAPPER.createArrayNode();
+        patch.addAll(Arrays.asList(patchs));
+
+        JsonNode model = JsonPatch.apply(patch, old);
 
         try {
 
-            validation.validate("default", "default", "schema_test", "default", MAPPER.convertValue(model, JsonNode.class),
-                    MAPPER.convertValue(new HashMap<>(), JsonNode.class));
+            validation.validate("default", "default", "schema_test", "default", model);
 
             Assert.fail("expected ValidationException");
 
         } catch (ValidationException e) {
+
+            LOG.debug("validationFailure {}", e.getMessage());
+
+            e.getAllExceptions().stream()
+                    .forEach(exception -> LOG.debug("code:{} path:{} message:{}", exception.getCode(), exception.getPath(), exception.getMessage()));
+
+            assertThat(e.getAllExceptions().size(), is(1));
+
+            ValidationExceptionModel exception = e.getAllExceptions().stream().findFirst().get();
+
+            assertThat(exception.getCode(), is(expectedCode));
+            assertThat(exception.getPath(), is(expectedPath));
+        }
+    }
+
+    @DataProvider(name = "validationPatchSuccess")
+    private static Object[][] validationPatchSuccess() {
+
+        ObjectNode patch1 = MAPPER.createObjectNode();
+        patch1.put("op", "replace");
+        patch1.put("path", "/email");
+        patch1.put("value", "jack.dupont@gmail.com");
+
+        Map<String, Object> addresse = new HashMap<>();
+        addresse.put("city", "New York");
+        addresse.put("street", "5th avenue");
+
+        ObjectNode patch2 = MAPPER.createObjectNode();
+        patch2.put("op", "add");
+        patch2.put("path", "/addresses/holidays");
+        patch2.set("value", MAPPER.convertValue(addresse, JsonNode.class));
+
+        ObjectNode patch3 = MAPPER.createObjectNode();
+        patch3.put("op", "add");
+        patch3.put("path", "/addresses/home");
+        patch3.set("value", MAPPER.convertValue(addresse, JsonNode.class));
+
+        ObjectNode patch4 = MAPPER.createObjectNode();
+        patch4.put("op", "remove");
+        patch4.put("path", "/addresses/job");
+
+        return new Object[][] {
+
+                // replace email
+                { patch1 },
+                // add addresses
+                { patch2, patch3, patch4 }
+
+        };
+    }
+
+    @Test(dataProvider = "validationPatchSuccess")
+    public void validationPatchSuccess(JsonNode... patchs) {
+
+        Map<String, Object> origin = new HashMap<>();
+        origin.put("email", "jean.dupont@gmail.com");
+        origin.put("lastname", "Dupont");
+        origin.put("firstname", "Jean");
+        origin.put("opt_in_email", true);
+        origin.put("civility", "Mr");
+        origin.put("civility", "Mr");
+
+        Map<String, Object> addresse = new HashMap<>();
+        addresse.put("city", "New York");
+        addresse.put("street", "5th avenue");
+        origin.put("addresses", MAPPER.createObjectNode().set("job", MAPPER.convertValue(addresse, JsonNode.class)));
+
+        JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+
+        ArrayNode patch = MAPPER.createArrayNode();
+        patch.addAll(Arrays.asList(patchs));
+
+        JsonNode model = JsonPatch.apply(patch, old);
+
+        validation.validate("default", "default", "schema_test", "default", MAPPER.convertValue(model, JsonNode.class),
+                MAPPER.convertValue(origin, JsonNode.class));
+    }
+
+    @Test
+    public void validationPatchSuccessWithNotAccessProperty() {
+
+        Map<String, Object> origin = new HashMap<>();
+        origin.put("email", "jean.dupont@gmail.com");
+        origin.put("lastname", "Dupont");
+        origin.put("firstname", "Jean");
+        origin.put("opt_in_email", true);
+        origin.put("civility", "Mr");
+        origin.put("hide", true);
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("email", "jack.dupont@gmail.com");
+        model.put("lastname", "Dupont");
+        model.put("firstname", "Jean");
+        model.put("opt_in_email", true);
+        model.put("civility", "Mr");
+        model.put("hide", true);
+
+        validation.validate("default", "default", "schema_test", "default", MAPPER.convertValue(model, JsonNode.class),
+                MAPPER.convertValue(origin, JsonNode.class));
+
+    }
+
+    @DataProvider(name = "validationPatchFailures")
+    private static Object[][] validationPatchFailures() {
+
+        ObjectNode patch1 = MAPPER.createObjectNode();
+        patch1.put("op", "replace");
+        patch1.put("path", "/external_id");
+        patch1.put("value", UUID.randomUUID().toString());
+
+        ObjectNode patch2 = MAPPER.createObjectNode();
+        patch2.put("op", "remove");
+        patch2.put("path", "/hide");
+
+        ObjectNode patch3 = MAPPER.createObjectNode();
+        patch3.put("op", "remove");
+        patch3.put("path", "/external_id");
+
+        return ArrayUtils.addAll(failure(), new Object[][] {
+                // external_id create only
+                { "readOnly", "/external_id", patch1 },
+                // additionalProperties hide unknown
+                { "additionalProperties", "/hide", patch2 },
+                // external_id create only
+                { "readOnly", "/external_id", patch3 } });
+
+    }
+
+    @Test(dataProvider = "validationPatchFailures")
+    public void validationPatchFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
+
+        Map<String, Object> origin = new HashMap<>();
+        origin.put("id", UUID.randomUUID().toString());
+        origin.put("external_id", UUID.randomUUID().toString());
+        origin.put("opt_in_email", false);
+        origin.put("firstname", "john");
+        origin.put("cgus", MAPPER.createArrayNode());
+        origin.put("addresses", MAPPER.createObjectNode());
+        origin.put("hide", true);
+
+        JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+
+        ArrayNode patch = MAPPER.createArrayNode();
+        patch.addAll(Arrays.asList(patchs));
+
+        JsonNode model = JsonPatch.apply(patch, old);
+
+        try {
+
+            validation.validate("default", "default", "schema_test", "default", model, old);
+
+            Assert.fail("expected ValidationException");
+
+        } catch (ValidationException e) {
+
+            LOG.debug("validationFailure {}", e.getMessage());
 
             e.getAllExceptions().stream()
                     .forEach(exception -> LOG.debug("code:{} path:{} message:{}", exception.getCode(), exception.getPath(), exception.getMessage()));
@@ -322,7 +531,7 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
             ValidationExceptionModel exception = e.getAllExceptions().stream().findFirst().get();
 
             assertThat(exception.getCode(), is("format"));
-            assertThat(exception.getPath(), is("/email"));
+            assertThat(exception.getPath().toString(), is("/email"));
         }
     }
 }

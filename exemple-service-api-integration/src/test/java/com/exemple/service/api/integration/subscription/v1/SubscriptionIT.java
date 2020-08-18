@@ -14,7 +14,6 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.exemple.service.api.integration.account.v1.AccountNominalIT;
 import com.exemple.service.api.integration.core.JsonRestTemplate;
 
 import io.restassured.response.Response;
@@ -73,10 +72,10 @@ public class SubscriptionIT {
 
                 .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, "v1")
 
-                .body(Collections.emptyMap()).put(URL + "/{email}", AccountNominalIT.ACCOUNT_BODY.get("email"));
+                .body(Collections.emptyMap()).put(URL + "/{email}", "toto");
 
         assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
-        assertThat(response.jsonPath().getList("code").get(0), is("login"));
+        assertThat(response.jsonPath().getList("code").get(0), is("format"));
         assertThat(response.jsonPath().getList("path").get(0), is("/email"));
 
     }
@@ -88,7 +87,7 @@ public class SubscriptionIT {
 
                 .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, VERSION_HEADER_VALUE)
 
-                .get(URL + "/{email}", AccountNominalIT.ACCOUNT_BODY.get("email"));
+                .get(URL + "/{email}", UUID.randomUUID().toString() + "@gmail.com");
 
         assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND.value()));
     }

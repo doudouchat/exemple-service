@@ -26,11 +26,4 @@ public class LoginServiceResourceAspect {
 
     }
 
-    @Around("execution(public boolean com.exemple.service.resource.login.LoginResource.save(*, *)) " + "&& args (login,source)")
-    public boolean updateLogin(ProceedingJoinPoint joinPoint, String login, JsonNode source) throws Throwable {
-
-        return (boolean) joinPoint.proceed(new Object[] { login, TransformUtils.transform(source, loginServiceResource::updateLogin) });
-
-    }
-
 }

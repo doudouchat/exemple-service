@@ -27,10 +27,4 @@ public class AccountServiceResourceAspect {
         return (JsonNode) joinPoint.proceed(new Object[] { id, TransformUtils.transform(source, accountServiceResource::save) });
     }
 
-    @Around("execution(public com.fasterxml.jackson.databind.JsonNode com.exemple.service.resource.account.AccountResource.update(*, *)) "
-            + "&& args (id, source)")
-    public JsonNode update(ProceedingJoinPoint joinPoint, UUID id, JsonNode source) throws Throwable {
-        return (JsonNode) joinPoint.proceed(new Object[] { id, TransformUtils.transform(source, accountServiceResource::update) });
-    }
-
 }

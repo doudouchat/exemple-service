@@ -27,11 +27,16 @@ import com.exemple.service.resource.core.ResourceConfiguration;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaEntity;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Sets;
 
 @Configuration
 @Import({ ResourceConfiguration.class, ApplicationConfiguration.class })
 public class IntegrationTestConfiguration {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private SchemaResource schemaResource;
@@ -74,10 +79,6 @@ public class IntegrationTestConfiguration {
         accountFilter.add("birthday");
         accountFilter.add("addresses[*[city,street]]");
         accountFilter.add("cgus[code,version]");
-        Map<String, Set<String>> accountRules = new HashMap<>();
-        accountRules.put("login", Collections.singleton("/email"));
-        accountRules.put("maxProperties", Collections.singleton("/addresses,2"));
-        accountRules.put("dependencies", Collections.singleton("optin_mobile,mobile"));
 
         ResourceExecutionContext.get().setKeyspace(detail.getKeyspace());
 
@@ -86,9 +87,8 @@ public class IntegrationTestConfiguration {
         accountSchema.setVersion(AccountNominalIT.VERSION_HEADER_VALUE);
         accountSchema.setResource("account");
         accountSchema.setProfile("user");
-        accountSchema.setContent(IOUtils.toByteArray(new ClassPathResource("account.json").getInputStream()));
+        accountSchema.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("account.json").getInputStream())));
         accountSchema.setFilters(accountFilter);
-        accountSchema.setRules(accountRules);
 
         schemaResource.save(accountSchema);
 
@@ -97,18 +97,23 @@ public class IntegrationTestConfiguration {
         loginFilter.add("enable");
         loginFilter.add("username");
         loginFilter.add("plain_password");
-        Map<String, Set<String>> loginRules = new HashMap<>();
-        loginRules.put("login", Collections.singleton("/username"));
-        loginRules.put("createOnly", Collections.singleton("/id"));
+
+        ObjectNode patch = MAPPER.createObjectNode();
+        patch.put("op", "add");
+        patch.put("path", "/properties/id/readOnly");
+        patch.put("value", true);
+
+        Set<JsonNode> loginPatchs = new HashSet<>();
+        loginPatchs.add(patch);
 
         SchemaEntity loginSchema = new SchemaEntity();
         loginSchema.setApplication(AccountNominalIT.APP_HEADER_VALUE);
         loginSchema.setVersion(AccountNominalIT.VERSION_HEADER_VALUE);
         loginSchema.setResource("login");
         loginSchema.setProfile("user");
-        loginSchema.setContent(IOUtils.toByteArray(new ClassPathResource("login.json").getInputStream()));
+        loginSchema.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("login.json").getInputStream())));
         loginSchema.setFilters(loginFilter);
-        loginSchema.setRules(loginRules);
+        loginSchema.setPatchs(loginPatchs);
 
         schemaResource.save(loginSchema);
 
@@ -124,9 +129,8 @@ public class IntegrationTestConfiguration {
         subscriptionSchema.setVersion(AccountNominalIT.VERSION_HEADER_VALUE);
         subscriptionSchema.setResource("subscription");
         subscriptionSchema.setProfile("user");
-        subscriptionSchema.setContent(IOUtils.toByteArray(new ClassPathResource("subscription.json").getInputStream()));
+        subscriptionSchema.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("subscription.json").getInputStream())));
         subscriptionSchema.setFilters(subscriptionFilter);
-        subscriptionSchema.setRules(subscriptionRules);
 
         schemaResource.save(subscriptionSchema);
 

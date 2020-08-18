@@ -14,9 +14,4 @@ class AccountServiceResourceImpl implements AccountServiceResource {
         account.put(CREATION_DATE, ServiceContextExecution.context().date.toString())
         account
     }
-
-    @Override
-    Map<String, Object> update(Map<String, Object> account) {
-        account
-    }
 }

@@ -26,7 +26,6 @@ import javax.ws.rs.ext.Provider;
 
 import org.springframework.stereotype.Component;
 
-import com.exemple.service.api.common.PatchUtils;
 import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.security.ApiSecurityContext;
@@ -105,8 +104,7 @@ public class LoginApi {
     })
     @RolesAllowed("login:create")
     public Response create(@NotNull @Parameter(schema = @Schema(ref = LOGIN_SCHEMA)) JsonNode source,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam, @Context UriInfo uriInfo)
-            throws LoginServiceException {
+            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam, @Context UriInfo uriInfo) {
 
         loginService.save(source);
 
@@ -134,13 +132,9 @@ public class LoginApi {
 
         authorizationCheckService.verifyLogin(login, (ApiSecurityContext) servletContext.getSecurityContext());
 
-        JsonNode source = loginService.get(login);
-
         schemaValidation.validatePatch(patch);
 
-        JsonNode data = PatchUtils.diff(patch, source);
-
-        loginService.save(login, data);
+        loginService.save(login, patch);
 
         return Response.status(Status.NO_CONTENT).build();
 

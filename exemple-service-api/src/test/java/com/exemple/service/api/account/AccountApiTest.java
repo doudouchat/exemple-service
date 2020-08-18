@@ -36,6 +36,7 @@ import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class AccountApiTest extends JerseySpringSupport {
 
@@ -83,8 +84,7 @@ public class AccountApiTest extends JerseySpringSupport {
 
         UUID id = UUID.randomUUID();
 
-        Mockito.when(service.get(Mockito.eq(id))).thenReturn(JsonNodeUtils.create(Collections.singletonMap("lastname", null)));
-        Mockito.when(service.save(Mockito.eq(id), Mockito.any(JsonNode.class)))
+        Mockito.when(service.save(Mockito.eq(id), Mockito.any(ArrayNode.class)))
                 .thenReturn(JsonNodeUtils.create(Collections.singletonMap("lastname", "Dupond")));
 
         Map<String, Object> patch = new HashMap<>();
@@ -98,35 +98,9 @@ public class AccountApiTest extends JerseySpringSupport {
 
                 .method("PATCH", Entity.json(MAPPER.writeValueAsString(Collections.singletonList(patch))));
 
-        Mockito.verify(service).save(Mockito.eq(id), Mockito.any(JsonNode.class));
-        Mockito.verify(service).get(Mockito.eq(id));
+        Mockito.verify(service).save(Mockito.eq(id), Mockito.any(ArrayNode.class));
 
         assertThat(response.getStatus(), is(Status.NO_CONTENT.getStatusCode()));
-
-    }
-
-    @Test
-    public void updateFailure() throws Exception {
-
-        UUID id = UUID.randomUUID();
-
-        Map<String, Object> patch = new HashMap<>();
-        patch.put("op", "replace");
-        patch.put("path", "/lastname");
-        patch.put("value", "Dupond");
-
-        Mockito.when(service.get(Mockito.eq(id))).thenReturn(JsonNodeUtils.init());
-
-        Response response = target(URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true).request(MediaType.APPLICATION_JSON)
-
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
-
-                .method("PATCH", Entity.json(MAPPER.writeValueAsString(Collections.singletonList(patch))));
-
-        Mockito.verify(service).get(Mockito.eq(id));
-
-        assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
-        assertThat(response.getEntity(), is(notNullValue()));
 
     }
 
@@ -160,7 +134,7 @@ public class AccountApiTest extends JerseySpringSupport {
                 // constraint exception
                 { new ConstraintViolationException(constraintViolations), Status.BAD_REQUEST },
                 // validation schema exception
-                { new ValidationException(), Status.BAD_REQUEST },
+                { new ValidationException(new IllegalArgumentException()), Status.BAD_REQUEST },
                 // exception
                 { new RuntimeException(), Status.INTERNAL_SERVER_ERROR },
 

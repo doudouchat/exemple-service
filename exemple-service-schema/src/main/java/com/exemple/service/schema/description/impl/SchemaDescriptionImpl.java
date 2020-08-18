@@ -1,10 +1,7 @@
 package com.exemple.service.schema.description.impl;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -32,9 +29,7 @@ public class SchemaDescriptionImpl implements SchemaDescription {
     @Override
     public JsonNode get(String app, String version, String resource, String profile) {
 
-        JSONObject rawSchema = new JSONObject(
-                new JSONTokener(new ByteArrayInputStream(schemaResource.get(app, version, resource, profile).getContent())));
-        return MAPPER.convertValue(rawSchema.toMap(), JsonNode.class);
+        return schemaResource.get(app, version, resource, profile).getContent();
     }
 
     @Override

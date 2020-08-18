@@ -23,11 +23,8 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.exemple.service.api.common.PatchUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
@@ -57,8 +54,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @OpenAPIDefinition(tags = @Tag(name = "account"))
 @Component
 public class AccountApi {
-
-    private static final Logger LOG = LoggerFactory.getLogger(AccountApi.class);
 
     private static final String ACCOUNT_SCHEMA = "Account";
 
@@ -143,11 +138,7 @@ public class AccountApi {
 
         schemaValidation.validatePatch(patch);
 
-        JsonNode source = service.get(id);
-        JsonNode account = PatchUtils.diff(patch, source);
-        LOG.debug("account update {}", account);
-
-        service.save(id, account);
+        service.save(id, patch);
 
         return Response.status(Status.NO_CONTENT).build();
 
