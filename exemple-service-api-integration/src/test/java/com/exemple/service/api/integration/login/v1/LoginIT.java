@@ -116,18 +116,11 @@ public class LoginIT extends AbstractTestNGSpringContextTests {
         patch1.put("path", "/username");
         patch1.put("value", "jean.dupond@gmail.com");
 
-        Map<String, Object> patch2 = new HashMap<>();
-        patch2.put("op", "replace");
-        patch2.put("path", "/username");
-        patch2.put("value", LOGIN);
-
         return new Object[][] {
-                // id is createOnly
-                { patch0, "/id", "createOnly" },
+                // id is readOnly
+                { patch0, "/id", "readOnly" },
                 // username is unique
-                { patch1, "/username", "login" },
-                // username is unique
-                { patch2, "/username", "login" }, };
+                { patch1, "/username", "login" } };
     }
 
     @Test(dataProvider = "updateFailure", dependsOnMethods = "create")

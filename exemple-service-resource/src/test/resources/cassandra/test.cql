@@ -64,9 +64,9 @@ CREATE TABLE test.resource_schema (
 	version text,
 	resource text,
 	profile text,
-	content blob,
+	content text,
 	filter set<text>,
-	rule map<text, frozen<set<text>>>,
+	patch set<text>,
 	PRIMARY KEY ((app), resource, version, profile)
 );
 CREATE INDEX account_status

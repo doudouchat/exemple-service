@@ -13,16 +13,10 @@ class LoginServiceResourceImpl implements LoginServiceResource {
 
     @Override
     Map<String, Object> saveLogin(Map<String, Object> source) {
-        Map<String, ?> login = updateLogin(source)
-        login.put(ROLES, ['ROLE_ACCOUNT'])
-        login
-    }
-
-    @Override
-    Map<String, Object> updateLogin(Map<String, Object> source) {
         if (source && source.containsKey(PASSWORD)) {
             source.put(PASSWORD, '{bcrypt}' + BCrypt.hashpw(source.get(PASSWORD), BCrypt.gensalt()))
         }
+        source.put(ROLES, ['ROLE_ACCOUNT'])
         source
     }
 }

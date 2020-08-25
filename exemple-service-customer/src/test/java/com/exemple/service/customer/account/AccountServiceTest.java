@@ -27,9 +27,14 @@ import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.schema.filter.SchemaFilter;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @ContextConfiguration(classes = { CustomerTestConfiguration.class })
 public class AccountServiceTest extends AbstractTestNGSpringContextTests {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private AccountService service;
@@ -92,11 +97,19 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
         UUID id = UUID.randomUUID();
 
         Mockito.when(resource.get(Mockito.eq(id))).thenReturn(Optional.of(JsonNodeUtils.create(model)));
-        Mockito.when(resource.update(Mockito.eq(id), Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.create(model));
+        Mockito.when(resource.save(Mockito.eq(id), Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.create(model));
         Mockito.when(schemaFilter.filter(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class),
                 Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.create(model));
 
-        JsonNode account = service.save(id, JsonNodeUtils.create(model));
+        ArrayNode patch = MAPPER.createArrayNode();
+
+        ObjectNode addLastName = MAPPER.createObjectNode();
+        addLastName.put("op", "add");
+        addLastName.put("path", "/lastname");
+        addLastName.put("value", "Dupond");
+        patch.add(addLastName);
+
+        JsonNode account = service.save(id, patch);
 
         // Mockito.verify(resource).get(Mockito.eq(id));
         // Mockito.verify(resource).update(Mockito.eq(id), Mockito.any(JsonNode.class));

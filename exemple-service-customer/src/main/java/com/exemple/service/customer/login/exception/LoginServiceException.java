@@ -8,8 +8,4 @@ public class LoginServiceException extends Exception {
         super();
     }
 
-    public LoginServiceException(Throwable cause) {
-        super(cause);
-    }
-
 }

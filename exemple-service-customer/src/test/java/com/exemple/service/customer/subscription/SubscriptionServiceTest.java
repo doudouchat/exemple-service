@@ -16,6 +16,7 @@ import org.testng.annotations.Test;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.exemple.service.customer.subscription.exception.SubscriptionServiceNotFoundException;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
+import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.subscription.SubscriptionResource;
 import com.exemple.service.schema.filter.SchemaFilter;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -32,10 +33,13 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private SchemaFilter schemaFilter;
 
+    @Autowired
+    private LoginResource loginResource;
+
     @BeforeMethod
     private void before() {
 
-        Mockito.reset(resource, schemaFilter);
+        Mockito.reset(resource, loginResource, schemaFilter);
 
     }
 
@@ -89,4 +93,5 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
         service.get(email);
 
     }
+
 }

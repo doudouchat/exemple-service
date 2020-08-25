@@ -23,10 +23,4 @@ public class LoginServiceResourceImpl implements LoginServiceResource {
         return scriptFactory.getBean(BEAN_NAME, LoginServiceResource.class).saveLogin(source);
     }
 
-    @Override
-    public Map<String, Object> updateLogin(Map<String, Object> source) {
-        return scriptFactory.getBean(BEAN_NAME, LoginServiceResource.class).updateLogin(source);
-
-    }
-
 }

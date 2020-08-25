@@ -3,17 +3,18 @@ package com.exemple.service.customer.login;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.exemple.service.customer.login.exception.LoginServiceException;
 import com.exemple.service.customer.login.exception.LoginServiceNotFoundException;
+import com.exemple.service.resource.common.validator.NotEmpty;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public interface LoginService {
 
     boolean exist(String login);
 
-    void save(@NotNull JsonNode source) throws LoginServiceException;
+    void save(@NotNull JsonNode source);
 
-    void save(@NotBlank String login, @NotNull JsonNode source) throws LoginServiceException;
+    void save(@NotBlank String login, @NotEmpty @NotNull ArrayNode patch) throws LoginServiceNotFoundException;
 
     void delete(@NotBlank String login);
 

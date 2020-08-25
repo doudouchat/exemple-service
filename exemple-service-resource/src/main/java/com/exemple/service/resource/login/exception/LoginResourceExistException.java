@@ -8,8 +8,15 @@ public class LoginResourceExistException extends LoginResourceException {
 
     private static final long serialVersionUID = 1L;
 
+    private final String login;
+
     public LoginResourceExistException(String login) {
         super(MessageFormat.format(EXCEPTION_MESSAGE, login));
+        this.login = login;
+    }
+
+    public String getLogin() {
+        return this.login;
     }
 
 }

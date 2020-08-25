@@ -19,7 +19,6 @@ import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.insert.Insert;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
-import com.datastax.oss.driver.api.querybuilder.update.Update;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.account.AccountField;
 import com.exemple.service.resource.account.AccountResource;
@@ -69,25 +68,6 @@ public class AccountResourceImpl implements AccountResource {
 
         return accountNode;
 
-    }
-
-    @Override
-    public JsonNode update(UUID id, JsonNode source) {
-
-        LOG.debug("update account {} {}", id, source);
-
-        OffsetDateTime now = ServiceContextExecution.context().getDate();
-
-        Update update = jsonQueryBuilder.update(source).whereColumn(AccountField.ID.field).isEqualTo(QueryBuilder.literal(id));
-
-        BatchStatementBuilder batch = new BatchStatementBuilder(BatchType.LOGGED);
-        batch.setConsistencyLevel(DefaultConsistencyLevel.QUORUM);
-        batch.addStatement(update.build());
-        accountHistoryResource.updateHistories(id, source, now).forEach(batch::addStatements);
-
-        session.execute(batch.build());
-
-        return this.getById(id).orElseThrow(IllegalArgumentException::new);
     }
 
     @Override

@@ -6,7 +6,6 @@
 			<package name="com.exemple.service.customer.account" />
 			<package name="com.exemple.service.customer.login" />
 			<package name="com.exemple.service.customer.subscription" />
-			<package name="com.exemple.service.customer.core.validator.rule" />
 			<package name="com.exemple.service.customer.core.script" />
 		</packages>
 	</test>

@@ -8,12 +8,10 @@
 	],
 	"properties": {
 		"username": {
-			"type": "string",
-			"login": true
+			"type": "string"
 		},
 		"id": {
-			"type": "string",
-			"createOnly": true
+			"type": "string"
 		},
 		"password": {
 			"type": "string",

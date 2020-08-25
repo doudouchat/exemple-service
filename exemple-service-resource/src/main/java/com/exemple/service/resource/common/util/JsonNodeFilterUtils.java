@@ -26,13 +26,6 @@ public final class JsonNodeFilterUtils {
         return filter(source, predicate);
     }
 
-    public static JsonNode cleanArray(JsonNode source) {
-
-        BiPredicate<JsonNode, Entry<String, JsonNode>> predicate = (root, node) -> !root.isArray() || !node.getValue().isNull();
-
-        return filter(source, predicate);
-    }
-
     public static JsonNode filter(JsonNode source, BiPredicate<JsonNode, Entry<String, JsonNode>> predicate) {
         return filter(Maps.immutableEntry(null, source), new ObjectMapper().createObjectNode(), predicate);
     }

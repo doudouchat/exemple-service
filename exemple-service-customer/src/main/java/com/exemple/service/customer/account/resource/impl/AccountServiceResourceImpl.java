@@ -23,10 +23,4 @@ public class AccountServiceResourceImpl implements AccountServiceResource {
         return scriptFactory.getBean(BEAN_NAME, AccountServiceResource.class).save(account);
     }
 
-    @Override
-    public Map<String, Object> update(Map<String, Object> account) {
-        return scriptFactory.getBean(BEAN_NAME, AccountServiceResource.class).update(account);
-
-    }
-
 }

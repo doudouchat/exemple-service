@@ -3,7 +3,10 @@ package com.exemple.service.api.common;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.client.Entity;
@@ -24,8 +27,13 @@ import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.account.exception.AccountServiceException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.flipkart.zjsonpatch.JsonPatchApplicationException;
 
 public class ExceptionApiTest extends JerseySpringSupport {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
     protected ResourceConfig configure() {
@@ -64,6 +72,31 @@ public class ExceptionApiTest extends JerseySpringSupport {
     public void JsonException() {
 
         Response response = target(AccountApiTest.URL).request(MediaType.APPLICATION_JSON).post(Entity.json("toto"));
+
+        assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+
+    }
+
+    @Test
+    public void JsonPatchException() throws AccountServiceException, IOException {
+
+        UUID id = UUID.randomUUID();
+
+        Mockito.when(service.save(Mockito.eq(id), Mockito.any(ArrayNode.class))).thenThrow(new JsonPatchApplicationException(null, null, null));
+
+        Map<String, Object> patch = new HashMap<>();
+        patch.put("op", "add");
+        patch.put("path", "/lastname");
+        patch.put("value", "Dupond");
+
+        Response response = target(AccountApiTest.URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
+                .request(MediaType.APPLICATION_JSON)
+
+                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
+
+                .method("PATCH", Entity.json(MAPPER.writeValueAsString(Collections.singletonList(patch))));
+
+        Mockito.verify(service).save(Mockito.eq(id), Mockito.any(ArrayNode.class));
 
         assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
 

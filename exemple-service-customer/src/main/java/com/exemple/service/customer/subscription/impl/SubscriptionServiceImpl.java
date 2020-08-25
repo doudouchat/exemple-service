@@ -44,7 +44,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         JsonNode subscription = JsonNodeUtils.clone(source);
         JsonNodeUtils.set(subscription, email, SubscriptionField.EMAIL.field);
 
-        subscriptionValidation.validate(subscription, null, context.getApp(), context.getVersion(), context.getProfile());
+        subscriptionValidation.validate(subscription, context.getApp(), context.getVersion(), context.getProfile());
 
         boolean created = !subscriptionResource.get(email).isPresent();
 

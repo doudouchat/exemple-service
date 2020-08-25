@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -150,7 +149,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         AccountHistory previousHistoryJob = accountHistoryResource.findByIdAndField(id, "addresses/job");
         AccountHistory previousHistoryCgus = accountHistoryResource.findByIdAndField(id, "cgus");
 
-        this.account = resource.update(id, JsonNodeUtils.create(model));
+        this.account = resource.save(id, JsonNodeUtils.create(model));
 
         JsonNode expected = JsonNodeUtils.create(model);
         expected = JsonNodeFilterUtils.clean(expected);
@@ -183,24 +182,31 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         Map<String, Object> model = new HashMap<>();
 
         model.put("addresses", null);
-        model.put("age", null);
+        model.put("cgus", null);
+        model.put("email", null);
 
-        this.account = resource.update(id, JsonNodeUtils.create(model));
+        AccountHistory previousHistoryEmail = accountHistoryResource.findByIdAndField(id, "email");
+        AccountHistory previousHistoryCgus = accountHistoryResource.findByIdAndField(id, "cgus");
+
+        this.account = resource.save(id, JsonNodeUtils.create(model));
 
         JsonNode expected = JsonNodeUtils.create(model);
-        JsonNodeFilterUtils.clean(expected);
+        expected = JsonNodeFilterUtils.clean(expected);
 
-        assertThat(this.account.get("addresses"), is(nullValue()));
-        assertThat(this.account.get("age"), is(nullValue()));
+        assertThat(this.account.get("addresses"), is(expected.get("addresses")));
+        assertThat(this.account.get("email"), is(expected.get("age")));
+        assertThat(this.account.get("cgus"), is(expected.get("cgus")));
 
         List<AccountHistory> histories = accountHistoryResource.findById(id);
 
         assertThat(histories, is(hasSize(8)));
 
+        assertHistory(accountHistoryResource.findByIdAndField(id, "email"), JsonNodeType.NULL, previousHistoryEmail.getValue(),
+                ServiceContextExecution.context().getDate().toInstant());
+        assertHistory(accountHistoryResource.findByIdAndField(id, "cgus"), JsonNodeType.NULL, previousHistoryCgus.getValue(),
+                ServiceContextExecution.context().getDate().toInstant());
         assertHistory(accountHistoryResource.findByIdAndField(id, "addresses"), JsonNodeType.NULL,
                 ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "age"), JsonNodeType.NULL, ServiceContextExecution.context().getDate().toInstant());
-
     }
 
     @Test
@@ -231,6 +237,15 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
     }
 
+    private static void assertHistory(AccountHistory accountHistory, JsonNodeType expectedValue, Instant expectedDate) {
+
+        assertThat(accountHistory.getValue().getNodeType(), is(expectedValue));
+        assertThat(accountHistory.getDate(), is(expectedDate));
+        assertThat(accountHistory.getPreviousValue().getNodeType(), is(JsonNodeType.NULL));
+        assertHistory(accountHistory);
+
+    }
+
     private static void assertHistory(AccountHistory accountHistory, JsonNode expectedValue, JsonNode expectedPreviousValue, Instant expectedDate) {
 
         assertThat(accountHistory.getValue(), is(expectedValue));
@@ -245,14 +260,6 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         assertThat(accountHistory.getValue().textValue(), is(expectedValue));
         assertThat(accountHistory.getDate(), is(expectedDate));
         assertThat(accountHistory.getPreviousValue().getNodeType(), is(JsonNodeType.NULL));
-        assertHistory(accountHistory);
-
-    }
-
-    private static void assertHistory(AccountHistory accountHistory, JsonNodeType expectedJsonNodeType, Instant expectedDate) {
-
-        assertThat(accountHistory.getValue().getNodeType(), is(expectedJsonNodeType));
-        assertThat(accountHistory.getDate(), is(expectedDate));
         assertHistory(accountHistory);
 
     }

@@ -52,7 +52,7 @@ public class JsonConstraintValidatorTest extends AbstractTestNGSpringContextTest
 
         UUID id = UUID.randomUUID();
 
-        JsonNode account = resource.update(id, JsonNodeUtils.create(model));
+        JsonNode account = resource.save(id, JsonNodeUtils.create(model));
         assertThat(account.get("email"), is(notNullValue()));
         assertThat(account.get("address"), is(notNullValue()));
         assertThat(account.get("addresses"), is(notNullValue()));

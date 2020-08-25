@@ -15,9 +15,4 @@ class AccountServiceResourceImpl implements AccountServiceResource {
         account.put("TEST_KEY", "TEST_VALUE")
         account
     }
-
-    @Override
-    Map<String, Object> update(Map<String, Object> account) {
-        account
-    }
 }

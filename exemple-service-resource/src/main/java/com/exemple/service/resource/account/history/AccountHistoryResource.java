@@ -35,6 +35,8 @@ public class AccountHistoryResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(AccountHistoryResource.class);
 
+    private static final JsonNode DEFAULT_HISTORY_VALUE = new ObjectMapper().nullNode();
+
     private final CqlSession session;
 
     private final ConcurrentMap<String, AccountHistoryMapper> mappers;
@@ -57,21 +59,16 @@ public class AccountHistoryResource {
 
     public Collection<BoundStatement> saveHistories(final UUID id, JsonNode source, OffsetDateTime now) {
 
-        return this.createHistories(id, source, now, new ObjectMapper().nullNode());
+        return this.createHistories(id, source, now);
     }
 
-    public Collection<BoundStatement> updateHistories(final UUID id, JsonNode source, OffsetDateTime now) {
-
-        return this.createHistories(id, source, now, null);
-    }
-
-    public Collection<BoundStatement> createHistories(final UUID id, JsonNode source, OffsetDateTime now, JsonNode previousDefaultValue) {
+    public Collection<BoundStatement> createHistories(final UUID id, JsonNode source, OffsetDateTime now) {
 
         Map<String, AccountHistory> histories = findById(id).stream().collect(Collectors.toMap(AccountHistory::getField, Function.identity()));
 
         AccountHistory defaultHistory = new AccountHistory();
         defaultHistory.setDate(now.toInstant().minusNanos(1));
-        defaultHistory.setValue(new ObjectMapper().nullNode());
+        defaultHistory.setValue(DEFAULT_HISTORY_VALUE);
 
         PreparedStatement prepared = session.prepare("INSERT INTO " + ResourceExecutionContext.get().keyspace()
                 + ".account_history (id,date,field,value,previous_value,application,version,user) VALUES (?,?,?,?,?,?,?,?)");
@@ -95,7 +92,7 @@ public class AccountHistoryResource {
                     return history;
                 })
 
-                .filter(checkIfPreviousValueIsDifferent(histories, previousDefaultValue))
+                .filter(checkIfPreviousValueIsDifferent(histories))
 
                 .map((AccountHistory history) -> {
                     LOG.debug("save history account {} {} {}", history.getId(), history.getField(), history.getValue());
@@ -104,10 +101,16 @@ public class AccountHistoryResource {
                 }).collect(Collectors.toList());
     }
 
-    private static Predicate<AccountHistory> checkIfPreviousValueIsDifferent(Map<String, AccountHistory> histories, JsonNode defaultValue) {
+    private static Predicate<AccountHistory> checkIfPreviousValueIsDifferent(Map<String, AccountHistory> histories) {
 
-        return (AccountHistory history) -> !Objects.equals(history.getValue(),
-                histories.containsKey(history.getField()) ? histories.get(history.getField()).getValue() : defaultValue);
+        AccountHistory defaultPreviousHistory = new AccountHistory();
+        if (histories.isEmpty()) {
+            defaultPreviousHistory.setValue(DEFAULT_HISTORY_VALUE);
+        }
+        Function<String, JsonNode> previousValue = (String field) -> histories.getOrDefault(field, defaultPreviousHistory).getValue();
+
+        return (AccountHistory history) -> !Objects.equals(history.getValue(), previousValue.apply(history.getField()));
+
     }
 
     private AccountHistoryDao dao() {

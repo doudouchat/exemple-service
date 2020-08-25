@@ -11,10 +11,8 @@ import com.datastax.oss.driver.api.core.metadata.schema.TableMetadata;
 import com.datastax.oss.driver.api.core.session.Session;
 import com.datastax.oss.driver.api.core.type.DataType;
 import com.datastax.oss.driver.api.core.type.MapType;
-import com.datastax.oss.driver.api.core.type.SetType;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Streams;
 
@@ -51,26 +49,6 @@ public final class MetadataSchemaUtils {
                 })
 
                 .map((Map.Entry<String, JsonNode> e) -> Pair.of(e.getKey(), e.getValue())).collect(Collectors.toList());
-    }
-
-    public static void merge(Session session, String table, JsonNode source, JsonNode override) {
-
-        TableMetadata tableMetadata = getTableMetadata(session, table);
-
-        override.fields().forEachRemaining((Map.Entry<String, JsonNode> node) -> {
-
-            DataType type = tableMetadata.getColumn(node.getKey()).get().getType();
-
-            if (type instanceof SetType) {
-
-                ((ArrayNode) override.get(node.getKey())).addAll((ArrayNode) source.get(node.getKey()));
-
-            }
-
-            JsonNodeUtils.set(source, override.get(node.getKey()), node.getKey());
-
-        });
-
     }
 
 }

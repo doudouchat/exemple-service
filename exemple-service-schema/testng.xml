@@ -6,7 +6,6 @@
 			<package name="com.exemple.service.schema.filter" />
 			<package name="com.exemple.service.schema.validation" />
 			<package name="com.exemple.service.schema.description" />
-			<package name="com.exemple.service.schema.core.validator.rule" />
 		</packages>
 	</test>
 </suite>

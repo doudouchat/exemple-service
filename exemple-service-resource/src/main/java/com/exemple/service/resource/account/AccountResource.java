@@ -12,9 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public interface AccountResource {
 
-    JsonNode save(@NotNull UUID id, @Json(table = "account") JsonNode account);
-
-    JsonNode update(@NotNull UUID id, @NotEmpty @Json(table = "account") JsonNode account);
+    JsonNode save(@NotNull UUID id, @NotEmpty @Json(table = "account") JsonNode account);
 
     Optional<JsonNode> get(UUID id);
 

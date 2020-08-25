@@ -6,6 +6,4 @@ public interface AccountServiceResource {
 
     Map<String, Object> save(Map<String, Object> account);
 
-    Map<String, Object> update(Map<String, Object> account);
-
 }

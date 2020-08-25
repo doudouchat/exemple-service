@@ -17,11 +17,11 @@ public class SubscriptionValidationAspect {
         this.subscriptionValidationCustom = subscriptionValidationCustom;
     }
 
-    @After("execution(public void com.exemple.service.customer.subscription.validation.SubscriptionValidation.validate(*, *, ..)) "
-            + "&& args(form, old, ..)")
-    public void validate(JsonNode form, JsonNode old) {
+    @After("execution(public void com.exemple.service.customer.subscription.validation.SubscriptionValidation.validate(*, ..)) "
+            + "&& args(form, ..)")
+    public void validate(JsonNode form) {
 
-        TransformUtils.transform(form, old, subscriptionValidationCustom::validate);
+        TransformUtils.transform(form, null, subscriptionValidationCustom::validate);
 
     }
 

@@ -13,13 +13,11 @@ class TestAccountServiceResource implements AccountServiceResource {
 
     @Override
     Map<String, Object> save(Map<String, Object> account) {
-        account.put(CREATION_DATE, ServiceContextExecution.context().date.toString())
-        account
-    }
-
-    @Override
-    Map<String, Object> update(Map<String, Object> account) {
-        account.put(UPDATE_DATE, ServiceContextExecution.context().date.toString())
+        if(!account.containsKey(CREATION_DATE)) {
+            account.put(CREATION_DATE, ServiceContextExecution.context().date.toString())
+        } else {
+            account.put(UPDATE_DATE, ServiceContextExecution.context().date.toString())
+        }
         account
     }
 }

@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -24,11 +25,18 @@ import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.login.LoginField;
 import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.login.exception.LoginResourceExistException;
+import com.exemple.service.schema.common.exception.ValidationException;
+import com.exemple.service.schema.common.exception.ValidationExceptionModel;
 import com.exemple.service.schema.filter.SchemaFilter;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @ContextConfiguration(classes = { CustomerTestConfiguration.class })
 public class LoginServiceTest extends AbstractTestNGSpringContextTests {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private LoginResource resource;
@@ -72,7 +80,7 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
 
     }
 
-    @Test(expectedExceptions = LoginServiceException.class)
+    @Test
     public void createAlreadyExist() throws LoginServiceException, LoginResourceExistException {
 
         Mockito.doThrow(new LoginResourceExistException("jean@gmail.com")).when(resource).save(Mockito.any(JsonNode.class));
@@ -81,7 +89,20 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
         model.put("login", "jean@gmail.com");
         model.put("password", "jean.dupont");
 
-        service.save(JsonNodeUtils.create(model));
+        try {
+            service.save(JsonNodeUtils.create(model));
+
+            Assert.fail("expected ValidationException");
+
+        } catch (ValidationException e) {
+
+            assertThat(e.getAllExceptions().size(), is(1));
+
+            ValidationExceptionModel exception = e.getAllExceptions().stream().findFirst().get();
+
+            assertThat(exception.getCode(), is("login"));
+            assertThat(exception.getPath(), is("/username"));
+        }
 
     }
 
@@ -90,28 +111,41 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
 
         return new Object[][] {
 
-                { true },
+                { "jean@gmail.com", "jean@gmail.com" },
 
-                { false }
+                { "jean@gmail.com", "jean@hotmail.com" }
 
         };
     }
 
     @Test(dataProvider = "update")
-    public void update(boolean created) throws LoginServiceException, LoginResourceExistException {
-
-        String login = "jean@gmail.com";
+    public void update(String login, String newLogin) throws LoginServiceException, LoginResourceExistException {
 
         Map<String, Object> source = new HashMap<>();
         source.put("password", "jean.dupont");
-        source.put(LoginField.USERNAME.field, login);
+        source.put(LoginField.USERNAME.field, newLogin);
 
         Mockito.when(resource.get(Mockito.eq(login))).thenReturn(Optional.of(JsonNodeUtils.create(source)));
-        Mockito.when(resource.save(Mockito.eq(login), Mockito.any(JsonNode.class))).thenReturn(created);
+        Mockito.doNothing().when(resource).save(Mockito.any(JsonNode.class));
 
         Map<String, Object> model = new HashMap<>();
         model.put("password", "jean.dupont");
-        service.save(login, JsonNodeUtils.create(model));
+
+        ArrayNode patch = MAPPER.createArrayNode();
+
+        ObjectNode replacePassword = MAPPER.createObjectNode();
+        replacePassword.put("op", "replace");
+        replacePassword.put("path", "/password");
+        replacePassword.put("value", "jean.dupont");
+        patch.add(replacePassword);
+
+        ObjectNode replaceLogin = MAPPER.createObjectNode();
+        replaceLogin.put("op", "replace");
+        replaceLogin.put("path", "/" + LoginField.USERNAME.field);
+        replaceLogin.put("value", newLogin);
+        patch.add(replacePassword);
+
+        service.save(login, patch);
 
     }
 
@@ -125,11 +159,11 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
 
         Mockito.when(resource.get(Mockito.eq(login))).thenReturn(Optional.empty());
 
-        service.save(login, JsonNodeUtils.create(model));
+        service.save(login, MAPPER.createArrayNode());
 
     }
 
-    @Test(expectedExceptions = LoginServiceException.class)
+    @Test
     public void updateAlreadyExist() throws LoginServiceException, LoginResourceExistException {
 
         String login = "jean@gmail.com";
@@ -139,11 +173,29 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
         source.put(LoginField.USERNAME.field, login);
 
         Mockito.when(resource.get(Mockito.eq(login))).thenReturn(Optional.of(JsonNodeUtils.create(source)));
-        Mockito.doThrow(new LoginResourceExistException("jean@gmail.com")).when(resource).save(Mockito.anyString(), Mockito.any(JsonNode.class));
+        Mockito.doThrow(new LoginResourceExistException("jean@gmail.com")).when(resource).save(Mockito.any(JsonNode.class));
 
-        Map<String, Object> model = new HashMap<>();
-        model.put(LoginField.USERNAME.field, "jack.dupont");
-        service.save(login, JsonNodeUtils.create(model));
+        ObjectNode replaceEmail = MAPPER.createObjectNode();
+        replaceEmail.put("op", "replace");
+        replaceEmail.put("path", "/" + LoginField.USERNAME.field);
+        replaceEmail.put("value", "jack.dupont");
+
+        ArrayNode patch = MAPPER.createArrayNode();
+        patch.add(replaceEmail);
+
+        try {
+            service.save(login, patch);
+            Assert.fail("expected ValidationException");
+
+        } catch (ValidationException e) {
+
+            assertThat(e.getAllExceptions().size(), is(1));
+
+            ValidationExceptionModel exception = e.getAllExceptions().stream().findFirst().get();
+
+            assertThat(exception.getCode(), is("login"));
+            assertThat(exception.getPath(), is("/username"));
+        }
 
     }
 

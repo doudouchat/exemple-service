@@ -7,6 +7,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public interface SubscriptionValidation {
 
-    void validate(@NotNull JsonNode form, JsonNode old, @NotBlank String app, @NotBlank String version, @NotBlank String profile);
+    void validate(@NotNull JsonNode form, @NotBlank String app, @NotBlank String version, @NotBlank String profile);
 
 }

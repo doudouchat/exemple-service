@@ -28,8 +28,10 @@
 		},
 		"email": {
 			"type": "string",
-			"format": "email",
-			"login": true
+			"format": "email"
+		},
+		"external_id": {
+			"type": "string"
 		},
 		"civility": {
 			"type": "string",
