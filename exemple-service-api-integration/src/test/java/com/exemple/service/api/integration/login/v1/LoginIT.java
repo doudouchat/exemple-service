@@ -6,7 +6,7 @@ import static com.exemple.service.api.integration.account.v1.AccountNominalIT.VE
 import static com.exemple.service.api.integration.account.v1.AccountNominalIT.VERSION_HEADER_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.startsWith;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -75,7 +75,7 @@ public class LoginIT extends AbstractTestNGSpringContextTests {
                 .get(URL + "/{login}", LOGIN);
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
 
-        assertThat(response.jsonPath().get("password"), is(nullValue()));
+        assertThat(response.jsonPath().get("password"), startsWith("{bcrypt}"));
         assertThat(response.jsonPath().getString("id"), is(ID.toString()));
         assertThat(response.jsonPath().getString("username"), is(LOGIN));
 
@@ -100,6 +100,17 @@ public class LoginIT extends AbstractTestNGSpringContextTests {
                 .body(patchs).patch(LoginIT.URL + "/{login}", LOGIN);
 
         assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+
+        response = JsonRestTemplate.given()
+
+                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, "v1")
+
+                .get(LoginIT.URL + "/{login}", LOGIN);
+        assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
+
+        assertThat(response.jsonPath().get("password"), startsWith("{bcrypt}"));
+        assertThat(response.jsonPath().getString("id"), is(ID.toString()));
+        assertThat(response.jsonPath().getString("username"), is(LOGIN));
 
     }
 

@@ -6,7 +6,7 @@ import static com.exemple.service.api.integration.account.v1.AccountNominalIT.VE
 import static com.exemple.service.api.integration.account.v1.AccountNominalIT.VERSION_HEADER_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.startsWith;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,6 +66,13 @@ public class LoginUpdateUsernameIT {
 
         patchs.add(patch2);
 
+        Map<String, Object> patch3 = new HashMap<>();
+        patch3.put("op", "add");
+        patch3.put("path", "/password");
+        patch3.put("value", "new_mdp");
+
+        patchs.add(patch3);
+
         Response response = JsonRestTemplate.given()
 
                 .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, "v1")
@@ -86,7 +93,7 @@ public class LoginUpdateUsernameIT {
                 .get(LoginIT.URL + "/{login}", NEW_LOGIN);
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
 
-        assertThat(response.jsonPath().get("password"), is(nullValue()));
+        assertThat(response.jsonPath().get("password"), startsWith("{bcrypt}"));
         assertThat(response.jsonPath().get("plain_password"), is("new_mdp"));
         assertThat(response.jsonPath().getString("id"), is(ID.toString()));
         assertThat(response.jsonPath().getString("username"), is(NEW_LOGIN));

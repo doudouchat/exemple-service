@@ -96,6 +96,7 @@ public class IntegrationTestConfiguration {
         loginFilter.add("id");
         loginFilter.add("enable");
         loginFilter.add("username");
+        loginFilter.add("password");
         loginFilter.add("plain_password");
 
         ObjectNode patch = MAPPER.createObjectNode();
