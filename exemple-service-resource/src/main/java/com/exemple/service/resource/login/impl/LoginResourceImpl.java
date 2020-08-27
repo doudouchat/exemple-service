@@ -41,7 +41,7 @@ public class LoginResourceImpl implements LoginResource {
 
         return Optional.ofNullable(getByUsername(username));
     }
-    
+
     @Override
     public void update(JsonNode source) {
 

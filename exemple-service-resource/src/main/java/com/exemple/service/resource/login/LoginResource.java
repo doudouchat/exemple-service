@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public interface LoginResource {
 
     Optional<JsonNode> get(@NotBlank String username);
-    
+
     void update(@Json(table = "login") JsonNode source);
 
     void save(@Json(table = "login") JsonNode source) throws LoginResourceExistException;
