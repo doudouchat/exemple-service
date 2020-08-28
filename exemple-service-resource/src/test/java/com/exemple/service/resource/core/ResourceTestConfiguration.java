@@ -1,5 +1,7 @@
 package com.exemple.service.resource.core;
 
+import java.io.FileNotFoundException;
+
 import javax.annotation.PostConstruct;
 import javax.validation.Validator;
 
@@ -37,10 +39,8 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
     @Value("${resource.cassandra.version}")
     private String version;
 
-    public ResourceTestConfiguration(@Value("${resource.cassandra.addresses}") String[] addresses, @Value("${resource.cassandra.port}") int port,
-            @Value("${resource.cassandra.local_data_center}") String localDataCenter) {
-
-        super(addresses, port, localDataCenter);
+    public ResourceTestConfiguration(@Value("${resource.cassandra.resource_configuration}") String cassandraResource) throws FileNotFoundException {
+        super(cassandraResource);
     }
 
     @Bean(initMethod = "start", destroyMethod = "stop")

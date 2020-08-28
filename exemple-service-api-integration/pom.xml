@@ -481,12 +481,6 @@
 										cargo.resource.parameters=factory=com.exemple.service.api.integration.core.PrimitivesAndStringFactory;value=${configuration.path}
 									</cargo.resource.resource.api>
 								</properties>
-								<configfiles>
-									<configfile>
-										<file>${project.build.testOutputDirectory}/application.conf</file>
-										<todir>lib</todir>
-									</configfile>
-								</configfiles>
 							</configuration>
 						</configuration>
 					</plugin>
