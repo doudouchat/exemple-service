@@ -295,12 +295,14 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
         origin.put("lastname", "Dupont");
         origin.put("firstname", "Jean");
         origin.put("opt_in_email", true);
-        origin.put("civility", "Mr");
-        origin.put("civility", "Mr");
+        origin.put("civility", "nc");
+
+        Map<String, Object> cgu0 = new HashMap<>();
+        cgu0.put("code", "code_0");
+        origin.put("cgus", MAPPER.createArrayNode().add(MAPPER.convertValue(cgu0, JsonNode.class)));
 
         Map<String, Object> addresse = new HashMap<>();
         addresse.put("city", "New York");
-        addresse.put("street", "5th avenue");
         origin.put("addresses", MAPPER.createObjectNode().set("job", MAPPER.convertValue(addresse, JsonNode.class)));
 
         JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
