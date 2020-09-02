@@ -254,6 +254,25 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
     @DataProvider(name = "validationPatchSuccess")
     private static Object[][] validationPatchSuccess() {
 
+        Map<String, Object> origin0 = new HashMap<>();
+        origin0.put("email", "jean.dupont@gmail.com");
+        origin0.put("lastname", "Dupont");
+        origin0.put("firstname", "Jean");
+        origin0.put("opt_in_email", true);
+        origin0.put("civility", "Mr");
+        origin0.put("addresses", MAPPER.createObjectNode());
+        origin0.put("cgus", MAPPER.createArrayNode());
+
+        Map<String, Object> origin1 = new HashMap<>();
+        origin1.put("id", UUID.randomUUID().toString());
+        origin1.put("email", "jean.dupont@gmail.com");
+        origin1.put("civility", "nc");
+        Map<String, Object> cgu0 = new HashMap<>();
+        cgu0.put("code", "code_0");
+        origin1.put("cgus", MAPPER.createArrayNode().add(MAPPER.convertValue(cgu0, JsonNode.class)));
+        origin1.put("addresses",
+                MAPPER.createObjectNode().set("job", MAPPER.convertValue(Collections.singletonMap("city", "New York"), JsonNode.class)));
+
         ObjectNode patch1 = MAPPER.createObjectNode();
         patch1.put("op", "replace");
         patch1.put("path", "/email");
@@ -277,33 +296,37 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
         patch4.put("op", "remove");
         patch4.put("path", "/addresses/job");
 
-        return new Object[][] {
+        Map<String, Object> cgu = new HashMap<>();
+        cgu.put("code", "code_1");
+        cgu.put("version", "v1");
 
+        ObjectNode patch5 = MAPPER.createObjectNode();
+        patch5.put("op", "add");
+        patch5.put("path", "/cgus/0");
+        patch5.set("value", MAPPER.convertValue(cgu, JsonNode.class));
+
+        ObjectNode patch6 = MAPPER.createObjectNode();
+        patch6.put("op", "add");
+        patch6.put("path", "/cgus/1");
+        patch6.set("value", MAPPER.convertValue(cgu, JsonNode.class));
+
+        return new Object[][] {
                 // replace email
-                { patch1 },
+                { origin0, patch1 },
                 // add addresses
-                { patch2, patch3, patch4 }
+                { origin0, patch2, patch3, patch4 },
+                // replace email with origin with one error
+                { origin1, patch1 },
+                // add cgu
+                { origin0, patch5 },
+                // add cgu
+                { origin1, patch6 },
 
         };
     }
 
     @Test(dataProvider = "validationPatchSuccess")
-    public void validationPatchSuccess(JsonNode... patchs) {
-
-        Map<String, Object> origin = new HashMap<>();
-        origin.put("email", "jean.dupont@gmail.com");
-        origin.put("lastname", "Dupont");
-        origin.put("firstname", "Jean");
-        origin.put("opt_in_email", true);
-        origin.put("civility", "nc");
-
-        Map<String, Object> cgu0 = new HashMap<>();
-        cgu0.put("code", "code_0");
-        origin.put("cgus", MAPPER.createArrayNode().add(MAPPER.convertValue(cgu0, JsonNode.class)));
-
-        Map<String, Object> addresse = new HashMap<>();
-        addresse.put("city", "New York");
-        origin.put("addresses", MAPPER.createObjectNode().set("job", MAPPER.convertValue(addresse, JsonNode.class)));
+    public void validationPatchSuccess(Map<String, Object> origin, JsonNode... patchs) {
 
         JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
 
