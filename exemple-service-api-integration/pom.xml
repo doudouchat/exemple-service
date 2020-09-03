@@ -356,11 +356,7 @@
 										<portName>application.port</portName>
 										<portName>cargo.rmi.port</portName>
 										<portName>cargo.ajp.port</portName>
-										<portName>cassandra.rpcPort</portName>
-										<portName>cassandra.jmxPort</portName>
-										<portName>cassandra.storagePort</portName>
-										<portName>cassandra.stopPort</portName>
-										<portName>cassandra.nativeTransportPort</portName>
+										<portName>cassandra.port</portName>
 										<portName>hazelcast.port</portName>
 										<portName>zookeeper.port</portName>
 										<portName>kafka.port</portName>
@@ -407,38 +403,6 @@
 								</configuration>
 							</execution>
 						</executions>
-					</plugin>
-
-					<!-- CASSANDRA -->
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>cassandra-maven-plugin</artifactId>
-						<configuration>
-							<script>${project.basedir}/src/test/resources/cassandra/schema.cql</script>
-							<cqlScript>${project.basedir}/src/test/resources/cassandra/exec.cql</cqlScript>
-							<logLevel>INFO</logLevel>
-							<cqlVersion>3.4.5</cqlVersion>
-							<startNativeTransport>true</startNativeTransport>
-							<addTestClasspath>true</addTestClasspath>
-						</configuration>
-						<executions>
-							<execution>
-								<id>start cassandra</id>
-								<goals>
-									<goal>start</goal>
-									<goal>cql-exec</goal>
-									<goal>stop</goal>
-								</goals>
-							</execution>
-						</executions>
-						<dependencies>
-							<dependency>
-								<groupId>org.codehaus.groovy</groupId>
-								<artifactId>groovy</artifactId>
-								<version>${groovy-version}</version>
-							</dependency>
-
-						</dependencies>
 					</plugin>
 
 					<!-- CARGO -->

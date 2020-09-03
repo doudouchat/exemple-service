@@ -365,6 +365,13 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- CASSANDRA EMBEDDED -->
+
+		<dependency>
+			<groupId>com.github.nosan</groupId>
+			<artifactId>embedded-cassandra</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
