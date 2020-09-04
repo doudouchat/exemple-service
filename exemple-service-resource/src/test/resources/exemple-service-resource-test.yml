@@ -1,6 +1,6 @@
 resource: 
    cassandra:
-      port: ${cassandra.nativeTransportPort}
+      port: ${cassandra.port}
       version: ${cassandra-version}
       resource_configuration: classpath:cassandra.conf
    hazelcast:

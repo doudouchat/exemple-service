@@ -210,7 +210,7 @@
 						<phase>process-resources</phase>
 						<configuration>
 							<portNames>
-								<portName>cassandra.nativeTransportPort</portName>
+								<portName>cassandra.port</portName>
 								<portName>hazelcast.port</portName>
 							</portNames>
 						</configuration>
