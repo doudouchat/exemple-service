@@ -4,6 +4,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 
@@ -12,14 +13,17 @@ import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.account.AccountResource;
+import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.subscription.SubscriptionResource;
 import com.exemple.service.schema.filter.SchemaFilter;
 import com.exemple.service.schema.validation.SchemaValidation;
+import com.fasterxml.jackson.databind.JsonNode;
 
 @Configuration
-public class CustomerTestConfiguration extends CustomerConfiguration {
+@Import(CustomerConfiguration.class)
+public class CustomerTestConfiguration {
 
     static {
 
@@ -47,7 +51,13 @@ public class CustomerTestConfiguration extends CustomerConfiguration {
 
     @Bean
     public SchemaFilter schemaFilter() {
-        return Mockito.mock(SchemaFilter.class);
+
+        SchemaFilter schemaFilter = Mockito.mock(SchemaFilter.class);
+
+        Mockito.when(schemaFilter.filter(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class),
+                Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.init());
+
+        return schemaFilter;
     }
 
     @Bean

@@ -2,6 +2,7 @@ package com.exemple.service.customer.subscription;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 import java.util.Optional;
 
@@ -18,7 +19,6 @@ import com.exemple.service.customer.subscription.exception.SubscriptionServiceNo
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.subscription.SubscriptionResource;
-import com.exemple.service.schema.filter.SchemaFilter;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @ContextConfiguration(classes = { CustomerTestConfiguration.class })
@@ -31,15 +31,12 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
     private SubscriptionService service;
 
     @Autowired
-    private SchemaFilter schemaFilter;
-
-    @Autowired
     private LoginResource loginResource;
 
     @BeforeMethod
     private void before() {
 
-        Mockito.reset(resource, loginResource, schemaFilter);
+        Mockito.reset(resource, loginResource);
 
     }
 
@@ -66,6 +63,8 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
 
         assertThat(created, is(expectedCreated));
 
+        Mockito.verify(resource).save(email, JsonNodeUtils.init());
+
     }
 
     @Test
@@ -73,13 +72,13 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
 
         String email = "jean@gmail.com";
 
-        Mockito.when(schemaFilter.filter(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class),
-                Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.init());
         Mockito.when(resource.get(Mockito.eq(email))).thenReturn(Optional.of(JsonNodeUtils.init()));
 
         JsonNode data = service.get(email);
 
-        assertThat(data, is(JsonNodeUtils.init()));
+        assertThat(data, is(notNullValue()));
+
+        Mockito.verify(resource).get(Mockito.eq(email));
 
     }
 

@@ -1,6 +1,5 @@
 package com.exemple.service.customer.login;
 
-import static nl.fd.hamcrest.jackson.HasJsonField.hasJsonField;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -15,7 +14,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.exemple.service.customer.core.CustomerTestConfiguration;
@@ -27,7 +25,6 @@ import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.login.exception.LoginResourceExistException;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionModel;
-import com.exemple.service.schema.filter.SchemaFilter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -44,13 +41,10 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private LoginService service;
 
-    @Autowired
-    private SchemaFilter schemaFilter;
-
     @BeforeMethod
     private void before() {
 
-        Mockito.reset(resource, schemaFilter);
+        Mockito.reset(resource);
 
     }
 
@@ -61,9 +55,11 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
 
         Mockito.when(resource.get(Mockito.eq(login))).thenReturn(Optional.of(JsonNodeUtils.init()));
 
-        service.exist(login);
+        boolean exist = service.exist(login);
 
-        assertThat(service.exist(login), is(Boolean.TRUE));
+        assertThat(exist, is(Boolean.TRUE));
+
+        Mockito.verify(resource).get(Mockito.eq(login));
 
     }
 
@@ -77,6 +73,8 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
         model.put("password", "jean.dupont");
 
         service.save(JsonNodeUtils.create(model));
+
+        Mockito.verify(resource).save(Mockito.any(JsonNode.class));
 
     }
 
@@ -102,24 +100,46 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
 
             assertThat(exception.getCode(), is("login"));
             assertThat(exception.getPath(), is("/username"));
+
+            Mockito.verify(resource).save(Mockito.any(JsonNode.class));
+
         }
 
     }
 
-    @DataProvider(name = "update")
-    private static Object[][] update() {
+    @Test
+    public void updatePassword() throws LoginServiceNotFoundException {
 
-        return new Object[][] {
+        String login = "jean@gmail.com";
 
-                { "jean@gmail.com", "jean@gmail.com" },
+        Map<String, Object> source = new HashMap<>();
+        source.put("password", "jean.dupont");
+        source.put(LoginField.USERNAME.field, login);
 
-                { "jean@gmail.com", "jean@hotmail.com" }
+        Mockito.when(resource.get(Mockito.eq(login))).thenReturn(Optional.of(JsonNodeUtils.create(source)));
 
-        };
+        Map<String, Object> model = new HashMap<>();
+        model.put("password", "jean.dupont");
+
+        ArrayNode patch = MAPPER.createArrayNode();
+
+        ObjectNode replacePassword = MAPPER.createObjectNode();
+        replacePassword.put("op", "replace");
+        replacePassword.put("path", "/password");
+        replacePassword.put("value", "jean.dupont");
+        patch.add(replacePassword);
+
+        service.save(login, patch);
+
+        Mockito.verify(resource).update(Mockito.any(JsonNode.class));
+
     }
 
-    @Test(dataProvider = "update")
-    public void update(String login, String newLogin) throws LoginServiceException, LoginResourceExistException {
+    @Test
+    public void updateUsername() throws LoginServiceException, LoginResourceExistException {
+
+        String login = "jean@gmail.com";
+        String newLogin = "jack@gmail.com";
 
         Map<String, Object> source = new HashMap<>();
         source.put("password", "jean.dupont");
@@ -133,19 +153,16 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
 
         ArrayNode patch = MAPPER.createArrayNode();
 
-        ObjectNode replacePassword = MAPPER.createObjectNode();
-        replacePassword.put("op", "replace");
-        replacePassword.put("path", "/password");
-        replacePassword.put("value", "jean.dupont");
-        patch.add(replacePassword);
-
         ObjectNode replaceLogin = MAPPER.createObjectNode();
         replaceLogin.put("op", "replace");
         replaceLogin.put("path", "/" + LoginField.USERNAME.field);
         replaceLogin.put("value", newLogin);
-        patch.add(replacePassword);
+        patch.add(replaceLogin);
 
         service.save(login, patch);
+
+        Mockito.verify(resource).save(Mockito.any(JsonNode.class));
+        Mockito.verify(resource).delete(login);
 
     }
 
@@ -195,6 +212,8 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
 
             assertThat(exception.getCode(), is("login"));
             assertThat(exception.getPath(), is("/username"));
+
+            Mockito.verify(resource).save(Mockito.any(JsonNode.class));
         }
 
     }
@@ -202,19 +221,15 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
     @Test
     public void get() throws LoginServiceNotFoundException {
 
-        Map<String, Object> model = new HashMap<>();
-        model.put("password", "jean.dupont");
-
         String login = "jean@gmail.com";
 
-        Mockito.when(schemaFilter.filter(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class),
-                Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.create(model));
-        Mockito.when(resource.get(Mockito.eq(login))).thenReturn(Optional.of(JsonNodeUtils.create(model)));
+        Mockito.when(resource.get(Mockito.eq(login))).thenReturn(Optional.of(JsonNodeUtils.init()));
 
         JsonNode data = service.get(login);
 
         assertThat(data, is(notNullValue()));
-        assertThat(data, hasJsonField("password", (String) model.get("password")));
+
+        Mockito.verify(resource).get(Mockito.eq(login));
 
     }
 
@@ -237,6 +252,8 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
         Mockito.doNothing().when(resource).delete(Mockito.eq(login));
 
         service.delete(login);
+
+        Mockito.verify(resource).delete(Mockito.eq(login));
 
     }
 }
