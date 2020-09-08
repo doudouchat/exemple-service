@@ -42,27 +42,21 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public void save(String login, ArrayNode patch) throws LoginServiceNotFoundException {
 
-        ServiceContext context = ServiceContextExecution.context();
-
         JsonNode old = loginResource.get(login).orElseThrow(LoginServiceNotFoundException::new);
 
         JsonNode source = JsonPatch.apply(patch, old);
 
-        loginValidation.validate(source, old, context.getApp(), context.getVersion(), context.getProfile());
+        validate(source, old);
 
-        if (!login.equals(source.path(LoginField.USERNAME.field).textValue())) {
+        if (usernameIsModified(login, source)) {
 
-            try {
-                loginResource.save(source);
-            } catch (LoginResourceExistException e) {
-                throw buildValidationException(e);
-            }
+            createLogin(source);
 
-            loginResource.delete(login);
+            delete(login);
 
         } else {
 
-            loginResource.update(source);
+            updateLogin(source);
         }
 
     }
@@ -70,15 +64,9 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public void save(JsonNode source) {
 
-        ServiceContext context = ServiceContextExecution.context();
+        validate(source);
 
-        loginValidation.validate(source, context.getApp(), context.getVersion(), context.getProfile());
-
-        try {
-            loginResource.save(source);
-        } catch (LoginResourceExistException e) {
-            throw buildValidationException(e);
-        }
+        createLogin(source);
 
     }
 
@@ -92,11 +80,49 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public JsonNode get(String login) throws LoginServiceNotFoundException {
 
-        ServiceContext context = ServiceContextExecution.context();
-
         JsonNode source = loginResource.get(login).orElseThrow(LoginServiceNotFoundException::new);
 
+        return filter(source);
+    }
+
+    private void createLogin(JsonNode source) {
+
+        try {
+            loginResource.save(source);
+        } catch (LoginResourceExistException e) {
+            throw buildValidationException(e);
+        }
+    }
+
+    private void updateLogin(JsonNode source) {
+
+        loginResource.update(source);
+    }
+
+    private JsonNode filter(JsonNode source) {
+
+        ServiceContext context = ServiceContextExecution.context();
+
         return schemaFilter.filter(context.getApp(), context.getVersion(), "login", context.getProfile(), source);
+    }
+
+    private void validate(JsonNode source) {
+
+        ServiceContext context = ServiceContextExecution.context();
+
+        loginValidation.validate(source, context.getApp(), context.getVersion(), context.getProfile());
+    }
+
+    private void validate(JsonNode source, JsonNode previousAccount) {
+
+        ServiceContext context = ServiceContextExecution.context();
+
+        loginValidation.validate(source, previousAccount, context.getApp(), context.getVersion(), context.getProfile());
+    }
+
+    private static boolean usernameIsModified(String login, JsonNode source) {
+
+        return !login.equals(source.path(LoginField.USERNAME.field).textValue());
     }
 
     private static ValidationException buildValidationException(LoginResourceExistException exception) {
