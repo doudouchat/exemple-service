@@ -22,7 +22,7 @@ public class SubscriptionServiceResourceAspect {
     @Around("execution(public void com.exemple.service.resource.subscription.SubscriptionResource.save(*, *)) && args (email, source)")
     public void save(ProceedingJoinPoint joinPoint, String email, JsonNode source) throws Throwable {
 
-        joinPoint.proceed(new Object[] { email, TransformUtils.transform(source, subscriptionServiceResource::save) });
+        joinPoint.proceed(new Object[] { email, TransformUtils.apply(source, subscriptionServiceResource::save) });
 
     }
 

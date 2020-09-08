@@ -53,7 +53,7 @@ public class SchemaValidationImpl implements SchemaValidation {
     }
 
     @Override
-    public void validate(String app, String version, String resource, String profile, JsonNode form) {
+    public void validate(String app, String version, String profile, String resource, JsonNode form) {
 
         SchemaEntity schemaEntity = schemaResource.get(app, version, resource, profile);
         Schema schema = buildSchema(schemaEntity.getContent(), Collections.emptySet());
@@ -71,7 +71,7 @@ public class SchemaValidationImpl implements SchemaValidation {
     }
 
     @Override
-    public void validate(String app, String version, String resource, String profile, JsonNode form, JsonNode old) {
+    public void validate(String app, String version, String profile, String resource, JsonNode form, JsonNode old) {
 
         SchemaEntity schemaEntity = schemaResource.get(app, version, resource, profile);
         Schema schema = buildSchema(schemaEntity.getContent(), schemaEntity.getPatchs());

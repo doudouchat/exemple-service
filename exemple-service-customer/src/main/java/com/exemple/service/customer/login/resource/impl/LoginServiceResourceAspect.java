@@ -22,14 +22,14 @@ public class LoginServiceResourceAspect {
     @Around("execution(public void com.exemple.service.resource.login.LoginResource.save(*)) && args (source)")
     public void save(ProceedingJoinPoint joinPoint, JsonNode source) throws Throwable {
 
-        joinPoint.proceed(new Object[] { TransformUtils.transform(source, loginServiceResource::saveLogin) });
+        joinPoint.proceed(new Object[] { TransformUtils.apply(source, loginServiceResource::saveLogin) });
 
     }
 
     @Around("execution(public void com.exemple.service.resource.login.LoginResource.update(*)) && args (source)")
     public void update(ProceedingJoinPoint joinPoint, JsonNode source) throws Throwable {
 
-        joinPoint.proceed(new Object[] { TransformUtils.transform(source, loginServiceResource::saveLogin) });
+        joinPoint.proceed(new Object[] { TransformUtils.apply(source, loginServiceResource::saveLogin) });
 
     }
 

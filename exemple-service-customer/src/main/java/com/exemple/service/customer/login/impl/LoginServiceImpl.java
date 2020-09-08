@@ -6,13 +6,13 @@ import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.customer.login.exception.LoginServiceNotFoundException;
-import com.exemple.service.customer.login.validation.LoginValidation;
 import com.exemple.service.resource.login.LoginField;
 import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.login.exception.LoginResourceExistException;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionModel;
 import com.exemple.service.schema.filter.SchemaFilter;
+import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -21,16 +21,18 @@ import com.flipkart.zjsonpatch.JsonPatch;
 @Service
 public class LoginServiceImpl implements LoginService {
 
+    private static final String LOGIN = "login";
+
     private final LoginResource loginResource;
 
-    private final LoginValidation loginValidation;
+    private final SchemaValidation schemaValidation;
 
     private final SchemaFilter schemaFilter;
 
-    public LoginServiceImpl(LoginResource loginResource, LoginValidation loginValidation, SchemaFilter schemaFilter) {
+    public LoginServiceImpl(LoginResource loginResource, SchemaValidation schemaValidation, SchemaFilter schemaFilter) {
 
         this.loginResource = loginResource;
-        this.loginValidation = loginValidation;
+        this.schemaValidation = schemaValidation;
         this.schemaFilter = schemaFilter;
     }
 
@@ -103,21 +105,21 @@ public class LoginServiceImpl implements LoginService {
 
         ServiceContext context = ServiceContextExecution.context();
 
-        return schemaFilter.filter(context.getApp(), context.getVersion(), "login", context.getProfile(), source);
+        return schemaFilter.filter(context.getApp(), context.getVersion(), LOGIN, context.getProfile(), source);
     }
 
     private void validate(JsonNode source) {
 
         ServiceContext context = ServiceContextExecution.context();
 
-        loginValidation.validate(source, context.getApp(), context.getVersion(), context.getProfile());
+        schemaValidation.validate(context.getApp(), context.getVersion(), context.getProfile(), LOGIN, source);
     }
 
     private void validate(JsonNode source, JsonNode previousAccount) {
 
         ServiceContext context = ServiceContextExecution.context();
 
-        loginValidation.validate(source, previousAccount, context.getApp(), context.getVersion(), context.getProfile());
+        schemaValidation.validate(context.getApp(), context.getVersion(), context.getProfile(), LOGIN, source, previousAccount);
     }
 
     private static boolean usernameIsModified(String login, JsonNode source) {

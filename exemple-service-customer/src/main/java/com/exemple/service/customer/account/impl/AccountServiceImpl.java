@@ -10,11 +10,11 @@ import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.account.exception.AccountServiceException;
 import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
-import com.exemple.service.customer.account.validation.AccountValidation;
 import com.exemple.service.event.model.EventData;
 import com.exemple.service.event.model.EventType;
 import com.exemple.service.resource.account.AccountResource;
 import com.exemple.service.schema.filter.SchemaFilter;
+import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.flipkart.zjsonpatch.JsonPatch;
@@ -26,17 +26,17 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountResource accountResource;
 
-    private final AccountValidation accountValidation;
+    private final SchemaValidation schemaValidation;
 
     private final SchemaFilter schemaFilter;
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public AccountServiceImpl(AccountResource accountResource, AccountValidation accountValidation, SchemaFilter schemaFilter,
+    public AccountServiceImpl(AccountResource accountResource, SchemaValidation schemaValidation, SchemaFilter schemaFilter,
             ApplicationEventPublisher applicationEventPublisher) {
 
         this.accountResource = accountResource;
-        this.accountValidation = accountValidation;
+        this.schemaValidation = schemaValidation;
         this.schemaFilter = schemaFilter;
         this.applicationEventPublisher = applicationEventPublisher;
     }
@@ -81,14 +81,14 @@ public class AccountServiceImpl implements AccountService {
 
         ServiceContext context = ServiceContextExecution.context();
 
-        accountValidation.validate(account, context.getApp(), context.getVersion(), context.getProfile());
+        schemaValidation.validate(context.getApp(), context.getVersion(), context.getProfile(), ACCOUNT, account);
     }
 
     private void validate(JsonNode account, JsonNode previousAccount) {
 
         ServiceContext context = ServiceContextExecution.context();
 
-        accountValidation.validate(account, previousAccount, context.getApp(), context.getVersion(), context.getProfile());
+        schemaValidation.validate(context.getApp(), context.getVersion(), context.getProfile(), ACCOUNT, account, previousAccount);
     }
 
     private void publish(JsonNode account, EventType type) {
