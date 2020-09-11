@@ -4,7 +4,7 @@ import org.springframework.util.Assert;
 
 public final class ResourceExecutionContext {
 
-    private static ThreadLocal<ResourceExecutionContext> executionContext = new ThreadLocal<>();
+    private static ThreadLocal<ResourceExecutionContext> executionContext = ThreadLocal.withInitial(ResourceExecutionContext::new);
 
     private String keyspace;
 
@@ -13,10 +13,6 @@ public final class ResourceExecutionContext {
     }
 
     public static ResourceExecutionContext get() {
-
-        if (executionContext.get() == null) {
-            executionContext.set(new ResourceExecutionContext());
-        }
 
         return executionContext.get();
     }

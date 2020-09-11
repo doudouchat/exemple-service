@@ -2,7 +2,7 @@ package com.exemple.service.context;
 
 public final class ServiceContextExecution {
 
-    private static ThreadLocal<ServiceContextExecution> executionContext = new ThreadLocal<>();
+    private static ThreadLocal<ServiceContextExecution> executionContext = ThreadLocal.withInitial(ServiceContextExecution::new);
 
     private final ServiceContext model;
 
@@ -12,10 +12,6 @@ public final class ServiceContextExecution {
     }
 
     public static ServiceContext context() {
-
-        if (executionContext.get() == null) {
-            executionContext.set(new ServiceContextExecution());
-        }
 
         return executionContext.get().model;
     }

@@ -2,7 +2,7 @@ package com.exemple.service.customer.core.validation;
 
 public final class ValidationCustomContext {
 
-    private static ThreadLocal<ValidationCustomContext> executionContext = new ThreadLocal<>();
+    private static ThreadLocal<ValidationCustomContext> executionContext = ThreadLocal.withInitial(ValidationCustomContext::new);
 
     private String resource;
 
@@ -11,10 +11,6 @@ public final class ValidationCustomContext {
     }
 
     public static ValidationCustomContext context() {
-
-        if (executionContext.get() == null) {
-            executionContext.set(new ValidationCustomContext());
-        }
 
         return executionContext.get();
     }
