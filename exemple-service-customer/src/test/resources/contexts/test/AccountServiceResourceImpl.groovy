@@ -1,18 +1,18 @@
 package com.exemple.service.customer.account.resource
 
-import java.time.OffsetDateTime
+import com.exemple.service.customer.core.script.CustomiseResource
 
 import groovy.transform.CompileDynamic
 
 @CompileDynamic
-class AccountServiceResourceImpl implements AccountServiceResource {
+class AccountServiceResourceImpl implements CustomiseResource {
 
     private static final String CREATION_DATE = 'creation_date'
 
     @Override
-    Map<String, Object> save(Map<String, Object> account) {
-        account.clear()
-        account.put("TEST_KEY", "TEST_VALUE")
-        account
+    Map<String, Object> create(Map<String, Object> source) {
+        source.clear()
+        source.put("TEST_KEY", "TEST_VALUE")
+        source
     }
 }

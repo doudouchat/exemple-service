@@ -98,6 +98,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- BCRYPT -->
+
+		<dependency>
+			<groupId>org.mindrot</groupId>
+			<artifactId>jbcrypt</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- HAMCREST -->
 
 		<dependency>

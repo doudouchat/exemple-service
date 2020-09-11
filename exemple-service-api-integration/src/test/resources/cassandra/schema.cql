@@ -43,8 +43,7 @@ CREATE TABLE IF NOT EXISTS login (
 	id UUID,
 	username text PRIMARY KEY,
 	password text,
-	plain_password text,
-	disabled boolean,
+	disable boolean,
 	account_locked boolean,
 	roles set<text>
 );

@@ -6,6 +6,7 @@ import static com.exemple.service.api.integration.account.v1.AccountNominalIT.VE
 import static com.exemple.service.api.integration.account.v1.AccountNominalIT.VERSION_HEADER_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -75,22 +77,38 @@ public class LoginIT extends AbstractTestNGSpringContextTests {
                 .get(URL + "/{login}", LOGIN);
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
 
+        assertThat(response.jsonPath().get("password"), is(notNullValue()));
         assertThat(response.jsonPath().get("password"), startsWith("{bcrypt}"));
+        assertThat(BCrypt.checkpw("mdp", response.jsonPath().getString("password").substring("{bcrypt}".length())), is(true));
         assertThat(response.jsonPath().getString("id"), is(ID.toString()));
         assertThat(response.jsonPath().getString("username"), is(LOGIN));
 
     }
 
-    @Test(dependsOnMethods = { "exist", "get" })
-    public void update() {
+    @DataProvider(name = "updateSuccess")
+    private static Object[][] updateSuccess() {
+
+        Map<String, Object> patch0 = new HashMap<>();
+        patch0.put("op", "add");
+        patch0.put("path", "/password");
+        patch0.put("value", "new_mdp");
+
+        Map<String, Object> patch1 = new HashMap<>();
+        patch1.put("op", "add");
+        patch1.put("path", "/disable");
+        patch1.put("value", true);
+
+        return new Object[][] {
+                // modify password
+                { patch0 },
+                // disable is true
+                { patch1 } };
+    }
+
+    @Test(dataProvider = "updateSuccess", dependsOnMethods = { "exist", "get" })
+    public void update(Map<String, Object> patch) {
 
         List<Map<String, Object>> patchs = new ArrayList<>();
-
-        Map<String, Object> patch = new HashMap<>();
-        patch.put("op", "add");
-        patch.put("path", "/password");
-        patch.put("value", "new_mdp");
-
         patchs.add(patch);
 
         Response response = JsonRestTemplate.given()
@@ -101,16 +119,24 @@ public class LoginIT extends AbstractTestNGSpringContextTests {
 
         assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
 
-        response = JsonRestTemplate.given()
+    }
+
+    @Test(dependsOnMethods = "update")
+    public void getLoginSuccess() {
+
+        Response response = JsonRestTemplate.given()
 
                 .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, "v1")
 
                 .get(LoginIT.URL + "/{login}", LOGIN);
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
 
+        assertThat(response.jsonPath().get("password"), is(notNullValue()));
         assertThat(response.jsonPath().get("password"), startsWith("{bcrypt}"));
+        assertThat(BCrypt.checkpw("new_mdp", response.jsonPath().getString("password").substring("{bcrypt}".length())), is(true));
         assertThat(response.jsonPath().getString("id"), is(ID.toString()));
         assertThat(response.jsonPath().getString("username"), is(LOGIN));
+        assertThat(response.jsonPath().getString("disable"), is("true"));
 
     }
 
