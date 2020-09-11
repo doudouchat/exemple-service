@@ -85,6 +85,8 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
         assertThat(account, hasJsonField("opt_in_email", true));
         assertThat(account, hasJsonField("civility", "Mr"));
 
+        Mockito.verify(resource).save(Mockito.any(UUID.class), Mockito.any(JsonNode.class));
+
     }
 
     @Test
@@ -111,13 +113,12 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
 
         JsonNode account = service.save(id, patch);
 
-        // Mockito.verify(resource).get(Mockito.eq(id));
-        // Mockito.verify(resource).update(Mockito.eq(id), Mockito.any(JsonNode.class));
-
         assertThat(account, is(notNullValue()));
-
         assertThat(account, hasJsonField("email", "jean.dupont@gmail.com"));
         assertThat(account, hasJsonField("lastname", "Dupont"));
+
+        Mockito.verify(resource).get(Mockito.eq(id));
+        Mockito.verify(resource).save(Mockito.eq(id), Mockito.any(JsonNode.class));
 
     }
 
@@ -142,17 +143,7 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
         assertThat(account, hasJsonField("lastname", "Dupont"));
         assertThat(account, hasJsonField("firstname", "Jean"));
 
-    }
-
-    @Test
-    public void getMultiple() throws AccountServiceException {
-
-        UUID id = UUID.randomUUID();
-
-        Mockito.when(resource.get(Mockito.eq(id))).thenReturn(Optional.of(JsonNodeUtils.init()));
-
-        service.get(id);
-        service.get(id);
+        Mockito.verify(resource).get(Mockito.eq(id));
 
     }
 
@@ -168,6 +159,8 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
         Mockito.when(resource.get(Mockito.eq(id))).thenReturn(Optional.empty());
 
         service.get(id);
+
+        Mockito.verify(resource).get(Mockito.eq(id));
 
     }
 
