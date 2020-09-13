@@ -17,10 +17,7 @@
 			"type": "string",
 			"writeOnly": true
 		},
-		"plain_password": {
-			"type": "string"
-		},
-		"enable": {
+		"disable": {
 			"type": "boolean"
 		}
 	}
