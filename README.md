@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/doudouchat/exemple-service.svg?branch=master)](https://travis-ci.org/doudouchat/exemple-service)
+[![Build Status](https://travis-ci.com/doudouchat/exemple-service.svg?branch=master)](https://travis-ci.com/doudouchat/exemple-service)
 [![codecov](https://codecov.io/gh/doudouchat/exemple-service/graph/badge.svg)](https://codecov.io/gh/doudouchat/exemple-service) 
 
 # exemple-service
