@@ -4,6 +4,9 @@ resource:
    hazelcast:
       port: 5705
       member: 127.0.0.1:5705
+customer:
+   contexts:
+      path: /usr/local/tomcat/etc/contexts
 store:
    zookeeper:
       host: 172.17.0.1:10024
