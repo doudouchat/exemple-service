@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.customer.core.script.CustomiseResourceHelper;
 import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.customer.login.exception.LoginServiceNotFoundException;
 import com.exemple.service.resource.login.LoginField;
@@ -29,11 +30,15 @@ public class LoginServiceImpl implements LoginService {
 
     private final SchemaFilter schemaFilter;
 
-    public LoginServiceImpl(LoginResource loginResource, SchemaValidation schemaValidation, SchemaFilter schemaFilter) {
+    private final CustomiseResourceHelper customiseResourceHelper;
+
+    public LoginServiceImpl(LoginResource loginResource, SchemaValidation schemaValidation, SchemaFilter schemaFilter,
+            CustomiseResourceHelper customiseResourceHelper) {
 
         this.loginResource = loginResource;
         this.schemaValidation = schemaValidation;
         this.schemaFilter = schemaFilter;
+        this.customiseResourceHelper = customiseResourceHelper;
     }
 
     @Override
@@ -49,6 +54,8 @@ public class LoginServiceImpl implements LoginService {
         JsonNode source = JsonPatch.apply(patch, old);
 
         validate(source, old);
+
+        source = customiseResourceHelper.customise(LOGIN, source, old);
 
         if (usernameIsModified(login, source)) {
 
@@ -67,6 +74,8 @@ public class LoginServiceImpl implements LoginService {
     public void save(JsonNode source) {
 
         validate(source);
+
+        source = customiseResourceHelper.customise(LOGIN, source);
 
         createLogin(source);
 

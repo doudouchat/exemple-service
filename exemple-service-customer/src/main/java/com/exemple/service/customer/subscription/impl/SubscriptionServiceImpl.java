@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.customer.core.script.CustomiseResourceHelper;
 import com.exemple.service.customer.subscription.SubscriptionService;
 import com.exemple.service.customer.subscription.exception.SubscriptionServiceNotFoundException;
 import com.exemple.service.event.model.EventData;
@@ -29,13 +30,16 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    private final CustomiseResourceHelper customiseResourceHelper;
+
     public SubscriptionServiceImpl(SubscriptionResource subscriptionResource, SchemaValidation schemaValidation, SchemaFilter schemaFilter,
-            ApplicationEventPublisher applicationEventPublisher) {
+            ApplicationEventPublisher applicationEventPublisher, CustomiseResourceHelper customiseResourceHelper) {
 
         this.subscriptionResource = subscriptionResource;
         this.schemaValidation = schemaValidation;
         this.schemaFilter = schemaFilter;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.customiseResourceHelper = customiseResourceHelper;
     }
 
     @Override
@@ -49,6 +53,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         schemaValidation.validate(context.getApp(), context.getVersion(), context.getProfile(), SUBSCRIPTION, subscription);
 
         boolean created = !subscriptionResource.get(email).isPresent();
+
+        source = customiseResourceHelper.customise(SUBSCRIPTION, source);
 
         subscriptionResource.save(email, source);
 

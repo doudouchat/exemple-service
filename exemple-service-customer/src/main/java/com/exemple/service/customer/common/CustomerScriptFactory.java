@@ -1,4 +1,4 @@
-package com.exemple.service.customer.core.script;
+package com.exemple.service.customer.common;
 
 import java.io.IOException;
 import java.nio.file.Files;

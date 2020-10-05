@@ -1,4 +1,4 @@
-package com.exemple.service.customer.core.script;
+package com.exemple.service.customer.common.script;
 
 import java.util.Map;
 

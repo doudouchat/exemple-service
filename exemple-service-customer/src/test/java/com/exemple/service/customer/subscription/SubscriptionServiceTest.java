@@ -58,12 +58,14 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
         String email = "jean@gmail.com";
 
         Mockito.when(resource.get(email)).thenReturn(subscription);
+        Mockito.doNothing().when(resource).save(Mockito.eq(email), Mockito.any(JsonNode.class));
 
         boolean created = service.save(email, JsonNodeUtils.init());
 
         assertThat(created, is(expectedCreated));
 
-        Mockito.verify(resource).save(email, JsonNodeUtils.init());
+        Mockito.verify(resource).get(email);
+        Mockito.verify(resource).save(Mockito.eq(email), Mockito.any(JsonNode.class));
 
     }
 

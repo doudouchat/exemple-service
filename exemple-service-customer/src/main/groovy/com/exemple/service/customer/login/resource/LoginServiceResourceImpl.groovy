@@ -2,7 +2,7 @@ package com.exemple.service.customer.login.resource
 
 import org.mindrot.jbcrypt.BCrypt
 
-import com.exemple.service.customer.core.script.CustomiseResource
+import com.exemple.service.customer.common.script.CustomiseResource
 
 import groovy.transform.CompileDynamic
 

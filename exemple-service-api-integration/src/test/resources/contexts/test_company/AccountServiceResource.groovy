@@ -1,7 +1,7 @@
 package com.exemple.service.customer.account.resource
 
 import com.exemple.service.context.ServiceContextExecution;
-import com.exemple.service.customer.core.script.CustomiseResource
+import com.exemple.service.customer.common.script.CustomiseResource
 
 import groovy.transform.CompileDynamic
 
