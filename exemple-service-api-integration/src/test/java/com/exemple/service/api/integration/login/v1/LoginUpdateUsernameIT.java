@@ -1,9 +1,9 @@
 package com.exemple.service.api.integration.login.v1;
 
-import static com.exemple.service.api.integration.account.v1.AccountNominalIT.APP_HEADER;
-import static com.exemple.service.api.integration.account.v1.AccountNominalIT.APP_HEADER_VALUE;
-import static com.exemple.service.api.integration.account.v1.AccountNominalIT.VERSION_HEADER;
-import static com.exemple.service.api.integration.account.v1.AccountNominalIT.VERSION_HEADER_VALUE;
+import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.APP_HEADER;
+import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.TEST_APP;
+import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.VERSION_HEADER;
+import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.VERSION_V1;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -43,7 +43,7 @@ public class LoginUpdateUsernameIT {
 
         Response create = JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, VERSION_HEADER_VALUE)
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
                 .body(body).post(LoginIT.URL);
 
@@ -69,7 +69,7 @@ public class LoginUpdateUsernameIT {
 
         Response response = JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, "v1")
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
                 .body(patchs).patch(LoginIT.URL + "/{login}", LOGIN);
 
@@ -82,7 +82,7 @@ public class LoginUpdateUsernameIT {
 
         Response response = JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, "v1")
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
                 .get(LoginIT.URL + "/{login}", NEW_LOGIN);
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
@@ -101,7 +101,7 @@ public class LoginUpdateUsernameIT {
 
         Response response = JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, "v1")
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
                 .get(LoginIT.URL + "/{login}", LOGIN);
         assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND.value()));

@@ -1,5 +1,9 @@
 package com.exemple.service.api.integration.account.v1;
 
+import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.APP_HEADER;
+import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.TEST_APP;
+import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.VERSION_HEADER;
+import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.VERSION_V1;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -26,21 +30,13 @@ import io.restassured.response.Response;
 @ContextConfiguration(classes = { IntegrationTestConfiguration.class })
 public class AccountNominalIT extends AbstractTestNGSpringContextTests {
 
-    public static final String APP_HEADER = "app";
-
-    public static final String APP_HEADER_VALUE = "test";
-
-    public static final String VERSION_HEADER = "version";
-
-    public static final String VERSION_HEADER_VALUE = "v1";
-
     public static final String ACCOUNT_URL = "/ws/v1/accounts";
 
-    public static UUID ID = null;
+    protected static UUID ID = null;
 
-    public static Map<String, Object> ACCOUNT_BODY;
+    protected static Map<String, Object> ACCOUNT_BODY;
 
-    public static Map<String, Object> LOGIN_BODY;
+    protected static Map<String, Object> LOGIN_BODY;
 
     @Test
     public void createSuccess() {
@@ -80,7 +76,7 @@ public class AccountNominalIT extends AbstractTestNGSpringContextTests {
 
         Response response = JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, VERSION_HEADER_VALUE)
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
                 .body(ACCOUNT_BODY).post(ACCOUNT_URL);
 
@@ -100,7 +96,7 @@ public class AccountNominalIT extends AbstractTestNGSpringContextTests {
 
         Response response = JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, "v1")
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
                 .body(LOGIN_BODY).post(LoginIT.URL);
 
@@ -113,7 +109,7 @@ public class AccountNominalIT extends AbstractTestNGSpringContextTests {
 
         Response response = JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, "v1")
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
                 .get(LoginIT.URL + "/{login}", ACCOUNT_BODY.get("email"));
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
@@ -129,7 +125,7 @@ public class AccountNominalIT extends AbstractTestNGSpringContextTests {
 
         Response response = JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, VERSION_HEADER_VALUE)
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
                 .get(ACCOUNT_URL + "/{id}", ID);
 
@@ -212,7 +208,7 @@ public class AccountNominalIT extends AbstractTestNGSpringContextTests {
 
         Response response = JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, VERSION_HEADER_VALUE)
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
                 .body(patchs).patch(ACCOUNT_URL + "/{id}", ID);
 
@@ -220,7 +216,7 @@ public class AccountNominalIT extends AbstractTestNGSpringContextTests {
 
         Response responseGet = JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, VERSION_HEADER_VALUE)
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
                 .get(ACCOUNT_URL + "/{id}", ID);
 

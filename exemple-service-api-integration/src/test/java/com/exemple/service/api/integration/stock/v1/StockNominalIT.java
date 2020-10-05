@@ -1,6 +1,7 @@
 package com.exemple.service.api.integration.stock.v1;
 
-import static com.exemple.service.api.integration.account.v1.AccountNominalIT.APP_HEADER;
+import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.APP_HEADER;
+import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.BACK_APP;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -20,8 +21,6 @@ import io.restassured.response.Response;
 
 @ContextConfiguration(classes = { IntegrationTestConfiguration.class })
 public class StockNominalIT extends AbstractTestNGSpringContextTests {
-
-    public static final String APP_HEADER_VALUE = "back";
 
     private static final String STOCK_URL = "/ws/v1/stocks/{store}/{product}";
 
@@ -46,7 +45,7 @@ public class StockNominalIT extends AbstractTestNGSpringContextTests {
 
         Response response = JsonRestTemplate.given().body(Collections.singletonMap("increment", increment))
 
-                .header(APP_HEADER, APP_HEADER_VALUE)
+                .header(APP_HEADER, BACK_APP)
 
                 .post(STOCK_URL, store, product);
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
@@ -57,7 +56,7 @@ public class StockNominalIT extends AbstractTestNGSpringContextTests {
 
         Response response = JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE)
+                .header(APP_HEADER, BACK_APP)
 
                 .get(STOCK_URL, store, product);
 
@@ -70,7 +69,7 @@ public class StockNominalIT extends AbstractTestNGSpringContextTests {
 
         Response response = JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE)
+                .header(APP_HEADER, BACK_APP)
 
                 .get(STOCK_URL, store, "product#" + UUID.randomUUID());
 
@@ -83,7 +82,7 @@ public class StockNominalIT extends AbstractTestNGSpringContextTests {
 
         Response response = JsonRestTemplate.given().body(Collections.singletonMap("increment", -100))
 
-                .header(APP_HEADER, APP_HEADER_VALUE)
+                .header(APP_HEADER, BACK_APP)
 
                 .post(STOCK_URL, store, product);
         assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));

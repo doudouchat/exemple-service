@@ -1,10 +1,10 @@
 package com.exemple.service.api.integration.account.v1;
 
-import static com.exemple.service.api.integration.account.v1.AccountNominalIT.APP_HEADER;
-import static com.exemple.service.api.integration.account.v1.AccountNominalIT.APP_HEADER_VALUE;
 import static com.exemple.service.api.integration.account.v1.AccountNominalIT.ID;
-import static com.exemple.service.api.integration.account.v1.AccountNominalIT.VERSION_HEADER;
-import static com.exemple.service.api.integration.account.v1.AccountNominalIT.VERSION_HEADER_VALUE;
+import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.APP_HEADER;
+import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.TEST_APP;
+import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.VERSION_HEADER;
+import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.VERSION_V1;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -83,7 +83,7 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
 
         Response response = JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, VERSION_HEADER_VALUE)
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
                 .body(accountBody).post(ACCOUNT_URL);
         assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
@@ -194,13 +194,13 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
 
         LOG.debug("{}", JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, VERSION_HEADER_VALUE)
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
                 .get(ACCOUNT_URL + "/{id}", ID));
 
         Response response = JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, VERSION_HEADER_VALUE)
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
                 .body(Collections.singletonList(patch)).patch(ACCOUNT_URL + "/{id}", ID);
         assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
@@ -231,7 +231,7 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
 
         Response response = JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, VERSION_HEADER_VALUE)
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
                 .get(ACCOUNT_URL + "/{id}", UUID.randomUUID());
         assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND.value()));
@@ -243,13 +243,13 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
 
         LOG.debug("{}", JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, VERSION_HEADER_VALUE)
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
                 .get(ACCOUNT_URL + "/{id}", ID));
 
         Response response = JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, VERSION_HEADER_VALUE)
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
                 .body(Collections.EMPTY_LIST).patch(ACCOUNT_URL + "/{id}", ID);
         assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
@@ -270,7 +270,7 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
 
         Response response = JsonRestTemplate.given()
 
-                .header(APP_HEADER, APP_HEADER_VALUE).header(VERSION_HEADER, VERSION_HEADER_VALUE)
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
                 .body(patchs).patch(ACCOUNT_URL + "/{id}", UUID.randomUUID());
         assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND.value()));

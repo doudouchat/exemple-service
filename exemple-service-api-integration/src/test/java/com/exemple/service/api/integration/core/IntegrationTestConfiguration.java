@@ -18,8 +18,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 
-import com.exemple.service.api.integration.account.v1.AccountNominalIT;
-import com.exemple.service.api.integration.stock.v1.StockNominalIT;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.core.ApplicationConfiguration;
 import com.exemple.service.application.detail.ApplicationDetailService;
@@ -35,6 +33,18 @@ import com.google.common.collect.Sets;
 @Configuration
 @Import({ ResourceConfiguration.class, ApplicationConfiguration.class })
 public class IntegrationTestConfiguration {
+
+    public static final String APP_HEADER = "app";
+
+    public static final String BACK_APP = "back";
+
+    public static final String TEST_APP = "test";
+
+    public static final String ADMIN_APP = "admin";
+
+    public static final String VERSION_HEADER = "version";
+
+    public static final String VERSION_V1 = "v1";
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -83,8 +93,8 @@ public class IntegrationTestConfiguration {
         ResourceExecutionContext.get().setKeyspace(detail.getKeyspace());
 
         SchemaEntity accountSchema = new SchemaEntity();
-        accountSchema.setApplication(AccountNominalIT.APP_HEADER_VALUE);
-        accountSchema.setVersion(AccountNominalIT.VERSION_HEADER_VALUE);
+        accountSchema.setApplication(TEST_APP);
+        accountSchema.setVersion(VERSION_V1);
         accountSchema.setResource("account");
         accountSchema.setProfile("user");
         accountSchema.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("account.json").getInputStream())));
@@ -107,8 +117,8 @@ public class IntegrationTestConfiguration {
         loginPatchs.add(patch);
 
         SchemaEntity loginSchema = new SchemaEntity();
-        loginSchema.setApplication(AccountNominalIT.APP_HEADER_VALUE);
-        loginSchema.setVersion(AccountNominalIT.VERSION_HEADER_VALUE);
+        loginSchema.setApplication(TEST_APP);
+        loginSchema.setVersion(VERSION_V1);
         loginSchema.setResource("login");
         loginSchema.setProfile("user");
         loginSchema.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("login.json").getInputStream())));
@@ -125,8 +135,8 @@ public class IntegrationTestConfiguration {
         subscriptionRules.put("login", Collections.singleton("/email"));
 
         SchemaEntity subscriptionSchema = new SchemaEntity();
-        subscriptionSchema.setApplication(AccountNominalIT.APP_HEADER_VALUE);
-        subscriptionSchema.setVersion(AccountNominalIT.VERSION_HEADER_VALUE);
+        subscriptionSchema.setApplication(TEST_APP);
+        subscriptionSchema.setVersion(VERSION_V1);
         subscriptionSchema.setResource("subscription");
         subscriptionSchema.setProfile("user");
         subscriptionSchema.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("subscription.json").getInputStream())));
@@ -134,7 +144,7 @@ public class IntegrationTestConfiguration {
 
         schemaResource.save(subscriptionSchema);
 
-        applicationDetailService.put(AccountNominalIT.APP_HEADER_VALUE, detail);
+        applicationDetailService.put(TEST_APP, detail);
 
         // STOCK
 
@@ -143,7 +153,7 @@ public class IntegrationTestConfiguration {
         backDetail.setCompany("test_company");
         backDetail.setClientIds(Sets.newHashSet("back", "back_user"));
 
-        applicationDetailService.put(StockNominalIT.APP_HEADER_VALUE, backDetail);
+        applicationDetailService.put(BACK_APP, backDetail);
 
     }
 
