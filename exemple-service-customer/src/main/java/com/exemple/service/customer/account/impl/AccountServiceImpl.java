@@ -10,6 +10,7 @@ import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.account.exception.AccountServiceException;
 import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
+import com.exemple.service.customer.core.script.CustomiseResourceHelper;
 import com.exemple.service.event.model.EventData;
 import com.exemple.service.event.model.EventType;
 import com.exemple.service.resource.account.AccountResource;
@@ -32,19 +33,24 @@ public class AccountServiceImpl implements AccountService {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    private final CustomiseResourceHelper customiseResourceHelper;
+
     public AccountServiceImpl(AccountResource accountResource, SchemaValidation schemaValidation, SchemaFilter schemaFilter,
-            ApplicationEventPublisher applicationEventPublisher) {
+            ApplicationEventPublisher applicationEventPublisher, CustomiseResourceHelper customiseResourceHelper) {
 
         this.accountResource = accountResource;
         this.schemaValidation = schemaValidation;
         this.schemaFilter = schemaFilter;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.customiseResourceHelper = customiseResourceHelper;
     }
 
     @Override
     public JsonNode save(JsonNode source) throws AccountServiceException {
 
         validate(source);
+
+        source = customiseResourceHelper.customise(ACCOUNT, source);
 
         JsonNode account = accountResource.save(UUID.randomUUID(), source);
 
@@ -61,6 +67,8 @@ public class AccountServiceImpl implements AccountService {
         JsonNode source = JsonPatch.apply(patch, old);
 
         validate(source, old);
+
+        source = customiseResourceHelper.customise(ACCOUNT, source, old);
 
         JsonNode account = accountResource.save(id, source);
 

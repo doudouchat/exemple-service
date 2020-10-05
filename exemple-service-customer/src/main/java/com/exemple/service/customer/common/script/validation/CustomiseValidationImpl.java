@@ -1,9 +1,9 @@
-package com.exemple.service.customer.core.script.validation;
+package com.exemple.service.customer.common.script.validation;
 
 import java.util.Map;
 
-import com.exemple.service.customer.core.script.CustomerScriptFactory;
-import com.exemple.service.customer.core.script.CustomiseValidation;
+import com.exemple.service.customer.common.CustomerScriptFactory;
+import com.exemple.service.customer.common.script.CustomiseValidation;
 
 public class CustomiseValidationImpl implements CustomiseValidation {
 

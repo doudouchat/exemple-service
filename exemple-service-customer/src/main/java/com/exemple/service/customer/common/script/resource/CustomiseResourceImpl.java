@@ -1,9 +1,9 @@
-package com.exemple.service.customer.core.script.resource;
+package com.exemple.service.customer.common.script.resource;
 
 import java.util.Map;
 
-import com.exemple.service.customer.core.script.CustomerScriptFactory;
-import com.exemple.service.customer.core.script.CustomiseResource;
+import com.exemple.service.customer.common.CustomerScriptFactory;
+import com.exemple.service.customer.common.script.CustomiseResource;
 
 public class CustomiseResourceImpl implements CustomiseResource {
 
