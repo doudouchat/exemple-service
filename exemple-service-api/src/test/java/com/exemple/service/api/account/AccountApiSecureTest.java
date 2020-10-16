@@ -76,6 +76,10 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
 
     private static UUID ID = UUID.randomUUID();
 
+    private static Optional<JsonNode> ID_RESPONSE_LOGIN = Optional.of(JsonNodeUtils.create(Collections.singletonMap("id", ID)));
+
+    private static Optional<JsonNode> RANDOM_RESPONSE_LOGIN = Optional.of(JsonNodeUtils.create(Collections.singletonMap("id", UUID.randomUUID())));
+
     @DataProvider(name = "notAuthorized")
     private static Object[][] notAuthorized() {
 
@@ -93,21 +97,23 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
 
         return new Object[][] {
 
-                { token1, ID },
+                { token1, ID_RESPONSE_LOGIN },
 
-                { token2, UUID.randomUUID() },
+                { token2, RANDOM_RESPONSE_LOGIN },
 
-                { token3, ID },
+                { token2, Optional.empty() },
 
-                { token4, ID }
+                { token3, ID_RESPONSE_LOGIN },
+
+                { token4, ID_RESPONSE_LOGIN }
 
         };
     }
 
     @Test(dataProvider = "notAuthorized")
-    public void authorizedGetUserFailure(String token, UUID id) throws Exception {
+    public void authorizedGetUserFailure(String token, Optional<JsonNode> loginResponse) throws Exception {
 
-        Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(Optional.of(JsonNodeUtils.create(Collections.singletonMap("id", id))));
+        Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(loginResponse);
 
         Response response = target(AccountApiTest.URL + "/" + ID).request(MediaType.APPLICATION_JSON)
 

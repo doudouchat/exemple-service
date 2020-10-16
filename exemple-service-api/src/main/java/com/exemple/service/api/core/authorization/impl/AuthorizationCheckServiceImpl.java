@@ -51,7 +51,7 @@ public class AuthorizationCheckServiceImpl implements AuthorizationCheckService 
 
     private static void checkIfAccountIdAndLoginIdAreIdentical(UUID id, JsonNode login) {
 
-        if (!id.toString().equals(login.get(LoginField.ID.field).asText(null))) {
+        if (!id.toString().equals(login.path(LoginField.ID.field).asText(null))) {
 
             throw new ForbiddenException();
         }
