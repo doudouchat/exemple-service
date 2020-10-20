@@ -212,19 +212,19 @@
 			<dependency>
 				<groupId>com.hazelcast</groupId>
 				<artifactId>hazelcast</artifactId>
-				<version>3.12.9</version>
+				<version>3.12.10</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.hazelcast</groupId>
 				<artifactId>hazelcast-client</artifactId>
-				<version>3.12.9</version>
+				<version>3.12.10</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.hazelcast</groupId>
 				<artifactId>hazelcast-spring</artifactId>
-				<version>3.12.9</version>
+				<version>3.12.10</version>
 			</dependency>
 
 			<!-- CURATOR -->
