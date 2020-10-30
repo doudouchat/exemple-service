@@ -104,11 +104,6 @@
 			<artifactId>hazelcast-spring</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-client</artifactId>
-		</dependency>
-
 		<!-- ASPECTJ -->
 
 		<dependency>
