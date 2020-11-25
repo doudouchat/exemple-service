@@ -1,4 +1,4 @@
-FROM tomcat:9.0.39-jdk8-openjdk
+FROM tomcat:9.0.40-jdk8-openjdk
 LABEL maintener=EXEMPLE
 COPY exemple-service-api/target/*.war /usr/local/tomcat/webapps/ExempleService.war
 COPY exemple-service-api/src/main/conf/context.xml /usr/local/tomcat/conf/context.xml
