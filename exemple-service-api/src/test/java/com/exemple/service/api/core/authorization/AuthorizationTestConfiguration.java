@@ -15,13 +15,9 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.commons.codec.binary.Base64;
-import org.mockserver.client.MockServerClient;
-import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
@@ -75,23 +71,6 @@ public class AuthorizationTestConfiguration {
         config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
 
         return Hazelcast.newHazelcastInstance(config);
-    }
-
-    @Value("${api.authorization.port}")
-    private int authorizationPort;
-
-    @Bean(destroyMethod = "stop")
-    @ConditionalOnWebApplication
-    public ClientAndServer authorizationServer() {
-        return ClientAndServer.startClientAndServer(authorizationPort);
-    }
-
-    @Bean(destroyMethod = "stop")
-    @DependsOn("authorizationServer")
-    @ConditionalOnWebApplication
-    public MockServerClient authorizationClient() {
-
-        return new MockServerClient("localhost", authorizationPort);
     }
 
     public static class TestFilter implements ContainerRequestFilter {

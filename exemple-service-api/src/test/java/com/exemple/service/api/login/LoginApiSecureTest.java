@@ -18,7 +18,6 @@ import javax.ws.rs.core.SecurityContext;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.mockito.Mockito;
-import org.mockserver.client.MockServerClient;
 import org.mockserver.model.Header;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
@@ -58,9 +57,6 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
 
     @Autowired
     private AuthorizationAlgorithmFactory authorizationAlgorithmFactory;
-
-    @Autowired
-    private MockServerClient authorizationClient;
 
     @BeforeMethod
     private void before() {
