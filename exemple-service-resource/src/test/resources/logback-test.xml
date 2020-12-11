@@ -19,10 +19,6 @@
 		<level value="INFO" />
 	</logger>
 
-	<logger name="com.hazelcast">
-		<level value="DEBUG" />
-	</logger>
-
 	<root level="WARN">
 		<appender-ref ref="console" />
 	</root>

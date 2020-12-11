@@ -1,9 +1,9 @@
+spring:
+   hazelcast:
+      config: file:/usr/local/tomcat/etc/hazelcast.yaml
 resource:
    cassandra:
       resource_configuration: file:/usr/local/tomcat/etc/cassandra.conf
-   hazelcast:
-      port: 5705
-      member: 127.0.0.1:5705
 customer:
    contexts:
       path: /usr/local/tomcat/etc/contexts

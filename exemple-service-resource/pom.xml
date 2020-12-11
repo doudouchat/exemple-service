@@ -97,13 +97,6 @@
 			<artifactId>java-driver-mapper-runtime</artifactId>
 		</dependency>
 
-		<!-- HAZELCAST -->
-
-		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-spring</artifactId>
-		</dependency>
-
 		<!-- ASPECTJ -->
 
 		<dependency>
@@ -206,7 +199,6 @@
 						<configuration>
 							<portNames>
 								<portName>cassandra.port</portName>
-								<portName>hazelcast.port</portName>
 							</portNames>
 						</configuration>
 					</execution>

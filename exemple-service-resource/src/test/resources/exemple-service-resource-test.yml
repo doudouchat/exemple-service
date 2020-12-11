@@ -3,6 +3,3 @@ resource:
       port: ${cassandra.port}
       version: ${cassandra-version}
       resource_configuration: classpath:cassandra.conf
-   hazelcast:
-      port: ${hazelcast.port}
-      member: 127.0.0.1:${hazelcast.port}
