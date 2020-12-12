@@ -1,11 +1,11 @@
+spring:
+   hazelcast:
+      config: file:${project.build.testOutputDirectory}/hazelcast.yaml
 resource:
    cassandra:
       resource_configuration: file:${project.build.testOutputDirectory}/cassandra.conf
-   hazelcast:
-      port: ${hazelcast.port}
-      member: 127.0.0.1:${hazelcast.port}
-customer: 
-   contexts: 
+customer:
+   contexts:
       path: ${project.build.testOutputDirectory}/contexts
 store:
    zookeeper:
