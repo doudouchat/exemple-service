@@ -33,6 +33,7 @@ import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.api.core.ApiTestConfiguration;
 import com.exemple.service.api.core.authorization.impl.AuthorizationAlgorithmFactory;
+import com.exemple.service.api.core.authorization.impl.AuthorizationTokenManager;
 import com.hazelcast.core.HazelcastInstance;
 
 @ContextConfiguration(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
@@ -59,7 +60,7 @@ public class AuthorizationContextServiceTest extends AbstractTestNGSpringContext
 
         authorizationAlgorithmFactory.resetAlgorithm();
 
-        hazelcastInstance.getMap(AuthorizationConfiguration.TOKEN_BLACK_LIST).put(DEPRECATED_TOKEN_ID.toString(), Date.from(Instant.now()));
+        hazelcastInstance.getMap(AuthorizationTokenManager.TOKEN_BLACK_LIST).put(DEPRECATED_TOKEN_ID.toString(), Date.from(Instant.now()));
 
     }
 
