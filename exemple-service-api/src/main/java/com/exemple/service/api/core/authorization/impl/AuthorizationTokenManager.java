@@ -12,12 +12,13 @@ import org.springframework.util.Assert;
 
 import com.auth0.jwt.impl.PublicClaims;
 import com.auth0.jwt.interfaces.Payload;
-import com.exemple.service.api.core.authorization.AuthorizationConfiguration;
 import com.hazelcast.core.HazelcastInstance;
 
 @Component
 @Profile("!noSecurity")
 public class AuthorizationTokenManager {
+
+    public static final String TOKEN_BLACK_LIST = "token.black_list";
 
     private final HazelcastInstance hazelcastInstance;
 
@@ -28,7 +29,7 @@ public class AuthorizationTokenManager {
 
     public boolean containsToken(Payload payload) {
 
-        return payload.getId() != null && hazelcastInstance.getMap(AuthorizationConfiguration.TOKEN_BLACK_LIST).containsKey(payload.getId());
+        return payload.getId() != null && hazelcastInstance.getMap(TOKEN_BLACK_LIST).containsKey(payload.getId());
     }
 
     public void addTokenInBlackList(Payload payload) {
@@ -37,10 +38,7 @@ public class AuthorizationTokenManager {
 
         Assert.notNull(payload.getExpiresAt(), PublicClaims.EXPIRES_AT + " is required in accessToken");
 
-        hazelcastInstance.getMap(AuthorizationConfiguration.TOKEN_BLACK_LIST)
-                .put(payload.getId(), payload.getExpiresAt(),
-                        ChronoUnit.SECONDS.between(LocalDateTime.now(),
-                                Instant.ofEpochSecond(payload.getExpiresAt().getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime()),
-                        TimeUnit.SECONDS);
+        hazelcastInstance.getMap(TOKEN_BLACK_LIST).put(payload.getId(), payload.getExpiresAt(), ChronoUnit.SECONDS.between(LocalDateTime.now(),
+                Instant.ofEpochSecond(payload.getExpiresAt().getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime()), TimeUnit.SECONDS);
     }
 }

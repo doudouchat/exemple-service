@@ -11,7 +11,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
@@ -22,10 +21,7 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
-import com.exemple.service.api.core.authorization.AuthorizationConfiguration;
-
 @Configuration
-@Import(AuthorizationConfiguration.class)
 @ComponentScan(basePackages = "com.exemple.service.api", excludeFilters = @ComponentScan.Filter(SpringBootApplication.class))
 @ImportResource("classpath:exemple-service-api-security.xml")
 public class ApiConfiguration {

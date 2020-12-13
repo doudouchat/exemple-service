@@ -8,3 +8,7 @@ hazelcast:
                enabled: true
             multicast:
                enabled: false
+hazelcast-client:
+   network:
+      cluster-members:
+      - 172.17.0.1:5706

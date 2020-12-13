@@ -18,7 +18,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
@@ -28,7 +27,6 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 
 @Configuration
-@Import(AuthorizationConfiguration.class)
 @Profile("!noSecurity")
 public class AuthorizationTestConfiguration {
 
@@ -68,7 +66,7 @@ public class AuthorizationTestConfiguration {
         Config config = new Config();
         config.getNetworkConfig().setPort(port);
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
-        config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
+        config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
 
         return Hazelcast.newHazelcastInstance(config);
     }
