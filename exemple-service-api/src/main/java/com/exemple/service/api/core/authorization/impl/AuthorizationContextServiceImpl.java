@@ -98,14 +98,14 @@ public class AuthorizationContextServiceImpl implements AuthorizationContextServ
         ApplicationDetail applicationDetail = applicationDetailService.get(headers.getFirst(ApplicationBeanParam.APP_HEADER));
         String clientId = getClientId(payload);
         if (!applicationDetail.getClientIds().contains(clientId)) {
-            throw new AuthorizationException(clientId + " is forbidden");
+            throw new AuthorizationException(Response.Status.FORBIDDEN, clientId + " is forbidden");
         }
     }
 
     private void checkTokenIsInBlackList(Payload payload) throws AuthorizationException {
 
         if (authorizationTokenManager.containsToken(payload)) {
-            throw new AuthorizationException(payload.getId() + " has been excluded");
+            throw new AuthorizationException(Response.Status.UNAUTHORIZED, payload.getId() + " has been excluded");
         }
     }
 

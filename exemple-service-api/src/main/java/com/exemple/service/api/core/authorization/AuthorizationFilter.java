@@ -49,7 +49,7 @@ public class AuthorizationFilter implements ContainerRequestFilter, ContainerRes
 
     private static Response build(AuthorizationException e) {
 
-        return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+        return Response.status(e.getStatus()).entity(e.getMessage()).build();
     }
 
 }
