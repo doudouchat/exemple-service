@@ -55,7 +55,7 @@ public class CassandraConfiguration {
 
                 .version(version)
 
-                .addEnvironmentVariable("MAX_HEAP_SIZE", "64M").addEnvironmentVariable("HEAP_NEWSIZE", "12m")
+                .addEnvironmentVariable("MAX_HEAP_SIZE", "512M").addEnvironmentVariable("HEAP_NEWSIZE", "256M")
 
                 .addConfigProperty("native_transport_port", port).addConfigProperty("disk_failure_policy", "stop_paranoid")
 
