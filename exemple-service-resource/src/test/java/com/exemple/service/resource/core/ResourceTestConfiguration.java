@@ -1,6 +1,7 @@
 package com.exemple.service.resource.core;
 
 import java.io.FileNotFoundException;
+import java.time.Duration;
 
 import javax.annotation.PostConstruct;
 import javax.validation.Validator;
@@ -38,6 +39,9 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
     @Value("${resource.cassandra.version}")
     private String version;
 
+    @Value("${resource.cassandra.startup_timeout:120}")
+    private int startupTimeout;
+
     public ResourceTestConfiguration(@Value("${resource.cassandra.resource_configuration}") String cassandraResource) throws FileNotFoundException {
         super(cassandraResource);
     }
@@ -49,11 +53,13 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
 
                 .version(version)
 
-                .addEnvironmentVariable("MAX_HEAP_SIZE", "64M").addEnvironmentVariable("HEAP_NEWSIZE", "12m")
+                .addEnvironmentVariable("MAX_HEAP_SIZE", "64M").addEnvironmentVariable("HEAP_NEWSIZE", "12M")
 
                 .addConfigProperty("native_transport_port", port).addConfigProperty("disk_failure_policy", "stop_paranoid")
 
                 .logger(new Slf4jLogger(LoggerFactory.getLogger("Cassandra")))
+
+                .startupTimeout(Duration.ofSeconds(startupTimeout))
 
                 .build();
     }
