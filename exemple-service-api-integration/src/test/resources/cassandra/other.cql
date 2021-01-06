@@ -1,10 +1,10 @@
-CREATE KEYSPACE IF NOT EXISTS other 
+CREATE KEYSPACE IF NOT EXISTS other_keyspace 
   WITH REPLICATION = { 
    'class' : 'NetworkTopologyStrategy', 
    'datacenter1' : 1
 };
 
-USE other;
+USE other_keyspace;
 
 CREATE TABLE IF NOT EXISTS resource_schema ( 
 	app text,

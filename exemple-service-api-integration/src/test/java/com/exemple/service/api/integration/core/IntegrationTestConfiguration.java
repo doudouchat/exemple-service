@@ -86,7 +86,7 @@ public class IntegrationTestConfiguration {
         // APP
 
         ApplicationDetail detail = new ApplicationDetail();
-        detail.setKeyspace("test");
+        detail.setKeyspace("test_keyspace");
         detail.setCompany("test_company");
         detail.setClientIds(Sets.newHashSet("test", "test_user"));
 
@@ -163,7 +163,7 @@ public class IntegrationTestConfiguration {
         // STOCK
 
         ApplicationDetail backDetail = new ApplicationDetail();
-        backDetail.setKeyspace("test");
+        backDetail.setKeyspace("test_keyspace");
         backDetail.setCompany("test_company");
         backDetail.setClientIds(Sets.newHashSet("back", "back_user"));
 
@@ -177,7 +177,7 @@ public class IntegrationTestConfiguration {
         // APP
 
         ApplicationDetail detail = new ApplicationDetail();
-        detail.setKeyspace("other");
+        detail.setKeyspace("other_keyspace");
         detail.setCompany("other_company");
         detail.setClientIds(Sets.newHashSet("test", "test_user"));
 

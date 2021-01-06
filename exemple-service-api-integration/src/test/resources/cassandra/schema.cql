@@ -1,10 +1,10 @@
-CREATE KEYSPACE IF NOT EXISTS test 
+CREATE KEYSPACE IF NOT EXISTS test_keyspace 
   WITH REPLICATION = { 
    'class' : 'NetworkTopologyStrategy', 
    'datacenter1' : 1
 };
 
-USE test;
+USE test_keyspace;
 
 CREATE TYPE IF NOT EXISTS address (
 	street text,
