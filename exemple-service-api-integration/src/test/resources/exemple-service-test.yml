@@ -38,4 +38,4 @@ api:
          port: ${cassandra.port}
          version: ${cassandra-version}
          startup_timeout: 240
-         scripts: ${project.build.testOutputDirectory}/cassandra/schema.cql, ${project.build.testOutputDirectory}/cassandra/exec.cql
+         scripts: ${project.build.testOutputDirectory}/cassandra/schema.cql, ${project.build.testOutputDirectory}/cassandra/exec.cql, ${project.build.testOutputDirectory}/cassandra/other.cql

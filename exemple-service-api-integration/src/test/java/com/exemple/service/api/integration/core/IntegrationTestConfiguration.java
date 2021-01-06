@@ -1,6 +1,8 @@
 package com.exemple.service.api.integration.core;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,6 +31,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Sets;
+import com.hazelcast.client.HazelcastClient;
+import com.hazelcast.client.config.ClientConfig;
+import com.hazelcast.core.HazelcastInstance;
 
 @Configuration
 @Import({ ResourceConfiguration.class, ApplicationConfiguration.class })
@@ -64,6 +69,15 @@ public class IntegrationTestConfiguration {
 
         propertySourcesPlaceholderConfigurer.setProperties(properties.getObject());
         return propertySourcesPlaceholderConfigurer;
+    }
+
+    @Bean
+    public HazelcastInstance hazelcastInstance() throws UnknownHostException {
+
+        ClientConfig config = new ClientConfig();
+        config.getNetworkConfig().addAddress(InetAddress.getLocalHost().getHostAddress() + ":5701");
+
+        return HazelcastClient.newHazelcastClient(config);
     }
 
     @PostConstruct
@@ -154,6 +168,31 @@ public class IntegrationTestConfiguration {
         backDetail.setClientIds(Sets.newHashSet("back", "back_user"));
 
         applicationDetailService.put(BACK_APP, backDetail);
+
+    }
+
+    @PostConstruct
+    public void initOther() throws IOException {
+
+        // APP
+
+        ApplicationDetail detail = new ApplicationDetail();
+        detail.setKeyspace("other");
+        detail.setCompany("other_company");
+        detail.setClientIds(Sets.newHashSet("test", "test_user"));
+
+        ResourceExecutionContext.get().setKeyspace(detail.getKeyspace());
+
+        SchemaEntity accountSchema = new SchemaEntity();
+        accountSchema.setApplication("other");
+        accountSchema.setVersion(VERSION_V1);
+        accountSchema.setResource("account");
+        accountSchema.setProfile("user");
+        accountSchema.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("other.json").getInputStream())));
+
+        schemaResource.save(accountSchema);
+
+        applicationDetailService.put("other", detail);
 
     }
 
