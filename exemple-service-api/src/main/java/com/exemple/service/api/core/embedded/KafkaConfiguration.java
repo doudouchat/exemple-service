@@ -3,7 +3,6 @@ package com.exemple.service.api.core.embedded;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,7 @@ public class KafkaConfiguration {
 
     }
 
-    @Bean
+    @Bean(destroyMethod = "destroy")
     public EmbeddedKafkaBroker embeddedKafka() {
 
         EmbeddedKafkaBroker embeddedKafka = new EmbeddedKafkaBroker(1, false, defaultTopic).brokerProperty(KafkaConfig.LogDirsProp(),
@@ -51,12 +50,6 @@ public class KafkaConfiguration {
         LOG.info("STARTING EMBEDDED KAFKA");
 
         embeddedKafka().afterPropertiesSet();
-    }
-
-    @PreDestroy
-    public void closeKafka() {
-
-        embeddedKafka().destroy();
     }
 
 }
