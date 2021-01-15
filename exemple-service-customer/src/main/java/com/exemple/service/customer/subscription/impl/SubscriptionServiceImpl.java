@@ -47,16 +47,15 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         ServiceContext context = ServiceContextExecution.context();
 
-        JsonNode subscription = JsonNodeUtils.clone(source);
-        JsonNodeUtils.set(subscription, email, SubscriptionField.EMAIL.field);
+        JsonNodeUtils.set(source, email, SubscriptionField.EMAIL.field);
 
-        schemaValidation.validate(context.getApp(), context.getVersion(), context.getProfile(), SUBSCRIPTION, subscription);
+        schemaValidation.validate(context.getApp(), context.getVersion(), context.getProfile(), SUBSCRIPTION, source);
 
         boolean created = !subscriptionResource.get(email).isPresent();
 
-        source = customiseResourceHelper.customise(SUBSCRIPTION, source);
+        JsonNode subscription = customiseResourceHelper.customise(SUBSCRIPTION, source);
 
-        subscriptionResource.save(email, source);
+        subscriptionResource.save(email, subscription);
 
         EventData eventData = new EventData(subscription, SUBSCRIPTION, EventType.CREATE, context.getApp(), context.getVersion(),
                 context.getDate().toString());

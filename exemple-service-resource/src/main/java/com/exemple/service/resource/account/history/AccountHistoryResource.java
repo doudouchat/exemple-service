@@ -2,14 +2,13 @@ package com.exemple.service.resource.account.history;
 
 import java.time.OffsetDateTime;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -22,13 +21,15 @@ import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.account.history.dao.AccountHistoryDao;
 import com.exemple.service.resource.account.history.mapper.AccountHistoryMapper;
-import com.exemple.service.resource.account.impl.AccountResourceImpl;
 import com.exemple.service.resource.account.model.AccountHistory;
 import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
-import com.exemple.service.resource.common.util.MetadataSchemaUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.flipkart.zjsonpatch.DiffFlags;
+import com.flipkart.zjsonpatch.JsonDiff;
+import com.google.common.collect.Streams;
 
 @Component
 public class AccountHistoryResource {
@@ -57,12 +58,12 @@ public class AccountHistoryResource {
         return dao().findByIdAndField(id, field);
     }
 
-    public Collection<BoundStatement> saveHistories(final UUID id, JsonNode source, OffsetDateTime now) {
+    public Collection<BoundStatement> saveHistories(final UUID id, JsonNode source, JsonNode previousSource, OffsetDateTime now) {
 
-        return this.createHistories(id, source, now);
+        return this.createHistories(id, source, previousSource, now);
     }
 
-    public Collection<BoundStatement> createHistories(final UUID id, JsonNode source, OffsetDateTime now) {
+    private Collection<BoundStatement> createHistories(final UUID id, JsonNode source, JsonNode previousSource, OffsetDateTime now) {
 
         Map<String, AccountHistory> histories = findById(id).stream().collect(Collectors.toMap(AccountHistory::getField, Function.identity()));
 
@@ -73,44 +74,34 @@ public class AccountHistoryResource {
         PreparedStatement prepared = session.prepare("INSERT INTO " + ResourceExecutionContext.get().keyspace()
                 + ".account_history (id,date,field,value,previous_value,application,version,user) VALUES (?,?,?,?,?,?,?,?)");
 
-        return MetadataSchemaUtils.transformColumnToLine(session, AccountResourceImpl.ACCOUNT_TABLE, source).stream()
+        ArrayNode patch = (ArrayNode) JsonDiff.asJson(JsonNodeFilterUtils.clean(previousSource), JsonNodeFilterUtils.clean(source),
+                EnumSet.of(DiffFlags.OMIT_COPY_OPERATION, DiffFlags.OMIT_MOVE_OPERATION, DiffFlags.OMIT_VALUE_ON_REMOVE));
 
-                .filter(line -> now.toInstant().isAfter(histories.getOrDefault(line.getKey(), defaultHistory).getDate()))
+        return Streams.stream(patch.elements())
 
-                .map((Map.Entry<String, JsonNode> line) -> {
+                .map((JsonNode element) -> {
+                    String path = element.get("path").asText();
+                    JsonNode value = element.path("value");
 
                     AccountHistory history = new AccountHistory();
                     history.setId(id);
-                    history.setField(line.getKey());
+                    history.setField(path);
                     history.setDate(now.toInstant());
-                    history.setValue(JsonNodeFilterUtils.clean(line.getValue()));
+                    history.setValue(value);
                     history.setApplication(ServiceContextExecution.context().getApp());
                     history.setVersion(ServiceContextExecution.context().getVersion());
                     history.setUser(ServiceContextExecution.context().getPrincipal().getName());
-                    history.setPreviousValue(histories.getOrDefault(line.getKey(), defaultHistory).getValue());
+                    history.setPreviousValue(histories.getOrDefault(path, defaultHistory).getValue());
 
                     return history;
-                })
 
-                .filter(checkIfPreviousValueIsDifferent(histories))
+                })
 
                 .map((AccountHistory history) -> {
                     LOG.debug("save history account {} {} {}", history.getId(), history.getField(), history.getValue());
                     return prepared.bind(history.getId(), history.getDate(), history.getField(), history.getValue(), history.getPreviousValue(),
                             history.getApplication(), history.getVersion(), history.getUser());
                 }).collect(Collectors.toList());
-    }
-
-    private static Predicate<AccountHistory> checkIfPreviousValueIsDifferent(Map<String, AccountHistory> histories) {
-
-        AccountHistory defaultPreviousHistory = new AccountHistory();
-        if (histories.isEmpty()) {
-            defaultPreviousHistory.setValue(DEFAULT_HISTORY_VALUE);
-        }
-        Function<String, JsonNode> previousValue = (String field) -> histories.getOrDefault(field, defaultPreviousHistory).getValue();
-
-        return (AccountHistory history) -> !Objects.equals(history.getValue(), previousValue.apply(history.getField()));
-
     }
 
     private AccountHistoryDao dao() {

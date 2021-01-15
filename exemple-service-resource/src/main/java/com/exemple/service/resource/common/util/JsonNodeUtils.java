@@ -1,7 +1,5 @@
 package com.exemple.service.resource.common.util;
 
-import java.util.Arrays;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -12,14 +10,6 @@ public final class JsonNodeUtils {
 
     private JsonNodeUtils() {
 
-    }
-
-    public static JsonNode clone(JsonNode resource, String... fields) {
-
-        ObjectNode node = ((ObjectNode) resource).deepCopy();
-        Arrays.stream(fields).forEach(node::remove);
-
-        return node;
     }
 
     public static JsonNode init() {

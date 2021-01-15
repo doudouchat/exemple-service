@@ -32,9 +32,9 @@ public class NotEmptyConstraintValidatorTest extends AbstractTestNGSpringContext
         Account model = new Account();
         model.setEmail("jean.dupont@gmail.com");
 
-        UUID id = UUID.randomUUID();
+        UUID id = resource.save(JsonNodeUtils.create(model));
 
-        JsonNode account = resource.save(id, JsonNodeUtils.create(model));
+        JsonNode account = resource.get(id).get();
         assertThat(account.get("email"), is(notNullValue()));
 
     }
@@ -53,7 +53,7 @@ public class NotEmptyConstraintValidatorTest extends AbstractTestNGSpringContext
     @Test(dataProvider = "failures", expectedExceptions = ConstraintViolationException.class)
     public void updateFailure(JsonNode account) {
 
-        resource.save(UUID.randomUUID(), account);
+        resource.save(account);
     }
 
 }

@@ -65,7 +65,7 @@ public class CustomerScriptFactoryTest extends AbstractTestNGSpringContextTests 
 
         JsonNode model = JsonNodeUtils.create(Collections.singletonMap("TEST_KEY", "TEST_VALUE"));
 
-        Mockito.when(resource.save(Mockito.any(UUID.class), Mockito.eq(model))).thenReturn(model);
+        Mockito.when(resource.save(Mockito.eq(model))).thenReturn(UUID.randomUUID());
 
         JsonNode account = service.save(JsonNodeUtils.init());
         assertThat(account, is(notNullValue()));

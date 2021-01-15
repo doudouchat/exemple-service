@@ -72,7 +72,7 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
         model.setOptinEmail(true);
         model.setCivility("Mr");
 
-        Mockito.when(resource.save(Mockito.any(UUID.class), Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.create(model));
+        Mockito.when(resource.save(Mockito.any(JsonNode.class))).thenReturn(UUID.randomUUID());
         Mockito.when(schemaFilter.filter(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class),
                 Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.create(model));
 
@@ -85,7 +85,7 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
         assertThat(account, hasJsonField("opt_in_email", true));
         assertThat(account, hasJsonField("civility", "Mr"));
 
-        Mockito.verify(resource).save(Mockito.any(UUID.class), Mockito.any(JsonNode.class));
+        Mockito.verify(resource).save(Mockito.any(JsonNode.class));
 
     }
 
@@ -99,7 +99,7 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
         UUID id = UUID.randomUUID();
 
         Mockito.when(resource.get(Mockito.eq(id))).thenReturn(Optional.of(JsonNodeUtils.create(model)));
-        Mockito.when(resource.save(Mockito.eq(id), Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.create(model));
+        Mockito.doNothing().when(resource).save(Mockito.eq(id), Mockito.any(JsonNode.class), Mockito.any(JsonNode.class));
         Mockito.when(schemaFilter.filter(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class),
                 Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.create(model));
 
@@ -118,7 +118,7 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
         assertThat(account, hasJsonField("lastname", "Dupont"));
 
         Mockito.verify(resource).get(Mockito.eq(id));
-        Mockito.verify(resource).save(Mockito.eq(id), Mockito.any(JsonNode.class));
+        Mockito.verify(resource).save(Mockito.eq(id), Mockito.any(JsonNode.class), Mockito.any(JsonNode.class));
 
     }
 

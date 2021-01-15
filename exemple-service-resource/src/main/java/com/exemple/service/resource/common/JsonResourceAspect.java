@@ -16,14 +16,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 @Component
 public class JsonResourceAspect {
 
-    @Around("@within(org.springframework.stereotype.Service) "
-            + "&& execution(public com.fasterxml.jackson.databind.JsonNode com.exemple.service.resource..*.*(..))")
-    public JsonNode returnJsonNode(ProceedingJoinPoint joinPoint) throws Throwable {
-
-        return JsonNodeFilterUtils.clean((JsonNode) joinPoint.proceed());
-
-    }
-
     @Around("@within(org.springframework.stereotype.Service) && execution(public java.util.Optional<com.fasterxml.jackson.databind.JsonNode> "
             + "com.exemple.service.resource..*.*(..))")
     public Optional<JsonNode> returnOptionalJsonNode(ProceedingJoinPoint joinPoint) throws Throwable {
