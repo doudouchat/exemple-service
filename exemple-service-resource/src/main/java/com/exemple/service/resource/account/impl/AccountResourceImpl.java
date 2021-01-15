@@ -50,23 +50,31 @@ public class AccountResourceImpl implements AccountResource {
     }
 
     @Override
-    public JsonNode save(UUID id, JsonNode source) {
+    public UUID save(JsonNode source) {
+
+        UUID id = UUID.randomUUID();
+
+        save(id, source);
+
+        return id;
+
+    }
+
+    @Override
+    public void save(UUID id, JsonNode source) {
 
         LOG.debug("save account {} {}", id, source);
 
         OffsetDateTime now = ServiceContextExecution.context().getDate();
 
-        JsonNode accountNode = JsonNodeUtils.clone(source);
-        JsonNodeUtils.set(accountNode, id, AccountField.ID.field);
-        Insert account = jsonQueryBuilder.insert(accountNode);
+        JsonNodeUtils.set(source, id, AccountField.ID.field);
+        Insert account = jsonQueryBuilder.insert(source);
 
         BatchStatementBuilder batch = new BatchStatementBuilder(BatchType.LOGGED);
         batch.addStatement(account.build());
-        accountHistoryResource.saveHistories(id, accountNode, now).forEach(batch::addStatements);
+        accountHistoryResource.saveHistories(id, source, get(id).orElse(JsonNodeUtils.init()), now).forEach(batch::addStatements);
 
         session.execute(batch.build());
-
-        return accountNode;
 
     }
 

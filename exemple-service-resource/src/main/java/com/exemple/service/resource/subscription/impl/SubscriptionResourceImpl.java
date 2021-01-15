@@ -44,9 +44,8 @@ public class SubscriptionResourceImpl implements SubscriptionResource {
     }
 
     @Override
-    public void save(String email, JsonNode source) {
+    public void save(String email, JsonNode subscription) {
 
-        JsonNode subscription = JsonNodeUtils.clone(source);
         JsonNodeUtils.set(subscription, email, SubscriptionField.EMAIL.field);
 
         session.execute(jsonQueryBuilder.insert(subscription).build());

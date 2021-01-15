@@ -50,9 +50,9 @@ public class AccountServiceImpl implements AccountService {
 
         validate(source);
 
-        source = customiseResourceHelper.customise(ACCOUNT, source);
+        JsonNode account = customiseResourceHelper.customise(ACCOUNT, source);
 
-        JsonNode account = accountResource.save(UUID.randomUUID(), source);
+        accountResource.save(account);
 
         publish(account, EventType.CREATE);
 
@@ -68,13 +68,13 @@ public class AccountServiceImpl implements AccountService {
 
         validate(source, old);
 
-        source = customiseResourceHelper.customise(ACCOUNT, source, old);
+        JsonNode account = customiseResourceHelper.customise(ACCOUNT, source, old);
 
-        JsonNode account = accountResource.save(id, source);
+        accountResource.save(id, account);
 
         publish(account, EventType.UPDATE);
 
-        return filter(source);
+        return filter(account);
     }
 
     @Override
