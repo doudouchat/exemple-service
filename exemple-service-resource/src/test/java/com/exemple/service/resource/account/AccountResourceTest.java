@@ -69,7 +69,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         model.setEmail("jean.dupont@gmail.com");
 
         model.setAddresses(new HashMap<>());
-        model.getAddresses().put("home", new Address("1 rue de de la poste", null, null, null));
+        model.getAddresses().put("home", new Address("1 rue de la poste", null, null, null));
         model.getAddresses().put("job", new Address("1 rue de paris", null, null, 5));
 
         model.setCgus(new HashSet<>());
@@ -84,14 +84,18 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
         List<AccountHistory> histories = accountHistoryResource.findById(id);
 
-        assertThat(histories, is(hasSize(4)));
+        assertThat(histories, is(hasSize(7)));
 
         assertHistory(accountHistoryResource.findByIdAndField(id, "/email"), this.account.get("email"),
                 ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses"), this.account.get("addresses"),
+        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/street"), "1 rue de la poste",
                 ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus"), this.account.get("cgus"),
+        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/job/street"), "1 rue de paris",
                 ServiceContextExecution.context().getDate().toInstant());
+        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/job/floor"), 5,
+                ServiceContextExecution.context().getDate().toInstant());
+        assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/code"), "code_1", ServiceContextExecution.context().getDate().toInstant());
+        assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/version"), "v1", ServiceContextExecution.context().getDate().toInstant());
         assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id.toString(), ServiceContextExecution.context().getDate().toInstant());
 
     }
@@ -136,8 +140,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
         AccountHistory previousHistoryEmail = accountHistoryResource.findByIdAndField(id, "/email");
         AccountHistory previousHistoryId = accountHistoryResource.findByIdAndField(id, "/id");
-        AccountHistory previousHistoryAddresses = accountHistoryResource.findByIdAndField(id, "/addresses");
-        AccountHistory previousHistoryCgus = accountHistoryResource.findByIdAndField(id, "/cgus");
+        AccountHistory previousHistoryCgus = accountHistoryResource.findByIdAndField(id, "/cgus/0/code");
 
         resource.save(id, JsonNodeUtils.create(model), this.account);
 
@@ -160,22 +163,22 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
         List<AccountHistory> histories = accountHistoryResource.findById(id);
 
-        assertThat(histories, is(hasSize(10)));
+        assertThat(histories, is(hasSize(12)));
 
         assertHistory(accountHistoryResource.findByIdAndField(id, "/email"), previousHistoryEmail.getValue(), previousHistoryEmail.getDate());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses"), previousHistoryAddresses.getValue(),
-                previousHistoryAddresses.getDate());
         assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/street"), addresses.get("home").getStreet(),
-                ServiceContextExecution.context().getDate().toInstant());
+                ServiceContextExecution.context().getDate().toInstant(), JsonNodeType.STRING);
         assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/floor"), addresses.get("home").getFloor(),
                 ServiceContextExecution.context().getDate().toInstant());
         assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/job"), JsonNodeType.NULL,
                 ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/holidays"), addresses.get("holidays"),
+        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/holidays/street"), addresses.get("holidays").getStreet(),
                 ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus"), previousHistoryCgus.getValue(), previousHistoryCgus.getDate());
+        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/holidays/floor"), addresses.get("holidays").getFloor(),
+                ServiceContextExecution.context().getDate().toInstant());
+        assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/code"), previousHistoryCgus.getValue(), previousHistoryCgus.getDate());
         assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/version"), cgu1.getVersion(),
-                ServiceContextExecution.context().getDate().toInstant());
+                ServiceContextExecution.context().getDate().toInstant(), JsonNodeType.STRING);
         assertHistory(accountHistoryResource.findByIdAndField(id, "/age"), model.get("age"), ServiceContextExecution.context().getDate().toInstant());
         assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), previousHistoryId.getValue(), previousHistoryId.getDate());
     }
@@ -190,9 +193,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         model.put("email", null);
 
         AccountHistory previousHistoryEmail = accountHistoryResource.findByIdAndField(id, "/email");
-        AccountHistory previousHistoryCgus = accountHistoryResource.findByIdAndField(id, "/cgus");
         AccountHistory previousHistoryAge = accountHistoryResource.findByIdAndField(id, "/age");
-        AccountHistory previousHistoryAddresses = accountHistoryResource.findByIdAndField(id, "/addresses");
 
         resource.save(id, JsonNodeUtils.create(model), this.account);
 
@@ -205,15 +206,15 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
         List<AccountHistory> histories = accountHistoryResource.findById(id);
 
-        assertThat(histories, is(hasSize(10)));
+        assertThat(histories, is(hasSize(14)));
 
         assertHistory(accountHistoryResource.findByIdAndField(id, "/email"), JsonNodeType.NULL, previousHistoryEmail.getValue(),
                 ServiceContextExecution.context().getDate().toInstant());
         assertHistory(accountHistoryResource.findByIdAndField(id, "/age"), JsonNodeType.NULL, previousHistoryAge.getValue(),
                 ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus"), JsonNodeType.NULL, previousHistoryCgus.getValue(),
+        assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus"), JsonNodeType.NULL,
                 ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses"), JsonNodeType.NULL, previousHistoryAddresses.getValue(),
+        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses"), JsonNodeType.NULL,
                 ServiceContextExecution.context().getDate().toInstant());
     }
 
@@ -244,25 +245,40 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
     private static void assertHistory(AccountHistory accountHistory, JsonNodeType expectedValue, Instant expectedDate) {
 
+        assertHistory(accountHistory, expectedValue, expectedDate, JsonNodeType.NULL);
+
+    }
+
+    private static void assertHistory(AccountHistory accountHistory, JsonNodeType expectedValue, Instant expectedDate,
+            JsonNodeType expectedPreviousJsonNodeType) {
+
         assertThat(accountHistory.getValue().getNodeType(), is(expectedValue));
         assertThat(accountHistory.getDate(), is(expectedDate));
-        assertThat(accountHistory.getPreviousValue().getNodeType(), is(JsonNodeType.NULL));
+        assertThat(accountHistory.getPreviousValue().getNodeType(), is(expectedPreviousJsonNodeType));
         assertHistory(accountHistory);
 
     }
 
     private static void assertHistory(AccountHistory accountHistory, Object expectedValue, Instant expectedDate) {
 
-        assertHistory(accountHistory, JsonNodeFilterUtils.clean(JsonNodeUtils.create(expectedValue)), expectedDate);
+        assertHistory(accountHistory, JsonNodeFilterUtils.clean(JsonNodeUtils.create(expectedValue)), expectedDate, JsonNodeType.NULL);
 
     }
 
-    private static void assertHistory(AccountHistory accountHistory, String expectedValue, Instant expectedDate) {
+    private static void assertHistory(AccountHistory accountHistory, JsonNode expectedValue, Instant expectedDate,
+            JsonNodeType expectedPreviousJsonNodeType) {
 
-        assertThat(accountHistory.getValue().textValue(), is(expectedValue));
+        assertThat(accountHistory.getValue(), is(expectedValue));
         assertThat(accountHistory.getDate(), is(expectedDate));
-        assertThat(accountHistory.getPreviousValue().getNodeType(), is(JsonNodeType.NULL));
+        assertThat(accountHistory.getPreviousValue().getNodeType(), is(expectedPreviousJsonNodeType));
         assertHistory(accountHistory);
+
+    }
+
+    private static void assertHistory(AccountHistory accountHistory, Object expectedValue, Instant expectedDate,
+            JsonNodeType expectedPreviousJsonNodeType) {
+
+        assertHistory(accountHistory, JsonNodeFilterUtils.clean(JsonNodeUtils.create(expectedValue)), expectedDate, expectedPreviousJsonNodeType);
 
     }
 

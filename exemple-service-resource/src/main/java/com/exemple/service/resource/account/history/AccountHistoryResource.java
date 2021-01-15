@@ -2,7 +2,6 @@ package com.exemple.service.resource.account.history;
 
 import java.time.OffsetDateTime;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -23,12 +22,11 @@ import com.exemple.service.resource.account.history.dao.AccountHistoryDao;
 import com.exemple.service.resource.account.history.mapper.AccountHistoryMapper;
 import com.exemple.service.resource.account.model.AccountHistory;
 import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
+import com.exemple.service.resource.common.util.JsonPatchUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.flipkart.zjsonpatch.DiffFlags;
-import com.flipkart.zjsonpatch.JsonDiff;
 import com.google.common.collect.Streams;
 
 @Component
@@ -74,8 +72,7 @@ public class AccountHistoryResource {
         PreparedStatement prepared = session.prepare("INSERT INTO " + ResourceExecutionContext.get().keyspace()
                 + ".account_history (id,date,field,value,previous_value,application,version,user) VALUES (?,?,?,?,?,?,?,?)");
 
-        ArrayNode patch = (ArrayNode) JsonDiff.asJson(JsonNodeFilterUtils.clean(previousSource), JsonNodeFilterUtils.clean(source),
-                EnumSet.of(DiffFlags.OMIT_COPY_OPERATION, DiffFlags.OMIT_MOVE_OPERATION, DiffFlags.OMIT_VALUE_ON_REMOVE));
+        ArrayNode patch = JsonPatchUtils.diff(JsonNodeFilterUtils.clean(previousSource), JsonNodeFilterUtils.clean(source));
 
         return Streams.stream(patch.elements())
 
