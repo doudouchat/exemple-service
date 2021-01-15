@@ -50,9 +50,8 @@ public class JsonConstraintValidatorTest extends AbstractTestNGSpringContextTest
         model.setPreferences(new ArrayList<>());
         model.getPreferences().add(Arrays.asList("pref1", "value1", 10, "2001-01-01 00:00:00.000Z"));
 
-        UUID id = UUID.randomUUID();
-
-        JsonNode account = resource.save(id, JsonNodeUtils.create(model));
+        UUID id = resource.save(JsonNodeUtils.create(model));
+        JsonNode account = resource.get(id).get();
         assertThat(account.get("email"), is(notNullValue()));
         assertThat(account.get("address"), is(notNullValue()));
         assertThat(account.get("addresses"), is(notNullValue()));
@@ -110,9 +109,9 @@ public class JsonConstraintValidatorTest extends AbstractTestNGSpringContextTest
     @Test(dataProvider = "failures", expectedExceptions = ConstraintViolationException.class)
     public void saveFailure(String property, Object value) {
 
-        JsonNode node = JsonNodeUtils.clone(JsonNodeUtils.create(new Account()));
+        JsonNode node = JsonNodeUtils.create(new Account());
         JsonNodeUtils.set(node, value, property);
 
-        resource.save(UUID.randomUUID(), node);
+        resource.save(node);
     }
 }

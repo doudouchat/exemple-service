@@ -116,6 +116,13 @@
 			<artifactId>json-path</artifactId>
 		</dependency>
 
+		<!-- JSON PATCH -->
+
+		<dependency>
+			<groupId>com.flipkart.zjsonpatch</groupId>
+			<artifactId>zjsonpatch</artifactId>
+		</dependency>
+
 		<!-- TEST -->
 
 		<dependency>
