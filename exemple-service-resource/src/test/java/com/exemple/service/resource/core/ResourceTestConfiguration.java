@@ -27,7 +27,7 @@ import com.exemple.service.resource.core.cassandra.ResourceCassandraConfiguratio
 import com.github.nosan.embedded.cassandra.Cassandra;
 import com.github.nosan.embedded.cassandra.CassandraBuilder;
 import com.github.nosan.embedded.cassandra.commons.logging.Slf4jLogger;
-import com.github.nosan.embedded.cassandra.cql.CqlScript;
+import com.github.nosan.embedded.cassandra.cql.CqlDataSet;
 
 @Configuration
 @Import(ResourceConfiguration.class)
@@ -102,9 +102,7 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
 
         CqlSession session = this.session();
 
-        CqlScript.ofClassPath("cassandra/keyspace.cql").forEachStatement(session::execute);
-        CqlScript.ofClassPath("cassandra/test.cql").forEachStatement(session::execute);
-        CqlScript.ofClassPath("cassandra/exec.cql").forEachStatement(session::execute);
+        CqlDataSet.ofClassPaths("cassandra/keyspace.cql", "cassandra/test.cql", "cassandra/exec.cql").forEachStatement(session::execute);
 
         ServiceContextExecution.context().setApp("test");
     }
