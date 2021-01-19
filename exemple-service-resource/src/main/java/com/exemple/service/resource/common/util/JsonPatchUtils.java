@@ -35,14 +35,22 @@ public final class JsonPatchUtils {
 
     public static ArrayNode diff(JsonNode source, JsonNode target) {
 
-        ArrayNode patch = (ArrayNode) JsonDiff.asJson(source, target,
-                EnumSet.of(DiffFlags.OMIT_COPY_OPERATION, DiffFlags.OMIT_MOVE_OPERATION, DiffFlags.OMIT_VALUE_ON_REMOVE));
+        ArrayNode patchs = (ArrayNode) JsonDiff.asJson(source, target, EnumSet.of(DiffFlags.OMIT_COPY_OPERATION, DiffFlags.OMIT_MOVE_OPERATION));
 
         ArrayNode result = MAPPER.createArrayNode();
 
-        Streams.stream(patch.elements()).flatMap(JsonPatchUtils::completePatch).forEach(result::add);
+        Streams.stream(patchs.elements()).filter((JsonNode patch) -> !isRemoveOperation(patch)).flatMap(JsonPatchUtils::completePatch)
+                .forEach(result::add);
+
+        Streams.stream(patchs.elements()).filter(JsonPatchUtils::isRemoveOperation).forEach(result::add);
 
         return result;
+
+    }
+
+    public static boolean isRemoveOperation(JsonNode patch) {
+
+        return "remove".equals(patch.get(OP).textValue());
     }
 
     private static Stream<JsonNode> completePatch(JsonNode element) {

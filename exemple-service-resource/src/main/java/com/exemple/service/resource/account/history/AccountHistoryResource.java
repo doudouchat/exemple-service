@@ -38,6 +38,14 @@ public class AccountHistoryResource {
 
     private static final JsonNode DEFAULT_HISTORY_VALUE = new ObjectMapper().nullNode();
 
+    private static final AccountHistory DEFAULT_HISTORY;
+
+    static {
+
+        DEFAULT_HISTORY = new AccountHistory();
+        DEFAULT_HISTORY.setValue(DEFAULT_HISTORY_VALUE);
+    }
+
     private final CqlSession session;
 
     private final ConcurrentMap<String, AccountHistoryMapper> mappers;
@@ -67,41 +75,23 @@ public class AccountHistoryResource {
 
         Map<String, AccountHistory> histories = findById(id).stream().collect(Collectors.toMap(AccountHistory::getField, Function.identity()));
 
-        AccountHistory defaultHistory = new AccountHistory();
-        defaultHistory.setDate(now.toInstant().minusNanos(1));
-        defaultHistory.setValue(DEFAULT_HISTORY_VALUE);
-
-        ArrayNode patch = JsonPatchUtils.diff(JsonNodeFilterUtils.clean(previousSource), JsonNodeFilterUtils.clean(source));
+        ArrayNode patchs = JsonPatchUtils.diff(JsonNodeFilterUtils.clean(previousSource), JsonNodeFilterUtils.clean(source));
 
         Collection<BoundStatement> statements = new ArrayList<>();
 
         PreparedStatement insertStatement = session.prepare("INSERT INTO " + ResourceExecutionContext.get().keyspace()
-                + ".account_history (id,date,field,value,previous_value,application,version,user) VALUES (?,?,?,?,?,?,?,?)");
+                + ".account_history (id,date,previous_date, field,value,previous_value,application,previous_application, "
+                + "version,previous_version, user, previous_user) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
 
-        Streams.stream(patch.elements())
+        Streams.stream(patchs.elements())
 
-                .map((JsonNode element) -> {
-                    String path = element.get(JsonPatchUtils.PATH).asText();
-                    JsonNode value = element.path(JsonPatchUtils.VALUE);
-
-                    AccountHistory history = new AccountHistory();
-                    history.setId(id);
-                    history.setField(path);
-                    history.setDate(now.toInstant());
-                    history.setValue(value);
-                    history.setApplication(ServiceContextExecution.context().getApp());
-                    history.setVersion(ServiceContextExecution.context().getVersion());
-                    history.setUser(ServiceContextExecution.context().getPrincipal().getName());
-                    history.setPreviousValue(histories.getOrDefault(path, defaultHistory).getValue());
-
-                    return history;
-
-                })
+                .map((JsonNode patch) -> buildHistory(patch, id, now, histories))
 
                 .map((AccountHistory history) -> {
                     LOG.debug("save history account {} {} {}", history.getId(), history.getField(), history.getValue());
-                    return insertStatement.bind(history.getId(), history.getDate(), history.getField(), history.getValue(),
-                            history.getPreviousValue(), history.getApplication(), history.getVersion(), history.getUser());
+                    return insertStatement.bind(history.getId(), history.getDate(), history.getPreviousDate(), history.getField(), history.getValue(),
+                            history.getPreviousValue(), history.getApplication(), history.getPreviousApplication(), history.getVersion(),
+                            history.getPreviousVersion(), history.getUser(), history.getPreviousUser());
                 }).forEach(statements::add);
 
         PreparedStatement deleteStatement = session
@@ -109,7 +99,7 @@ public class AccountHistoryResource {
 
         histories.keySet().stream()
 
-                .filter((String path) -> patchNotContainsPath(patch, path))
+                .filter((String path) -> patchNotContainsPath(patchs, path))
 
                 .filter((String path) -> JsonNodeType.MISSING == source.at(path).getNodeType())
 
@@ -121,6 +111,33 @@ public class AccountHistoryResource {
                 .forEach(statements::add);
 
         return statements;
+    }
+
+    private static AccountHistory buildHistory(JsonNode patch, UUID id, OffsetDateTime now, Map<String, AccountHistory> histories) {
+
+        String path = patch.get(JsonPatchUtils.PATH).asText();
+        JsonNode value = patch.path(JsonPatchUtils.VALUE);
+
+        AccountHistory history = new AccountHistory();
+        history.setId(id);
+        history.setField(path);
+        history.setDate(now.toInstant());
+        history.setValue(value);
+        history.setPreviousValue(histories.getOrDefault(path, DEFAULT_HISTORY).getValue());
+        history.setApplication(ServiceContextExecution.context().getApp());
+        history.setVersion(ServiceContextExecution.context().getVersion());
+        history.setUser(ServiceContextExecution.context().getPrincipal().getName());
+        history.setPreviousApplication(histories.getOrDefault(path, DEFAULT_HISTORY).getApplication());
+        history.setPreviousDate(histories.getOrDefault(path, DEFAULT_HISTORY).getDate());
+        history.setPreviousUser(histories.getOrDefault(path, DEFAULT_HISTORY).getUser());
+        history.setPreviousVersion(histories.getOrDefault(path, DEFAULT_HISTORY).getVersion());
+
+        if (JsonPatchUtils.isRemoveOperation(patch)) {
+            history.setValue(DEFAULT_HISTORY_VALUE);
+            history.setPreviousValue(value);
+        }
+
+        return history;
     }
 
     private static boolean patchNotContainsPath(ArrayNode patch, String path) {

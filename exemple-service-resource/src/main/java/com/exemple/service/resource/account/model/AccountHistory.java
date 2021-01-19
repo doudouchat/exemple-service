@@ -29,8 +29,20 @@ public class AccountHistory {
 
     private String user;
 
+    @CqlName("previous_date")
+    private Instant previousDate;
+
     @CqlName("previous_value")
     private JsonNode previousValue;
+
+    @CqlName("previous_application")
+    private String previousApplication;
+
+    @CqlName("previous_version")
+    private String previousVersion;
+
+    @CqlName("previous_user")
+    private String previousUser;
 
     public UUID getId() {
         return id;
@@ -88,12 +100,44 @@ public class AccountHistory {
         this.user = user;
     }
 
+    public Instant getPreviousDate() {
+        return previousDate;
+    }
+
+    public void setPreviousDate(Instant previousDate) {
+        this.previousDate = previousDate;
+    }
+
     public JsonNode getPreviousValue() {
         return previousValue;
     }
 
     public void setPreviousValue(JsonNode previousValue) {
         this.previousValue = previousValue;
+    }
+
+    public String getPreviousApplication() {
+        return previousApplication;
+    }
+
+    public void setPreviousApplication(String previousApplication) {
+        this.previousApplication = previousApplication;
+    }
+
+    public String getPreviousVersion() {
+        return previousVersion;
+    }
+
+    public void setPreviousVersion(String previousVersion) {
+        this.previousVersion = previousVersion;
+    }
+
+    public String getPreviousUser() {
+        return previousUser;
+    }
+
+    public void setPreviousUser(String previousUser) {
+        this.previousUser = previousUser;
     }
 
 }

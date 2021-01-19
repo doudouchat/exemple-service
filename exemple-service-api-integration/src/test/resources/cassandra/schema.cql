@@ -61,7 +61,11 @@ CREATE TABLE IF NOT EXISTS account_history (
 	application text,
 	version text,
 	user text,
+	previous_date timestamp,
 	previous_value text,
+	previous_application text,
+	previous_version text,
+	previous_user text,
 	PRIMARY KEY ((id), field)
 );
 
