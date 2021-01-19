@@ -97,7 +97,7 @@ public class JsonPatchUtilsTest {
 
         assertThat(result.get(3).get(JsonPatchUtils.OP).textValue(), is("remove"));
         assertThat(result.get(3).get(JsonPatchUtils.PATH).textValue(), is("/addresses/job"));
-        assertThat(result.get(3).path(JsonPatchUtils.VALUE).getNodeType(), is(JsonNodeType.MISSING));
+        assertThat(result.get(3).path(JsonPatchUtils.VALUE), is(JsonNodeUtils.create(new Address("1 rue de la paix", "Paris"))));
 
     }
 
