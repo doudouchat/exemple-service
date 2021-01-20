@@ -1,0 +1,25 @@
+{
+	"optin_mobile": true,
+	"birthday": "1967-06-15",
+	"firstname": "Jean",
+	"addresses": {
+		"job": {
+			"city": "Paris",
+			"street": "rue de la paix"
+		},
+		"home": {
+			"city": "Lyon",
+			"street": "rue de la poste"
+		}
+	},
+	"civility": "Mr",
+	"mobile": "0610203040",
+	"cgus": [
+		{
+			"code": "code_1",
+			"version": "v0"
+		}
+	],
+	"email": "963508ad-470e-4cf8-9576-cfae70ad9a1e@gmail.com",
+	"lastname": "Dupont"
+}
