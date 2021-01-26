@@ -201,12 +201,6 @@
 				<version>${datastax-version}</version>
 			</dependency>
 
-			<dependency>
-				<groupId>com.datastax.oss</groupId>
-				<artifactId>native-protocol</artifactId>
-				<version>1.4.11</version>
-			</dependency>
-
 			<!-- HAZELCAST -->
 
 			<dependency>
