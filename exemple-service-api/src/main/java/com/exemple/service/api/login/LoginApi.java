@@ -1,5 +1,7 @@
 package com.exemple.service.api.login;
 
+import java.util.UUID;
+
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -159,6 +161,28 @@ public class LoginApi {
         authorizationCheckService.verifyLogin(login, (ApiSecurityContext) servletContext.getSecurityContext());
 
         return loginService.get(login);
+
+    }
+
+    @GET
+    @Path("/id/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(tags = "login", security = { @SecurityRequirement(name = DocumentApiResource.BEARER_AUTH),
+            @SecurityRequirement(name = DocumentApiResource.OAUTH2_PASS) })
+    @ApiResponses(value = {
+
+            @ApiResponse(description = "Login Data", responseCode = "200", content = @Content(schema = @Schema(ref = LOGIN_SCHEMA))),
+            @ApiResponse(description = "Login is not found", responseCode = "404"),
+            @ApiResponse(description = "Login is not accessible", responseCode = "403")
+
+    })
+    @RolesAllowed("login:read")
+    public ArrayNode getById(@NotNull @PathParam("id") UUID id, @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam)
+            throws LoginServiceException {
+
+        authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
+
+        return loginService.get(id);
 
     }
 

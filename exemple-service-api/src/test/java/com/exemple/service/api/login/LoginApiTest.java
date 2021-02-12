@@ -51,7 +51,7 @@ public class LoginApiTest extends JerseySpringSupport {
 
     public static final String URL = "/v1/logins";
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    protected static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Test
     public void check() throws Exception {
@@ -169,6 +169,44 @@ public class LoginApiTest extends JerseySpringSupport {
                 .get();
 
         Mockito.verify(service).get(Mockito.eq(login));
+
+        assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
+
+    }
+
+    @Test
+    public void getById() throws Exception {
+
+        UUID id = UUID.randomUUID();
+
+        Mockito.when(service.get(Mockito.eq(id))).thenReturn(MAPPER.createArrayNode());
+
+        Response response = target(URL + "/id/" + id).request(MediaType.APPLICATION_JSON)
+
+                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
+
+                .get();
+
+        Mockito.verify(service).get(Mockito.eq(id));
+
+        assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+
+    }
+
+    @Test
+    public void getByIdFailure() throws Exception {
+
+        UUID id = UUID.randomUUID();
+
+        Mockito.when(service.get(Mockito.eq(id))).thenThrow(new LoginServiceNotFoundException());
+
+        Response response = target(URL + "/id/" + id).request(MediaType.APPLICATION_JSON)
+
+                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
+
+                .get();
+
+        Mockito.verify(service).get(Mockito.eq(id));
 
         assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
 

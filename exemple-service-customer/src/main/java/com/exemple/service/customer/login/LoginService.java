@@ -1,5 +1,7 @@
 package com.exemple.service.customer.login;
 
+import java.util.UUID;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -19,5 +21,7 @@ public interface LoginService {
     void delete(@NotBlank String login);
 
     JsonNode get(@NotBlank String login) throws LoginServiceNotFoundException;
+
+    ArrayNode get(@NotNull UUID id) throws LoginServiceNotFoundException;
 
 }

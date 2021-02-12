@@ -1,5 +1,9 @@
 package com.exemple.service.customer.login.impl;
 
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 import com.exemple.service.context.ServiceContext;
@@ -16,11 +20,14 @@ import com.exemple.service.schema.filter.SchemaFilter;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.flipkart.zjsonpatch.JsonPatch;
 
 @Service
 public class LoginServiceImpl implements LoginService {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private static final String LOGIN = "login";
 
@@ -96,6 +103,22 @@ public class LoginServiceImpl implements LoginService {
         return filter(source);
     }
 
+    @Override
+    public ArrayNode get(UUID id) throws LoginServiceNotFoundException {
+
+        List<JsonNode> sources = loginResource.get(id);
+
+        if (sources.isEmpty()) {
+            throw new LoginServiceNotFoundException();
+        }
+
+        ArrayNode logins = MAPPER.createArrayNode();
+
+        filter(sources).forEach(logins::add);
+
+        return logins;
+    }
+
     private void createLogin(JsonNode source) {
 
         try {
@@ -115,6 +138,14 @@ public class LoginServiceImpl implements LoginService {
         ServiceContext context = ServiceContextExecution.context();
 
         return schemaFilter.filter(context.getApp(), context.getVersion(), LOGIN, context.getProfile(), source);
+    }
+
+    private List<JsonNode> filter(List<JsonNode> sources) {
+
+        ServiceContext context = ServiceContextExecution.context();
+
+        return sources.stream().map(source -> schemaFilter.filter(context.getApp(), context.getVersion(), LOGIN, context.getProfile(), source))
+                .collect(Collectors.toList());
     }
 
     private void validate(JsonNode source) {
