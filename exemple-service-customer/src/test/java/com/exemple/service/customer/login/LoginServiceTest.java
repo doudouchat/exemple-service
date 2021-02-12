@@ -4,9 +4,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -241,6 +244,33 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
         Mockito.when(resource.get(Mockito.eq(login))).thenReturn(Optional.empty());
 
         service.get(login);
+
+    }
+
+    @Test
+    public void getById() throws LoginServiceNotFoundException {
+
+        UUID id = UUID.randomUUID();
+
+        Mockito.when(resource.get(Mockito.eq(id))).thenReturn(Arrays.asList(JsonNodeUtils.init(), JsonNodeUtils.init()));
+
+        ArrayNode data = service.get(id);
+
+        assertThat(data, is(notNullValue()));
+        assertThat(data.size(), is(2));
+
+        Mockito.verify(resource).get(Mockito.eq(id));
+
+    }
+
+    @Test(expectedExceptions = LoginServiceNotFoundException.class)
+    public void getByIdNotFound() throws LoginServiceNotFoundException {
+
+        UUID id = UUID.randomUUID();
+
+        Mockito.when(resource.get(Mockito.eq(id))).thenReturn(Collections.emptyList());
+
+        service.get(id);
 
     }
 
