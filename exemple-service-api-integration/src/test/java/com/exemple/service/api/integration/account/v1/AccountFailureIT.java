@@ -1,10 +1,10 @@
 package com.exemple.service.api.integration.account.v1;
 
 import static com.exemple.service.api.integration.account.v1.AccountNominalIT.ID;
-import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.APP_HEADER;
-import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.TEST_APP;
-import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.VERSION_HEADER;
-import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.VERSION_V1;
+import static com.exemple.service.api.integration.core.InitData.APP_HEADER;
+import static com.exemple.service.api.integration.core.InitData.TEST_APP;
+import static com.exemple.service.api.integration.core.InitData.VERSION_HEADER;
+import static com.exemple.service.api.integration.core.InitData.VERSION_V1;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
