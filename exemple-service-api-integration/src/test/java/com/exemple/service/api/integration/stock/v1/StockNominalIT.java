@@ -1,7 +1,7 @@
 package com.exemple.service.api.integration.stock.v1;
 
-import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.APP_HEADER;
-import static com.exemple.service.api.integration.core.IntegrationTestConfiguration.BACK_APP;
+import static com.exemple.service.api.integration.core.InitData.APP_HEADER;
+import static com.exemple.service.api.integration.core.InitData.BACK_APP;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 

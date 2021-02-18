@@ -34,8 +34,14 @@ api:
          port: ${kafka.port}
          defaultTopic: test
          dir: ${project.build.directory}/kafka
-      cassandra:
-         port: ${cassandra.port}
-         version: ${cassandra-version}
-         startup_timeout: 240
-         scripts: ${project.build.testOutputDirectory}/cassandra/schema.cql, ${project.build.testOutputDirectory}/cassandra/exec.cql, ${project.build.testOutputDirectory}/cassandra/other.cql
+cassandra:
+   embedded:
+      config-properties:
+         native_transport_port: ${cassandra.port}
+      startup-timeout: 240s
+      version: ${cassandra-version}
+      logger: Cassandra
+      environment-variables:
+         MAX_HEAP_SIZE: 64M
+         HEAP_NEWSIZE: 12M
+      scripts: ${project.build.testOutputDirectory}/cassandra/schema.cql, ${project.build.testOutputDirectory}/cassandra/exec.cql, ${project.build.testOutputDirectory}/cassandra/other.cql
