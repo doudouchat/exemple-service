@@ -1,0 +1,89 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>exemple</groupId>
+		<artifactId>exemple-service</artifactId>
+		<version>2.0.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>exemple-service-api-embedded</artifactId>
+	<packaging>war</packaging>
+
+	<dependencies>
+
+		<!-- SERVICE API -->
+
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>exemple-service-api</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+		</dependency>
+
+		<!-- CASSANDRA EMBEDDED -->
+
+		<dependency>
+			<groupId>com.github.nosan</groupId>
+			<artifactId>embedded-cassandra</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- CURATOR -->
+
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-test</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- SPRING KAFKA -->
+
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka-test</artifactId>
+			<scope>runtime</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.module</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+
+		<plugins>
+
+			<!-- WAR -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+					<overlays>
+						<overlay>
+							<id>cassandra</id>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>exemple-service-api</artifactId>
+						</overlay>
+					</overlays>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+
+		</plugins>
+
+	</build>
+
+
+</project>
