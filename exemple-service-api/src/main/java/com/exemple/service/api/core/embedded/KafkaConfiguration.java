@@ -15,7 +15,7 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import kafka.server.KafkaConfig;
 
 @Configuration
-@ConditionalOnProperty(value = { "port", "dir", "defaultTopic" }, prefix = "api.embedded.kafka")
+@ConditionalOnProperty(value = { "port", "dir", "defaultTopic" }, prefix = "kafka.embedded")
 public class KafkaConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaConfiguration.class);
@@ -26,8 +26,8 @@ public class KafkaConfiguration {
 
     private final String defaultTopic;
 
-    public KafkaConfiguration(@Value("${api.embedded.kafka.port}") int kafkaPort, @Value("${api.embedded.kafka.dir}") String logDir,
-            @Value("${api.embedded.kafka.defaultTopic}") String defaultTopic) {
+    public KafkaConfiguration(@Value("${kafka.embedded.port}") int kafkaPort, @Value("${kafka.embedded.dir}") String logDir,
+            @Value("${kafka.embedded.defaultTopic}") String defaultTopic) {
         this.kafkaPort = kafkaPort;
         this.logDir = logDir;
         this.defaultTopic = defaultTopic;
