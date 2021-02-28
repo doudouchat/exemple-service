@@ -5,18 +5,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@ConditionalOnProperty(value = "port", prefix = "zookeeper.embedded")
 @ConditionalOnClass(TestingServer.class)
-public class ZookeeperConfiguration {
+public class EmbeddedZookeeperAutoConfiguration {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ZookeeperConfiguration.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EmbeddedZookeeperAutoConfiguration.class);
 
     private final int port;
 
-    public ZookeeperConfiguration(@Value("${zookeeper.embedded.port:-1}") int port) {
+    public EmbeddedZookeeperAutoConfiguration(@Value("${zookeeper.embedded.port:-1}") int port) {
         this.port = port;
     }
 
