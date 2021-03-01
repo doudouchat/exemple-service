@@ -1,6 +1,18 @@
 resource:
    cassandra:
       resource_configuration: file:/usr/local/tomcat/etc/cassandra.conf
+management:
+   endpoints:
+      web:
+         exposure:
+            include:
+             - info
+             - health
+   endpoint:
+      info:
+         enabled: true
+      health:
+         enabled: true
 customer:
    contexts:
       path: /usr/local/tomcat/etc/contexts

@@ -1,6 +1,18 @@
 spring:
    hazelcast:
       config: file:${project.build.testOutputDirectory}/hazelcast.yaml
+management:
+   endpoints:
+      web:
+         exposure:
+            include:
+             - info
+             - health
+   endpoint:
+      info:
+         enabled: true
+      health:
+         enabled: true
 resource:
    cassandra:
       resource_configuration: file:${project.build.testOutputDirectory}/cassandra.conf
