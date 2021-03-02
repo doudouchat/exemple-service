@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.exemple.service.api.core.embedded.EmbeddedZookeeperAutoConfiguration
+com.exemple.service.api.core.embedded.EmbeddedZookeeperAutoConfiguration,\
+com.exemple.service.api.core.embedded.EmbeddedKafkaAutoConfiguration
