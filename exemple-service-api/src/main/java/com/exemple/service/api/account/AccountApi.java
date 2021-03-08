@@ -34,7 +34,7 @@ import com.exemple.service.customer.account.exception.AccountServiceException;
 import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
 import com.exemple.service.resource.account.AccountField;
 import com.exemple.service.resource.common.validator.NotEmpty;
-import com.exemple.service.schema.validation.SchemaValidation;
+import com.exemple.service.schema.validation.annotation.Patch;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -59,17 +59,14 @@ public class AccountApi {
 
     private final AccountService service;
 
-    private final SchemaValidation schemaValidation;
-
     private final AuthorizationCheckService authorizationCheckService;
 
     @Context
     private ContainerRequestContext servletContext;
 
-    public AccountApi(AccountService service, SchemaValidation schemaValidation, AuthorizationCheckService authorizationCheckService) {
+    public AccountApi(AccountService service, AuthorizationCheckService authorizationCheckService) {
 
         this.service = service;
-        this.schemaValidation = schemaValidation;
         this.authorizationCheckService = authorizationCheckService;
     }
 
@@ -131,12 +128,11 @@ public class AccountApi {
 
     })
     @RolesAllowed("account:update")
-    public Response update(@NotNull @PathParam("id") UUID id, @NotEmpty @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch,
+    public Response update(@NotNull @PathParam("id") UUID id,
+            @NotEmpty @Patch @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws AccountServiceException {
 
         authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
-
-        schemaValidation.validatePatch(patch);
 
         service.save(id, patch);
 

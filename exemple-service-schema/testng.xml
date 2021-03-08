@@ -5,6 +5,7 @@
 		<packages>
 			<package name="com.exemple.service.schema.filter" />
 			<package name="com.exemple.service.schema.validation" />
+			<package name="com.exemple.service.schema.validation.annotation" />
 			<package name="com.exemple.service.schema.description" />
 		</packages>
 	</test>
