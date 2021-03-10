@@ -22,11 +22,14 @@ import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.customer.subscription.SubscriptionService;
+import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.schema.description.SchemaDescription;
+import com.exemple.service.schema.filter.SchemaFilter;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.exemple.service.store.stock.StockService;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Sets;
 
 @Configuration
@@ -45,6 +48,17 @@ public class ApiTestConfiguration extends ApiConfiguration {
     @Bean
     public SchemaValidation schemaValidation() {
         return Mockito.mock(SchemaValidation.class);
+    }
+
+    @Bean
+    public SchemaFilter schemaFilter() {
+
+        SchemaFilter schemaFilter = Mockito.mock(SchemaFilter.class);
+
+        Mockito.when(schemaFilter.filter(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class),
+                Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.init());
+
+        return schemaFilter;
     }
 
     @Bean

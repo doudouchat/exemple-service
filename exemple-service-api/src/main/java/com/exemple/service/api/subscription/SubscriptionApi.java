@@ -23,10 +23,13 @@ import javax.ws.rs.ext.Provider;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.model.SchemaBeanParam;
+import com.exemple.service.api.common.schema.FilterHelper;
+import com.exemple.service.api.common.schema.ValidationHelper;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.subscription.SubscriptionService;
-import com.exemple.service.customer.subscription.exception.SubscriptionServiceException;
 import com.exemple.service.customer.subscription.exception.SubscriptionServiceNotFoundException;
+import com.exemple.service.resource.common.util.JsonNodeUtils;
+import com.exemple.service.resource.subscription.SubscriptionField;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -48,14 +51,22 @@ public class SubscriptionApi {
 
     private static final String SUBSCRIPTION_SCHEMA = "Subscription";
 
+    private static final String SUBSCRIPTION_RESOURCE = "subscription";
+
     private final SubscriptionService service;
+
+    private final ValidationHelper schemaValidation;
+
+    private final FilterHelper schemaFilter;
 
     @Context
     private ContainerRequestContext servletContext;
 
-    public SubscriptionApi(SubscriptionService service) {
+    public SubscriptionApi(SubscriptionService service, ValidationHelper schemaValidation, FilterHelper schemaFilter) {
 
         this.service = service;
+        this.schemaValidation = schemaValidation;
+        this.schemaFilter = schemaFilter;
     }
 
     @GET
@@ -71,9 +82,11 @@ public class SubscriptionApi {
     })
     @RolesAllowed("subscription:read")
     public JsonNode get(@NotNull @PathParam("email") String email,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws SubscriptionServiceException {
+            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws SubscriptionServiceNotFoundException {
 
-        return service.get(email);
+        JsonNode subscription = service.get(email);
+
+        return schemaFilter.filter(subscription, SUBSCRIPTION_RESOURCE, servletContext);
 
     }
 
@@ -95,7 +108,10 @@ public class SubscriptionApi {
             @NotNull @Parameter(schema = @Schema(ref = SUBSCRIPTION_SCHEMA)) JsonNode subscription,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam, @Context UriInfo uriInfo) {
 
-        boolean created = service.save(email, subscription);
+        JsonNodeUtils.set(subscription, email, SubscriptionField.EMAIL.field);
+        schemaValidation.validate(subscription, SUBSCRIPTION_RESOURCE, servletContext);
+
+        boolean created = service.save(subscription);
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
         builder.path(email);

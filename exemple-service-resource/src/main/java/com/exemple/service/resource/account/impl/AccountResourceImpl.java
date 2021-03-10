@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 
 import com.datastax.oss.driver.api.core.CqlSession;
@@ -54,25 +55,27 @@ public class AccountResourceImpl implements AccountResource {
 
         UUID id = UUID.randomUUID();
 
-        save(id, source, JsonNodeUtils.init());
+        JsonNodeUtils.set(source, id, AccountField.ID.field);
+        save(source, JsonNodeUtils.init());
 
         return id;
 
     }
 
     @Override
-    public void save(UUID id, JsonNode source, JsonNode previousAccount) {
+    public void save(JsonNode source, JsonNode previousAccount) {
 
-        LOG.debug("save account {} {}", id, source);
+        Assert.isTrue(source.path(AccountField.ID.field).isTextual(), AccountField.ID.field + " is required");
+
+        LOG.debug("save account {}", source);
 
         OffsetDateTime now = ServiceContextExecution.context().getDate();
 
-        JsonNodeUtils.set(source, id, AccountField.ID.field);
         Insert account = jsonQueryBuilder.insert(source);
 
         BatchStatementBuilder batch = new BatchStatementBuilder(BatchType.LOGGED);
         batch.addStatement(account.build());
-        accountHistoryResource.saveHistories(id, source, previousAccount, now).forEach(batch::addStatements);
+        accountHistoryResource.saveHistories(source, previousAccount, now).forEach(batch::addStatements);
 
         session.execute(batch.build());
 

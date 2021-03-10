@@ -4,17 +4,15 @@ import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
-import com.exemple.service.customer.account.exception.AccountServiceException;
-import com.exemple.service.resource.common.validator.NotEmpty;
+import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public interface AccountService {
 
-    JsonNode save(@NotNull JsonNode account) throws AccountServiceException;
+    JsonNode save(@NotNull JsonNode account);
 
-    JsonNode save(@NotNull UUID id, @NotEmpty @NotNull ArrayNode patch) throws AccountServiceException;
+    JsonNode save(@NotNull JsonNode source, @NotNull JsonNode previousSource);
 
-    JsonNode get(@NotNull UUID id) throws AccountServiceException;
+    JsonNode get(@NotNull UUID id) throws AccountServiceNotFoundException;
 
 }

@@ -59,7 +59,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
         String email = "jean.dupond@gmail.com";
 
-        Mockito.when(service.save(Mockito.eq(email), Mockito.any(JsonNode.class))).thenReturn(created);
+        Mockito.when(service.save(Mockito.any(JsonNode.class))).thenReturn(created);
 
         Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
 
@@ -67,7 +67,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
                 .put(Entity.json(JsonNodeUtils.init().toString()));
 
-        Mockito.verify(service).save(Mockito.eq(email), Mockito.any(JsonNode.class));
+        Mockito.verify(service).save(Mockito.any(JsonNode.class));
 
         assertThat(response.getStatus(), is(expectedStatus.getStatusCode()));
 

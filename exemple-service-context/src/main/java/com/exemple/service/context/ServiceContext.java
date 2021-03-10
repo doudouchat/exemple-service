@@ -13,8 +13,6 @@ public class ServiceContext {
 
     private String version;
 
-    private String profile;
-
     public String getApp() {
         return app;
     }
@@ -23,20 +21,12 @@ public class ServiceContext {
         return version;
     }
 
-    public String getProfile() {
-        return profile;
-    }
-
     public void setApp(String app) {
         this.app = app;
     }
 
     public void setVersion(String version) {
         this.version = version;
-    }
-
-    public void setProfile(String profile) {
-        this.profile = profile;
     }
 
     public OffsetDateTime getDate() {

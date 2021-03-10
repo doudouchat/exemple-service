@@ -4,8 +4,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.customer.common.CustomerScriptFactory;
@@ -14,9 +12,8 @@ import com.exemple.service.customer.common.script.validation.CustomiseValidation
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Aspect
 @Component
-public class SchemaValidationAspect {
+public class CustomiseValidationHelper {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -24,22 +21,20 @@ public class SchemaValidationAspect {
 
     private final CustomerScriptFactory customerScriptFactory;
 
-    public SchemaValidationAspect(CustomerScriptFactory customerScriptFactory) {
+    public CustomiseValidationHelper(CustomerScriptFactory customerScriptFactory) {
 
         this.customerScriptFactory = customerScriptFactory;
     }
 
-    @After("execution(public void com.exemple.service.schema.validation.SchemaValidation.validate(.., *, *)) && args(.., resource, form)")
-    public void validate(String resource, JsonNode form) {
+    public void validate(String sourceName, JsonNode source) {
 
-        validate(form, buildCustomiseValidation(resource)::validate);
+        validate(source, buildCustomiseValidation(sourceName)::validate);
 
     }
 
-    @After("execution(public void com.exemple.service.schema.validation.SchemaValidation.validate(.., *, *, *)) && args(.., resource, form, old)")
-    public void validate(String resource, JsonNode form, JsonNode old) {
+    public void validate(String sourceName, JsonNode source, JsonNode previousSource) {
 
-        validate(form, old, buildCustomiseValidation(resource)::validate);
+        validate(source, previousSource, buildCustomiseValidation(sourceName)::validate);
 
     }
 

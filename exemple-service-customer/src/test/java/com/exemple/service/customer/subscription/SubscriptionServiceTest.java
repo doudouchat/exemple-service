@@ -4,6 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.mockito.Mockito;
@@ -18,6 +20,7 @@ import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.exemple.service.customer.subscription.exception.SubscriptionServiceNotFoundException;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.login.LoginResource;
+import com.exemple.service.resource.subscription.SubscriptionField;
 import com.exemple.service.resource.subscription.SubscriptionResource;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -58,14 +61,17 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
         String email = "jean@gmail.com";
 
         Mockito.when(resource.get(email)).thenReturn(subscription);
-        Mockito.doNothing().when(resource).save(Mockito.eq(email), Mockito.any(JsonNode.class));
+        Mockito.doNothing().when(resource).save(Mockito.any(JsonNode.class));
 
-        boolean created = service.save(email, JsonNodeUtils.init());
+        Map<String, Object> model = new HashMap<>();
+        model.put(SubscriptionField.EMAIL.field, email);
+
+        boolean created = service.save(JsonNodeUtils.create(model));
 
         assertThat(created, is(expectedCreated));
 
         Mockito.verify(resource).get(email);
-        Mockito.verify(resource).save(Mockito.eq(email), Mockito.any(JsonNode.class));
+        Mockito.verify(resource).save(Mockito.any(JsonNode.class));
 
     }
 

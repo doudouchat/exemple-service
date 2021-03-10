@@ -26,17 +26,19 @@ import javax.ws.rs.ext.Provider;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.model.SchemaBeanParam;
+import com.exemple.service.api.common.schema.FilterHelper;
+import com.exemple.service.api.common.schema.ValidationHelper;
 import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.account.AccountService;
-import com.exemple.service.customer.account.exception.AccountServiceException;
 import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
 import com.exemple.service.resource.account.AccountField;
 import com.exemple.service.resource.common.validator.NotEmpty;
 import com.exemple.service.schema.validation.annotation.Patch;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.flipkart.zjsonpatch.JsonPatch;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,16 +59,25 @@ public class AccountApi {
 
     private static final String ACCOUNT_SCHEMA = "Account";
 
+    private static final String ACCOUNT_RESOURCE = "account";
+
     private final AccountService service;
+
+    private final ValidationHelper schemaValidation;
+
+    private final FilterHelper schemaFilter;
 
     private final AuthorizationCheckService authorizationCheckService;
 
     @Context
     private ContainerRequestContext servletContext;
 
-    public AccountApi(AccountService service, AuthorizationCheckService authorizationCheckService) {
+    public AccountApi(AccountService service, ValidationHelper schemaValidation, FilterHelper schemaFilter,
+            AuthorizationCheckService authorizationCheckService) {
 
         this.service = service;
+        this.schemaValidation = schemaValidation;
+        this.schemaFilter = schemaFilter;
         this.authorizationCheckService = authorizationCheckService;
     }
 
@@ -84,11 +95,13 @@ public class AccountApi {
     })
     @RolesAllowed("account:read")
     public JsonNode get(@NotNull @PathParam("id") UUID id, @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam)
-            throws AccountServiceException {
+            throws AccountServiceNotFoundException {
 
         authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
 
-        return service.get(id);
+        JsonNode account = service.get(id);
+
+        return schemaFilter.filter(account, ACCOUNT_RESOURCE, servletContext);
 
     }
 
@@ -104,8 +117,9 @@ public class AccountApi {
     })
     @RolesAllowed("account:create")
     public Response create(@NotNull @Parameter(schema = @Schema(ref = ACCOUNT_SCHEMA)) JsonNode account,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam, @Context UriInfo uriInfo)
-            throws AccountServiceException {
+            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam, @Context UriInfo uriInfo) {
+
+        schemaValidation.validate(account, ACCOUNT_RESOURCE, servletContext);
 
         JsonNode source = service.save(account);
 
@@ -128,13 +142,18 @@ public class AccountApi {
 
     })
     @RolesAllowed("account:update")
-    public Response update(@NotNull @PathParam("id") UUID id,
-            @NotEmpty @Patch @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws AccountServiceException {
+    public Response update(@NotNull @PathParam("id") UUID id, @NotEmpty @Patch @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch,
+            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws AccountServiceNotFoundException {
 
         authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
 
-        service.save(id, patch);
+        JsonNode previousSource = service.get(id);
+
+        JsonNode source = JsonPatch.apply(patch, previousSource);
+
+        schemaValidation.validate(source, previousSource, ACCOUNT_RESOURCE, servletContext);
+
+        service.save(source, previousSource);
 
         return Response.status(Status.NO_CONTENT).build();
 

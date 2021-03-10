@@ -19,11 +19,9 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.schema.common.SchemaBuilder;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionModel;
@@ -43,15 +41,6 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
     private SchemaValidation validation;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-
-    @BeforeClass
-    private void before() {
-
-        ServiceContextExecution.context().setApp("default");
-        ServiceContextExecution.context().setVersion("default");
-        ServiceContextExecution.context().setProfile("default");
-
-    }
 
     @Test
     public void validation() {

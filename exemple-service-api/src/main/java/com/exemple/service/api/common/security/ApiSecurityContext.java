@@ -6,6 +6,8 @@ import java.util.function.Predicate;
 
 import javax.ws.rs.core.SecurityContext;
 
+import org.apache.commons.lang3.ObjectUtils;
+
 import com.auth0.jwt.interfaces.Payload;
 
 public class ApiSecurityContext implements SecurityContext {
@@ -25,7 +27,7 @@ public class ApiSecurityContext implements SecurityContext {
         this.scheme = scheme;
         this.containsRole = containsRole;
         this.payload = payload;
-        this.profile = profile;
+        this.profile = ObjectUtils.defaultIfNull(profile, ApiProfile.USER_PROFILE.profile);
     }
 
     public ApiSecurityContext(Principal principal, String scheme, Collection<String> roles, String profile, Payload payload) {

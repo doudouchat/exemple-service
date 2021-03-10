@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public interface SubscriptionService {
 
-    boolean save(@NotBlank String email, @NotNull JsonNode source);
+    boolean save(@NotNull JsonNode source);
 
     JsonNode get(@NotBlank String email) throws SubscriptionServiceNotFoundException;
 }

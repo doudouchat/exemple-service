@@ -30,7 +30,6 @@ import com.exemple.service.customer.login.exception.LoginServiceNotFoundExceptio
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class LoginApiTest extends JerseySpringSupport {
 
@@ -119,6 +118,8 @@ public class LoginApiTest extends JerseySpringSupport {
         patch.put("path", "/password");
         patch.put("value", "mdp");
 
+        Mockito.when(service.get(Mockito.eq(login))).thenReturn(JsonNodeUtils.init());
+
         Response response = target(URL + "/" + login).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
                 .request(MediaType.APPLICATION_JSON)
 
@@ -126,7 +127,7 @@ public class LoginApiTest extends JerseySpringSupport {
 
                 .method("PATCH", Entity.json(MAPPER.writeValueAsString(Collections.singletonList(patch))));
 
-        Mockito.verify(service).save(Mockito.eq(login), Mockito.any(ArrayNode.class));
+        Mockito.verify(service).save(Mockito.eq(login), Mockito.any(JsonNode.class), Mockito.any(JsonNode.class));
 
         assertThat(response.getStatus(), is(Status.NO_CONTENT.getStatusCode()));
 
@@ -179,7 +180,7 @@ public class LoginApiTest extends JerseySpringSupport {
 
         UUID id = UUID.randomUUID();
 
-        Mockito.when(service.get(Mockito.eq(id))).thenReturn(MAPPER.createArrayNode());
+        Mockito.when(service.get(Mockito.eq(id))).thenReturn(Collections.emptyList());
 
         Response response = target(URL + "/id/" + id).request(MediaType.APPLICATION_JSON)
 
