@@ -106,7 +106,7 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
 
     }
 
-    @DataProvider(name = "updateFailure")
+    @DataProvider(name = "updatePatchFailures")
     private static Object[][] updatePatchFailures() {
 
         Map<String, Object> patch0 = new HashMap<>();
@@ -189,8 +189,8 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
         };
     }
 
-    @Test(dataProvider = "updateFailure", dependsOnMethods = "com.exemple.service.api.integration.account.v1.AccountNominalIT.updateSuccess")
-    public void updateFailure(Map<String, Object> patch, String expectedPath, String expectedCode) {
+    @Test(dataProvider = "updatePatchFailures", dependsOnMethods = "com.exemple.service.api.integration.account.v1.AccountNominalIT.updateSuccess")
+    public void updatePatchFailures(Map<String, Object> patch, String expectedPath, String expectedCode) {
 
         LOG.debug("{}", JsonRestTemplate.given()
 
@@ -238,8 +238,24 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
 
     }
 
-    @Test(dependsOnMethods = "com.exemple.service.api.integration.account.v1.AccountNominalIT.updateSuccess")
-    public void updateFailure() {
+    @DataProvider(name = "updateFailure")
+    private static Object[][] updateFailure() {
+
+        Map<String, Object> patch0 = new HashMap<>();
+        patch0.put("op", "replace");
+        patch0.put("path", "/lastname");
+
+        return new Object[][] {
+                // patch empty
+                { Collections.EMPTY_LIST },
+                // patch without value
+                { Collections.singletonList(patch0) }
+                //
+        };
+    }
+
+    @Test(dataProvider = "updateFailure", dependsOnMethods = "com.exemple.service.api.integration.account.v1.AccountNominalIT.updateSuccess")
+    public void updateFailure(List<Map<String, Object>> patchs) {
 
         LOG.debug("{}", JsonRestTemplate.given()
 
@@ -251,7 +267,7 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
 
                 .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
 
-                .body(Collections.EMPTY_LIST).patch(ACCOUNT_URL + "/{id}", ID);
+                .body(patchs).patch(ACCOUNT_URL + "/{id}", ID);
         assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
 
     }
