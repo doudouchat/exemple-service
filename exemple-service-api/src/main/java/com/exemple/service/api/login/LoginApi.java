@@ -38,7 +38,7 @@ import com.exemple.service.customer.login.exception.LoginServiceException;
 import com.exemple.service.customer.login.exception.LoginServiceNotFoundException;
 import com.exemple.service.resource.common.validator.NotEmpty;
 import com.exemple.service.resource.login.LoginField;
-import com.exemple.service.schema.validation.SchemaValidation;
+import com.exemple.service.schema.validation.annotation.Patch;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -63,17 +63,14 @@ public class LoginApi {
 
     private final LoginService loginService;
 
-    private final SchemaValidation schemaValidation;
-
     private final AuthorizationCheckService authorizationCheckService;
 
     @Context
     private ContainerRequestContext servletContext;
 
-    public LoginApi(LoginService loginService, SchemaValidation schemaValidation, AuthorizationCheckService authorizationCheckService) {
+    public LoginApi(LoginService loginService, AuthorizationCheckService authorizationCheckService) {
 
         this.loginService = loginService;
-        this.schemaValidation = schemaValidation;
         this.authorizationCheckService = authorizationCheckService;
     }
 
@@ -129,12 +126,10 @@ public class LoginApi {
 
     })
     @RolesAllowed("login:update")
-    public Response update(@NotNull @PathParam("login") String login, @NotEmpty @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch,
+    public Response update(@NotNull @PathParam("login") String login, @NotEmpty @Patch @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws LoginServiceException {
 
         authorizationCheckService.verifyLogin(login, (ApiSecurityContext) servletContext.getSecurityContext());
-
-        schemaValidation.validatePatch(patch);
 
         loginService.save(login, patch);
 

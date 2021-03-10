@@ -3,6 +3,8 @@ package com.exemple.service.schema.core;
 import java.io.IOException;
 import java.util.Collections;
 
+import javax.validation.Validator;
+
 import org.apache.commons.io.IOUtils;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +12,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.impl.SchemaResourceImpl;
@@ -47,6 +51,21 @@ public class SchemaTestConfiguration {
                 .thenReturn(defaultResourceSchema);
 
         return resource;
+    }
+
+    @Bean
+    public Validator validator() {
+
+        return new LocalValidatorFactoryBean();
+    }
+
+    @Bean
+    public MethodValidationPostProcessor methodValidationPostProcessor() {
+
+        MethodValidationPostProcessor methodValidationPostProcessor = new MethodValidationPostProcessor();
+        methodValidationPostProcessor.setValidator(validator());
+
+        return methodValidationPostProcessor;
     }
 
 }

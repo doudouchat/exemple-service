@@ -192,12 +192,6 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
     @Test(dataProvider = "updatePatchFailures", dependsOnMethods = "com.exemple.service.api.integration.account.v1.AccountNominalIT.updateSuccess")
     public void updatePatchFailures(Map<String, Object> patch, String expectedPath, String expectedCode) {
 
-        LOG.debug("{}", JsonRestTemplate.given()
-
-                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
-
-                .get(ACCOUNT_URL + "/{id}", ID));
-
         Response response = JsonRestTemplate.given()
 
                 .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
