@@ -27,6 +27,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.auth0.jwt.JWT;
+import com.exemple.service.api.common.JsonNodeUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.JerseySpringSupportSecure;
 import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration.TestFilter;
@@ -34,8 +35,9 @@ import com.exemple.service.api.core.authorization.impl.AuthorizationAlgorithmFac
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.login.LoginService;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
+import com.exemple.service.customer.login.exception.LoginServiceNotFoundException;
 import com.exemple.service.resource.login.LoginResource;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class LoginApiSecureTest extends JerseySpringSupportSecure {
 
@@ -58,6 +60,9 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
     @Autowired
     private AuthorizationAlgorithmFactory authorizationAlgorithmFactory;
 
+    @Autowired
+    private JsonNode login;
+
     @BeforeMethod
     private void before() {
 
@@ -76,102 +81,167 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
     private static UUID ID = UUID.randomUUID();
 
     @Test
-    public void authorizedGetLoginWithPrincipal() throws Exception {
+    public void authorizedGetLoginWithPrincipal() throws LoginServiceNotFoundException {
 
-        String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe").withAudience("exemple")
+        // Given user_name
+
+        String username = "jean.dupond@gmail.com";
+
+        // and token
+
+        String token = JWT.create().withClaim("client_id", "clientId1").withSubject(username).withAudience("exemple")
                 .withArrayClaim("scope", new String[] { "login:read" }).sign(RSA256_ALGORITHM);
 
-        Map<String, Object> model = new HashMap<>();
-        model.put("password", "jean.dupont");
-        model.put("id", ID);
+        // And mock service
 
-        Mockito.when(loginService.get(Mockito.eq("john_doe"))).thenReturn(JsonNodeUtils.create(model));
+        Mockito.when(loginService.get(Mockito.eq(username))).thenReturn(login);
 
-        Response response = target(LoginApiTest.URL + "/" + "john_doe").request(MediaType.APPLICATION_JSON)
+        // When perform get
+
+        Response response = target(LoginApiTest.URL + "/" + username).request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token).get();
+
+        // Then check status
 
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
 
-        Mockito.verify(loginService).get(Mockito.eq("john_doe"));
+        // And check security context
 
-        assertThat(testFilter.context.getUserPrincipal().getName(), is("john_doe"));
+        assertThat(testFilter.context.getUserPrincipal().getName(), is(username));
         assertThat(testFilter.context.isSecure(), is(true));
         assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH));
 
     }
 
     @Test
-    public void authorizedGetLoginWithSecond() throws Exception {
+    public void authorizedGetLoginWithSecond() throws LoginServiceNotFoundException {
 
-        String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe").withAudience("exemple")
+        // Given user_name
+
+        String username = "jean.dupond@gmail.com";
+
+        // And second login
+
+        String secondUsername = "jack.dupond@gmail.com";
+
+        JsonNode second = JsonNodeUtils.create(() -> {
+
+            Map<String, Object> model = new HashMap<>();
+            model.put("username", secondUsername);
+            model.put("password", "jean.dupont");
+            model.put("id", ID);
+
+            return model;
+        });
+
+        // And token
+
+        String token = JWT.create().withClaim("client_id", "clientId1").withSubject(secondUsername).withAudience("exemple")
                 .withArrayClaim("scope", new String[] { "login:read" }).sign(RSA256_ALGORITHM);
 
-        Map<String, Object> model = new HashMap<>();
-        model.put("password", "jean.dupont");
-        model.put("id", ID);
+        // And mock service & resource
 
-        Mockito.when(loginResource.get(Mockito.eq("jack_doe"))).thenReturn(Optional.of(JsonNodeUtils.create(model)));
-        Mockito.when(loginResource.get(Mockito.eq(ID)))
-                .thenReturn(Collections.singletonList(JsonNodeUtils.create(Collections.singletonMap("username", "john_doe"))));
-        Mockito.when(loginService.get(Mockito.eq("jack_doe"))).thenReturn(JsonNodeUtils.create(model));
+        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(JsonNodeUtils.create(() -> {
 
-        Response response = target(LoginApiTest.URL + "/" + "jack_doe").request(MediaType.APPLICATION_JSON)
+            Map<String, Object> model = new HashMap<>();
+            model.put("password", "jean.dupont");
+            model.put("id", ID);
+
+            return model;
+        })));
+        Mockito.when(loginResource.get(Mockito.eq(ID))).thenReturn(Collections.singletonList(second));
+        Mockito.when(loginService.get(Mockito.eq(username))).thenReturn(login);
+
+        // When perform get
+
+        Response response = target(LoginApiTest.URL + "/" + username).request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token).get();
+
+        // Then check status
 
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
 
-        Mockito.verify(loginService).get(Mockito.eq("jack_doe"));
+        // And check security context
 
-        assertThat(testFilter.context.getUserPrincipal().getName(), is("john_doe"));
+        assertThat(testFilter.context.getUserPrincipal().getName(), is(secondUsername));
         assertThat(testFilter.context.isSecure(), is(true));
         assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH));
 
     }
 
     @Test
-    public void authorizedGetLoginFailure() throws Exception {
+    public void authorizedGetLoginFailure() {
 
-        String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe").withAudience("exemple")
+        // Given user_name
+
+        String username = "jean.dupond@gmail.com";
+
+        // and token
+
+        String token = JWT.create().withClaim("client_id", "clientId1").withSubject("other").withAudience("exemple")
                 .withArrayClaim("scope", new String[] { "login:read" }).sign(RSA256_ALGORITHM);
 
-        Response response = target(LoginApiTest.URL + "/" + "other").request(MediaType.APPLICATION_JSON)
+        // When perform get
+
+        Response response = target(LoginApiTest.URL + "/" + username).request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token).get();
 
-        assertThat(response.getStatus(), is(Status.FORBIDDEN.getStatusCode()));
+        // Then check status
 
-        assertThat(testFilter.context.getUserPrincipal().getName(), is("john_doe"));
-        assertThat(testFilter.context.isSecure(), is(true));
-        assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH));
+        assertThat(response.getStatus(), is(Status.FORBIDDEN.getStatusCode()));
 
     }
 
     @Test
-    public void authorizedGetLoginWithSecondFailure() throws Exception {
+    public void authorizedGetLoginWithSecondFailure() throws LoginServiceNotFoundException {
 
-        String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe").withAudience("exemple")
+        // Given user_name
+
+        String username = "jean.dupond@gmail.com";
+
+        // And second login
+
+        String secondUsername = "jack.dupond@gmail.com";
+
+        JsonNode second = JsonNodeUtils.create(() -> {
+
+            Map<String, Object> model = new HashMap<>();
+            model.put("username", secondUsername);
+            model.put("password", "jean.dupont");
+            model.put("id", ID);
+
+            return model;
+        });
+
+        // And token
+
+        String token = JWT.create().withClaim("client_id", "clientId1").withSubject("other").withAudience("exemple")
                 .withArrayClaim("scope", new String[] { "login:read" }).sign(RSA256_ALGORITHM);
 
-        Map<String, Object> model = new HashMap<>();
-        model.put("password", "jean.dupont");
-        model.put("id", ID);
+        // And mock service & resource
 
-        Mockito.when(loginResource.get(Mockito.eq("jack_doe"))).thenReturn(Optional.of(JsonNodeUtils.create(model)));
-        Mockito.when(loginResource.get(Mockito.eq(ID)))
-                .thenReturn(Collections.singletonList(JsonNodeUtils.create(Collections.singletonMap("username", "jack_doe"))));
-        Mockito.when(loginService.get(Mockito.eq("jack_doe"))).thenReturn(JsonNodeUtils.create(model));
+        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(JsonNodeUtils.create(() -> {
 
-        Response response = target(LoginApiTest.URL + "/" + "jack_doe").request(MediaType.APPLICATION_JSON)
+            Map<String, Object> model = new HashMap<>();
+            model.put("password", "jean.dupont");
+            model.put("id", ID);
+
+            return model;
+        })));
+        Mockito.when(loginResource.get(Mockito.eq(ID))).thenReturn(Collections.singletonList(second));
+
+        // When perform get
+
+        Response response = target(LoginApiTest.URL + "/" + username).request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token).get();
 
-        assertThat(response.getStatus(), is(Status.FORBIDDEN.getStatusCode()));
+        // Then check status
 
-        assertThat(testFilter.context.getUserPrincipal().getName(), is("john_doe"));
-        assertThat(testFilter.context.isSecure(), is(true));
-        assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH));
+        assertThat(response.getStatus(), is(Status.FORBIDDEN.getStatusCode()));
 
     }
 }

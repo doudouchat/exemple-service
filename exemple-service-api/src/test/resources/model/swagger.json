@@ -1,0 +1,872 @@
+{
+	"openapi": "3.0.1",
+	"info": {
+		"title": "Api documentation",
+		"description": "Api documentation",
+		"version": "nc"
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	],
+	"tags": [
+		{
+			"name": "account"
+		},
+		{
+			"name": "login"
+		},
+		{
+			"name": "stock"
+		},
+		{
+			"name": "subscription"
+		}
+	],
+	"paths": {
+		"/ws/v1/accounts": {
+			"post": {
+				"tags": [
+					"account"
+				],
+				"operationId": "create",
+				"parameters": [
+					{
+						"name": "app",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "version",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"oneOf": [
+									{
+										"$ref": "#/components/schemas/Account.v1.user"
+									},
+									{
+										"$ref": "#/components/schemas/Account.v2.admin"
+									}
+								]
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "Account is created",
+						"headers": {
+							"Location": {
+								"description": "Links to Account Data",
+								"style": "simple",
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"bearer_authentification": []
+					},
+					{
+						"oauth2_client_credentials": []
+					}
+				]
+			}
+		},
+		"/ws/v1/accounts/{id}": {
+			"get": {
+				"tags": [
+					"account"
+				],
+				"operationId": "get",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						}
+					},
+					{
+						"name": "app",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "version",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Account Data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"oneOf": [
+										{
+											"$ref": "#/components/schemas/Account.v1.user"
+										},
+										{
+											"$ref": "#/components/schemas/Account.v2.admin"
+										}
+									]
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Account is not found"
+					},
+					"403": {
+						"description": "Account is not accessible"
+					}
+				},
+				"security": [
+					{
+						"bearer_authentification": []
+					},
+					{
+						"oauth2_password": []
+					}
+				]
+			},
+			"patch": {
+				"tags": [
+					"account"
+				],
+				"operationId": "update",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						}
+					},
+					{
+						"name": "app",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "version",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Patch"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Account is updated"
+					},
+					"404": {
+						"description": "Account is not found"
+					},
+					"403": {
+						"description": "Account is not accessible"
+					}
+				},
+				"security": [
+					{
+						"bearer_authentification": []
+					},
+					{
+						"oauth2_password": []
+					}
+				]
+			}
+		},
+		"/ws/v1/logins/{username}": {
+			"get": {
+				"tags": [
+					"login"
+				],
+				"operationId": "get_1",
+				"parameters": [
+					{
+						"name": "username",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "app",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "version",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Login Data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Login"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Login is not found"
+					},
+					"403": {
+						"description": "Login is not accessible"
+					}
+				},
+				"security": [
+					{
+						"bearer_authentification": []
+					},
+					{
+						"oauth2_password": []
+					}
+				]
+			},
+			"delete": {
+				"tags": [
+					"login"
+				],
+				"operationId": "delete",
+				"parameters": [
+					{
+						"name": "username",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "app",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"default": {
+						"description": "default response",
+						"content": {
+							"*/*": {
+								
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"bearer_authentification": []
+					},
+					{
+						"oauth2_password": []
+					}
+				]
+			},
+			"head": {
+				"tags": [
+					"login"
+				],
+				"operationId": "check",
+				"parameters": [
+					{
+						"name": "username",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "app",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"default": {
+						"description": "default response",
+						"content": {
+							"*/*": {
+								
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"bearer_authentification": []
+					},
+					{
+						"oauth2_client_credentials": []
+					}
+				]
+			},
+			"patch": {
+				"tags": [
+					"login"
+				],
+				"operationId": "update_1",
+				"parameters": [
+					{
+						"name": "username",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "app",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "version",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Patch"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Login is updated"
+					},
+					"404": {
+						"description": "Login is not found"
+					},
+					"403": {
+						"description": "Login is not accessible"
+					}
+				},
+				"security": [
+					{
+						"bearer_authentification": []
+					},
+					{
+						"oauth2_password": []
+					}
+				]
+			}
+		},
+		"/ws/v1/logins": {
+			"post": {
+				"tags": [
+					"login"
+				],
+				"operationId": "create_1",
+				"parameters": [
+					{
+						"name": "app",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "version",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Login"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "login is created",
+						"headers": {
+							"Location": {
+								"description": "Links to Login Data",
+								"style": "simple",
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"bearer_authentification": []
+					},
+					{
+						"oauth2_client_credentials": []
+					}
+				]
+			}
+		},
+		"/ws/v1/logins/id/{id}": {
+			"get": {
+				"tags": [
+					"login"
+				],
+				"operationId": "getById",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						}
+					},
+					{
+						"name": "app",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "version",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Login Data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Login"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Login is not found"
+					},
+					"403": {
+						"description": "Login is not accessible"
+					}
+				},
+				"security": [
+					{
+						"bearer_authentification": []
+					},
+					{
+						"oauth2_password": []
+					}
+				]
+			}
+		},
+		"/ws/v1/stocks/{store}/{product}": {
+			"get": {
+				"tags": [
+					"stock"
+				],
+				"operationId": "get_2",
+				"parameters": [
+					{
+						"name": "store",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "product",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "app",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Stock Data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Stock"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"bearer_authentification": []
+					},
+					{
+						"oauth2_client_credentials": []
+					}
+				]
+			},
+			"post": {
+				"tags": [
+					"stock"
+				],
+				"operationId": "post",
+				"parameters": [
+					{
+						"name": "store",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "product",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "app",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Stock"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"default": {
+						"description": "default response",
+						"content": {
+							"*/*": {
+								"schema": {
+									"type": "integer",
+									"format": "int64"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"bearer_authentification": []
+					},
+					{
+						"oauth2_client_credentials": []
+					}
+				]
+			}
+		},
+		"/ws/v1/subscriptions/{email}": {
+			"get": {
+				"tags": [
+					"subscription"
+				],
+				"operationId": "get_3",
+				"parameters": [
+					{
+						"name": "email",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "app",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "version",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Subscription Data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Subscription"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Subscription is not accessible"
+					}
+				},
+				"security": [
+					{
+						"bearer_authentification": []
+					},
+					{
+						"oauth2_password": []
+					}
+				]
+			},
+			"put": {
+				"tags": [
+					"subscription"
+				],
+				"operationId": "update_2",
+				"parameters": [
+					{
+						"name": "email",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "app",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "version",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Subscription"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "Subscription is created",
+						"headers": {
+							"Location": {
+								"description": "Links to Subscription Data",
+								"style": "simple",
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"204": {
+						"description": "Subscription is updated",
+						"headers": {
+							"Location": {
+								"description": "Links to Subscription Data",
+								"style": "simple",
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"bearer_authentification": []
+					},
+					{
+						"oauth2_password": []
+					}
+				]
+			}
+		},
+		"/ws/application.wadl/{path}": {
+			"get": {
+				"operationId": "getExternalGrammar",
+				"parameters": [
+					{
+						"name": "path",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"default": {
+						"description": "default response",
+						"content": {
+							"application/xml": {
+								
+							}
+						}
+					}
+				}
+			}
+		},
+		"/ws/application.wadl": {
+			"get": {
+				"operationId": "getWadl",
+				"responses": {
+					"default": {
+						"description": "default response",
+						"content": {
+							"application/vnd.sun.wadl+xml": {
+								
+							},
+							"application/xml": {
+								
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"Patch": {
+				"$ref": "/ws/v1/schemas/patch"
+			},
+			"Stock": {
+				"required": [
+					"increment"
+				],
+				"type": "object",
+				"properties": {
+					"increment": {
+						"type": "integer",
+						"format": "int32",
+						"writeOnly": true
+					},
+					"amount": {
+						"type": "integer",
+						"format": "int64",
+						"readOnly": true
+					}
+				}
+			},
+			"Account.v1.user": {
+				"$ref": "/ws/v1/schemas/account/test/v1/user"
+			},
+			"Account.v2.admin": {
+				"$ref": "/ws/v1/schemas/account/test/v2/admin"
+			}
+		}
+	}
+}
