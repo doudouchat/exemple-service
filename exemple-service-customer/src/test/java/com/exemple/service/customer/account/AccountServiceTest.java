@@ -25,16 +25,10 @@ import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.exemple.service.resource.account.AccountResource;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.schema.SchemaResource;
-import com.exemple.service.schema.filter.SchemaFilter;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @ContextConfiguration(classes = { CustomerTestConfiguration.class })
 public class AccountServiceTest extends AbstractTestNGSpringContextTests {
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private AccountService service;
@@ -43,15 +37,12 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
     private AccountResource resource;
 
     @Autowired
-    private SchemaFilter schemaFilter;
-
-    @Autowired
     private SchemaResource schemaResource;
 
     @BeforeMethod
     private void before() {
 
-        Mockito.reset(resource, schemaFilter);
+        Mockito.reset(resource);
 
     }
 
@@ -63,7 +54,7 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void save() throws AccountServiceException {
+    public void save() {
 
         Account model = new Account();
         model.setEmail("jean.dupont@gmail.com");
@@ -73,8 +64,6 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
         model.setCivility("Mr");
 
         Mockito.when(resource.save(Mockito.any(JsonNode.class))).thenReturn(UUID.randomUUID());
-        Mockito.when(schemaFilter.filter(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class),
-                Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.create(model));
 
         JsonNode account = service.save(JsonNodeUtils.create(model));
         assertThat(account, is(notNullValue()));
@@ -90,35 +79,25 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void update() throws AccountServiceException {
+    public void update() {
 
-        Map<String, Object> model = new HashMap<>();
-        model.put("email", "jean.dupont@gmail.com");
-        model.put("lastname", "Dupont");
+        Map<String, Object> previousSource = new HashMap<>();
+        previousSource.put("email", "jean.dupont@gmail.com");
+        previousSource.put("lastname", "Dupont");
 
-        UUID id = UUID.randomUUID();
+        Mockito.doNothing().when(resource).save(Mockito.any(JsonNode.class), Mockito.any(JsonNode.class));
 
-        Mockito.when(resource.get(Mockito.eq(id))).thenReturn(Optional.of(JsonNodeUtils.create(model)));
-        Mockito.doNothing().when(resource).save(Mockito.eq(id), Mockito.any(JsonNode.class), Mockito.any(JsonNode.class));
-        Mockito.when(schemaFilter.filter(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class),
-                Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.create(model));
+        Map<String, Object> source = new HashMap<>();
+        source.put("email", "jean.dupont@gmail.com");
+        source.put("lastname", "Dupond");
 
-        ArrayNode patch = MAPPER.createArrayNode();
-
-        ObjectNode addLastName = MAPPER.createObjectNode();
-        addLastName.put("op", "add");
-        addLastName.put("path", "/lastname");
-        addLastName.put("value", "Dupond");
-        patch.add(addLastName);
-
-        JsonNode account = service.save(id, patch);
+        JsonNode account = service.save(JsonNodeUtils.create(source), JsonNodeUtils.create(previousSource));
 
         assertThat(account, is(notNullValue()));
         assertThat(account, hasJsonField("email", "jean.dupont@gmail.com"));
-        assertThat(account, hasJsonField("lastname", "Dupont"));
+        assertThat(account, hasJsonField("lastname", "Dupond"));
 
-        Mockito.verify(resource).get(Mockito.eq(id));
-        Mockito.verify(resource).save(Mockito.eq(id), Mockito.any(JsonNode.class), Mockito.any(JsonNode.class));
+        Mockito.verify(resource).save(Mockito.any(JsonNode.class), Mockito.any(JsonNode.class));
 
     }
 
@@ -132,8 +111,6 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
 
         UUID id = UUID.randomUUID();
 
-        Mockito.when(schemaFilter.filter(Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class),
-                Mockito.any(JsonNode.class))).thenReturn(JsonNodeUtils.create(model));
         Mockito.when(resource.get(Mockito.eq(id))).thenReturn(Optional.of(JsonNodeUtils.create(model)));
 
         JsonNode account = service.get(id);

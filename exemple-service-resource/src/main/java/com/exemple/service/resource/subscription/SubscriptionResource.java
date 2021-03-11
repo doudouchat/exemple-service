@@ -11,5 +11,5 @@ public interface SubscriptionResource {
 
     Optional<JsonNode> get(@NotBlank String email);
 
-    void save(@NotBlank String email, @Json(table = "subscription") JsonNode source);
+    void save(@Json(table = "subscription") JsonNode source);
 }

@@ -123,6 +123,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
     public void update() {
 
         Map<String, Object> model = new HashMap<>();
+        model.put(AccountField.ID.field, id);
 
         Map<String, Address> addresses = new HashMap<>();
         addresses.put("home", new Address("10 rue de de la poste", null, null, 2));
@@ -142,7 +143,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         AccountHistory previousHistoryId = accountHistoryResource.findByIdAndField(id, "/id");
         AccountHistory previousHistoryCgus = accountHistoryResource.findByIdAndField(id, "/cgus/0/code");
 
-        resource.save(id, JsonNodeUtils.create(model), this.account);
+        resource.save(JsonNodeUtils.create(model), this.account);
 
         this.account = resource.get(id).get();
 
@@ -187,6 +188,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
     public void updateNull() {
 
         Map<String, Object> model = new HashMap<>();
+        model.put(AccountField.ID.field, id);
 
         model.put("addresses", null);
         model.put("cgus", null);
@@ -196,7 +198,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         AccountHistory previousHistoryAge = accountHistoryResource.findByIdAndField(id, "/age");
         AccountHistory previousHistoryId = accountHistoryResource.findByIdAndField(id, "/id");
 
-        resource.save(id, JsonNodeUtils.create(model), this.account);
+        resource.save(JsonNodeUtils.create(model), this.account);
 
         this.account = resource.get(id).get();
 

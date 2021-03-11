@@ -19,14 +19,6 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- SCHEMA -->
-
-		<dependency>
-			<groupId>exemple</groupId>
-			<artifactId>exemple-service-schema</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<!-- EVENT -->
 
 		<dependency>
@@ -54,13 +46,6 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-		</dependency>
-
-		<!-- JSON PATCH -->
-
-		<dependency>
-			<groupId>com.flipkart.zjsonpatch</groupId>
-			<artifactId>zjsonpatch</artifactId>
 		</dependency>
 
 		<!-- APACHE -->

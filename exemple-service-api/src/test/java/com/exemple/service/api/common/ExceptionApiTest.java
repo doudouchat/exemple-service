@@ -27,9 +27,9 @@ import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.account.exception.AccountServiceException;
+import com.exemple.service.resource.common.util.JsonNodeUtils;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.flipkart.zjsonpatch.JsonPatchApplicationException;
 
 public class ExceptionApiTest extends JerseySpringSupport {
 
@@ -78,31 +78,6 @@ public class ExceptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void JsonPatchException() throws AccountServiceException, IOException {
-
-        UUID id = UUID.randomUUID();
-
-        Mockito.when(service.save(Mockito.eq(id), Mockito.any(ArrayNode.class))).thenThrow(new JsonPatchApplicationException(null, null, null));
-
-        Map<String, Object> patch = new HashMap<>();
-        patch.put("op", "add");
-        patch.put("path", "/lastname");
-        patch.put("value", "Dupond");
-
-        Response response = target(AccountApiTest.URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
-                .request(MediaType.APPLICATION_JSON)
-
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
-
-                .method("PATCH", Entity.json(MAPPER.writeValueAsString(Collections.singletonList(patch))));
-
-        Mockito.verify(service).save(Mockito.eq(id), Mockito.any(ArrayNode.class));
-
-        assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
-
-    }
-
-    @Test
     public void JsonEmptyException() {
 
         Response response = target(AccountApiTest.URL + "/" + UUID.randomUUID()).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
@@ -117,11 +92,37 @@ public class ExceptionApiTest extends JerseySpringSupport {
     }
 
     @Test
+    public void JsonPatchException() throws AccountServiceException, IOException {
+
+        UUID id = UUID.randomUUID();
+
+        Mockito.when(service.get(Mockito.eq(id))).thenReturn(JsonNodeUtils.init());
+
+        Map<String, Object> patch = new HashMap<>();
+        patch.put("op", "replace");
+        patch.put("path", "/lastname");
+        patch.put("value", "Dupond");
+
+        Response response = target(AccountApiTest.URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
+                .request(MediaType.APPLICATION_JSON)
+
+                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
+
+                .method("PATCH", Entity.json(MAPPER.writeValueAsString(Collections.singletonList(patch))));
+
+        Mockito.verify(service).get(Mockito.eq(id));
+        Mockito.verify(service, Mockito.never()).save(Mockito.any(JsonNode.class), Mockito.any(JsonNode.class));
+
+        assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+
+    }
+
+    @Test
     public void internalServerError() throws AccountServiceException {
 
         UUID id = UUID.randomUUID();
 
-        Mockito.when(service.get(Mockito.eq(id))).thenThrow(new AccountServiceException());
+        Mockito.when(service.get(Mockito.eq(id))).thenThrow(new RuntimeException());
 
         Response response = target(AccountApiTest.URL + "/" + id).request(MediaType.APPLICATION_JSON)
 

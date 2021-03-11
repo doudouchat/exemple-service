@@ -36,7 +36,6 @@ import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class AccountApiTest extends JerseySpringSupport {
 
@@ -84,7 +83,8 @@ public class AccountApiTest extends JerseySpringSupport {
 
         UUID id = UUID.randomUUID();
 
-        Mockito.when(service.save(Mockito.eq(id), Mockito.any(ArrayNode.class)))
+        Mockito.when(service.get(Mockito.eq(id))).thenReturn(JsonNodeUtils.init());
+        Mockito.when(service.save(Mockito.any(JsonNode.class), Mockito.any(JsonNode.class)))
                 .thenReturn(JsonNodeUtils.create(Collections.singletonMap("lastname", "Dupond")));
 
         Map<String, Object> patch = new HashMap<>();
@@ -98,7 +98,8 @@ public class AccountApiTest extends JerseySpringSupport {
 
                 .method("PATCH", Entity.json(MAPPER.writeValueAsString(Collections.singletonList(patch))));
 
-        Mockito.verify(service).save(Mockito.eq(id), Mockito.any(ArrayNode.class));
+        Mockito.verify(service).get(Mockito.eq(id));
+        Mockito.verify(service).save(Mockito.any(JsonNode.class), Mockito.any(JsonNode.class));
 
         assertThat(response.getStatus(), is(Status.NO_CONTENT.getStatusCode()));
 

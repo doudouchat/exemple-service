@@ -3,6 +3,8 @@ package com.exemple.service.resource.subscription;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,10 @@ public class SubscriptionResourceTest extends AbstractTestNGSpringContextTests {
 
         email = UUID.randomUUID() + "@gmail.com";
 
-        resource.save(email, JsonNodeUtils.init());
+        Map<String, Object> model = new HashMap<>();
+        model.put(SubscriptionField.EMAIL.field, email);
+
+        resource.save(JsonNodeUtils.create(model));
 
     }
 

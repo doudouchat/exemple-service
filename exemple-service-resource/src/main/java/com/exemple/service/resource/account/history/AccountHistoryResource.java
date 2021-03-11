@@ -19,6 +19,7 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.resource.account.AccountField;
 import com.exemple.service.resource.account.history.dao.AccountHistoryDao;
 import com.exemple.service.resource.account.history.mapper.AccountHistoryMapper;
 import com.exemple.service.resource.account.model.AccountHistory;
@@ -66,12 +67,14 @@ public class AccountHistoryResource {
         return dao().findByIdAndField(id, field);
     }
 
-    public Collection<BoundStatement> saveHistories(final UUID id, JsonNode source, JsonNode previousSource, OffsetDateTime now) {
+    public Collection<BoundStatement> saveHistories(JsonNode source, JsonNode previousSource, OffsetDateTime now) {
 
-        return this.createHistories(id, source, previousSource, now);
+        return this.createHistories(source, previousSource, now);
     }
 
-    private Collection<BoundStatement> createHistories(final UUID id, JsonNode source, JsonNode previousSource, OffsetDateTime now) {
+    private Collection<BoundStatement> createHistories(JsonNode source, JsonNode previousSource, OffsetDateTime now) {
+
+        UUID id = UUID.fromString(source.get(AccountField.ID.field).textValue());
 
         Map<String, AccountHistory> histories = findById(id).stream().collect(Collectors.toMap(AccountHistory::getField, Function.identity()));
 
