@@ -66,6 +66,7 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
         resourceSchema.setProfile("example");
         resourceSchema.setContent(schemaResource);
         resourceSchema.setFilters(Collections.singleton("filter"));
+        resourceSchema.setFields((Collections.singleton("field")));
         resourceSchema.setPatchs(Collections.singleton(JsonNodeUtils.create(Collections.singletonMap("op", "add"))));
 
         resource.save(resourceSchema);
@@ -180,6 +181,15 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
         Set<String> filter = resource.get("app1", UUID.randomUUID().toString(), "account", "example").getFilters();
 
         assertThat(filter, empty());
+
+    }
+
+    @Test(dependsOnMethods = "save")
+    public void getFields() {
+
+        Set<String> fields = resource.get("app1", "v1", "account", "example").getFields();
+
+        assertThat(fields, hasItem("field"));
 
     }
 

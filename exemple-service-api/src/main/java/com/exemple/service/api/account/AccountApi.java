@@ -10,6 +10,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.schema.FilterHelper;
+import com.exemple.service.api.common.schema.SchemaHelper;
 import com.exemple.service.api.common.schema.ValidationHelper;
 import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
@@ -67,17 +69,20 @@ public class AccountApi {
 
     private final FilterHelper schemaFilter;
 
+    private final SchemaHelper schemaMerge;
+
     private final AuthorizationCheckService authorizationCheckService;
 
     @Context
     private ContainerRequestContext servletContext;
 
-    public AccountApi(AccountService service, ValidationHelper schemaValidation, FilterHelper schemaFilter,
+    public AccountApi(AccountService service, ValidationHelper schemaValidation, FilterHelper schemaFilter, SchemaHelper schemaMerge,
             AuthorizationCheckService authorizationCheckService) {
 
         this.service = service;
         this.schemaValidation = schemaValidation;
         this.schemaFilter = schemaFilter;
+        this.schemaMerge = schemaMerge;
         this.authorizationCheckService = authorizationCheckService;
     }
 
@@ -154,6 +159,36 @@ public class AccountApi {
         schemaValidation.validate(source, previousSource, ACCOUNT_RESOURCE, servletContext);
 
         service.save(source, previousSource);
+
+        return Response.status(Status.NO_CONTENT).build();
+
+    }
+
+    @PUT
+    @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Operation(tags = "account", security = { @SecurityRequirement(name = DocumentApiResource.BEARER_AUTH),
+            @SecurityRequirement(name = DocumentApiResource.OAUTH2_PASS) })
+    @ApiResponses(value = {
+
+            @ApiResponse(description = "Account is updated", responseCode = "204"),
+            @ApiResponse(description = "Account is not found", responseCode = "404"),
+            @ApiResponse(description = "Account is not accessible", responseCode = "403")
+
+    })
+    @RolesAllowed("account:update")
+    public Response update(@NotNull @PathParam("id") UUID id, @NotNull @Parameter(schema = @Schema(ref = ACCOUNT_SCHEMA)) JsonNode account,
+            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws AccountServiceNotFoundException {
+
+        authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
+
+        JsonNode previousSource = service.get(id);
+
+        schemaMerge.complete(account, previousSource, ACCOUNT_RESOURCE, servletContext);
+
+        schemaValidation.validate(account, previousSource, ACCOUNT_RESOURCE, servletContext);
+
+        service.save(account, previousSource);
 
         return Response.status(Status.NO_CONTENT).build();
 

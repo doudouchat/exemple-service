@@ -72,6 +72,20 @@ public class InitData {
         accountFilter.add("birthday");
         accountFilter.add("addresses[*[city,street]]");
         accountFilter.add("cgus[code,version]");
+        
+        Set<String> accountField = new HashSet<>();
+        accountField.add("id");
+        accountField.add("lastname");
+        accountField.add("firstname");
+        accountField.add("email");
+        accountField.add("optin_mobile");
+        accountField.add("civility");
+        accountField.add("mobile");
+        accountField.add("creation_date");
+        accountField.add("update_date");
+        accountField.add("birthday");
+        accountField.add("addresses[*[city,street]]");
+        accountField.add("cgus[code,version]");
 
         ResourceExecutionContext.get().setKeyspace(detail.getKeyspace());
 
@@ -82,6 +96,7 @@ public class InitData {
         accountSchema.setProfile("user");
         accountSchema.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("account.json").getInputStream())));
         accountSchema.setFilters(accountFilter);
+        accountSchema.setFields(accountField);
 
         schemaResource.save(accountSchema);
 
@@ -90,6 +105,12 @@ public class InitData {
         loginFilter.add("disable");
         loginFilter.add("username");
         loginFilter.add("password");
+        
+        Set<String> loginField = new HashSet<>();
+        loginField.add("id");
+        loginField.add("disable");
+        loginField.add("username");
+        loginField.add("password");
 
         ObjectNode patch = MAPPER.createObjectNode();
         patch.put("op", "add");
@@ -106,6 +127,7 @@ public class InitData {
         loginSchema.setProfile("user");
         loginSchema.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("login.json").getInputStream())));
         loginSchema.setFilters(loginFilter);
+        loginSchema.setFields(loginField);
         loginSchema.setPatchs(loginPatchs);
 
         schemaResource.save(loginSchema);

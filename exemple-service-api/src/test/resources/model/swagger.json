@@ -157,11 +157,80 @@
 					}
 				]
 			},
-			"patch": {
+			"put": {
 				"tags": [
 					"account"
 				],
 				"operationId": "update",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						}
+					},
+					{
+						"name": "app",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "version",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"oneOf": [
+									{
+										"$ref": "#/components/schemas/Account.v1.user"
+									},
+									{
+										"$ref": "#/components/schemas/Account.v2.admin"
+									}
+								]
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Account is updated"
+					},
+					"404": {
+						"description": "Account is not found"
+					},
+					"403": {
+						"description": "Account is not accessible"
+					}
+				},
+				"security": [
+					{
+						"bearer_authentification": []
+					},
+					{
+						"oauth2_password": []
+					}
+				]
+			},
+			"patch": {
+				"tags": [
+					"account"
+				],
+				"operationId": "update_1",
 				"parameters": [
 					{
 						"name": "id",
@@ -279,6 +348,67 @@
 					}
 				]
 			},
+			"put": {
+				"tags": [
+					"login"
+				],
+				"operationId": "update_2",
+				"parameters": [
+					{
+						"name": "username",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "app",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "version",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Login"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Login is updated"
+					},
+					"404": {
+						"description": "Login is not found"
+					},
+					"403": {
+						"description": "Login is not accessible"
+					}
+				},
+				"security": [
+					{
+						"bearer_authentification": []
+					},
+					{
+						"oauth2_password": []
+					}
+				]
+			},
 			"delete": {
 				"tags": [
 					"login"
@@ -367,7 +497,7 @@
 				"tags": [
 					"login"
 				],
-				"operationId": "update_1",
+				"operationId": "update_3",
 				"parameters": [
 					{
 						"name": "username",
@@ -721,7 +851,7 @@
 				"tags": [
 					"subscription"
 				],
-				"operationId": "update_2",
+				"operationId": "update_4",
 				"parameters": [
 					{
 						"name": "email",

@@ -36,6 +36,9 @@ public class SchemaEntity implements Serializable {
     @CqlName("filter")
     private Set<String> filters = Collections.emptySet();
 
+    @CqlName("field")
+    private Set<String> fields = Collections.emptySet();
+
     @CqlName("patch")
     private Set<JsonNode> patchs = Collections.emptySet();
 
@@ -85,6 +88,14 @@ public class SchemaEntity implements Serializable {
 
     public void setFilters(Set<String> filters) {
         this.filters = new LinkedHashSet<>(filters);
+    }
+
+    public Set<String> getFields() {
+        return new LinkedHashSet<>(fields);
+    }
+
+    public void setFields(Set<String> fields) {
+        this.fields = new LinkedHashSet<>(fields);
     }
 
     public Set<JsonNode> getPatchs() {
