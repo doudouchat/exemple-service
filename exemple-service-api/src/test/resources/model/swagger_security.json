@@ -1,0 +1,23 @@
+{
+	"oauth2_password": {
+		"type": "oauth2",
+		"flows": {
+			"password": {
+				"tokenUrl": "/oauth/token"
+			}
+		}
+	},
+	"bearer_authentification": {
+		"type": "http",
+		"scheme": "bearer",
+		"bearerFormat": "JWT"
+	},
+	"oauth2_client_credentials": {
+		"type": "oauth2",
+		"flows": {
+			"clientCredentials": {
+				"tokenUrl": "/oauth/token"
+			}
+		}
+	}
+}

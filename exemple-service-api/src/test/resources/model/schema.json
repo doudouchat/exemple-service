@@ -1,0 +1,25 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"additionalProperties": false,
+	"required": [
+		"email",
+		"lastname",
+		"firstname"
+	],
+	"properties": {
+		"id": {
+			"type": "string",
+			"readOnly": true
+		},
+		"email": {
+			"type": "string",
+			"format": "email"
+		},
+		"lastname": {
+			"type": "string"
+		},
+		"firstname": {
+			"type": "string"
+		}
+	}
+}

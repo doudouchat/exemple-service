@@ -3,7 +3,6 @@ package com.exemple.service.api.common;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,13 +27,9 @@ import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.api.stock.StockApiTest;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.account.exception.AccountServiceException;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
 
 public class ExceptionApiTest extends JerseySpringSupport {
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
     protected ResourceConfig configure() {
@@ -54,7 +49,11 @@ public class ExceptionApiTest extends JerseySpringSupport {
     @Test
     public void notFound() {
 
+        // When perform get
+
         Response response = target("/v1/notfound").request(MediaType.APPLICATION_JSON).get();
+
+        // Then check status
 
         assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
 
@@ -63,7 +62,11 @@ public class ExceptionApiTest extends JerseySpringSupport {
     @Test
     public void notAcceptable() {
 
+        // When perform get
+
         Response response = target(AccountApiTest.URL + "/" + UUID.randomUUID()).request(MediaType.TEXT_HTML).get();
+
+        // Then check status
 
         assertThat(response.getStatus(), is(Status.NOT_ACCEPTABLE.getStatusCode()));
 
@@ -72,14 +75,19 @@ public class ExceptionApiTest extends JerseySpringSupport {
     @Test
     public void JsonException() {
 
+        // When perform post
+
         Response response = target(AccountApiTest.URL).request(MediaType.APPLICATION_JSON).post(Entity.json("toto"));
 
-        assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+        // Then check status
 
+        assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
     }
 
     @Test
     public void JsonEmptyException() {
+
+        // When perform past
 
         Response response = target(AccountApiTest.URL + "/" + UUID.randomUUID()).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
                 .request(MediaType.APPLICATION_JSON)
@@ -88,16 +96,23 @@ public class ExceptionApiTest extends JerseySpringSupport {
 
                 .method("PATCH", Entity.json(Collections.EMPTY_LIST));
 
-        assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+        // Then check status
 
+        assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
     }
 
     @Test
-    public void JsonPatchException() throws AccountServiceException, IOException {
+    public void JsonPatchException() throws AccountServiceNotFoundException {
+
+        // Given account id
 
         UUID id = UUID.randomUUID();
 
-        Mockito.when(service.get(Mockito.eq(id))).thenReturn(JsonNodeUtils.init());
+        // And mock service
+
+        Mockito.when(service.get(Mockito.eq(id))).thenReturn(JsonNodeUtils.create(() -> "{}"));
+
+        // When perform patch
 
         Map<String, Object> patch = new HashMap<>();
         patch.put("op", "replace");
@@ -109,10 +124,9 @@ public class ExceptionApiTest extends JerseySpringSupport {
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
 
-                .method("PATCH", Entity.json(MAPPER.writeValueAsString(Collections.singletonList(patch))));
+                .method("PATCH", Entity.json(JsonNodeUtils.toString(Collections.singletonList(patch))));
 
-        Mockito.verify(service).get(Mockito.eq(id));
-        Mockito.verify(service, Mockito.never()).save(Mockito.any(JsonNode.class), Mockito.any(JsonNode.class));
+        // Then check status
 
         assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
 
@@ -121,14 +135,20 @@ public class ExceptionApiTest extends JerseySpringSupport {
     @Test
     public void unrecognizedPropertyException() {
 
-        String store = "store";
-        String product = "product";
-        String application = "application";
+        // When perform post
 
-        Response response = target(StockApiTest.URL + "/" + store + "/" + product).request(MediaType.APPLICATION_JSON)
-                .header(SchemaBeanParam.APP_HEADER, application).post(Entity.json("{\"other\":10, \"increment\":5}"));
+        Response response = target(StockApiTest.URL + "/store/product").request(MediaType.APPLICATION_JSON)
+
+                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
+
+                .post(Entity.json("{\"other\":10, \"increment\":5}"));
+
+        // Then check status
 
         assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+
+        // And check body
+
         assertThat(response.readEntity(String.class), is("One or more fields are unrecognized"));
 
     }
@@ -136,15 +156,17 @@ public class ExceptionApiTest extends JerseySpringSupport {
     @Test
     public void internalServerError() throws AccountServiceException {
 
-        UUID id = UUID.randomUUID();
+        // Given mock service
 
-        Mockito.when(service.get(Mockito.eq(id))).thenThrow(new RuntimeException());
+        Mockito.when(service.get(Mockito.any(UUID.class))).thenThrow(new RuntimeException());
 
-        Response response = target(AccountApiTest.URL + "/" + id).request(MediaType.APPLICATION_JSON)
+        // When perform post
+
+        Response response = target(AccountApiTest.URL + "/" + UUID.randomUUID()).request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").get();
 
-        Mockito.verify(service).get(Mockito.eq(id));
+        // Then check status
 
         assertThat(response.getStatus(), is(Status.INTERNAL_SERVER_ERROR.getStatusCode()));
 

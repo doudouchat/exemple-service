@@ -32,11 +32,19 @@ public class InfoApiTest extends JerseySpringSupport {
     private static final String URL = "/";
 
     @Test
-    public void template() throws Exception {
+    public void template() {
+
+        // When perform get
 
         Response response = target(URL).request().get();
 
+        // Then check status
+
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+
+        // And check body
+
+        assertThat(response.readEntity(String.class), is("{\"version\":\"nc\",\"buildTime\":\"nc\"}"));
 
     }
 

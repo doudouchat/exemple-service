@@ -6,6 +6,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,13 +29,14 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.auth0.jwt.JWT;
+import com.exemple.service.api.common.JsonNodeUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.JerseySpringSupportSecure;
 import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration.TestFilter;
 import com.exemple.service.api.core.authorization.impl.AuthorizationAlgorithmFactory;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.account.AccountService;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
+import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
 import com.exemple.service.resource.login.LoginResource;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -55,6 +58,9 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     @Autowired
     private AuthorizationAlgorithmFactory authorizationAlgorithmFactory;
 
+    @Autowired
+    private JsonNode account;
+
     @BeforeMethod
     private void before() {
 
@@ -72,9 +78,10 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
 
     private static UUID ID = UUID.randomUUID();
 
-    private static Optional<JsonNode> ID_RESPONSE_LOGIN = Optional.of(JsonNodeUtils.create(Collections.singletonMap("id", ID)));
+    private static Optional<JsonNode> ID_RESPONSE_LOGIN = Optional.of(JsonNodeUtils.create(() -> Collections.singletonMap("id", ID)));
 
-    private static Optional<JsonNode> RANDOM_RESPONSE_LOGIN = Optional.of(JsonNodeUtils.create(Collections.singletonMap("id", UUID.randomUUID())));
+    private static Optional<JsonNode> RANDOM_RESPONSE_LOGIN = Optional
+            .of(JsonNodeUtils.create(() -> Collections.singletonMap("id", UUID.randomUUID())));
 
     @DataProvider(name = "notAuthorized")
     private static Object[][] notAuthorized() {
@@ -107,35 +114,49 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     }
 
     @Test(dataProvider = "notAuthorized")
-    public void authorizedGetUserFailure(String token, Optional<JsonNode> loginResponse) throws Exception {
+    public void authorizedGetUserFailure(String token, Optional<JsonNode> loginResponse) {
+
+        // Given mock service
 
         Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(loginResponse);
+
+        // When perform get
 
         Response response = target(AccountApiTest.URL + "/" + ID).request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token).get();
+
+        // Then check status
 
         assertThat(response.getStatus(), is(Status.FORBIDDEN.getStatusCode()));
 
     }
 
     @Test
-    public void authorizedGetAccount() throws Exception {
+    public void authorizedGetAccount() throws AccountServiceNotFoundException {
+
+        // Given token
 
         String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe").withAudience("exemple")
                 .withArrayClaim("scope", new String[] { "account:read" }).sign(RSA256_ALGORITHM);
 
-        Mockito.when(accountService.get(Mockito.eq(ID))).thenReturn(JsonNodeUtils.init());
-        Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(Optional.of(JsonNodeUtils.create(Collections.singletonMap("id", ID))));
+        // And mock service & resource
+
+        Mockito.when(accountService.get(Mockito.eq(ID))).thenReturn(account);
+        Mockito.when(loginResource.get(Mockito.eq("john_doe")))
+                .thenReturn(Optional.of(JsonNodeUtils.create(() -> Collections.singletonMap("id", ID))));
+
+        // When perform get
 
         Response response = target(AccountApiTest.URL + "/" + ID).request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token).get();
 
-        Mockito.verify(accountService).get(Mockito.eq(ID));
-        Mockito.verify(loginResource).get(Mockito.eq("john_doe"));
+        // Then check status
 
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+
+        // And check security context
 
         assertThat(testFilter.context.getUserPrincipal().getName(), is("john_doe"));
         assertThat(testFilter.context.isSecure(), is(true));
@@ -144,22 +165,33 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     }
 
     @Test
-    public void authorizedPostAccount() throws Exception {
+    public void authorizedPostAccount() {
+
+        // Given token
 
         String token = JWT.create().withClaim("client_id", "clientId1").withAudience("exemple")
                 .withArrayClaim("scope", new String[] { "account:create" }).sign(RSA256_ALGORITHM);
 
-        Mockito.when(accountService.save(Mockito.any(JsonNode.class)))
-                .thenReturn(JsonNodeUtils.create(Collections.singletonMap("id", UUID.randomUUID())));
+        // And mock service
+
+        Mockito.when(accountService.save(Mockito.any(JsonNode.class))).thenReturn(this.account);
+
+        
+        // When perform post
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("email", "jean.dupond@gmail.com");
 
         Response response = target(AccountApiTest.URL).request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
-                .post(Entity.json(JsonNodeUtils.init().toString()));
+                .post(Entity.json(model));
 
-        Mockito.verify(accountService).save(Mockito.any(JsonNode.class));
+        // Then check status
 
         assertThat(response.getStatus(), is(Status.CREATED.getStatusCode()));
+
+        // And check security context
 
         assertThat(testFilter.context.getUserPrincipal().getName(), is("clientId1"));
         assertThat(testFilter.context.isSecure(), is(true));
@@ -168,22 +200,30 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     }
 
     @Test
-    public void authorizedGetUser() throws Exception {
+    public void authorizedGetUser() throws AccountServiceNotFoundException {
+
+        // Given token
 
         String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe").withAudience("exemple")
                 .withArrayClaim("scope", new String[] { "account:read" }).sign(RSA256_ALGORITHM);
 
-        Mockito.when(accountService.get(Mockito.eq(ID))).thenReturn(JsonNodeUtils.init());
-        Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(Optional.of(JsonNodeUtils.create(Collections.singletonMap("id", ID))));
+        // And mock service & resource
+
+        Mockito.when(accountService.get(Mockito.eq(ID))).thenReturn(account);
+        Mockito.when(loginResource.get(Mockito.eq("john_doe")))
+                .thenReturn(Optional.of(JsonNodeUtils.create(() -> Collections.singletonMap("id", ID))));
+
+        // When perform get
 
         Response response = target(AccountApiTest.URL + "/" + ID).request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token).get();
 
-        Mockito.verify(accountService).get(Mockito.eq(ID));
-        Mockito.verify(loginResource).get(Mockito.eq("john_doe"));
+        // Then check status
 
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+
+        // And check security context
 
         assertThat(testFilter.context.getUserPrincipal().getName(), is("john_doe"));
         assertThat(testFilter.context.isSecure(), is(true));

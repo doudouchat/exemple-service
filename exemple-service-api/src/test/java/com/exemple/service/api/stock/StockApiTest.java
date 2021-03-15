@@ -3,10 +3,6 @@ package com.exemple.service.api.stock;
 import static com.exemple.service.api.common.model.ApplicationBeanParam.APP_HEADER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-
-import java.io.InputStream;
-import java.util.Collections;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
@@ -21,17 +17,12 @@ import org.testng.annotations.Test;
 
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
-import com.exemple.service.api.stock.model.Stock;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.store.common.InsufficientStockException;
 import com.exemple.service.store.common.NoFoundStockException;
 import com.exemple.service.store.stock.StockService;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class StockApiTest extends JerseySpringSupport {
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
     protected ResourceConfig configure() {
@@ -51,107 +42,139 @@ public class StockApiTest extends JerseySpringSupport {
     public static final String URL = "/v1/stocks";
 
     @Test
-    public void update() throws Exception {
+    public void update() throws InsufficientStockException {
+
+        // Given stock
 
         String store = "store";
         String product = "product";
         String company = "company1";
         String application = "application";
-        Stock stock = new Stock();
-        stock.setIncrement(5);
 
-        Mockito.when(service.update(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product), Mockito.eq(stock.getIncrement())))
-                .thenReturn(18L);
+        // And mock service
+
+        Mockito.when(service.update(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product), Mockito.eq(5))).thenReturn(18L);
+
+        // When perform post
 
         Response response = target(URL + "/" + store + "/" + product).request(MediaType.APPLICATION_JSON).header(APP_HEADER, application)
-                .post(Entity.json(JsonNodeUtils.create(Collections.singletonMap("increment", stock.getIncrement())).toString()));
+                .post(Entity.json("{\"increment\":5}"));
+
+        // Then check status
 
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
 
-        Mockito.verify(service).update(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product),
-                Mockito.eq(stock.getIncrement()));
+        // And check body
 
-        JsonNode responseEntity = MAPPER.readTree(response.readEntity(InputStream.class));
-        assertThat(responseEntity.asLong(), is(18L));
+        assertThat(response.readEntity(Long.class), is(18L));
 
     }
 
     @Test
     public void updateValidationFailure() {
 
+        // Given stock
+
         String store = "store";
         String product = "product";
         String application = "application";
 
+        // When perform post
+
         Response response = target(URL + "/" + store + "/" + product).request(MediaType.APPLICATION_JSON).header(APP_HEADER, application)
                 .post(Entity.json("{}"));
 
+        // Then check status
+
         assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+
+        // And check body
+
         assertThat(response.readEntity(String.class), is("{\"increment\":\"La valeur doit être renseignée.\"}"));
 
     }
 
     @Test
-    public void updateInsufficientStockFailure() throws Exception {
+    public void updateInsufficientStockFailure() throws InsufficientStockException {
+
+        // Given stock
 
         String store = "store";
         String product = "product";
         String company = "company1";
         String application = "application";
-        Stock stock = new Stock();
-        stock.setIncrement(5);
 
-        Mockito.doThrow(new InsufficientStockException("/" + company, "/" + store, "/" + product, 100, stock.getIncrement())).when(service)
-                .update(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product), Mockito.eq(stock.getIncrement()));
+        // And mock service
+
+        Mockito.doThrow(new InsufficientStockException("/" + company, "/" + store, "/" + product, 100, 5)).when(service)
+                .update(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product), Mockito.eq(5));
+
+        // When perform put
 
         Response response = target(URL + "/" + store + "/" + product).request(MediaType.APPLICATION_JSON).header(APP_HEADER, application)
-                .post(Entity.json(JsonNodeUtils.create(Collections.singletonMap("increment", stock.getIncrement())).toString()));
+                .post(Entity.json("{\"increment\":5}"));
 
-        Mockito.verify(service).update(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product),
-                Mockito.eq(stock.getIncrement()));
+        // Then check status
 
         assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
-        assertThat(response.getEntity(), is(notNullValue()));
+
+        // And check body
+
+        assertThat(response.readEntity(String.class),
+                is(new InsufficientStockException("/" + company, "/" + store, "/" + product, 100, 5).getMessage()));
 
     }
 
     @Test
-    public void get() throws Exception {
+    public void get() throws NoFoundStockException {
+
+        // Given stock
 
         String store = "store";
         String product = "product";
         String company = "company1";
         String application = "application";
-        long stock = 5L;
 
-        Mockito.when(service.get(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product))).thenReturn(stock);
+        // And mock service
+
+        Mockito.when(service.get(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product))).thenReturn(5L);
+
+        // When perform service
 
         Response response = target(URL + "/" + store + "/" + product).request(MediaType.APPLICATION_JSON).header(APP_HEADER, application).get();
 
-        Mockito.verify(service).get(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product));
+        // Then check status
 
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
 
-        JsonNode responseEntity = MAPPER.readTree(response.readEntity(InputStream.class));
+        // and check body
+
+        JsonNode responseEntity = response.readEntity(JsonNode.class);
         assertThat(responseEntity.get("amount").asLong(), is(5L));
         assertThat(responseEntity.has("increment"), is(false));
 
     }
 
     @Test
-    public void getNoFoundStockFailure() throws Exception {
+    public void getNotFoundStockFailure() throws NoFoundStockException {
+
+        // Given stock
 
         String store = "store";
         String product = "product";
         String company = "company1";
         String application = "application";
 
+        // And mock service
+
         Mockito.when(service.get(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product)))
                 .thenThrow(new NoFoundStockException("/" + store, "/" + product, new RuntimeException()));
 
+        // When perform service
+
         Response response = target(URL + "/" + store + "/" + product).request(MediaType.APPLICATION_JSON).header(APP_HEADER, application).get();
 
-        Mockito.verify(service).get(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product));
+        // Then check status
 
         assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
 

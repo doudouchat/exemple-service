@@ -1,9 +1,7 @@
 package com.exemple.service.api.core.swagger;
 
-import static nl.fd.hamcrest.jackson.HasJsonField.hasJsonField;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,12 +19,10 @@ import org.testng.annotations.Test;
 
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
 import com.exemple.service.schema.description.SchemaDescription;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DocumentApiResourceTest extends JerseySpringSupport {
 
@@ -49,6 +45,12 @@ public class DocumentApiResourceTest extends JerseySpringSupport {
     @Autowired
     private SchemaDescription schemaDescription;
 
+    @Autowired
+    private JsonNode schema;
+
+    @Autowired
+    private JsonNode swagger;
+
     @BeforeMethod
     private void before() {
 
@@ -57,31 +59,24 @@ public class DocumentApiResourceTest extends JerseySpringSupport {
     }
 
     @Test
-    public void swagger() throws Exception {
+    public void swagger() {
+
+        // Given service mock
 
         Mockito.when(schemaResource.allVersions(Mockito.anyString())).thenReturn(Collections.singletonMap("account",
                 Arrays.asList(new SchemaVersionProfileEntity("v1", "user"), new SchemaVersionProfileEntity("v2", "admin"))));
 
+        // When perform get
+
         Response response = target(URL).request(MediaType.APPLICATION_JSON).get();
+
+        // Then check status
 
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode responseBody = mapper.readTree(response.readEntity(String.class));
+        // And check body
 
-        assertThat(responseBody, notNullValue());
-        assertThat(responseBody, hasJsonField("components", hasJsonField("schemas",
-                // Account
-                hasJsonField("Account.v1.user", hasJsonField("$ref", ACCOUNT_V1_URL)),
-                // Account
-                hasJsonField("Account.v2.admin", hasJsonField("$ref", ACCOUNT_V2_URL)),
-                // Stock
-                hasJsonField("Stock", hasJsonField("type", "object"),
-                        hasJsonField("properties", hasJsonField("increment", hasJsonField("type", "integer")))),
-                // Patch
-                hasJsonField("Patch", hasJsonField("$ref", PATCH_URL))
-
-        )));
+        assertThat(response.readEntity(JsonNode.class), is(swagger));
 
     }
 
@@ -94,25 +89,42 @@ public class DocumentApiResourceTest extends JerseySpringSupport {
     @Test(dataProvider = "schemas", dependsOnMethods = "swagger")
     public void schemas(String url) throws Exception {
 
-        Mockito.when(schemaDescription.get(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
-                .thenReturn(JsonNodeUtils.init());
+        // Given mock service
+
+        Mockito.when(schemaDescription.get(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(schema);
+
+        // When perform get
 
         Response response = target(url.replaceFirst("ws/", "")).request(MediaType.APPLICATION_JSON).get();
 
+        // Then check status
+
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
-        assertThat(response.getEntity(), is(notNullValue()));
+
+        // And check body
+
+        assertThat(response.readEntity(JsonNode.class), is(schema));
 
     }
 
     @Test(dependsOnMethods = "swagger")
     public void patch() {
 
-        Mockito.when(schemaDescription.getPatch()).thenReturn(JsonNodeUtils.init());
+        // Given mock service
+
+        Mockito.when(schemaDescription.getPatch()).thenReturn(schema);
+
+        // When perform get
 
         Response response = target(PATCH_URL.replaceFirst("ws/", "")).request(MediaType.APPLICATION_JSON).get();
 
+        // Then check status
+
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
-        assertThat(response.getEntity(), is(notNullValue()));
+
+        // And check body
+
+        assertThat(response.readEntity(JsonNode.class), is(schema));
 
     }
 
