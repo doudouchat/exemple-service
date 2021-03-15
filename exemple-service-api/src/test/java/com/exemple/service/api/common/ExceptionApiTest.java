@@ -25,6 +25,7 @@ import com.exemple.service.api.account.AccountApiTest;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
+import com.exemple.service.api.stock.StockApiTest;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.account.exception.AccountServiceException;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
@@ -114,6 +115,21 @@ public class ExceptionApiTest extends JerseySpringSupport {
         Mockito.verify(service, Mockito.never()).save(Mockito.any(JsonNode.class), Mockito.any(JsonNode.class));
 
         assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+
+    }
+
+    @Test
+    public void unrecognizedPropertyException() {
+
+        String store = "store";
+        String product = "product";
+        String application = "application";
+
+        Response response = target(StockApiTest.URL + "/" + store + "/" + product).request(MediaType.APPLICATION_JSON)
+                .header(SchemaBeanParam.APP_HEADER, application).post(Entity.json("{\"other\":10, \"increment\":5}"));
+
+        assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+        assertThat(response.readEntity(String.class), is("One or more fields are unrecognized"));
 
     }
 

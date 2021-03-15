@@ -48,7 +48,7 @@ public class StockApiTest extends JerseySpringSupport {
 
     }
 
-    private static final String URL = "/v1/stocks";
+    public static final String URL = "/v1/stocks";
 
     @Test
     public void update() throws Exception {
@@ -77,18 +77,17 @@ public class StockApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void updateFailure() throws Exception {
+    public void updateValidationFailure() {
 
         String store = "store";
         String product = "product";
         String application = "application";
-        Stock stock = new Stock();
-        stock.setIncrement(5);
 
         Response response = target(URL + "/" + store + "/" + product).request(MediaType.APPLICATION_JSON).header(APP_HEADER, application)
-                .post(Entity.json(JsonNodeUtils.create(Collections.singletonMap("amount", 5)).toString()));
+                .post(Entity.json("{}"));
 
         assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+        assertThat(response.readEntity(String.class), is("{\"increment\":\"La valeur doit être renseignée.\"}"));
 
     }
 

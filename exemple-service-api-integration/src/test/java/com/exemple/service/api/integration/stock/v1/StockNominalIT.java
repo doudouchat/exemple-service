@@ -86,7 +86,7 @@ public class StockNominalIT extends AbstractTestNGSpringContextTests {
 
                 .post(STOCK_URL, store, product);
         assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
-        assertThat(response.getBody().asString(), is("Stock /test_company/" + store + "/" + product + ":13 is insufficient for qunatity -100"));
+        assertThat(response.getBody().asString(), is("Stock /test_company/" + store + "/" + product + ":13 is insufficient for quantity -100"));
 
     }
 
