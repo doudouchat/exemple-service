@@ -10,23 +10,29 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.event.ApplicationEvents;
+import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.exemple.service.context.ServiceContext;
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.account.exception.AccountServiceException;
 import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
-import com.exemple.service.customer.account.model.Account;
+import com.exemple.service.customer.common.JsonNodeUtils;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
+import com.exemple.service.event.model.EventData;
+import com.exemple.service.event.model.EventType;
 import com.exemple.service.resource.account.AccountResource;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
-import com.exemple.service.resource.schema.SchemaResource;
 import com.fasterxml.jackson.databind.JsonNode;
 
+@RecordApplicationEvents
 @ContextConfiguration(classes = { CustomerTestConfiguration.class })
 public class AccountServiceTest extends AbstractTestNGSpringContextTests {
 
@@ -37,7 +43,7 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
     private AccountResource resource;
 
     @Autowired
-    private SchemaResource schemaResource;
+    private ApplicationEvents applicationEvents;
 
     @BeforeMethod
     private void before() {
@@ -46,98 +52,158 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
 
     }
 
-    @AfterClass
-    private void afterClass() {
+    @BeforeClass
+    private void initServiceContextExecution() {
 
-        Mockito.reset(schemaResource);
-
+        ServiceContext context = ServiceContextExecution.context();
+        context.setApp("default");
     }
 
     @Test
     public void save() {
 
-        Account model = new Account();
-        model.setEmail("jean.dupont@gmail.com");
-        model.setLastname("Dupont");
-        model.setFirstname("Jean");
-        model.setOptinEmail(true);
-        model.setCivility("Mr");
+        // Given mock service
 
-        Mockito.when(resource.save(Mockito.any(JsonNode.class))).thenReturn(UUID.randomUUID());
+        UUID accountId = UUID.randomUUID();
+        Mockito.when(resource.save(Mockito.any(JsonNode.class))).thenReturn(accountId);
 
-        JsonNode account = service.save(JsonNodeUtils.create(model));
+        // When perform save
+
+        JsonNode source = JsonNodeUtils.create(() -> {
+
+            Map<String, Object> model = new HashMap<>();
+            model.put("email", "jean.dupont@gmail.com");
+            model.put("lastname", "Dupont");
+            model.put("firstname", "Jean");
+
+            return model;
+
+        });
+
+        JsonNode account = service.save(source);
+
+        // Then check account
+
         assertThat(account, is(notNullValue()));
-
         assertThat(account, hasJsonField("email", "jean.dupont@gmail.com"));
         assertThat(account, hasJsonField("lastname", "Dupont"));
         assertThat(account, hasJsonField("firstname", "Jean"));
-        assertThat(account, hasJsonField("opt_in_email", true));
-        assertThat(account, hasJsonField("civility", "Mr"));
 
-        Mockito.verify(resource).save(Mockito.any(JsonNode.class));
+        // And check save resource
+
+        ArgumentCaptor<JsonNode> accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
+        Mockito.verify(resource).save(accountCaptor.capture());
+        assertThat(accountCaptor.getValue(), is(account));
+
+        // And check publish resource
+
+        Optional<EventData> event = applicationEvents.stream(EventData.class).findFirst();
+        assertThat(event.isPresent(), is(true));
+        assertThat(event.get().getSource(), is(account));
+        assertThat(event.get().getEventType(), is(EventType.CREATE));
+        assertThat(event.get().getResource(), is("account"));
 
     }
 
     @Test
     public void update() {
 
-        Map<String, Object> previousSource = new HashMap<>();
-        previousSource.put("email", "jean.dupont@gmail.com");
-        previousSource.put("lastname", "Dupont");
+        // When perform save
 
-        Mockito.doNothing().when(resource).save(Mockito.any(JsonNode.class), Mockito.any(JsonNode.class));
+        JsonNode previousSource = JsonNodeUtils.create(() -> {
 
-        Map<String, Object> source = new HashMap<>();
-        source.put("email", "jean.dupont@gmail.com");
-        source.put("lastname", "Dupond");
+            Map<String, Object> model = new HashMap<>();
+            model.put("email", "jean.dupont@gmail.com");
+            model.put("lastname", "Dupont");
+            model.put("firstname", "Jean");
 
-        JsonNode account = service.save(JsonNodeUtils.create(source), JsonNodeUtils.create(previousSource));
+            return model;
+
+        });
+
+        JsonNode source = JsonNodeUtils.create(() -> {
+
+            Map<String, Object> model = new HashMap<>();
+            model.put("email", "jean.dupont@gmail.com");
+            model.put("lastname", "Dupond");
+
+            return model;
+
+        });
+
+        JsonNode account = service.save(source, previousSource);
+
+        // Then check account
 
         assertThat(account, is(notNullValue()));
         assertThat(account, hasJsonField("email", "jean.dupont@gmail.com"));
         assertThat(account, hasJsonField("lastname", "Dupond"));
 
-        Mockito.verify(resource).save(Mockito.any(JsonNode.class), Mockito.any(JsonNode.class));
+        // And check save resource
+
+        ArgumentCaptor<JsonNode> accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
+        ArgumentCaptor<JsonNode> previousAccountCaptor = ArgumentCaptor.forClass(JsonNode.class);
+
+        Mockito.verify(resource).save(accountCaptor.capture(), previousAccountCaptor.capture());
+        assertThat(accountCaptor.getValue(), is(account));
+        assertThat(previousAccountCaptor.getValue(), is(previousSource));
+
+        // And check publish resource
+
+        Optional<EventData> event = applicationEvents.stream(EventData.class).findFirst();
+        assertThat(event.isPresent(), is(true));
+        assertThat(event.get().getSource(), is(account));
+        assertThat(event.get().getEventType(), is(EventType.UPDATE));
+        assertThat(event.get().getResource(), is("account"));
 
     }
 
     @Test
     public void get() throws AccountServiceException {
 
-        Map<String, Object> model = new HashMap<>();
-        model.put("email", "jean.dupont@gmail.com");
-        model.put("lastname", "Dupont");
-        model.put("firstname", "Jean");
+        // Given account id
 
         UUID id = UUID.randomUUID();
 
-        Mockito.when(resource.get(Mockito.eq(id))).thenReturn(Optional.of(JsonNodeUtils.create(model)));
+        // And mock resource
+
+        JsonNode source = JsonNodeUtils.create(() -> {
+
+            Map<String, Object> model = new HashMap<>();
+            model.put("email", "jean.dupont@gmail.com");
+            model.put("lastname", "Dupont");
+            model.put("firstname", "Jean");
+
+            return model;
+
+        });
+
+        Mockito.when(resource.get(Mockito.eq(id))).thenReturn(Optional.of(source));
+
+        // When perform get
 
         JsonNode account = service.get(id);
-        assertThat(account, is(notNullValue()));
 
-        assertThat(account, hasJsonField("email", "jean.dupont@gmail.com"));
-        assertThat(account, hasJsonField("lastname", "Dupont"));
-        assertThat(account, hasJsonField("firstname", "Jean"));
+        // Then check account
 
-        Mockito.verify(resource).get(Mockito.eq(id));
+        assertThat(account, is(source));
 
     }
 
     @Test(expectedExceptions = AccountServiceNotFoundException.class)
     public void getNotFound() throws AccountServiceException {
 
-        Account model = new Account();
-        model.setEmail("jean.dupont@gmail.com");
-        model.setLastname("Dupont");
+        // Given account id
 
         UUID id = UUID.randomUUID();
 
+        // And mock resource
+
         Mockito.when(resource.get(Mockito.eq(id))).thenReturn(Optional.empty());
 
-        service.get(id);
+        // When perform get
 
-        Mockito.verify(resource).get(Mockito.eq(id));
+        service.get(id);
 
     }
 
