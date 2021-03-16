@@ -1,5 +1,6 @@
 package com.exemple.service.customer.core.script;
 
+import static nl.fd.hamcrest.jackson.HasJsonField.hasJsonField;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -21,11 +22,12 @@ import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.account.exception.AccountServiceException;
+import com.exemple.service.customer.common.JsonNodeUtils;
 import com.exemple.service.customer.core.CustomerScriptConfiguration;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.exemple.service.resource.account.AccountResource;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 @ContextHierarchy({ @ContextConfiguration(classes = CustomerTestConfiguration.class),
         @ContextConfiguration(classes = CustomerScriptConfiguration.class) })
@@ -63,12 +65,23 @@ public class CustomerScriptFactoryTest extends AbstractTestNGSpringContextTests 
     @Test
     public void save() throws AccountServiceException {
 
-        JsonNode model = JsonNodeUtils.create(Collections.singletonMap("TEST_KEY", "TEST_VALUE"));
+        // Given source
+
+        JsonNode model = JsonNodeUtils.create(() -> Collections.singletonMap("KEY", "VALUE"));
+
+        // And mock resource
 
         Mockito.when(resource.save(Mockito.eq(model))).thenReturn(UUID.randomUUID());
 
-        JsonNode account = service.save(JsonNodeUtils.init());
+        // When perform account
+
+        JsonNode account = service.save(model);
+
+        // Then check account
+
         assertThat(account, is(notNullValue()));
+        assertThat(account, hasJsonField("TEST_KEY", "TEST_VALUE"));
+        assertThat(account.path("KEY").getNodeType(), is(JsonNodeType.MISSING));
 
     }
 }
