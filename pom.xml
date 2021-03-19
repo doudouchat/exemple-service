@@ -54,7 +54,7 @@
 		<org.springframework.boot-version>2.5.0-M3</org.springframework.boot-version>
 		<org.slf4j-version>1.7.30</org.slf4j-version>
 		<datastax-version>4.10.0</datastax-version>
-		<com.fasterxml.jackson-version>2.11.4</com.fasterxml.jackson-version>
+		<com.fasterxml.jackson-version>2.12.2</com.fasterxml.jackson-version>
 		<groovy-version>3.0.7</groovy-version>
 		<cassandra-version>3.11.9</cassandra-version>
 		<!-- SONAR -->
