@@ -6,6 +6,7 @@ import static com.exemple.service.api.integration.core.InitData.TEST_APP;
 import static com.exemple.service.api.integration.core.InitData.VERSION_HEADER;
 import static com.exemple.service.api.integration.core.InitData.VERSION_V1;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.is;
 
 import java.util.ArrayList;
@@ -204,8 +205,8 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
 
     private static void assertHttpClientErrorException(Response response, String expectedPath, String expectedCode) {
 
-        assertThat(response.jsonPath().getList("code").get(0), is(expectedCode));
-        assertThat(response.jsonPath().getList("path").get(0), is(expectedPath));
+        assertThat(response.jsonPath().getList("code"), everyItem(is(expectedCode)));
+        assertThat(response.jsonPath().getList("path"), everyItem(is(expectedPath)));
     }
 
     @Test(dependsOnMethods = "com.exemple.service.api.integration.account.v1.AccountNominalIT.putSuccess")

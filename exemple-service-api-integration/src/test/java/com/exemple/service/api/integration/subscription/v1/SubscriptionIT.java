@@ -5,6 +5,7 @@ import static com.exemple.service.api.integration.core.InitData.TEST_APP;
 import static com.exemple.service.api.integration.core.InitData.VERSION_HEADER;
 import static com.exemple.service.api.integration.core.InitData.VERSION_V1;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -75,8 +76,8 @@ public class SubscriptionIT {
                 .body(Collections.emptyMap()).put(URL + "/{email}", "toto");
 
         assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
-        assertThat(response.jsonPath().getList("code").get(0), is("format"));
-        assertThat(response.jsonPath().getList("path").get(0), is("/email"));
+        assertThat(response.jsonPath().getList("code"), everyItem(is("format")));
+        assertThat(response.jsonPath().getList("path"), everyItem(is("/email")));
 
     }
 
