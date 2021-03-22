@@ -33,5 +33,5 @@ jobs:
          run: mvn clean verify -Pservice,it
       -  name: display logs cargo
          if: ${{ failure() }}
-         run: cat target/cargo/configurations/tomcat9x/logs/container.log
+         run: cat exemple-service-api-integration/target/cargo/configurations/tomcat9x/logs/container.log
       -  uses: codecov/codecov-action@v1
