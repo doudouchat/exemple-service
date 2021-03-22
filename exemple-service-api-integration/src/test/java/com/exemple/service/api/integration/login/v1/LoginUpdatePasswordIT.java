@@ -5,6 +5,7 @@ import static com.exemple.service.api.integration.core.InitData.TEST_APP;
 import static com.exemple.service.api.integration.core.InitData.VERSION_HEADER;
 import static com.exemple.service.api.integration.core.InitData.VERSION_V1;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -102,8 +103,8 @@ public class LoginUpdatePasswordIT extends AbstractTestNGSpringContextTests {
                 .body(model).put(LoginIT.URL + "/{login}", LOGIN);
 
         assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
-        assertThat(response.jsonPath().getList("code").get(0), is("required"));
-        assertThat(response.jsonPath().getList("path").get(0), is("/id"));
+        assertThat(response.jsonPath().getList("code"), contains(is("required")));
+        assertThat(response.jsonPath().getList("path"), contains(is("/id")));
 
     }
 

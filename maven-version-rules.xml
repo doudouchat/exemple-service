@@ -4,4 +4,21 @@
 		<ignoreVersion type="regex">(?i).*redhat(?:-?\d+)?</ignoreVersion>
 		<ignoreVersion type="regex">(?i).*(alpha|beta|RC|M)(?:-?\d+)?</ignoreVersion>
 	</ignoreVersions>
+	<rules>
+		<rule groupId="com.fasterxml.jackson.*" comparisonMethod="maven">
+			<ignoreVersions>
+				<ignoreVersion type="regex">2.12.(.*)</ignoreVersion>
+			</ignoreVersions>
+		</rule>
+		<rule groupId="org.hibernate.validator" comparisonMethod="maven">
+			<ignoreVersions>
+				<ignoreVersion type="regex">7.(.*)</ignoreVersion>
+			</ignoreVersions>
+		</rule>
+		<rule groupId="org.glassfish.jersey.*" comparisonMethod="maven">
+			<ignoreVersions>
+				<ignoreVersion type="regex">3.(.*)</ignoreVersion>
+			</ignoreVersions>
+		</rule>
+	</rules>
 </ruleset>
