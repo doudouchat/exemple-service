@@ -29,6 +29,15 @@ public final class JsonNodeUtils {
         return clone;
     }
 
+    public static JsonNode remove(JsonNode node, String field) {
+
+        ObjectNode clone = node.deepCopy();
+
+        clone.remove(field);
+
+        return clone;
+    }
+
     public static String toString(List<Map<String, Object>> patchs) {
 
         try {

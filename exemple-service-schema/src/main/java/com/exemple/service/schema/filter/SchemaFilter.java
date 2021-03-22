@@ -4,6 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public interface SchemaFilter {
 
-    JsonNode filter(String app, String version, String resource, String profile, JsonNode form);
+    JsonNode filter(String app, String version, String resource, String profile, JsonNode source);
 
 }

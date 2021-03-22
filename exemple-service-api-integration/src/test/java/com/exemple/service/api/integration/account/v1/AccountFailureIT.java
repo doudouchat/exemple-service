@@ -189,7 +189,7 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
         };
     }
 
-    @Test(dataProvider = "updatePatchFailures", dependsOnMethods = "com.exemple.service.api.integration.account.v1.AccountNominalIT.updateSuccess")
+    @Test(dataProvider = "updatePatchFailures", dependsOnMethods = "com.exemple.service.api.integration.account.v1.AccountNominalIT.putSuccess")
     public void updatePatchFailures(Map<String, Object> patch, String expectedPath, String expectedCode) {
 
         Response response = JsonRestTemplate.given()
@@ -208,7 +208,7 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
         assertThat(response.jsonPath().getList("path").get(0), is(expectedPath));
     }
 
-    @Test(dependsOnMethods = "com.exemple.service.api.integration.account.v1.AccountNominalIT.updateSuccess")
+    @Test(dependsOnMethods = "com.exemple.service.api.integration.account.v1.AccountNominalIT.putSuccess")
     public void getSchemaFailure() {
 
         Map<String, List<String>> headers = new HashMap<>();
@@ -248,7 +248,7 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
         };
     }
 
-    @Test(dataProvider = "updateFailure", dependsOnMethods = "com.exemple.service.api.integration.account.v1.AccountNominalIT.updateSuccess")
+    @Test(dataProvider = "updateFailure", dependsOnMethods = "com.exemple.service.api.integration.account.v1.AccountNominalIT.putSuccess")
     public void updateFailure(List<Map<String, Object>> patchs) {
 
         LOG.debug("{}", JsonRestTemplate.given()

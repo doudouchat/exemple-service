@@ -27,6 +27,7 @@ import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.schema.description.SchemaDescription;
 import com.exemple.service.schema.filter.SchemaFilter;
+import com.exemple.service.schema.merge.SchemaMerge;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.exemple.service.store.stock.StockService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -61,6 +62,12 @@ public class ApiTestConfiguration extends ApiConfiguration {
             }
 
         };
+
+    }
+
+    @Bean
+    public SchemaMerge schemaMerge() {
+        return Mockito.mock(SchemaMerge.class);
     }
 
     @Bean

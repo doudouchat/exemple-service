@@ -16,6 +16,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Component;
 import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.schema.FilterHelper;
+import com.exemple.service.api.common.schema.SchemaHelper;
 import com.exemple.service.api.common.schema.ValidationHelper;
 import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
@@ -78,17 +80,20 @@ public class LoginApi {
 
     private final FilterHelper schemaFilter;
 
+    private final SchemaHelper schemaMerge;
+
     private final AuthorizationCheckService authorizationCheckService;
 
     @Context
     private ContainerRequestContext servletContext;
 
-    public LoginApi(LoginService loginService, ValidationHelper schemaValidation, FilterHelper schemaFilter,
+    public LoginApi(LoginService loginService, ValidationHelper schemaValidation, FilterHelper schemaFilter, SchemaHelper schemaMerge,
             AuthorizationCheckService authorizationCheckService) {
 
         this.loginService = loginService;
         this.schemaValidation = schemaValidation;
         this.schemaFilter = schemaFilter;
+        this.schemaMerge = schemaMerge;
         this.authorizationCheckService = authorizationCheckService;
     }
 
@@ -156,6 +161,36 @@ public class LoginApi {
         JsonNode previousSource = loginService.get(username);
 
         JsonNode source = JsonPatch.apply(patch, previousSource);
+
+        schemaValidation.validate(source, previousSource, LOGIN_RESOURCE, servletContext);
+
+        loginService.save(username, source, previousSource);
+
+        return Response.status(Status.NO_CONTENT).build();
+
+    }
+
+    @PUT
+    @Path("/{username}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Operation(tags = "login", security = { @SecurityRequirement(name = DocumentApiResource.BEARER_AUTH),
+            @SecurityRequirement(name = DocumentApiResource.OAUTH2_PASS) })
+    @ApiResponses(value = {
+
+            @ApiResponse(description = "Login is updated", responseCode = "204"),
+            @ApiResponse(description = "Login is not found", responseCode = "404"),
+            @ApiResponse(description = "Login is not accessible", responseCode = "403")
+
+    })
+    @RolesAllowed("login:update")
+    public Response update(@NotNull @PathParam("username") String username, @NotNull @Parameter(schema = @Schema(ref = LOGIN_SCHEMA)) JsonNode source,
+            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws LoginServiceException {
+
+        authorizationCheckService.verifyLogin(username, (ApiSecurityContext) servletContext.getSecurityContext());
+
+        JsonNode previousSource = loginService.get(username);
+
+        schemaMerge.complete(source, previousSource, LOGIN_RESOURCE, servletContext);
 
         schemaValidation.validate(source, previousSource, LOGIN_RESOURCE, servletContext);
 

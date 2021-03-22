@@ -17,6 +17,7 @@
 			<class name="com.exemple.service.api.integration.login.v1.LoginIT" />
 			<class name="com.exemple.service.api.integration.login.v1.LoginMultipleIT" />
 			<class name="com.exemple.service.api.integration.login.v1.LoginUpdateUsernameIT" />
+			<class name="com.exemple.service.api.integration.login.v1.LoginUpdatePasswordIT" />
 		</classes>
 	</test>
 	<test name="subscription">

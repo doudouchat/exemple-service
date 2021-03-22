@@ -30,6 +30,7 @@ import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.customer.login.exception.LoginServiceAlreadyExistException;
 import com.exemple.service.customer.login.exception.LoginServiceNotFoundException;
+import com.exemple.service.schema.merge.SchemaMerge;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
@@ -48,12 +49,15 @@ public class LoginApiTest extends JerseySpringSupport {
     private SchemaValidation schemaValidation;
 
     @Autowired
+    private SchemaMerge schemaMerge;
+
+    @Autowired
     private JsonNode login;
 
     @BeforeMethod
     public void before() {
 
-        Mockito.reset(service, schemaValidation);
+        Mockito.reset(service, schemaValidation, schemaMerge);
 
     }
 
@@ -243,6 +247,62 @@ public class LoginApiTest extends JerseySpringSupport {
                 previousLogin.capture());
         assertThat(previousLogin.getValue(), is(this.login));
         assertThat(login.getValue(), is(expectedLogin));
+
+    }
+
+    @Test
+    public void put() throws LoginServiceNotFoundException, LoginServiceAlreadyExistException {
+
+        // Given user_name
+
+        String username = "jean.dupond@gmail.com";
+
+        // And mock service
+
+        Mockito.when(service.get(Mockito.eq(username))).thenReturn(this.login);
+
+        // When perform past
+
+        JsonNode source = JsonNodeUtils.create(() -> {
+
+            Map<String, Object> model = new HashMap<>();
+            model.put("password", "mdp");
+
+            return model;
+
+        });
+
+        Response response = target(URL + "/" + username).request(MediaType.APPLICATION_JSON)
+
+                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
+
+                .put(Entity.json(source));
+
+        // Then check status
+
+        assertThat(response.getStatus(), is(Status.NO_CONTENT.getStatusCode()));
+
+        // And check service
+
+        ArgumentCaptor<JsonNode> previousLogin = ArgumentCaptor.forClass(JsonNode.class);
+        ArgumentCaptor<JsonNode> login = ArgumentCaptor.forClass(JsonNode.class);
+
+        Mockito.verify(service).save(Mockito.eq(username), login.capture(), previousLogin.capture());
+        assertThat(previousLogin.getValue(), is(this.login));
+        assertThat(login.getValue(), is(source));
+
+        // And check validation
+
+        Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("login"), login.capture(),
+                previousLogin.capture());
+        assertThat(previousLogin.getValue(), is(this.login));
+        assertThat(login.getValue(), is(source));
+
+        // And check merge
+        Mockito.verify(schemaMerge).mergeMissingFieldFromOriginal(Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq("login"), Mockito.anyString(),
+                login.capture(), previousLogin.capture());
+        assertThat(previousLogin.getValue(), is(this.login));
+        assertThat(login.getValue(), is(source));
 
     }
 

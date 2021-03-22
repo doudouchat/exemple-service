@@ -9,6 +9,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import org.testng.annotations.Test;
 import com.exemple.service.api.integration.core.IntegrationTestConfiguration;
 import com.exemple.service.api.integration.core.JsonRestTemplate;
 import com.exemple.service.api.integration.login.v1.LoginIT;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.restassured.response.Response;
 
@@ -37,6 +39,8 @@ public class AccountNominalIT extends AbstractTestNGSpringContextTests {
     protected static Map<String, Object> ACCOUNT_BODY;
 
     protected static Map<String, Object> LOGIN_BODY;
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Test
     public void createSuccess() {
@@ -140,7 +144,7 @@ public class AccountNominalIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "getSuccess")
-    public void updateSuccess() {
+    public void patchSuccess() {
 
         List<Map<String, Object>> patchs = new ArrayList<>();
 
@@ -222,6 +226,40 @@ public class AccountNominalIT extends AbstractTestNGSpringContextTests {
 
         assertThat(responseGet.jsonPath().getString("lastname"), is(patch0.get("value")));
         assertThat(responseGet.jsonPath().getString("firstname"), is(patch1.get("value")));
+        assertThat(responseGet.jsonPath().getString("email"), is(ACCOUNT_BODY.get("email")));
+        assertThat(responseGet.jsonPath().getString("update_date"), is(notNullValue()));
+
+    }
+
+    @Test(dependsOnMethods = "patchSuccess")
+    public void putSuccess() throws IOException {
+
+        Response response = JsonRestTemplate.given()
+
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
+
+                .get(ACCOUNT_URL + "/{id}", ID);
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> model = MAPPER.convertValue(MAPPER.readTree(response.getBody().asString()), Map.class);
+        model.put("firstname", "Roland");
+
+        response = JsonRestTemplate.given()
+
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
+
+                .body(model).put(ACCOUNT_URL + "/{id}", ID);
+
+        assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+
+        Response responseGet = JsonRestTemplate.given()
+
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
+
+                .get(ACCOUNT_URL + "/{id}", ID);
+
+        assertThat(responseGet.jsonPath().getString("lastname"), is(model.get("lastname")));
+        assertThat(responseGet.jsonPath().getString("firstname"), is(model.get("firstname")));
         assertThat(responseGet.jsonPath().getString("email"), is(ACCOUNT_BODY.get("email")));
         assertThat(responseGet.jsonPath().getString("update_date"), is(notNullValue()));
 
