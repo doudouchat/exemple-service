@@ -36,6 +36,22 @@
 
 	</properties>
 
+	<dependencyManagement>
+
+		<dependencies>
+
+			<dependency>
+				<groupId>org.apache.tomcat</groupId>
+				<artifactId>tomcat</artifactId>
+				<version>${tomcat.version}</version>
+				<type>pom</type>
+				<scope>provided</scope>
+			</dependency>
+
+		</dependencies>
+
+	</dependencyManagement>
+
 	<dependencies>
 
 		<!-- RESOURCE -->
