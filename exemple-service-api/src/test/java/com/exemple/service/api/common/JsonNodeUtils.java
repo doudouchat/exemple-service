@@ -10,6 +10,7 @@ import org.springframework.util.ResourceUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public final class JsonNodeUtils {
@@ -60,6 +61,12 @@ public final class JsonNodeUtils {
     public static JsonNode create(Supplier<?> source) {
 
         return MAPPER.convertValue(source.get(), JsonNode.class);
+
+    }
+
+    public static ArrayNode toArrayNode(List<JsonNode> nodes) {
+
+        return MAPPER.createArrayNode().addAll(nodes);
 
     }
 

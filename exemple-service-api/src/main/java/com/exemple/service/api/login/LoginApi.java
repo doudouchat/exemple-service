@@ -32,6 +32,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.springframework.stereotype.Component;
 
+import com.datastax.oss.driver.shaded.guava.common.collect.Streams;
 import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.schema.FilterHelper;
@@ -72,7 +73,11 @@ public class LoginApi {
 
     private static final String LOGIN_SCHEMA = "Login";
 
+    private static final String LOGIN_ID_SCHEMA = "Login_id";
+
     private static final String LOGIN_RESOURCE = "login";
+
+    private static final String LOGIN_ID_RESOURCE = "login_id";
 
     private final LoginService loginService;
 
@@ -154,7 +159,7 @@ public class LoginApi {
     @RolesAllowed("login:update")
     public Response update(@NotNull @PathParam("username") String username,
             @NotEmpty @Patch @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws LoginServiceException {
+            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws LoginServiceNotFoundException {
 
         authorizationCheckService.verifyLogin(username, (ApiSecurityContext) servletContext.getSecurityContext());
 
@@ -164,7 +169,7 @@ public class LoginApi {
 
         schemaValidation.validate(source, previousSource, LOGIN_RESOURCE, servletContext);
 
-        loginService.save(username, source, previousSource);
+        loginService.save(source, previousSource);
 
         return Response.status(Status.NO_CONTENT).build();
 
@@ -184,7 +189,7 @@ public class LoginApi {
     })
     @RolesAllowed("login:update")
     public Response update(@NotNull @PathParam("username") String username, @NotNull @Parameter(schema = @Schema(ref = LOGIN_SCHEMA)) JsonNode source,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws LoginServiceException {
+            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws LoginServiceNotFoundException {
 
         authorizationCheckService.verifyLogin(username, (ApiSecurityContext) servletContext.getSecurityContext());
 
@@ -194,7 +199,7 @@ public class LoginApi {
 
         schemaValidation.validate(source, previousSource, LOGIN_RESOURCE, servletContext);
 
-        loginService.save(username, source, previousSource);
+        loginService.save(source, previousSource);
 
         return Response.status(Status.NO_CONTENT).build();
 
@@ -231,7 +236,7 @@ public class LoginApi {
             @SecurityRequirement(name = DocumentApiResource.OAUTH2_PASS) })
     @ApiResponses(value = {
 
-            @ApiResponse(description = "Login Data", responseCode = "200", content = @Content(schema = @Schema(ref = LOGIN_SCHEMA))),
+            @ApiResponse(description = "Login Data", responseCode = "200", content = @Content(schema = @Schema(ref = LOGIN_ID_SCHEMA))),
             @ApiResponse(description = "Login is not found", responseCode = "404"),
             @ApiResponse(description = "Login is not accessible", responseCode = "403")
 
@@ -242,9 +247,40 @@ public class LoginApi {
 
         authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
 
-        List<JsonNode> logins = loginService.get(id);
+        ArrayNode logins = loginService.get(id);
 
-        return logins.stream().map(login -> schemaFilter.filter(login, LOGIN_RESOURCE, servletContext)).collect(Collectors.toList());
+        return Streams.stream(logins.elements()).map(login -> schemaFilter.filter(login, LOGIN_ID_RESOURCE, servletContext))
+                .collect(Collectors.toList());
+
+    }
+
+    @PATCH
+    @Path("/id/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Operation(tags = "login", security = { @SecurityRequirement(name = DocumentApiResource.BEARER_AUTH),
+            @SecurityRequirement(name = DocumentApiResource.OAUTH2_PASS) })
+    @ApiResponses(value = {
+
+            @ApiResponse(description = "Login is updated", responseCode = "204"),
+            @ApiResponse(description = "Login is not found", responseCode = "404"),
+            @ApiResponse(description = "Login is not accessible", responseCode = "403")
+
+    })
+    @RolesAllowed("login:update")
+    public Response update(@NotNull @PathParam("id") UUID id, @NotEmpty @Patch @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch,
+            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws LoginServiceException {
+
+        authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
+
+        ArrayNode previousSource = loginService.get(id);
+
+        ArrayNode source = (ArrayNode) JsonPatch.apply(patch, previousSource);
+
+        schemaValidation.validate(source, previousSource, LOGIN_ID_RESOURCE, servletContext);
+
+        loginService.save(source, previousSource);
+
+        return Response.status(Status.NO_CONTENT).build();
 
     }
 
@@ -275,7 +311,7 @@ public class LoginApi {
     }
 
     @Provider
-    public static class LoginServiceAlreadyExistExceptionnMapper implements ExceptionMapper<LoginServiceAlreadyExistException> {
+    public static class LoginServiceAlreadyExistExceptionMapper implements ExceptionMapper<LoginServiceAlreadyExistException> {
 
         @Override
         public Response toResponse(LoginServiceAlreadyExistException exception) {

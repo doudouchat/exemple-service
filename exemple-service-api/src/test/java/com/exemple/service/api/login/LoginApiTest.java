@@ -29,11 +29,14 @@ import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.customer.login.exception.LoginServiceAlreadyExistException;
+import com.exemple.service.customer.login.exception.LoginServiceException;
 import com.exemple.service.customer.login.exception.LoginServiceNotFoundException;
 import com.exemple.service.schema.merge.SchemaMerge;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 public class LoginApiTest extends JerseySpringSupport {
 
@@ -202,7 +205,7 @@ public class LoginApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void update() throws LoginServiceNotFoundException, LoginServiceAlreadyExistException {
+    public void update() throws LoginServiceNotFoundException {
 
         // Given user_name
 
@@ -237,7 +240,7 @@ public class LoginApiTest extends JerseySpringSupport {
 
         JsonNode expectedLogin = JsonNodeUtils.set(this.login, "enabled", BooleanNode.TRUE);
 
-        Mockito.verify(service).save(Mockito.eq(username), login.capture(), previousLogin.capture());
+        Mockito.verify(service).save(login.capture(), previousLogin.capture());
         assertThat(previousLogin.getValue(), is(this.login));
         assertThat(login.getValue(), is(expectedLogin));
 
@@ -251,7 +254,7 @@ public class LoginApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void put() throws LoginServiceNotFoundException, LoginServiceAlreadyExistException {
+    public void put() throws LoginServiceNotFoundException {
 
         // Given user_name
 
@@ -287,7 +290,7 @@ public class LoginApiTest extends JerseySpringSupport {
         ArgumentCaptor<JsonNode> previousLogin = ArgumentCaptor.forClass(JsonNode.class);
         ArgumentCaptor<JsonNode> login = ArgumentCaptor.forClass(JsonNode.class);
 
-        Mockito.verify(service).save(Mockito.eq(username), login.capture(), previousLogin.capture());
+        Mockito.verify(service).save(login.capture(), previousLogin.capture());
         assertThat(previousLogin.getValue(), is(this.login));
         assertThat(login.getValue(), is(source));
 
@@ -369,7 +372,7 @@ public class LoginApiTest extends JerseySpringSupport {
 
         // And mock service
 
-        Mockito.when(service.get(Mockito.eq(id))).thenReturn(Collections.singletonList(login));
+        Mockito.when(service.get(Mockito.eq(id))).thenReturn(JsonNodeUtils.toArrayNode(Collections.singletonList(login)));
 
         // When perform get
 
@@ -411,6 +414,55 @@ public class LoginApiTest extends JerseySpringSupport {
         // Then check status
 
         assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
+
+    }
+
+    @Test
+    public void updateById() throws LoginServiceException {
+
+        // Given account id
+
+        UUID id = UUID.randomUUID();
+
+        // And mock service
+
+        Mockito.when(service.get(Mockito.eq(id))).thenReturn(JsonNodeUtils.toArrayNode(Collections.singletonList(login)));
+
+        // When perform past
+
+        Map<String, Object> patch = new HashMap<>();
+        patch.put("op", "replace");
+        patch.put("path", "/0/username");
+        patch.put("value", "jean.dupont");
+
+        Response response = target(URL + "/id/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
+                .request(MediaType.APPLICATION_JSON)
+
+                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
+
+                .method("PATCH", Entity.json(JsonNodeUtils.toString(Collections.singletonList(patch))));
+
+        // Then check status
+
+        assertThat(response.getStatus(), is(Status.NO_CONTENT.getStatusCode()));
+
+        // And check service
+
+        ArgumentCaptor<ArrayNode> previousLogins = ArgumentCaptor.forClass(ArrayNode.class);
+        ArgumentCaptor<ArrayNode> logins = ArgumentCaptor.forClass(ArrayNode.class);
+
+        JsonNode expectedLogin = JsonNodeUtils.set(this.login, "username", TextNode.valueOf("jean.dupont"));
+
+        Mockito.verify(service).save(logins.capture(), previousLogins.capture());
+        assertThat(previousLogins.getValue(), is(JsonNodeUtils.toArrayNode(Collections.singletonList(login))));
+        assertThat(logins.getValue(), is(JsonNodeUtils.toArrayNode(Collections.singletonList(expectedLogin))));
+
+        // And check validation
+
+        Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("login_id"), logins.capture(),
+                previousLogins.capture());
+        assertThat(previousLogins.getValue(), is(JsonNodeUtils.toArrayNode(Collections.singletonList(login))));
+        assertThat(logins.getValue(), is(JsonNodeUtils.toArrayNode(Collections.singletonList(expectedLogin))));
 
     }
 

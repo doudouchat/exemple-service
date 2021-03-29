@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,17 +19,21 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.exemple.service.context.ServiceContext;
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.common.JsonNodeUtils;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.exemple.service.customer.login.exception.LoginServiceAlreadyExistException;
-import com.exemple.service.customer.login.exception.LoginServiceException;
 import com.exemple.service.customer.login.exception.LoginServiceNotFoundException;
 import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.login.exception.LoginResourceExistException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 @ContextConfiguration(classes = { CustomerTestConfiguration.class })
 public class LoginServiceTest extends AbstractTestNGSpringContextTests {
@@ -44,6 +49,13 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
 
         Mockito.reset(resource);
 
+    }
+
+    @BeforeClass
+    private void initServiceContextExecution() {
+
+        ServiceContext context = ServiceContextExecution.context();
+        context.setApp("default");
     }
 
     @Test
@@ -129,7 +141,7 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void updatePassword() throws LoginServiceAlreadyExistException {
+    public void updatePassword() {
 
         // Given user_name
 
@@ -157,7 +169,7 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
 
         });
 
-        service.save(username, source, previousSource);
+        service.save(source, previousSource);
 
         // Then check save resource
 
@@ -171,58 +183,136 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
     @Test
     public void updateUsername() throws LoginResourceExistException, LoginServiceAlreadyExistException {
 
-        // Given user_name
-
-        String username = "jean@gmail.com";
-        String newUsername = "jack@gmail.com";
-
         // When perform save
 
-        JsonNode previousSource = JsonNodeUtils.create(() -> {
+        ArrayNode previousSource = JsonNodeUtils.toArrayNode(() -> {
 
-            Map<String, Object> model = new HashMap<>();
-            model.put("username", username);
-            model.put("password", "mdp123");
+            Map<String, Object> login1 = new HashMap<>();
+            login1.put("username", "jean1@gmail.com");
+            login1.put("password", "mdp123");
 
-            return model;
+            Map<String, Object> login2 = new HashMap<>();
+            login2.put("username", "jean2@gmail.com");
+            login2.put("password", "mdp123");
 
-        });
+            List<Object> logins = new ArrayList<>();
+            logins.add(login1);
+            logins.add(login2);
 
-        JsonNode source = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("username", newUsername);
-            model.put("password", "mdp123");
-
-            return model;
+            return logins;
 
         });
 
-        service.save(username, source, previousSource);
+        ArrayNode source = JsonNodeUtils.toArrayNode(() -> {
+
+            Map<String, Object> login1 = new HashMap<>();
+            login1.put("username", "jean1@gmail.com");
+            login1.put("password", "mdp124");
+
+            Map<String, Object> login2 = new HashMap<>();
+            login2.put("username", "jean3@gmail.com");
+            login2.put("password", "mdp124");
+
+            List<Object> logins = new ArrayList<>();
+            logins.add(login1);
+            logins.add(login2);
+
+            return logins;
+
+        });
+
+        service.save(source, previousSource);
 
         // Then check save resource
 
         ArgumentCaptor<JsonNode> loginCaptor = ArgumentCaptor.forClass(JsonNode.class);
         Mockito.verify(resource).save(loginCaptor.capture());
-        assertThat(loginCaptor.getValue(), is(source));
+        assertThat(loginCaptor.getValue(), hasJsonField("username", "jean3@gmail.com"));
+        assertThat(loginCaptor.getValue().get("password").textValue(), startsWith("{bcrypt}"));
+
+        // And check update resource
+
+        Mockito.verify(resource).update(loginCaptor.capture());
+        assertThat(loginCaptor.getValue(), hasJsonField("username", "jean1@gmail.com"));
+        assertThat(loginCaptor.getValue().get("password").textValue(), startsWith("{bcrypt}"));
 
         // And check delete resource
-
-        Mockito.verify(resource).delete(username);
+        ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(resource).delete(usernameCaptor.capture());
+        assertThat(usernameCaptor.getValue(), is("jean2@gmail.com"));
 
     }
 
-    @Test(expectedExceptions = LoginServiceAlreadyExistException.class)
-    public void updateAlreadyExist() throws LoginServiceException, LoginResourceExistException {
+    @Test
+    public void updateUsernameFailureUsernameAlreadyExist() throws LoginResourceExistException {
+
+        // Given mock exist
+
+        JsonNode login = JsonNodeUtils.create(() -> {
+
+            Map<String, Object> model = new HashMap<>();
+            model.put("username", "jean2@gmail.com");
+            model.put("password", "mdp123");
+
+            return model;
+
+        });
+
+        Mockito.when(resource.get(Mockito.eq("jean2@gmail.com"))).thenReturn(Optional.of(login));
+
+        // When perform save
+
+        ArrayNode previousSource = JsonNodeUtils.toArrayNode(() -> new ArrayList<>());
+
+        ArrayNode source = JsonNodeUtils.toArrayNode(() -> {
+
+            Map<String, Object> login1 = new HashMap<>();
+            login1.put("username", "jean1@gmail.com");
+            login1.put("password", "mdp123");
+
+            Map<String, Object> login2 = new HashMap<>();
+            login2.put("username", "jean2@gmail.com");
+            login2.put("password", "mdp123");
+
+            List<Object> logins = new ArrayList<>();
+            logins.add(login1);
+            logins.add(login2);
+
+            return logins;
+
+        });
+
+        try {
+
+            service.save(source, previousSource);
+
+            Assert.fail("LoginServiceAlreadyExistException must be throwed");
+
+        } catch (LoginServiceAlreadyExistException e) {
+
+            // Then
+            assertThat(e.getUsername(), is("jean2@gmail.com"));
+
+            // And check save resource
+            Mockito.verify(resource, Mockito.never()).save(Mockito.any());
+
+            // And check update resource
+
+            Mockito.verify(resource, Mockito.never()).update(Mockito.any());
+
+            // And check delete resource
+            Mockito.verify(resource, Mockito.never()).delete(Mockito.any());
+        }
+
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Username must be equals")
+    public void updateUsernameFailure() {
 
         // Given user_name
 
         String username = "jean@gmail.com";
         String newUsername = "jack@gmail.com";
-
-        // And mock resource
-
-        Mockito.doThrow(new LoginResourceExistException("jean@gmail.com")).when(resource).save(Mockito.any(JsonNode.class));
 
         // When perform save
 
@@ -246,7 +336,7 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
 
         });
 
-        service.save(username, source, previousSource);
+        service.save(source, previousSource);
 
     }
 
@@ -333,7 +423,7 @@ public class LoginServiceTest extends AbstractTestNGSpringContextTests {
 
         // When perform get
 
-        List<JsonNode> logins = service.get(id);
+        ArrayNode logins = service.get(id);
 
         // Then check logins
 

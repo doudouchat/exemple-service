@@ -1,9 +1,14 @@
 package com.exemple.service.customer.login.impl;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import com.exemple.service.customer.core.script.CustomiseResourceHelper;
 import com.exemple.service.customer.core.script.CustomiseValidationHelper;
@@ -14,6 +19,10 @@ import com.exemple.service.resource.login.LoginField;
 import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.login.exception.LoginResourceExistException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.google.common.collect.Streams;
+import com.pivovarit.function.ThrowingConsumer;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -25,6 +34,8 @@ public class LoginServiceImpl implements LoginService {
     private final CustomiseResourceHelper customiseResourceHelper;
 
     private final CustomiseValidationHelper customiseValidationHelper;
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public LoginServiceImpl(LoginResource loginResource, CustomiseResourceHelper customiseResourceHelper,
             CustomiseValidationHelper customiseValidationHelper) {
@@ -40,22 +51,46 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public void save(String username, JsonNode source, JsonNode previousSource) throws LoginServiceAlreadyExistException {
+    public void save(JsonNode source, JsonNode previousSource) {
+
+        Assert.isTrue(source.path(LoginField.USERNAME.field).equals(previousSource.path(LoginField.USERNAME.field)), "Username must be equals");
 
         customiseValidationHelper.validate(LOGIN, source, previousSource);
 
         JsonNode login = customiseResourceHelper.customise(LOGIN, source, previousSource);
 
-        if (usernameIsModified(username, login)) {
+        updateLogin(login);
 
-            createLogin(login);
+    }
 
-            delete(username);
+    @Override
+    public void save(ArrayNode sources, ArrayNode previousSources) throws LoginServiceAlreadyExistException {
 
-        } else {
+        Map<String, JsonNode> sourcesMap = Streams.stream(sources.elements())
+                .collect(Collectors.toMap((JsonNode source) -> source.get(LoginField.USERNAME.field).textValue(), Function.identity()));
 
-            updateLogin(login);
+        Map<String, JsonNode> previousSource = Streams.stream(previousSources.elements())
+                .collect(Collectors.toMap((JsonNode source) -> source.get(LoginField.USERNAME.field).textValue(), Function.identity()));
+
+        // check login
+        Optional<String> usernameAlreadyExist = sourcesMap.entrySet().stream()
+                .filter((Map.Entry<String, JsonNode> node) -> !previousSource.containsKey(node.getKey())).map(Map.Entry::getKey).filter(this::exist)
+                .findFirst();
+        if (usernameAlreadyExist.isPresent()) {
+            throw new LoginServiceAlreadyExistException(usernameAlreadyExist.get());
         }
+
+        // add login
+        sourcesMap.entrySet().stream().filter((Map.Entry<String, JsonNode> node) -> !previousSource.containsKey(node.getKey()))
+                .map(Map.Entry::getValue).forEach(ThrowingConsumer.sneaky(this::save));
+
+        // update login
+        sourcesMap.entrySet().stream().filter((Map.Entry<String, JsonNode> node) -> previousSource.containsKey(node.getKey()))
+                .forEach((Map.Entry<String, JsonNode> node) -> this.save(node.getValue(), previousSource.get(node.getKey())));
+
+        // delete login
+        previousSource.entrySet().stream().filter((Map.Entry<String, JsonNode> node) -> !sourcesMap.containsKey(node.getKey())).map(Map.Entry::getKey)
+                .forEach(this::delete);
 
     }
 
@@ -84,15 +119,17 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public List<JsonNode> get(UUID id) throws LoginServiceNotFoundException {
+    public ArrayNode get(UUID id) throws LoginServiceNotFoundException {
 
         List<JsonNode> sources = loginResource.get(id);
+        sources.sort((JsonNode login1, JsonNode login2) -> login1.get(LoginField.USERNAME.field).textValue()
+                .compareTo(login2.get(LoginField.USERNAME.field).textValue()));
 
         if (sources.isEmpty()) {
             throw new LoginServiceNotFoundException();
         }
 
-        return sources;
+        return MAPPER.createArrayNode().addAll(sources);
     }
 
     private void createLogin(JsonNode source) throws LoginServiceAlreadyExistException {
@@ -108,10 +145,4 @@ public class LoginServiceImpl implements LoginService {
 
         loginResource.update(source);
     }
-
-    private static boolean usernameIsModified(String login, JsonNode source) {
-
-        return !login.equals(source.path(LoginField.USERNAME.field).textValue());
-    }
-
 }

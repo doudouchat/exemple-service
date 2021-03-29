@@ -72,7 +72,7 @@ public class InitData {
         accountFilter.add("birthday");
         accountFilter.add("addresses[*[city,street]]");
         accountFilter.add("cgus[code,version]");
-        
+
         Set<String> accountField = new HashSet<>();
         accountField.add("id");
         accountField.add("lastname");
@@ -105,20 +105,26 @@ public class InitData {
         loginFilter.add("disable");
         loginFilter.add("username");
         loginFilter.add("password");
-        
+
         Set<String> loginField = new HashSet<>();
         loginField.add("id");
         loginField.add("disable");
         loginField.add("username");
         loginField.add("password");
 
-        ObjectNode patch = MAPPER.createObjectNode();
-        patch.put("op", "add");
-        patch.put("path", "/properties/id/readOnly");
-        patch.put("value", true);
+        ObjectNode patchId = MAPPER.createObjectNode();
+        patchId.put("op", "add");
+        patchId.put("path", "/properties/id/readOnly");
+        patchId.put("value", true);
+
+        ObjectNode patchUsername = MAPPER.createObjectNode();
+        patchUsername.put("op", "add");
+        patchUsername.put("path", "/properties/username/readOnly");
+        patchUsername.put("value", true);
 
         Set<JsonNode> loginPatchs = new HashSet<>();
-        loginPatchs.add(patch);
+        loginPatchs.add(patchId);
+        loginPatchs.add(patchUsername);
 
         SchemaEntity loginSchema = new SchemaEntity();
         loginSchema.setApplication(TEST_APP);
@@ -131,6 +137,29 @@ public class InitData {
         loginSchema.setPatchs(loginPatchs);
 
         schemaResource.save(loginSchema);
+
+        Set<String> loginIdFilter = new HashSet<>();
+        loginIdFilter.add("id");
+        loginIdFilter.add("disable");
+        loginIdFilter.add("username");
+        loginIdFilter.add("password");
+
+        Set<String> loginIdField = new HashSet<>();
+        loginIdField.add("id");
+        loginIdField.add("disable");
+        loginIdField.add("username");
+        loginIdField.add("password");
+
+        SchemaEntity loginIdSchema = new SchemaEntity();
+        loginIdSchema.setApplication(TEST_APP);
+        loginIdSchema.setVersion(VERSION_V1);
+        loginIdSchema.setResource("login_id");
+        loginIdSchema.setProfile("user");
+        loginIdSchema.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("login_id.json").getInputStream())));
+        loginIdSchema.setFilters(loginIdFilter);
+        loginIdSchema.setFields(loginIdField);
+
+        schemaResource.save(loginIdSchema);
 
         Set<String> subscriptionFilter = new HashSet<>();
         subscriptionFilter.add("email");
