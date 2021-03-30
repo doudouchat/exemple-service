@@ -1,0 +1,27 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"additionalProperties": false,
+	"type": "array",
+	"uniqueItems": true,
+	"items": {
+		"$ref": "#/definitions/Address"
+	},
+	"definitions": {
+		"additionalProperties": false,
+		"Address": {
+			"type": "object",
+			"properties": {
+				"street": {
+					"type": "string"
+				},
+				"city": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"street",
+				"city"
+			]
+		}
+	}
+}

@@ -652,10 +652,72 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Login"
+									"$ref": "#/components/schemas/Login_id"
 								}
 							}
 						}
+					},
+					"404": {
+						"description": "Login is not found"
+					},
+					"403": {
+						"description": "Login is not accessible"
+					}
+				},
+				"security": [
+					{
+						"bearer_authentification": []
+					},
+					{
+						"oauth2_password": []
+					}
+				]
+			},
+			"patch": {
+				"tags": [
+					"login"
+				],
+				"operationId": "update_4",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "uuid"
+						}
+					},
+					{
+						"name": "app",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "version",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Patch"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Login is updated"
 					},
 					"404": {
 						"description": "Login is not found"
@@ -851,7 +913,7 @@
 				"tags": [
 					"subscription"
 				],
-				"operationId": "update_4",
+				"operationId": "update_5",
 				"parameters": [
 					{
 						"name": "email",

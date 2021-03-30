@@ -15,7 +15,7 @@ class LoginServiceResourceImpl implements CustomiseResource {
 
     @Override
     Map<String, Object> create(Map<String, Object> source) {
-        if (source.containsKey(PASSWORD)) {
+        if (source.containsKey(PASSWORD) && !((String) source.get(PASSWORD)).startsWith('{bcrypt}')) {
             encryptPassword(source);
         }
         source.put(ROLES, ['ROLE_ACCOUNT'])
@@ -24,7 +24,7 @@ class LoginServiceResourceImpl implements CustomiseResource {
 
     @Override
     Map<String, Object> update(Map<String, Object> source, Map<String, Object> previousSource) {
-        if (source.containsKey(PASSWORD) && (!previousSource || !source.get(PASSWORD).equals(previousSource.get(PASSWORD)))) {
+        if (source.containsKey(PASSWORD) && !((String) source.get(PASSWORD)).startsWith('{bcrypt}')) {
             encryptPassword(source);
         }
         source

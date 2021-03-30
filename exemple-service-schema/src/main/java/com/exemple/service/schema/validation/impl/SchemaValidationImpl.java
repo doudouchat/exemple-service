@@ -157,9 +157,15 @@ public class SchemaValidationImpl implements SchemaValidation {
     private static void performValidation(Schema schema, JsonNode form) {
 
         Validator validator = Validator.builder().readWriteContext(ReadWriteContext.WRITE).build();
-        @SuppressWarnings("unchecked")
-        Map<String, Object> formMap = MAPPER.convertValue(form, Map.class);
-        validator.performValidation(schema, new JSONObject(formMap));
+        if (form.isArray()) {
+            @SuppressWarnings("unchecked")
+            List<Object> formMap = MAPPER.convertValue(form, List.class);
+            validator.performValidation(schema, new JSONArray(formMap));
+        } else {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> formMap = MAPPER.convertValue(form, Map.class);
+            validator.performValidation(schema, new JSONObject(formMap));
+        }
 
     }
 

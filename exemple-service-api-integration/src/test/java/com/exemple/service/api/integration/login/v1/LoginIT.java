@@ -178,8 +178,8 @@ public class LoginIT extends AbstractTestNGSpringContextTests {
         return new Object[][] {
                 // id is readOnly
                 { patch0, "/id", "readOnly" },
-                // username is unique
-                { patch1, "/username", "username" } };
+                // username is readOnly
+                { patch1, "/username", "readOnly" } };
     }
 
     @Test(dataProvider = "updateFailure", dependsOnMethods = "create")
