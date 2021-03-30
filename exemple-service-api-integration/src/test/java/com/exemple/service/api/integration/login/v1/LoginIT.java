@@ -5,6 +5,7 @@ import static com.exemple.service.api.integration.core.InitData.TEST_APP;
 import static com.exemple.service.api.integration.core.InitData.VERSION_HEADER;
 import static com.exemple.service.api.integration.core.InitData.VERSION_V1;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -53,6 +54,26 @@ public class LoginIT extends AbstractTestNGSpringContextTests {
                 .body(body).post(LoginIT.URL);
 
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED.value()));
+
+    }
+
+    @Test
+    public void createFailure() {
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("username", "jean.dupond@gmail.com");
+        body.put("password", "mdp");
+        body.put("id", ID);
+
+        Response response = JsonRestTemplate.given()
+
+                .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
+
+                .body(body).post(LoginIT.URL);
+
+        assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
+        assertThat(response.jsonPath().getList("code"), contains(is("username")));
+        assertThat(response.jsonPath().getList("path"), contains(is("/username")));
 
     }
 
