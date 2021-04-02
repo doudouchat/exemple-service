@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import com.exemple.service.application.common.exception.NotFoundApplicationException;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,6 +25,10 @@ public class ApplicationDetailServiceImpl implements ApplicationDetailService {
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationDetailServiceImpl.class);
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    static {
+        MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
     private final CuratorFramework client;
 
