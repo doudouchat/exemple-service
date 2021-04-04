@@ -19,8 +19,6 @@ public class ApplicationDetail {
     @NotEmpty
     private Set<String> clientIds;
 
-    private Long expiryTimePassword;
-
     public String getKeyspace() {
         return keyspace;
     }
@@ -37,14 +35,6 @@ public class ApplicationDetail {
         this.company = company;
     }
 
-    public Long getExpiryTimePassword() {
-        return expiryTimePassword;
-    }
-
-    public void setExpiryTimePassword(Long expiryTimePassword) {
-        this.expiryTimePassword = expiryTimePassword;
-    }
-
     public Set<String> getClientIds() {
         return Collections.unmodifiableSet(clientIds);
     }
@@ -56,8 +46,7 @@ public class ApplicationDetail {
     @Override
     public String toString() {
 
-        return new ToStringBuilder(this).append("clientIds", clientIds).append("keyspace", keyspace).append("company", company)
-                .append("expiryTimePassword", expiryTimePassword).toString();
+        return new ToStringBuilder(this).append("clientIds", clientIds).append("keyspace", keyspace).append("company", company).toString();
 
     }
 

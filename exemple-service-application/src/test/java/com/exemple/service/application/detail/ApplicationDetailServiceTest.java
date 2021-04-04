@@ -29,7 +29,6 @@ public class ApplicationDetailServiceTest extends AbstractTestNGSpringContextTes
         ApplicationDetail detail = new ApplicationDetail();
         detail.setKeyspace("keyspace1");
         detail.setCompany("company1");
-        detail.setExpiryTimePassword(100L);
         detail.setClientIds(Sets.newHashSet("clientId1"));
 
         service.put("app", detail);
@@ -43,7 +42,6 @@ public class ApplicationDetailServiceTest extends AbstractTestNGSpringContextTes
 
         assertThat(detail.getKeyspace(), is("keyspace1"));
         assertThat(detail.getCompany(), is("company1"));
-        assertThat(detail.getExpiryTimePassword(), is(100L));
         assertThat(detail.getClientIds(), contains("clientId1"));
 
     }
