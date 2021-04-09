@@ -43,7 +43,9 @@ public class LoginUpdateUsernameIT {
         LOGIN_2 = "2_" + random.toString() + "@gmail.com";
     }
 
-    private static final String NEW_LOGIN = UUID.randomUUID() + "@gmail.com";
+    private static final String NEW_LOGIN_1 = UUID.randomUUID() + "@gmail.com";
+
+    private static final String NEW_LOGIN_2 = UUID.randomUUID() + "@gmail.com";
 
     private static final UUID ID = UUID.randomUUID();
 
@@ -87,7 +89,7 @@ public class LoginUpdateUsernameIT {
         Map<String, Object> patch1 = new HashMap<>();
         patch1.put("op", "replace");
         patch1.put("path", "/0/username");
-        patch1.put("value", NEW_LOGIN);
+        patch1.put("value", NEW_LOGIN_1);
 
         patchs.add(patch1);
 
@@ -112,6 +114,20 @@ public class LoginUpdateUsernameIT {
 
         patchs.add(patch4);
 
+        Map<String, Object> patch5 = new HashMap<>();
+        patch5.put("op", "copy");
+        patch5.put("from", "/1");
+        patch5.put("path", "/2");
+
+        patchs.add(patch5);
+
+        Map<String, Object> patch6 = new HashMap<>();
+        patch6.put("op", "replace");
+        patch6.put("path", "/2/username");
+        patch6.put("value", NEW_LOGIN_2);
+
+        patchs.add(patch6);
+
         Response response = JsonRestTemplate.given()
 
                 .header(APP_HEADER, TEST_APP).header(VERSION_HEADER, VERSION_V1)
@@ -127,9 +143,11 @@ public class LoginUpdateUsernameIT {
 
         return new Object[][] {
 
-                { NEW_LOGIN, "mdp" },
+                { NEW_LOGIN_1, "mdp" },
 
-                { LOGIN_2, "mdp123" } };
+                { LOGIN_2, "mdp123" },
+
+                { NEW_LOGIN_2, "mdp123" } };
     }
 
     @Test(dataProvider = "logins", dependsOnMethods = "update")

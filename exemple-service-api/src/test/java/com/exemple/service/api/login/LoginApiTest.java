@@ -5,8 +5,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -430,17 +432,26 @@ public class LoginApiTest extends JerseySpringSupport {
 
         // When perform past
 
-        Map<String, Object> patch = new HashMap<>();
-        patch.put("op", "replace");
-        patch.put("path", "/0/username");
-        patch.put("value", "jean.dupont");
+        Map<String, Object> patch1 = new HashMap<>();
+        patch1.put("op", "copy");
+        patch1.put("from", "/0");
+        patch1.put("path", "/1");
+
+        Map<String, Object> patch2 = new HashMap<>();
+        patch2.put("op", "replace");
+        patch2.put("path", "/0/username");
+        patch2.put("value", "jean.dupont");
+
+        List<Map<String, Object>> patchs = new ArrayList<>();
+        patchs.add(patch1);
+        patchs.add(patch2);
 
         Response response = target(URL + "/id/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
                 .request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
 
-                .method("PATCH", Entity.json(JsonNodeUtils.toString(Collections.singletonList(patch))));
+                .method("PATCH", Entity.json(JsonNodeUtils.toString(patchs)));
 
         // Then check status
 
@@ -453,16 +464,20 @@ public class LoginApiTest extends JerseySpringSupport {
 
         JsonNode expectedLogin = JsonNodeUtils.set(this.login, "username", TextNode.valueOf("jean.dupont"));
 
+        List<JsonNode> expectedLogins = new ArrayList<>();
+        expectedLogins.add(expectedLogin);
+        expectedLogins.add(login);
+
         Mockito.verify(service).save(logins.capture(), previousLogins.capture());
         assertThat(previousLogins.getValue(), is(JsonNodeUtils.toArrayNode(Collections.singletonList(login))));
-        assertThat(logins.getValue(), is(JsonNodeUtils.toArrayNode(Collections.singletonList(expectedLogin))));
+        assertThat(logins.getValue(), is(JsonNodeUtils.toArrayNode(expectedLogins)));
 
         // And check validation
 
         Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("login_id"), logins.capture(),
                 previousLogins.capture());
         assertThat(previousLogins.getValue(), is(JsonNodeUtils.toArrayNode(Collections.singletonList(login))));
-        assertThat(logins.getValue(), is(JsonNodeUtils.toArrayNode(Collections.singletonList(expectedLogin))));
+        assertThat(logins.getValue(), is(JsonNodeUtils.toArrayNode(expectedLogins)));
 
     }
 
