@@ -195,7 +195,7 @@ public class SchemaValidationImpl implements SchemaValidation {
 
     private static boolean isNewException(ValidationExceptionModel cause, Set<JsonPointer> paths) {
 
-        if (!cause.getPointer().head().equals(JsonPointer.empty())) {
+        if (!JsonPointer.empty().equals(cause.getPointer().head())) {
             return paths.contains(cause.getPointer().head());
         }
 

@@ -226,10 +226,7 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
 
         } catch (ValidationException e) {
 
-            LOG.debug("validationFailure {}", e.getMessage());
-
-            e.getAllExceptions().stream()
-                    .forEach(exception -> LOG.debug("code:{} path:{} message:{}", exception.getCode(), exception.getPath(), exception.getMessage()));
+            e.getAllExceptions().stream().forEach(exception -> LOG.debug("{}", exception));
 
             assertThat(e.getAllExceptions().size(), is(1));
 

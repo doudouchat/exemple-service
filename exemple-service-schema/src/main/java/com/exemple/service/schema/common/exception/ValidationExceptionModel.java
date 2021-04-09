@@ -57,4 +57,9 @@ public class ValidationExceptionModel implements Serializable {
         return new EqualsBuilder().append(code, other.code).append(message, other.message).append(path, other.path).isEquals();
     }
 
+    @Override
+    public String toString() {
+        return String.format("ValidationExceptionModel [path=%s, pointer=%s, code=%s, message=%s]", path, pointer, code, message);
+    }
+
 }
