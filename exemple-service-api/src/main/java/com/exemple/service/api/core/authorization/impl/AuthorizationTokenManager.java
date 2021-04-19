@@ -39,6 +39,6 @@ public class AuthorizationTokenManager {
         Assert.notNull(payload.getExpiresAt(), PublicClaims.EXPIRES_AT + " is required in accessToken");
 
         hazelcastInstance.getMap(TOKEN_BLACK_LIST).put(payload.getId(), payload.getExpiresAt(), ChronoUnit.SECONDS.between(LocalDateTime.now(),
-                Instant.ofEpochSecond(payload.getExpiresAt().getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime()), TimeUnit.SECONDS);
+                Instant.ofEpochMilli(payload.getExpiresAt().getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime()), TimeUnit.SECONDS);
     }
 }
