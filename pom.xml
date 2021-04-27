@@ -56,7 +56,7 @@
 		<datastax-version>4.12.0</datastax-version>
 		<com.fasterxml.jackson-version>2.12.3</com.fasterxml.jackson-version>
 		<groovy-version>3.0.8</groovy-version>
-		<cassandra-version>3.11.9</cassandra-version>
+		<cassandra-version>4.0-beta4</cassandra-version>
 		<!-- SONAR -->
 
 		<!-- force sonar to use jacoco -->
