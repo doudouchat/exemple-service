@@ -31,8 +31,8 @@
 		<!-- API -->
 		<cassandra.host>127.0.0.1</cassandra.host>
 		<cassandra.port>9042</cassandra.port>
-		<hazelcast.port>5705</hazelcast.port>
-		<zmp.clientPort>10024</zmp.clientPort>
+		<hazelcast.port>5706</hazelcast.port>
+		<zookeeper.port>10024</zookeeper.port>
 
 	</properties>
 
@@ -283,6 +283,13 @@
 		<profile>
 			<id>service</id>
 
+			<properties>
+
+				<!-- API -->
+				<hazelcast.port>5701</hazelcast.port>
+
+			</properties>
+
 			<dependencies>
 
 				<dependency>
@@ -315,7 +322,6 @@
 										<portName>cargo.rmi.port</portName>
 										<portName>cargo.ajp.port</portName>
 										<portName>cassandra.port</portName>
-										<portName>hazelcast.port</portName>
 										<portName>zookeeper.port</portName>
 										<portName>kafka.port</portName>
 									</portNames>
