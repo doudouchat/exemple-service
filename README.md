@@ -18,4 +18,5 @@
 
 <ol>
 <li>docker-compose up -d service</li>
+<li>dev: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d service</li>
 </ol>

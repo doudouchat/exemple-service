@@ -30,6 +30,8 @@ api:
 zookeeper:
    embedded:
       port: ${zookeeper.port}
+hazelcast:
+   port: ${hazelcast.port}
 kafka:
    embedded:
       port: ${kafka.port}

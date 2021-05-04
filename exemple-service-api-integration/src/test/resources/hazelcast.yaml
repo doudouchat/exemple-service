@@ -1,8 +1,9 @@
 hazelcast:
    config:
       network:
-         port: ${hazelcast.port}
-         port-auto-increment: false
+         port:
+            port: ${hazelcast.port}
+            auto-increment: false
          join:
             tcp-ip:
                enabled: false
