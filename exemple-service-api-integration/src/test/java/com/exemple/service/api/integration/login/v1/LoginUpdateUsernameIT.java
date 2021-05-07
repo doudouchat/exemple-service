@@ -95,7 +95,7 @@ public class LoginUpdateUsernameIT {
 
         Map<String, Object> patch2 = new HashMap<>();
         patch2.put("op", "add");
-        patch2.put("path", "/0/disable");
+        patch2.put("path", "/0/disabled");
         patch2.put("value", true);
 
         patchs.add(patch2);
@@ -109,7 +109,7 @@ public class LoginUpdateUsernameIT {
 
         Map<String, Object> patch4 = new HashMap<>();
         patch4.put("op", "add");
-        patch4.put("path", "/1/disable");
+        patch4.put("path", "/1/disabled");
         patch4.put("value", true);
 
         patchs.add(patch4);
@@ -165,7 +165,7 @@ public class LoginUpdateUsernameIT {
         assertThat(BCrypt.checkpw(expectedPassword, response.jsonPath().getString("password").substring("{bcrypt}".length())), is(true));
         assertThat(response.jsonPath().getString("id"), is(ID.toString()));
         assertThat(response.jsonPath().getString("username"), is(login));
-        assertThat(response.jsonPath().getString("disable"), is("true"));
+        assertThat(response.jsonPath().getString("disabled"), is("true"));
 
     }
 

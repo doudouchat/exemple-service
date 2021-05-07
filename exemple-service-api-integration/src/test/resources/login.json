@@ -17,7 +17,7 @@
 			"type": "string",
 			"writeOnly": true
 		},
-		"disable": {
+		"disabled": {
 			"type": "boolean"
 		}
 	}

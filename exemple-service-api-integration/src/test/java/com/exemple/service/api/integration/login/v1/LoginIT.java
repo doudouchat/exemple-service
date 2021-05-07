@@ -117,13 +117,13 @@ public class LoginIT extends AbstractTestNGSpringContextTests {
 
         Map<String, Object> patch1 = new HashMap<>();
         patch1.put("op", "add");
-        patch1.put("path", "/disable");
+        patch1.put("path", "/disabled");
         patch1.put("value", true);
 
         return new Object[][] {
                 // modify password
                 { patch0 },
-                // disable is true
+                // disabled is true
                 { patch1 } };
     }
 
@@ -158,7 +158,7 @@ public class LoginIT extends AbstractTestNGSpringContextTests {
         assertThat(BCrypt.checkpw("new_mdp", response.jsonPath().getString("password").substring("{bcrypt}".length())), is(true));
         assertThat(response.jsonPath().getString("id"), is(ID.toString()));
         assertThat(response.jsonPath().getString("username"), is(LOGIN));
-        assertThat(response.jsonPath().getString("disable"), is("true"));
+        assertThat(response.jsonPath().getString("disabled"), is("true"));
 
     }
 

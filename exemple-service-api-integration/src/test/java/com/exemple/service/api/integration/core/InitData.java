@@ -102,13 +102,13 @@ public class InitData {
 
         Set<String> loginFilter = new HashSet<>();
         loginFilter.add("id");
-        loginFilter.add("disable");
+        loginFilter.add("disabled");
         loginFilter.add("username");
         loginFilter.add("password");
 
         Set<String> loginField = new HashSet<>();
         loginField.add("id");
-        loginField.add("disable");
+        loginField.add("disabled");
         loginField.add("username");
         loginField.add("password");
 
@@ -140,13 +140,13 @@ public class InitData {
 
         Set<String> loginIdFilter = new HashSet<>();
         loginIdFilter.add("id");
-        loginIdFilter.add("disable");
+        loginIdFilter.add("disabled");
         loginIdFilter.add("username");
         loginIdFilter.add("password");
 
         Set<String> loginIdField = new HashSet<>();
         loginIdField.add("id");
-        loginIdField.add("disable");
+        loginIdField.add("disabled");
         loginIdField.add("username");
         loginIdField.add("password");
 
