@@ -44,10 +44,11 @@ public class SubscriptionResourceTest extends AbstractTestNGSpringContextTests {
 
     }
 
-    @Test
-    public void getNotFound() {
+    @Test(dependsOnMethods = "get")
+    public void delete() {
 
-        assertThat(resource.get(UUID.randomUUID() + "@gmail.com").isPresent(), is(false));
+        resource.delete(email);
+        assertThat(resource.get(email).isPresent(), is(false));
 
     }
 

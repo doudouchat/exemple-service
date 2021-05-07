@@ -52,4 +52,11 @@ public class SubscriptionResourceImpl implements SubscriptionResource {
 
     }
 
+    @Override
+    public void delete(String email) {
+
+        session.execute(QueryBuilder.deleteFrom(ResourceExecutionContext.get().keyspace(), SUBSCRIPTION_TABLE)
+                .whereColumn(SubscriptionField.EMAIL.field).isEqualTo(QueryBuilder.literal(email)).build());
+    }
+
 }
