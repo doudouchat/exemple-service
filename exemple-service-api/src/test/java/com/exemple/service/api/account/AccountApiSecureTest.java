@@ -1,7 +1,5 @@
 package com.exemple.service.api.account;
 
-import static com.exemple.service.api.core.authorization.AuthorizationTestConfiguration.RSA256_ALGORITHM;
-import static com.exemple.service.api.core.authorization.AuthorizationTestConfiguration.TOKEN_KEY_RESPONSE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -19,10 +17,6 @@ import javax.ws.rs.core.SecurityContext;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.mockito.Mockito;
-import org.mockserver.model.Header;
-import org.mockserver.model.HttpRequest;
-import org.mockserver.model.HttpResponse;
-import org.mockserver.model.JsonBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -32,8 +26,10 @@ import com.auth0.jwt.JWT;
 import com.exemple.service.api.common.JsonNodeUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.JerseySpringSupportSecure;
+import com.exemple.service.api.core.authorization.AuthorizationException;
+import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration;
 import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration.TestFilter;
-import com.exemple.service.api.core.authorization.impl.AuthorizationAlgorithmFactory;
+import com.exemple.service.api.core.authorization.impl.AuthorizationTokenValidation;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
@@ -53,10 +49,10 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     private AccountService accountService;
 
     @Autowired
-    private LoginResource loginResource;
+    private AuthorizationTokenValidation authorizationTokenValidation;
 
     @Autowired
-    private AuthorizationAlgorithmFactory authorizationAlgorithmFactory;
+    private LoginResource loginResource;
 
     @Autowired
     private JsonNode account;
@@ -64,15 +60,9 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     @BeforeMethod
     private void before() {
 
-        Mockito.reset(accountService, accountService);
+        Mockito.reset(accountService);
         Mockito.reset(loginResource);
-
-        authorizationAlgorithmFactory.resetAlgorithm();
-
-        authorizationClient.reset();
-        authorizationClient.when(HttpRequest.request().withMethod("GET").withPath("/oauth/token_key"))
-                .respond(HttpResponse.response().withHeaders(new Header("Content-Type", "application/json;charset=UTF-8"))
-                        .withBody(JsonBody.json(TOKEN_KEY_RESPONSE)).withStatusCode(200));
+        Mockito.reset(authorizationTokenValidation);
 
     }
 
@@ -86,17 +76,11 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     @DataProvider(name = "notAuthorized")
     private static Object[][] notAuthorized() {
 
-        String token1 = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe").withAudience("exemple")
-                .withArrayClaim("scope", new String[] { "account:write" }).sign(RSA256_ALGORITHM);
+        String token1 = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe")
+                .withArrayClaim("scope", new String[] { "account:write" }).sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
 
-        String token2 = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe").withAudience("exemple")
-                .withArrayClaim("scope", new String[] { "account:read" }).sign(RSA256_ALGORITHM);
-
-        String token3 = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe").withAudience("other")
-                .withArrayClaim("scope", new String[] { "account:read" }).sign(RSA256_ALGORITHM);
-
-        String token4 = JWT.create().withClaim("client_id", "clientId2").withSubject("john_doe").withAudience("exemple")
-                .withArrayClaim("scope", new String[] { "account:read" }).sign(RSA256_ALGORITHM);
+        String token2 = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe")
+                .withArrayClaim("scope", new String[] { "account:read" }).sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
 
         return new Object[][] {
 
@@ -104,11 +88,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
 
                 { token2, RANDOM_RESPONSE_LOGIN },
 
-                { token2, Optional.empty() },
-
-                { token3, ID_RESPONSE_LOGIN },
-
-                { token4, ID_RESPONSE_LOGIN }
+                { token2, Optional.empty() }
 
         };
     }
@@ -117,8 +97,32 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     public void authorizedGetUserFailure(String token, Optional<JsonNode> loginResponse) {
 
         // Given mock service
-
         Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(loginResponse);
+
+        // When perform get
+
+        Response response = target(AccountApiTest.URL + "/" + ID).request(MediaType.APPLICATION_JSON)
+
+                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token).get();
+
+        // Then check status
+
+        assertThat(response.getStatus(), is(Status.FORBIDDEN.getStatusCode()));
+
+    }
+
+    @Test
+    public void authorizedGetUserFailure() throws AccountServiceNotFoundException, AuthorizationException {
+
+        // Given token
+
+        String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe")
+                .withArrayClaim("scope", new String[] { "account:read" }).sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
+
+        // And mock service & resource
+
+        Mockito.doThrow(new AuthorizationException(Response.Status.FORBIDDEN, "error")).when(authorizationTokenValidation)
+                .checkSignature(Mockito.any());
 
         // When perform get
 
@@ -137,8 +141,8 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
 
         // Given token
 
-        String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe").withAudience("exemple")
-                .withArrayClaim("scope", new String[] { "account:read" }).sign(RSA256_ALGORITHM);
+        String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe")
+                .withArrayClaim("scope", new String[] { "account:read" }).sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
 
         // And mock service & resource
 
@@ -169,14 +173,13 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
 
         // Given token
 
-        String token = JWT.create().withClaim("client_id", "clientId1").withAudience("exemple")
-                .withArrayClaim("scope", new String[] { "account:create" }).sign(RSA256_ALGORITHM);
+        String token = JWT.create().withClaim("client_id", "clientId1").withArrayClaim("scope", new String[] { "account:create" })
+                .sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
 
         // And mock service
 
         Mockito.when(accountService.save(Mockito.any(JsonNode.class))).thenReturn(this.account);
 
-        
         // When perform post
 
         Map<String, Object> model = new HashMap<>();
@@ -204,8 +207,8 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
 
         // Given token
 
-        String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe").withAudience("exemple")
-                .withArrayClaim("scope", new String[] { "account:read" }).sign(RSA256_ALGORITHM);
+        String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe")
+                .withArrayClaim("scope", new String[] { "account:read" }).sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
 
         // And mock service & resource
 

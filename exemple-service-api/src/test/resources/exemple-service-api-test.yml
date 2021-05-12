@@ -1,5 +1,4 @@
 api:
-   resourceId: exemple
    authorization:
       port: ${authorization.port}
       path: http://localhost:${authorization.port}

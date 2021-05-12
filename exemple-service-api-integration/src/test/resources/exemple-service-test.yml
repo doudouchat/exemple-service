@@ -21,7 +21,6 @@ event:
    topic: test
    timeout: 10000
 api:
-   resourceId: exemple
    authorization:
       path: ${authorization.host}:${application.port}/${authorization.contextpath}
       client:

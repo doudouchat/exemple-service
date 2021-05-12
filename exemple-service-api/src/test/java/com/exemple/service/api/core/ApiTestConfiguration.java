@@ -9,7 +9,6 @@ import javax.naming.NamingException;
 import org.mockito.Mockito;
 import org.osjava.sj.SimpleJndi;
 import org.osjava.sj.loader.JndiLoader;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -17,13 +16,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jndi.JndiObjectFactoryBean;
 
 import com.exemple.service.api.common.JsonNodeUtils;
-import com.exemple.service.api.core.authorization.AuthorizationService;
-import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.customer.subscription.SubscriptionService;
-import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.schema.description.SchemaDescription;
 import com.exemple.service.schema.filter.SchemaFilter;
@@ -31,7 +27,6 @@ import com.exemple.service.schema.merge.SchemaMerge;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.exemple.service.store.stock.StockService;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Sets;
 
 @Configuration
 public class ApiTestConfiguration extends ApiConfiguration {
@@ -91,29 +86,8 @@ public class ApiTestConfiguration extends ApiConfiguration {
     }
 
     @Bean
-    public LoginResource loginResource() {
-        return Mockito.mock(LoginResource.class);
-    }
-
-    @Bean(name = "authorizationServiceImpl")
-    @ConditionalOnNotWebApplication
-    public AuthorizationService AuthorizationService() {
-        return Mockito.mock(AuthorizationService.class);
-    }
-
-    @Bean
     public ApplicationDetailService ApplicationDetailService() {
-
-        ApplicationDetailService service = Mockito.mock(ApplicationDetailService.class);
-
-        ApplicationDetail detail = new ApplicationDetail();
-        detail.setKeyspace("test");
-        detail.setCompany("company1");
-        detail.setClientIds(Sets.newHashSet("clientId1"));
-
-        Mockito.when(service.get(Mockito.anyString())).thenReturn(detail);
-
-        return service;
+        return Mockito.mock(ApplicationDetailService.class);
     }
 
     @Bean

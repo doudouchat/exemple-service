@@ -7,34 +7,58 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.SecurityContext;
 
-import org.apache.commons.codec.binary.Base64;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 import com.auth0.jwt.algorithms.Algorithm;
+import com.exemple.service.api.core.authorization.impl.AuthorizationTokenManager;
+import com.exemple.service.api.core.authorization.impl.AuthorizationTokenValidation;
+import com.exemple.service.resource.login.LoginResource;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 
 @Configuration
+@ComponentScan(basePackages = "com.exemple.service.api.core.authorization")
 @Profile("!noSecurity")
 public class AuthorizationTestConfiguration {
 
     public static final Algorithm RSA256_ALGORITHM;
 
-    public static final Map<String, String> TOKEN_KEY_RESPONSE = new HashMap<>();
+    public static final PublicKey PUBLIC_KEY;
+
+    public static final Algorithm OTHER_RSA256_ALGORITHM;
+
+    public static final PublicKey OTHER_PUBLIC_KEY;
 
     static {
+
+        KeyPairGenerator keyPairGenerator = buildKeyPairGenerator();
+        KeyPair keypair = keyPairGenerator.genKeyPair();
+        PrivateKey privateKey = keypair.getPrivate();
+
+        PUBLIC_KEY = keypair.getPublic();
+        RSA256_ALGORITHM = Algorithm.RSA256((RSAPublicKey) PUBLIC_KEY, (RSAPrivateKey) privateKey);
+
+        KeyPairGenerator otherKeyPairGenerator = buildKeyPairGenerator();
+        KeyPair otherKeypair = otherKeyPairGenerator.genKeyPair();
+        PrivateKey otherPrivateKey = otherKeypair.getPrivate();
+
+        OTHER_PUBLIC_KEY = otherKeypair.getPublic();
+        OTHER_RSA256_ALGORITHM = Algorithm.RSA256((RSAPublicKey) OTHER_PUBLIC_KEY, (RSAPrivateKey) otherPrivateKey);
+
+    }
+
+    public static KeyPairGenerator buildKeyPairGenerator() {
 
         KeyPairGenerator keyPairGenerator;
         try {
@@ -44,31 +68,55 @@ public class AuthorizationTestConfiguration {
         }
 
         keyPairGenerator.initialize(1024);
-        KeyPair keypair = keyPairGenerator.genKeyPair();
-        PrivateKey privateKey = keypair.getPrivate();
-        PublicKey publicKey = keypair.getPublic();
+        return keyPairGenerator;
+    }
 
-        RSA256_ALGORITHM = Algorithm.RSA256((RSAPublicKey) publicKey, (RSAPrivateKey) privateKey);
+    @Bean
+    public LoginResource loginResource() {
+        return Mockito.mock(LoginResource.class);
+    }
 
-        TOKEN_KEY_RESPONSE.put("alg", "SHA256withRSA");
-        TOKEN_KEY_RESPONSE.put("value",
-                "-----BEGIN PUBLIC KEY-----\n" + new String(Base64.encodeBase64(publicKey.getEncoded())) + "\n-----END PUBLIC KEY-----");
+    @Configuration
+    @Profile("AuthorizationMock")
+    public class AuthorizationMock {
+
+        @Bean
+        public AuthorizationTokenManager authorizationTokenManager() {
+
+            AuthorizationTokenManager authorizationTokenManager = Mockito.mock(AuthorizationTokenManager.class);
+            Mockito.when(authorizationTokenManager.containsToken(Mockito.any())).thenReturn(false);
+
+            return authorizationTokenManager;
+
+        }
+
+        @Bean
+        public AuthorizationTokenValidation authorizationTokenValidation() {
+
+            return Mockito.mock(AuthorizationTokenValidation.class);
+
+        }
 
     }
 
-    @Value("${api.authorization.hazelcast.port}")
-    private int port;
+    @Configuration
+    @Profile("!AuthorizationMock")
+    public class NotAuthorizationMock {
 
-    @Bean
-    @Primary
-    public HazelcastInstance hazelcastInstanceServer() {
+        @Value("${api.authorization.hazelcast.port}")
+        private int port;
 
-        Config config = new Config();
-        config.getNetworkConfig().setPort(port);
-        config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
-        config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
+        @Bean
+        public HazelcastInstance hazelcastInstanceServer() {
 
-        return Hazelcast.newHazelcastInstance(config);
+            Config config = new Config();
+            config.getNetworkConfig().setPort(port);
+            config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
+            config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
+
+            return Hazelcast.newHazelcastInstance(config);
+        }
+
     }
 
     public static class TestFilter implements ContainerRequestFilter {
@@ -83,4 +131,5 @@ public class AuthorizationTestConfiguration {
         }
 
     }
+
 }
