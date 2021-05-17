@@ -18,8 +18,8 @@ import org.springframework.jndi.JndiObjectFactoryBean;
 import com.exemple.service.api.common.JsonNodeUtils;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.customer.account.AccountService;
-import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.customer.subscription.SubscriptionService;
+import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.schema.description.SchemaDescription;
 import com.exemple.service.schema.filter.SchemaFilter;
@@ -66,8 +66,8 @@ public class ApiTestConfiguration extends ApiConfiguration {
     }
 
     @Bean
-    public LoginService loginService() {
-        return Mockito.mock(LoginService.class);
+    public LoginResource loginResource() {
+        return Mockito.mock(LoginResource.class);
     }
 
     @Bean
@@ -116,12 +116,6 @@ public class ApiTestConfiguration extends ApiConfiguration {
     public JsonNode account() {
 
         return JsonNodeUtils.create("classpath:model/account.json");
-    }
-
-    @Bean(name = "login")
-    public JsonNode login() {
-
-        return JsonNodeUtils.create("classpath:model/login.json");
     }
 
     @Bean(name = "subscription")

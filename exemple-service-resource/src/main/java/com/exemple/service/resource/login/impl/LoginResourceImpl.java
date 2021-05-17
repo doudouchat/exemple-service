@@ -1,92 +1,65 @@
 package com.exemple.service.resource.login.impl;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.Row;
-import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
-import com.datastax.oss.driver.api.querybuilder.insert.Insert;
-import com.datastax.oss.driver.api.querybuilder.select.Select;
-import com.exemple.service.resource.common.JsonQueryBuilder;
 import com.exemple.service.resource.core.ResourceExecutionContext;
-import com.exemple.service.resource.login.LoginField;
 import com.exemple.service.resource.login.LoginResource;
-import com.exemple.service.resource.login.exception.LoginResourceExistException;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.exemple.service.resource.login.dao.LoginDao;
+import com.exemple.service.resource.login.exception.UsernameAlreadyExistsException;
+import com.exemple.service.resource.login.mapper.LoginMapper;
+import com.exemple.service.resource.login.model.LoginEntity;
 
 @Service
 @Validated
 public class LoginResourceImpl implements LoginResource {
 
-    private static final String LOGIN_TABLE = "login";
-
     private final CqlSession session;
 
-    private final JsonQueryBuilder jsonQueryBuilder;
+    private final ConcurrentMap<String, LoginMapper> mappers;
 
     public LoginResourceImpl(CqlSession session) {
+
         this.session = session;
-        this.jsonQueryBuilder = new JsonQueryBuilder(session, LOGIN_TABLE);
-
+        this.mappers = new ConcurrentHashMap<>();
     }
 
     @Override
-    public Optional<JsonNode> get(String username) {
+    public Optional<LoginEntity> get(String username) {
 
-        return Optional.ofNullable(getByUsername(username));
+        return Optional.ofNullable(dao().findByUsername(username));
     }
 
     @Override
-    public void update(JsonNode source) {
+    public void save(LoginEntity source) throws UsernameAlreadyExistsException {
+        boolean notExists = dao().create(source);
 
-        Insert insert = jsonQueryBuilder.insert(source);
+        if (!notExists) {
 
-        session.execute(insert.build());
-    }
-
-    @Override
-    public void save(JsonNode source) throws LoginResourceExistException {
-
-        Insert insert = jsonQueryBuilder.insert(source).ifNotExists();
-
-        Row resultLogin = session.execute(insert.build()).one();
-        boolean notExistLogin = resultLogin.getBoolean(0);
-
-        if (!notExistLogin) {
-            throw new LoginResourceExistException(resultLogin.getString(1));
+            throw new UsernameAlreadyExistsException(source.getUsername());
         }
+
     }
 
     @Override
     public void delete(String username) {
+        dao().deleteByUsername(username);
 
-        session.execute(QueryBuilder.deleteFrom(ResourceExecutionContext.get().keyspace(), LOGIN_TABLE).whereColumn(LoginField.USERNAME.field)
-                .isEqualTo(QueryBuilder.literal(username)).build());
     }
 
-    @Override
-    public List<JsonNode> get(UUID id) {
+    private LoginDao dao() {
 
-        Select select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), LOGIN_TABLE).json().all().whereColumn(LoginField.ID.field)
-                .isEqualTo(QueryBuilder.literal(id));
-
-        return session.execute(select.build()).all().stream().map((Row row) -> row.get(0, JsonNode.class)).collect(Collectors.toList());
+        return mappers.computeIfAbsent(ResourceExecutionContext.get().keyspace(), this::build).loginDao();
     }
 
-    private JsonNode getByUsername(String username) {
+    private LoginMapper build(String keyspace) {
 
-        Select select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), LOGIN_TABLE).json().all()
-                .whereColumn(LoginField.USERNAME.field).isEqualTo(QueryBuilder.literal(username));
-
-        Row row = session.execute(select.build()).one();
-
-        return row != null ? row.get(0, JsonNode.class) : null;
+        return LoginMapper.builder(session).withDefaultKeyspace(keyspace).build();
     }
 
 }

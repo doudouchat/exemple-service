@@ -17,18 +17,12 @@ public class LoginTestContext {
 
     private final LinkedList<Response> getResponses;
 
-    private final LinkedList<Response> patchResponses;
-
-    private final LinkedList<Response> putResponses;
-
     private final LinkedList<Response> deleteResponses;
 
     public LoginTestContext() {
         this.responses = new LinkedList<>();
         this.postResponses = new LinkedList<>();
         this.getResponses = new LinkedList<>();
-        this.patchResponses = new LinkedList<>();
-        this.putResponses = new LinkedList<>();
         this.deleteResponses = new LinkedList<>();
 
     }
@@ -51,20 +45,6 @@ public class LoginTestContext {
         return this.getResponses.getLast();
     }
 
-    public void savePatch(Response patch) {
-        this.responses.add(patch);
-        this.patchResponses.add(patch);
-    }
-
-    public Response lastPatch() {
-        return this.patchResponses.getLast();
-    }
-
-    public void savePut(Response put) {
-        this.responses.add(put);
-        this.putResponses.add(put);
-    }
-
     public Response lastDelete() {
         return this.deleteResponses.getLast();
     }
@@ -72,10 +52,6 @@ public class LoginTestContext {
     public void saveDelete(Response delete) {
         this.responses.add(delete);
         this.deleteResponses.add(delete);
-    }
-
-    public Response lastPut() {
-        return this.patchResponses.getLast();
     }
 
     public Response lastResponse() {

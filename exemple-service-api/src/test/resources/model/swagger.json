@@ -333,14 +333,6 @@
 						"schema": {
 							"type": "string"
 						}
-					},
-					{
-						"name": "version",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
 					}
 				],
 				"responses": {
@@ -353,67 +345,6 @@
 								}
 							}
 						}
-					},
-					"404": {
-						"description": "Login is not found"
-					},
-					"403": {
-						"description": "Login is not accessible"
-					}
-				},
-				"security": [
-					{
-						"bearer_authentification": []
-					},
-					{
-						"oauth2_password": []
-					}
-				]
-			},
-			"put": {
-				"tags": [
-					"login"
-				],
-				"operationId": "update_2",
-				"parameters": [
-					{
-						"name": "username",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "app",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "version",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/Login"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"204": {
-						"description": "Login is updated"
 					},
 					"404": {
 						"description": "Login is not found"
@@ -514,67 +445,6 @@
 						"oauth2_client_credentials": []
 					}
 				]
-			},
-			"patch": {
-				"tags": [
-					"login"
-				],
-				"operationId": "update_3",
-				"parameters": [
-					{
-						"name": "username",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "app",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "version",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/Patch"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"204": {
-						"description": "Login is updated"
-					},
-					"404": {
-						"description": "Login is not found"
-					},
-					"403": {
-						"description": "Login is not accessible"
-					}
-				},
-				"security": [
-					{
-						"bearer_authentification": []
-					},
-					{
-						"oauth2_password": []
-					}
-				]
 			}
 		},
 		"/ws/v1/logins": {
@@ -591,21 +461,13 @@
 						"schema": {
 							"type": "string"
 						}
-					},
-					{
-						"name": "version",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
 					}
 				],
 				"requestBody": {
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/Login"
+								"$ref": "#/components/schemas/LoginModel"
 							}
 						}
 					},
@@ -631,129 +493,6 @@
 					},
 					{
 						"oauth2_client_credentials": []
-					}
-				]
-			}
-		},
-		"/ws/v1/logins/id/{id}": {
-			"get": {
-				"tags": [
-					"login"
-				],
-				"operationId": "getById",
-				"parameters": [
-					{
-						"name": "id",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"format": "uuid"
-						}
-					},
-					{
-						"name": "app",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "version",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Login Data",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Login_id"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Login is not found"
-					},
-					"403": {
-						"description": "Login is not accessible"
-					}
-				},
-				"security": [
-					{
-						"bearer_authentification": []
-					},
-					{
-						"oauth2_password": []
-					}
-				]
-			},
-			"patch": {
-				"tags": [
-					"login"
-				],
-				"operationId": "update_4",
-				"parameters": [
-					{
-						"name": "id",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"format": "uuid"
-						}
-					},
-					{
-						"name": "app",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "version",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/Patch"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"204": {
-						"description": "Login is updated"
-					},
-					"404": {
-						"description": "Login is not found"
-					},
-					"403": {
-						"description": "Login is not accessible"
-					}
-				},
-				"security": [
-					{
-						"bearer_authentification": []
-					},
-					{
-						"oauth2_password": []
 					}
 				]
 			}
@@ -935,7 +674,7 @@
 				"tags": [
 					"subscription"
 				],
-				"operationId": "update_5",
+				"operationId": "update_2",
 				"parameters": [
 					{
 						"name": "email",
@@ -1065,6 +804,23 @@
 					},
 					"buildTime": {
 						"type": "string"
+					}
+				}
+			},
+			"LoginModel": {
+				"required": [
+					"id",
+					"username"
+				],
+				"type": "object",
+				"properties": {
+					"username": {
+						"type": "string",
+						"writeOnly": true
+					},
+					"id": {
+						"type": "string",
+						"format": "uuid"
 					}
 				}
 			},

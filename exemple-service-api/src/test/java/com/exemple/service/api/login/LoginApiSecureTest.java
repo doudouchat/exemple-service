@@ -3,9 +3,6 @@ package com.exemple.service.api.login;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,17 +18,13 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.auth0.jwt.JWT;
-import com.exemple.service.api.common.JsonNodeUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.JerseySpringSupportSecure;
 import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration;
 import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration.TestFilter;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
-import com.exemple.service.customer.account.AccountService;
-import com.exemple.service.customer.login.LoginService;
-import com.exemple.service.customer.login.exception.LoginServiceNotFoundException;
 import com.exemple.service.resource.login.LoginResource;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.exemple.service.resource.login.model.LoginEntity;
 
 public class LoginApiSecureTest extends JerseySpringSupportSecure {
 
@@ -43,21 +36,10 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
     }
 
     @Autowired
-    private AccountService accountService;
-
-    @Autowired
-    private LoginService loginService;
-
-    @Autowired
     private LoginResource loginResource;
-
-    @Autowired
-    private JsonNode login;
 
     @BeforeMethod
     private void before() {
-
-        Mockito.reset(accountService);
         Mockito.reset(loginResource);
 
     }
@@ -65,11 +47,15 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
     private static UUID ID = UUID.randomUUID();
 
     @Test
-    public void authorizedGetLoginWithPrincipal() throws LoginServiceNotFoundException {
+    public void authorizedGetLoginWithPrincipal() {
 
         // Given user_name
 
         String username = "jean.dupond@gmail.com";
+
+        LoginEntity first = new LoginEntity();
+        first.setUsername(username);
+        first.setId(ID);
 
         // and token
 
@@ -78,7 +64,7 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
 
         // And mock service
 
-        Mockito.when(loginService.get(Mockito.eq(username))).thenReturn(login);
+        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(first));
 
         // When perform get
 
@@ -99,25 +85,23 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
     }
 
     @Test
-    public void authorizedGetLoginWithSecond() throws LoginServiceNotFoundException {
+    public void authorizedGetLoginWithSecond() {
 
         // Given user_name
 
         String username = "jean.dupond@gmail.com";
 
+        LoginEntity first = new LoginEntity();
+        first.setUsername(username);
+        first.setId(ID);
+
         // And second login
 
         String secondUsername = "jack.dupond@gmail.com";
 
-        JsonNode second = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("username", secondUsername);
-            model.put("password", "jean.dupont");
-            model.put("id", ID);
-
-            return model;
-        });
+        LoginEntity second = new LoginEntity();
+        second.setUsername(secondUsername);
+        second.setId(ID);
 
         // And token
 
@@ -126,16 +110,8 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
 
         // And mock service & resource
 
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("password", "jean.dupont");
-            model.put("id", ID);
-
-            return model;
-        })));
-        Mockito.when(loginResource.get(Mockito.eq(ID))).thenReturn(Collections.singletonList(second));
-        Mockito.when(loginService.get(Mockito.eq(username))).thenReturn(login);
+        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(first));
+        Mockito.when(loginResource.get(Mockito.eq(secondUsername))).thenReturn(Optional.of(second));
 
         // When perform get
 
@@ -180,42 +156,33 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
     }
 
     @Test
-    public void authorizedGetLoginWithSecondFailure() throws LoginServiceNotFoundException {
+    public void authorizedGetLoginWithSecondFailure() {
 
         // Given user_name
 
         String username = "jean.dupond@gmail.com";
 
+        LoginEntity first = new LoginEntity();
+        first.setUsername(username);
+        first.setId(ID);
+
         // And second login
 
         String secondUsername = "jack.dupond@gmail.com";
 
-        JsonNode second = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("username", secondUsername);
-            model.put("password", "jean.dupont");
-            model.put("id", ID);
-
-            return model;
-        });
+        LoginEntity second = new LoginEntity();
+        second.setUsername(secondUsername);
+        second.setId(UUID.randomUUID());
 
         // And token
 
-        String token = JWT.create().withClaim("client_id", "clientId1").withSubject("other").withArrayClaim("scope", new String[] { "login:read" })
-                .sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
+        String token = JWT.create().withClaim("client_id", "clientId1").withSubject(secondUsername)
+                .withArrayClaim("scope", new String[] { "login:read" }).sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
 
         // And mock service & resource
 
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("password", "jean.dupont");
-            model.put("id", ID);
-
-            return model;
-        })));
-        Mockito.when(loginResource.get(Mockito.eq(ID))).thenReturn(Collections.singletonList(second));
+        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(first));
+        Mockito.when(loginResource.get(Mockito.eq(secondUsername))).thenReturn(Optional.of(second));
 
         // When perform get
 

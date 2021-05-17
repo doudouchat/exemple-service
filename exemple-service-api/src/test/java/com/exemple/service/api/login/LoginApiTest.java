@@ -1,15 +1,14 @@
 package com.exemple.service.api.login;
 
-import static com.exemple.service.api.common.model.ApplicationBeanParam.APP_HEADER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.ws.rs.client.Entity;
@@ -17,7 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -29,16 +27,10 @@ import com.exemple.service.api.common.JsonNodeUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
-import com.exemple.service.customer.login.LoginService;
-import com.exemple.service.customer.login.exception.LoginServiceAlreadyExistException;
-import com.exemple.service.customer.login.exception.LoginServiceException;
-import com.exemple.service.customer.login.exception.LoginServiceNotFoundException;
-import com.exemple.service.schema.merge.SchemaMerge;
-import com.exemple.service.schema.validation.SchemaValidation;
+import com.exemple.service.resource.login.LoginResource;
+import com.exemple.service.resource.login.exception.UsernameAlreadyExistsException;
+import com.exemple.service.resource.login.model.LoginEntity;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.BooleanNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 
 public class LoginApiTest extends JerseySpringSupport {
 
@@ -48,21 +40,12 @@ public class LoginApiTest extends JerseySpringSupport {
     }
 
     @Autowired
-    private LoginService service;
-
-    @Autowired
-    private SchemaValidation schemaValidation;
-
-    @Autowired
-    private SchemaMerge schemaMerge;
-
-    @Autowired
-    private JsonNode login;
+    private LoginResource resource;
 
     @BeforeMethod
     public void before() {
 
-        Mockito.reset(service, schemaValidation, schemaMerge);
+        Mockito.reset(resource);
 
     }
 
@@ -77,11 +60,11 @@ public class LoginApiTest extends JerseySpringSupport {
 
         // And mock service
 
-        Mockito.when(service.exist(Mockito.eq(username))).thenReturn(true);
+        Mockito.when(resource.get(Mockito.eq(username))).thenReturn(Optional.of(new LoginEntity()));
 
         // When perform head
 
-        Response response = target(URL + "/" + username).request().header(APP_HEADER, "test").head();
+        Response response = target(URL + "/" + username).request().header(SchemaBeanParam.APP_HEADER, "test").head();
 
         // Then check status
 
@@ -92,17 +75,17 @@ public class LoginApiTest extends JerseySpringSupport {
     @Test
     public void checkNotFound() throws Exception {
 
-        // Given login
+        // Given username
 
-        String login = "jean.dupond@gmail.com";
+        String username = "jean.dupond@gmail.com";
 
         // And mock service
 
-        Mockito.when(service.exist(Mockito.eq(login))).thenReturn(false);
+        Mockito.when(resource.get(Mockito.eq(username))).thenReturn(Optional.empty());
 
         // When perform head
 
-        Response response = target(URL + "/" + login).request().header(APP_HEADER, "test").head();
+        Response response = target(URL + "/" + username).request().header(SchemaBeanParam.APP_HEADER, "test").head();
 
         // Then check status
 
@@ -111,7 +94,7 @@ public class LoginApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void create() throws LoginServiceAlreadyExistException {
+    public void create() throws UsernameAlreadyExistsException {
 
         // Given user_name
 
@@ -119,21 +102,15 @@ public class LoginApiTest extends JerseySpringSupport {
 
         // When perform post
 
-        JsonNode source = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("username", username);
-            model.put("password", "jean.dupont");
-
-            return model;
-
-        });
+        Map<String, Object> model = new HashMap<String, Object>();
+        model.put("username", username);
+        model.put("id", UUID.randomUUID());
 
         Response response = target(URL).request(MediaType.APPLICATION_JSON)
 
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
+                .header(SchemaBeanParam.APP_HEADER, "test")
 
-                .post(Entity.json(source));
+                .post(Entity.json(model));
 
         // Then check status
 
@@ -146,19 +123,15 @@ public class LoginApiTest extends JerseySpringSupport {
 
         // And check service
 
-        ArgumentCaptor<JsonNode> login = ArgumentCaptor.forClass(JsonNode.class);
-        Mockito.verify(service).save(login.capture());
-        assertThat(login.getValue(), is(source));
-
-        // And check validation
-
-        Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("login"), login.capture());
-        assertThat(login.getValue(), is(source));
+        ArgumentCaptor<LoginEntity> login = ArgumentCaptor.forClass(LoginEntity.class);
+        Mockito.verify(resource).save(login.capture());
+        assertThat(login.getValue().getUsername(), is(username));
+        assertThat(login.getValue().getId(), is(model.get("id")));
 
     }
 
     @Test
-    public void createAlreadyExistFailure() throws LoginServiceAlreadyExistException {
+    public void createAlreadyExistFailure() throws UsernameAlreadyExistsException {
 
         // Given user_name
 
@@ -166,25 +139,19 @@ public class LoginApiTest extends JerseySpringSupport {
 
         // And mock service
 
-        Mockito.doThrow(new LoginServiceAlreadyExistException(username, null)).when(service).save(Mockito.any(JsonNode.class));
+        Mockito.doThrow(new UsernameAlreadyExistsException(username)).when(resource).save(Mockito.any());
 
         // When perform post
 
-        JsonNode source = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("username", username);
-            model.put("password", "jean.dupont");
-
-            return model;
-
-        });
+        Map<String, Object> model = new HashMap<String, Object>();
+        model.put("username", username);
+        model.put("id", UUID.randomUUID());
 
         Response response = target(URL).request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
 
-                .post(Entity.json(source));
+                .post(Entity.json(model));
 
         // Then check status
 
@@ -194,12 +161,12 @@ public class LoginApiTest extends JerseySpringSupport {
 
         JsonNode expectedMessage = JsonNodeUtils.create(() -> {
 
-            Map<String, Object> model = new HashMap<>();
-            model.put("path", "/username");
-            model.put("code", "username");
-            model.put("message", "[" + username + "] already exists");
+            Map<String, Object> message = new HashMap<>();
+            message.put("path", "/username");
+            message.put("code", "username");
+            message.put("message", "[" + username + "] already exists");
 
-            return Collections.singletonList(model);
+            return Collections.singletonList(message);
 
         });
         assertThat(response.readEntity(JsonNode.class), is(expectedMessage));
@@ -207,7 +174,7 @@ public class LoginApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void update() throws LoginServiceNotFoundException {
+    public void get() {
 
         // Given user_name
 
@@ -215,112 +182,11 @@ public class LoginApiTest extends JerseySpringSupport {
 
         // And mock service
 
-        Mockito.when(service.get(Mockito.eq(username))).thenReturn(this.login);
+        LoginEntity entity = new LoginEntity();
+        entity.setUsername(username);
+        entity.setId(UUID.randomUUID());
 
-        // When perform past
-
-        Map<String, Object> patch = new HashMap<>();
-        patch.put("op", "add");
-        patch.put("path", "/enabled");
-        patch.put("value", true);
-
-        Response response = target(URL + "/" + username).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
-                .request(MediaType.APPLICATION_JSON)
-
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
-
-                .method("PATCH", Entity.json(JsonNodeUtils.toString(Collections.singletonList(patch))));
-
-        // Then check status
-
-        assertThat(response.getStatus(), is(Status.NO_CONTENT.getStatusCode()));
-
-        // And check service
-
-        ArgumentCaptor<JsonNode> previousLogin = ArgumentCaptor.forClass(JsonNode.class);
-        ArgumentCaptor<JsonNode> login = ArgumentCaptor.forClass(JsonNode.class);
-
-        JsonNode expectedLogin = JsonNodeUtils.set(this.login, "enabled", BooleanNode.TRUE);
-
-        Mockito.verify(service).save(login.capture(), previousLogin.capture());
-        assertThat(previousLogin.getValue(), is(this.login));
-        assertThat(login.getValue(), is(expectedLogin));
-
-        // And check validation
-
-        Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("login"), login.capture(),
-                previousLogin.capture());
-        assertThat(previousLogin.getValue(), is(this.login));
-        assertThat(login.getValue(), is(expectedLogin));
-
-    }
-
-    @Test
-    public void put() throws LoginServiceNotFoundException {
-
-        // Given user_name
-
-        String username = "jean.dupond@gmail.com";
-
-        // And mock service
-
-        Mockito.when(service.get(Mockito.eq(username))).thenReturn(this.login);
-
-        // When perform past
-
-        JsonNode source = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("password", "mdp");
-
-            return model;
-
-        });
-
-        Response response = target(URL + "/" + username).request(MediaType.APPLICATION_JSON)
-
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
-
-                .put(Entity.json(source));
-
-        // Then check status
-
-        assertThat(response.getStatus(), is(Status.NO_CONTENT.getStatusCode()));
-
-        // And check service
-
-        ArgumentCaptor<JsonNode> previousLogin = ArgumentCaptor.forClass(JsonNode.class);
-        ArgumentCaptor<JsonNode> login = ArgumentCaptor.forClass(JsonNode.class);
-
-        Mockito.verify(service).save(login.capture(), previousLogin.capture());
-        assertThat(previousLogin.getValue(), is(this.login));
-        assertThat(login.getValue(), is(source));
-
-        // And check validation
-
-        Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("login"), login.capture(),
-                previousLogin.capture());
-        assertThat(previousLogin.getValue(), is(this.login));
-        assertThat(login.getValue(), is(source));
-
-        // And check merge
-        Mockito.verify(schemaMerge).mergeMissingFieldFromOriginal(Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq("login"), Mockito.anyString(),
-                login.capture(), previousLogin.capture());
-        assertThat(previousLogin.getValue(), is(this.login));
-        assertThat(login.getValue(), is(source));
-
-    }
-
-    @Test
-    public void get() throws LoginServiceNotFoundException {
-
-        // Given user_name
-
-        String username = "jean.dupond@gmail.com";
-
-        // And mock service
-
-        Mockito.when(service.get(Mockito.eq(username))).thenReturn(login);
+        Mockito.when(resource.get(Mockito.eq(username))).thenReturn(Optional.of(entity));
 
         // When perform get
 
@@ -335,13 +201,15 @@ public class LoginApiTest extends JerseySpringSupport {
         assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
 
         // And check body
-
-        assertThat(response.readEntity(JsonNode.class), is(login));
+        @SuppressWarnings("unchecked")
+        Map<String, Object> actualModel = response.readEntity(Map.class);
+        assertThat(actualModel.get("username"), is(nullValue()));
+        assertThat(actualModel.get("id"), is(entity.getId().toString()));
 
     }
 
     @Test
-    public void getNotFound() throws LoginServiceNotFoundException {
+    public void getNotFound() {
 
         // Given user_name
 
@@ -349,7 +217,7 @@ public class LoginApiTest extends JerseySpringSupport {
 
         // And mock service
 
-        Mockito.when(service.get(Mockito.eq(username))).thenThrow(new LoginServiceNotFoundException());
+        Mockito.when(resource.get(Mockito.eq(username))).thenReturn(Optional.empty());
 
         // When perform get
 
@@ -362,122 +230,6 @@ public class LoginApiTest extends JerseySpringSupport {
         // Then check status
 
         assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
-
-    }
-
-    @Test
-    public void getById() throws LoginServiceNotFoundException {
-
-        // Given account id
-
-        UUID id = UUID.randomUUID();
-
-        // And mock service
-
-        Mockito.when(service.get(Mockito.eq(id))).thenReturn(JsonNodeUtils.toArrayNode(Collections.singletonList(login)));
-
-        // When perform get
-
-        Response response = target(URL + "/id/" + id).request(MediaType.APPLICATION_JSON)
-
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
-
-                .get();
-
-        // Then check status
-
-        assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
-
-        // And check body
-
-        assertThat(response.readEntity(JsonNode.class), is(JsonNodeUtils.create(() -> Collections.singletonList(login))));
-
-    }
-
-    @Test
-    public void getByIdNotFound() throws LoginServiceNotFoundException {
-
-        // Given account id
-
-        UUID id = UUID.randomUUID();
-
-        // And mock service
-
-        Mockito.when(service.get(Mockito.eq(id))).thenThrow(new LoginServiceNotFoundException());
-
-        // When perform get
-
-        Response response = target(URL + "/id/" + id).request(MediaType.APPLICATION_JSON)
-
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
-
-                .get();
-
-        // Then check status
-
-        assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
-
-    }
-
-    @Test
-    public void updateById() throws LoginServiceException {
-
-        // Given account id
-
-        UUID id = UUID.randomUUID();
-
-        // And mock service
-
-        Mockito.when(service.get(Mockito.eq(id))).thenReturn(JsonNodeUtils.toArrayNode(Collections.singletonList(login)));
-
-        // When perform past
-
-        Map<String, Object> patch1 = new HashMap<>();
-        patch1.put("op", "copy");
-        patch1.put("from", "/0");
-        patch1.put("path", "/1");
-
-        Map<String, Object> patch2 = new HashMap<>();
-        patch2.put("op", "replace");
-        patch2.put("path", "/0/username");
-        patch2.put("value", "jean.dupont");
-
-        List<Map<String, Object>> patchs = new ArrayList<>();
-        patchs.add(patch1);
-        patchs.add(patch2);
-
-        Response response = target(URL + "/id/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
-                .request(MediaType.APPLICATION_JSON)
-
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
-
-                .method("PATCH", Entity.json(JsonNodeUtils.toString(patchs)));
-
-        // Then check status
-
-        assertThat(response.getStatus(), is(Status.NO_CONTENT.getStatusCode()));
-
-        // And check service
-
-        ArgumentCaptor<ArrayNode> previousLogins = ArgumentCaptor.forClass(ArrayNode.class);
-        ArgumentCaptor<ArrayNode> logins = ArgumentCaptor.forClass(ArrayNode.class);
-
-        JsonNode expectedLogin = JsonNodeUtils.set(this.login, "username", TextNode.valueOf("jean.dupont"));
-
-        List<JsonNode> expectedLogins = new ArrayList<>();
-        expectedLogins.add(expectedLogin);
-        expectedLogins.add(login);
-
-        Mockito.verify(service).save(logins.capture(), previousLogins.capture());
-        assertThat(previousLogins.getValue(), is(JsonNodeUtils.toArrayNode(Collections.singletonList(login))));
-        assertThat(logins.getValue(), is(JsonNodeUtils.toArrayNode(expectedLogins)));
-
-        // And check validation
-
-        Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("login_id"), logins.capture(),
-                previousLogins.capture());
-        assertThat(previousLogins.getValue(), is(JsonNodeUtils.toArrayNode(Collections.singletonList(login))));
-        assertThat(logins.getValue(), is(JsonNodeUtils.toArrayNode(expectedLogins)));
 
     }
 
@@ -502,7 +254,7 @@ public class LoginApiTest extends JerseySpringSupport {
 
         // And check mock
 
-        Mockito.verify(service).delete(Mockito.eq(username));
+        Mockito.verify(resource).delete(Mockito.eq(username));
 
     }
 
