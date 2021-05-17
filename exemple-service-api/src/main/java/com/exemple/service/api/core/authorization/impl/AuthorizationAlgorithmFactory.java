@@ -26,7 +26,6 @@ import org.springframework.util.Assert;
 
 import com.auth0.jwt.algorithms.Algorithm;
 import com.exemple.service.api.core.authorization.AuthorizationException;
-import com.exemple.service.api.core.authorization.AuthorizationService;
 import com.pivovarit.function.ThrowingFunction;
 
 @Component
@@ -35,7 +34,7 @@ public class AuthorizationAlgorithmFactory {
 
     private static final Pattern RSA_PUBLIC_KEY;
 
-    private final AuthorizationService authorizationService;
+    private final AuthorizationClient authorizationClient;
 
     private final KeyFactory keyFactory;
 
@@ -52,11 +51,11 @@ public class AuthorizationAlgorithmFactory {
         RSA_PUBLIC_KEY = Pattern.compile("-----BEGIN PUBLIC KEY-----(.*)-----END PUBLIC KEY-----", Pattern.DOTALL);
     }
 
-    public AuthorizationAlgorithmFactory(AuthorizationService authorizationService, @Value("${api.authorization.path}") String defaultPath,
+    public AuthorizationAlgorithmFactory(AuthorizationClient authorizationClient, @Value("${api.authorization.path}") String defaultPath,
             @Value("${api.authorization.client.clientId}") String clientId, @Value("${api.authorization.client.clientSecret}") String clientSecret)
             throws NoSuchAlgorithmException {
 
-        this.authorizationService = authorizationService;
+        this.authorizationClient = authorizationClient;
         this.keyFactory = KeyFactory.getInstance("RSA");
         this.algorithms = new ConcurrentHashMap<>();
         this.defaultPath = defaultPath;
@@ -66,7 +65,7 @@ public class AuthorizationAlgorithmFactory {
 
     private Algorithm buildAlgorithm(String path) throws AuthorizationException {
 
-        Response response = this.authorizationService.tokenKey(path, clientId, clientSecret);
+        Response response = this.authorizationClient.tokenKey(path, clientId, clientSecret);
 
         if (response.getStatus() != Response.Status.OK.getStatusCode()) {
 

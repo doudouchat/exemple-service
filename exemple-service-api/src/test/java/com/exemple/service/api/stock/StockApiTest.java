@@ -17,6 +17,8 @@ import org.testng.annotations.Test;
 
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
+import com.exemple.service.application.common.model.ApplicationDetail;
+import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.store.common.InsufficientStockException;
 import com.exemple.service.store.common.NoFoundStockException;
 import com.exemple.service.store.stock.StockService;
@@ -32,10 +34,13 @@ public class StockApiTest extends JerseySpringSupport {
     @Autowired
     private StockService service;
 
+    @Autowired
+    private ApplicationDetailService applicationDetailService;
+
     @BeforeMethod
     private void before() {
 
-        Mockito.reset(service);
+        Mockito.reset(service, applicationDetailService);
 
     }
 
@@ -51,7 +56,12 @@ public class StockApiTest extends JerseySpringSupport {
         String company = "company1";
         String application = "application";
 
+        ApplicationDetail detail = new ApplicationDetail();
+        detail.setCompany("company1");
+
         // And mock service
+
+        Mockito.when(applicationDetailService.get(application)).thenReturn(detail);
 
         Mockito.when(service.update(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product), Mockito.eq(5))).thenReturn(18L);
 
@@ -79,6 +89,13 @@ public class StockApiTest extends JerseySpringSupport {
         String product = "product";
         String application = "application";
 
+        ApplicationDetail detail = new ApplicationDetail();
+        detail.setCompany("company1");
+
+        // And mock service
+
+        Mockito.when(applicationDetailService.get(application)).thenReturn(detail);
+
         // When perform post
 
         Response response = target(URL + "/" + store + "/" + product).request(MediaType.APPLICATION_JSON).header(APP_HEADER, application)
@@ -104,7 +121,12 @@ public class StockApiTest extends JerseySpringSupport {
         String company = "company1";
         String application = "application";
 
+        ApplicationDetail detail = new ApplicationDetail();
+        detail.setCompany("company1");
+
         // And mock service
+
+        Mockito.when(applicationDetailService.get(application)).thenReturn(detail);
 
         Mockito.doThrow(new InsufficientStockException("/" + company, "/" + store, "/" + product, 100, 5)).when(service)
                 .update(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product), Mockito.eq(5));
@@ -135,7 +157,12 @@ public class StockApiTest extends JerseySpringSupport {
         String company = "company1";
         String application = "application";
 
+        ApplicationDetail detail = new ApplicationDetail();
+        detail.setCompany("company1");
+
         // And mock service
+
+        Mockito.when(applicationDetailService.get(application)).thenReturn(detail);
 
         Mockito.when(service.get(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product))).thenReturn(5L);
 
@@ -165,7 +192,12 @@ public class StockApiTest extends JerseySpringSupport {
         String company = "company1";
         String application = "application";
 
+        ApplicationDetail detail = new ApplicationDetail();
+        detail.setCompany("company1");
+
         // And mock service
+
+        Mockito.when(applicationDetailService.get(application)).thenReturn(detail);
 
         Mockito.when(service.get(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product)))
                 .thenThrow(new NoFoundStockException("/" + store, "/" + product, new RuntimeException()));

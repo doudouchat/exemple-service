@@ -3,7 +3,6 @@ package com.exemple.service.api.core.authorization.impl;
 import java.security.Principal;
 
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -22,13 +21,6 @@ public class AuthorizationNoSecureContextServiceImpl implements AuthorizationCon
         Principal principal = () -> "anonymous";
 
         return new ApiSecurityContext(principal, "http");
-    }
-
-    @Override
-    public void cleanContext(ApiSecurityContext securityContext, Response.StatusType statusInfo) {
-
-        // Nope
-
     }
 
 }
