@@ -178,7 +178,7 @@ public class InitData {
 
         schemaResource.save(subscriptionSchema);
 
-        applicationDetailService.put(TEST_APP, detail);
+        applicationDetailService.put(TEST_APP, MAPPER.convertValue(detail, JsonNode.class));
 
         // STOCK
 
@@ -187,7 +187,7 @@ public class InitData {
         backDetail.setCompany("test_company");
         backDetail.setClientIds(Sets.newHashSet("back", "back_user"));
 
-        applicationDetailService.put(BACK_APP, backDetail);
+        applicationDetailService.put(BACK_APP, MAPPER.convertValue(backDetail, JsonNode.class));
 
     }
 
@@ -212,7 +212,7 @@ public class InitData {
 
         schemaResource.save(accountSchema);
 
-        applicationDetailService.put("other", detail);
+        applicationDetailService.put("other", MAPPER.convertValue(detail, JsonNode.class));
 
     }
 

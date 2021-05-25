@@ -6,8 +6,6 @@ import java.util.Set;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
 public class ApplicationDetail {
 
     @NotBlank
@@ -41,13 +39,6 @@ public class ApplicationDetail {
 
     public void setClientIds(Set<String> clientIds) {
         this.clientIds = Collections.unmodifiableSet(clientIds);
-    }
-
-    @Override
-    public String toString() {
-
-        return new ToStringBuilder(this).append("clientIds", clientIds).append("keyspace", keyspace).append("company", company).toString();
-
     }
 
 }
