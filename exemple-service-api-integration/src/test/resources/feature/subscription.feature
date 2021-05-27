@@ -4,28 +4,24 @@ Feature: api subscription
     Given delete subscription 'jean.dupond@gmail.com'
     When create subscription 'jean.dupond@gmail.com' for application 'test' and version 'v1'
     Then subscription status is 201
-    And subscription 'jean.dupond@gmail.com' exists
-    And subscription contains 'subscription_date'
-    And subscription is
+    And subscription 'jean.dupond@gmail.com' is
       """
       {
-          "email": "jean.dupond@gmail.com"
       }
       """
+    And subscription contains 'subscription_date'
 
   Scenario: update subscription
     Given delete subscription 'jean.dupond@gmail.com'
     When create subscription 'jean.dupond@gmail.com' for application 'test' and version 'v1'
     And create subscription 'jean.dupond@gmail.com' for application 'test' and version 'v1'
     Then subscription status is 204
-    And subscription 'jean.dupond@gmail.com' exists
-    And subscription contains 'subscription_date'
-    And subscription is
+    And subscription 'jean.dupond@gmail.com' is
       """
       {
-          "email": "jean.dupond@gmail.com"
       }
       """
+    And subscription contains 'subscription_date'
 
   Scenario: get subscription fails because none subscription exists
     Given delete subscription 'jean.dupond@gmail.com'

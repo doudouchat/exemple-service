@@ -4,7 +4,8 @@
 	"properties": {
 		"email": {
 			"type": "string",
-			"format": "email"
+			"format": "email",
+			"writeOnly": true
 		},
 		"subscription_date": {
 			"type": "string",

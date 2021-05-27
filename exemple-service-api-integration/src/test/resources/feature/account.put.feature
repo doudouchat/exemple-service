@@ -64,7 +64,6 @@ Feature: api put account
     And account exists
     And account 'creation_date' exists
     And account 'update_date' exists
-    And account 'id' exists
     And account is
       """
       {

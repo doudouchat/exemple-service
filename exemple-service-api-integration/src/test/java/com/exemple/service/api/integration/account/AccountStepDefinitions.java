@@ -65,7 +65,6 @@ public class AccountStepDefinitions {
 
         Response responseGet = AccountApiClient.get(context.lastId(), application, version);
 
-        ((ObjectNode) body).put("id", responseGet.jsonPath().getString("id"));
         ((ObjectNode) body).put("creation_date", responseGet.jsonPath().getString("creation_date"));
 
         Response response = AccountApiClient.put(context.lastId(), body, application, version);
@@ -162,7 +161,6 @@ public class AccountStepDefinitions {
     public void checkBody(JsonNode body) throws JsonProcessingException {
 
         ObjectNode expectedBody = (ObjectNode) MAPPER.readTree(context.lastGet().asString());
-        expectedBody.remove("id");
         expectedBody.remove("creation_date");
         expectedBody.remove("update_date");
 

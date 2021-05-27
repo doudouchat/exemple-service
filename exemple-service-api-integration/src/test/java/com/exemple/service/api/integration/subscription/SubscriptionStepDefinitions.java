@@ -79,17 +79,10 @@ public class SubscriptionStepDefinitions {
 
     }
 
-    @And("subscription {string} exists")
-    public void checkExists(String email) {
-
+    @And("subscription {string} is")
+    public void checkBody(String email, JsonNode body) throws JsonProcessingException {
+        
         getSubscription(email, TEST_APP, VERSION_V1);
-
-        checkStatus(200);
-
-    }
-
-    @And("subscription is")
-    public void checkBody(JsonNode body) throws JsonProcessingException {
 
         ObjectNode expectedBody = (ObjectNode) MAPPER.readTree(context.lastGet().asString());
         expectedBody.remove("subscription_date");

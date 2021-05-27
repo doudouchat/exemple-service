@@ -60,7 +60,6 @@ public class InitData {
         detail.setClientIds(Sets.newHashSet("test", "test_user"));
 
         Set<String> accountFilter = new HashSet<>();
-        accountFilter.add("id");
         accountFilter.add("lastname");
         accountFilter.add("firstname");
         accountFilter.add("email");
@@ -74,7 +73,6 @@ public class InitData {
         accountFilter.add("cgus[code,version]");
 
         Set<String> accountField = new HashSet<>();
-        accountField.add("id");
         accountField.add("lastname");
         accountField.add("firstname");
         accountField.add("email");
@@ -162,7 +160,6 @@ public class InitData {
         schemaResource.save(loginIdSchema);
 
         Set<String> subscriptionFilter = new HashSet<>();
-        subscriptionFilter.add("email");
         subscriptionFilter.add("subscription_date");
 
         Map<String, Set<String>> subscriptionRules = new HashMap<>();

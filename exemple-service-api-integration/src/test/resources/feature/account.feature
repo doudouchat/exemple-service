@@ -34,7 +34,6 @@ Feature: api account
     Then account status is 201
     And account exists
     And account 'creation_date' exists
-    And account 'id' exists
     And account is
       """
       {
