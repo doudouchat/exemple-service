@@ -16,14 +16,6 @@
 		script-source="classpath:com/exemple/service/customer/account/validation/AccountValidationCustomImpl.groovy">
 	</lang:groovy>
 
-	<lang:groovy id="loginServiceResource"
-		script-source="classpath:com/exemple/service/customer/login/resource/LoginServiceResourceImpl.groovy">
-	</lang:groovy>
-
-	<lang:groovy id="loginValidationCustom"
-		script-source="classpath:com/exemple/service/customer/login/validation/LoginValidationCustomImpl.groovy">
-	</lang:groovy>
-
 	<lang:groovy id="subscriptionServiceResource"
 		script-source="classpath:com/exemple/service/customer/subscription/resource/SubscriptionServiceResourceImpl.groovy">
 	</lang:groovy>

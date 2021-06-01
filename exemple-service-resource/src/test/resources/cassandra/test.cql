@@ -37,10 +37,7 @@ CREATE TABLE test.account (
 
 CREATE TABLE test.login (
 	id UUID,
-	username text PRIMARY KEY,
-	password text,
-	enable boolean,
-	note text
+	username text PRIMARY KEY
 );
 
 CREATE TABLE test.subscription (
@@ -72,10 +69,10 @@ CREATE TABLE test.resource_schema (
 );
 CREATE INDEX account_status
 	ON test.account ( status );
-	
+
 CREATE INDEX login_id
 	ON test.login ( id );
-	
+
 CREATE TABLE test.stock ( 
 	store text,
 	product text,

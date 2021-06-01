@@ -6,7 +6,6 @@ Feature: api login
       """
       {
           "username": "jean.dupond@gmail.com",
-          "password": "mdp",
           "id": "4a62b95a-3a0a-4104-baee-7bbce9249c6b"
       }
       """
@@ -15,18 +14,15 @@ Feature: api login
     And login is
       """
       {
-          "username": "jean.dupond@gmail.com",
           "id": "4a62b95a-3a0a-4104-baee-7bbce9249c6b"
       }
       """
-    And login password is 'mdp'
 
   Scenario: delete login
     Given delete username 'jean.dupond@gmail.com'
     And create login for application 'test' and version 'v1'
       """
       {
-          "password": "mdp",
           "username": "jean.dupond@gmail.com",
           "id": "bcc4e98f-c9ae-4a33-b2c3-7cc49d9b1b71"
       }
@@ -40,7 +36,6 @@ Feature: api login
     And create login for application 'test' and version 'v1'
       """
       {
-          "password": "mdp",
           "username": "jean.dupond@gmail.com",
           "id": "607a1829-8972-463e-9a91-bc55688edc13"
       }
@@ -49,7 +44,6 @@ Feature: api login
       """
       {
           "username": "jean.dupond@gmail.com",
-          "password": "mdp",
           "id": "179d5fa8-dabd-4363-9668-cd295fc90a51"
       }
       """

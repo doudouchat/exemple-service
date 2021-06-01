@@ -22,7 +22,6 @@ import org.springframework.context.annotation.Profile;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.exemple.service.api.core.authorization.impl.AuthorizationTokenManager;
 import com.exemple.service.api.core.authorization.impl.AuthorizationTokenValidation;
-import com.exemple.service.resource.login.LoginResource;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -69,11 +68,6 @@ public class AuthorizationTestConfiguration {
 
         keyPairGenerator.initialize(1024);
         return keyPairGenerator;
-    }
-
-    @Bean
-    public LoginResource loginResource() {
-        return Mockito.mock(LoginResource.class);
     }
 
     @Configuration

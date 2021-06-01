@@ -3,7 +3,6 @@ package com.exemple.service.api.account;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -23,7 +22,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.auth0.jwt.JWT;
-import com.exemple.service.api.common.JsonNodeUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.JerseySpringSupportSecure;
 import com.exemple.service.api.core.authorization.AuthorizationException;
@@ -34,6 +32,7 @@ import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
 import com.exemple.service.resource.login.LoginResource;
+import com.exemple.service.resource.login.model.LoginEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class AccountApiSecureTest extends JerseySpringSupportSecure {
@@ -68,10 +67,22 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
 
     private static UUID ID = UUID.randomUUID();
 
-    private static Optional<JsonNode> ID_RESPONSE_LOGIN = Optional.of(JsonNodeUtils.create(() -> Collections.singletonMap("id", ID)));
+    private static Optional<LoginEntity> ID_RESPONSE_LOGIN;
 
-    private static Optional<JsonNode> RANDOM_RESPONSE_LOGIN = Optional
-            .of(JsonNodeUtils.create(() -> Collections.singletonMap("id", UUID.randomUUID())));
+    private static Optional<LoginEntity> RANDOM_RESPONSE_LOGIN;
+
+    static {
+
+        LoginEntity login = new LoginEntity();
+        login.setId(ID);
+
+        ID_RESPONSE_LOGIN = Optional.of(login);
+
+        LoginEntity random = new LoginEntity();
+        random.setId(UUID.randomUUID());
+
+        RANDOM_RESPONSE_LOGIN = Optional.of(random);
+    }
 
     @DataProvider(name = "notAuthorized")
     private static Object[][] notAuthorized() {
@@ -94,7 +105,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     }
 
     @Test(dataProvider = "notAuthorized")
-    public void authorizedGetUserFailure(String token, Optional<JsonNode> loginResponse) {
+    public void authorizedGetUserFailure(String token, Optional<LoginEntity> loginResponse) {
 
         // Given mock service
         Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(loginResponse);
@@ -147,8 +158,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
         // And mock service & resource
 
         Mockito.when(accountService.get(Mockito.eq(ID))).thenReturn(account);
-        Mockito.when(loginResource.get(Mockito.eq("john_doe")))
-                .thenReturn(Optional.of(JsonNodeUtils.create(() -> Collections.singletonMap("id", ID))));
+        Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(ID_RESPONSE_LOGIN);
 
         // When perform get
 
@@ -213,8 +223,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
         // And mock service & resource
 
         Mockito.when(accountService.get(Mockito.eq(ID))).thenReturn(account);
-        Mockito.when(loginResource.get(Mockito.eq("john_doe")))
-                .thenReturn(Optional.of(JsonNodeUtils.create(() -> Collections.singletonMap("id", ID))));
+        Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(ID_RESPONSE_LOGIN);
 
         // When perform get
 

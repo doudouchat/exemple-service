@@ -9,7 +9,6 @@
 	<test name="ut">
 		<packages>
 			<package name="com.exemple.service.customer.account" />
-			<package name="com.exemple.service.customer.login" />
 			<package name="com.exemple.service.customer.subscription" />
 		</packages>
 	</test>

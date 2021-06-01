@@ -22,7 +22,6 @@ import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Sets;
 
 @Component
@@ -97,67 +96,6 @@ public class InitData {
         accountSchema.setFields(accountField);
 
         schemaResource.save(accountSchema);
-
-        Set<String> loginFilter = new HashSet<>();
-        loginFilter.add("id");
-        loginFilter.add("disabled");
-        loginFilter.add("username");
-        loginFilter.add("password");
-
-        Set<String> loginField = new HashSet<>();
-        loginField.add("id");
-        loginField.add("disabled");
-        loginField.add("username");
-        loginField.add("password");
-
-        ObjectNode patchId = MAPPER.createObjectNode();
-        patchId.put("op", "add");
-        patchId.put("path", "/properties/id/readOnly");
-        patchId.put("value", true);
-
-        ObjectNode patchUsername = MAPPER.createObjectNode();
-        patchUsername.put("op", "add");
-        patchUsername.put("path", "/properties/username/readOnly");
-        patchUsername.put("value", true);
-
-        Set<JsonNode> loginPatchs = new HashSet<>();
-        loginPatchs.add(patchId);
-        loginPatchs.add(patchUsername);
-
-        SchemaEntity loginSchema = new SchemaEntity();
-        loginSchema.setApplication(TEST_APP);
-        loginSchema.setVersion(VERSION_V1);
-        loginSchema.setResource("login");
-        loginSchema.setProfile("user");
-        loginSchema.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("login.json").getInputStream())));
-        loginSchema.setFilters(loginFilter);
-        loginSchema.setFields(loginField);
-        loginSchema.setPatchs(loginPatchs);
-
-        schemaResource.save(loginSchema);
-
-        Set<String> loginIdFilter = new HashSet<>();
-        loginIdFilter.add("id");
-        loginIdFilter.add("disabled");
-        loginIdFilter.add("username");
-        loginIdFilter.add("password");
-
-        Set<String> loginIdField = new HashSet<>();
-        loginIdField.add("id");
-        loginIdField.add("disabled");
-        loginIdField.add("username");
-        loginIdField.add("password");
-
-        SchemaEntity loginIdSchema = new SchemaEntity();
-        loginIdSchema.setApplication(TEST_APP);
-        loginIdSchema.setVersion(VERSION_V1);
-        loginIdSchema.setResource("login_id");
-        loginIdSchema.setProfile("user");
-        loginIdSchema.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("login_id.json").getInputStream())));
-        loginIdSchema.setFilters(loginIdFilter);
-        loginIdSchema.setFields(loginIdField);
-
-        schemaResource.save(loginIdSchema);
 
         Set<String> subscriptionFilter = new HashSet<>();
         subscriptionFilter.add("subscription_date");
