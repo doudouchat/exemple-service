@@ -10,5 +10,15 @@
 				<ignoreVersion type="regex">10.(.*)</ignoreVersion>
 			</ignoreVersions>
 		</rule>
+		<rule groupId="org.hibernate.validator" comparisonMethod="maven">
+			<ignoreVersions>
+				<ignoreVersion type="regex">7.(.*)</ignoreVersion>
+			</ignoreVersions>
+		</rule>
+		<rule groupId="org.glassfish.jersey.*" comparisonMethod="maven">
+			<ignoreVersions>
+				<ignoreVersion type="regex">3.(.*)</ignoreVersion>
+			</ignoreVersions>
+		</rule>
 	</rules>
 </ruleset>
