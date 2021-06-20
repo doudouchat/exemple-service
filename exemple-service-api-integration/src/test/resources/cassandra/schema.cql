@@ -61,6 +61,26 @@ CREATE TABLE IF NOT EXISTS account_history (
 	PRIMARY KEY ((id), field)
 );
 
+CREATE TABLE IF NOT EXISTS account_event ( 
+	id UUID,
+	date timestamp,
+	data text,
+	event_type text,
+	application text,
+	version text,
+	PRIMARY KEY ((id), date)
+);
+
+CREATE TABLE IF NOT EXISTS subscription_event ( 
+	email text,
+	date timestamp,
+	data text,
+	event_type text,
+	application text,
+	version text,
+	PRIMARY KEY ((email), date)
+);
+
 CREATE TABLE IF NOT EXISTS resource_schema ( 
 	app text,
 	version text,

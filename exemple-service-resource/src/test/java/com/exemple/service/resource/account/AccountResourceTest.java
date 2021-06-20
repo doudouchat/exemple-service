@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.time.Instant;
@@ -26,11 +27,14 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.resource.account.event.AccountEventResource;
 import com.exemple.service.resource.account.history.AccountHistoryResource;
 import com.exemple.service.resource.account.model.Account;
+import com.exemple.service.resource.account.model.AccountEvent;
 import com.exemple.service.resource.account.model.AccountHistory;
 import com.exemple.service.resource.account.model.Address;
 import com.exemple.service.resource.account.model.Cgu;
+import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
@@ -50,6 +54,9 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private AccountHistoryResource accountHistoryResource;
+
+    @Autowired
+    private AccountEventResource accountEventResource;
 
     @BeforeMethod
     public void initExecutionContextDate() {
@@ -97,6 +104,10 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/code"), "code_1", ServiceContextExecution.context().getDate().toInstant());
         assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/version"), "v1", ServiceContextExecution.context().getDate().toInstant());
         assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id.toString(), ServiceContextExecution.context().getDate().toInstant());
+
+        AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+        assertThat(event.getEventType(), is(EventType.CREATE));
+        assertThat(event.getData(), is(notNullValue()));
 
     }
 
@@ -182,6 +193,9 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
                 ServiceContextExecution.context().getDate().toInstant(), JsonNodeType.STRING);
         assertHistory(accountHistoryResource.findByIdAndField(id, "/age"), model.get("age"), ServiceContextExecution.context().getDate().toInstant());
         assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), previousHistoryId.getValue(), previousHistoryId.getDate());
+
+        AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+        assertThat(event.getEventType(), is(EventType.UPDATE));
     }
 
     @Test(dependsOnMethods = "update")

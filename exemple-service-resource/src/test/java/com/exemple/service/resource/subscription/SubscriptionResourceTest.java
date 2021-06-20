@@ -2,7 +2,9 @@ package com.exemple.service.resource.subscription;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -10,10 +12,15 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
+import com.exemple.service.resource.subscription.event.SubscriptionEventResource;
+import com.exemple.service.resource.subscription.model.SubscriptionEvent;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @ContextConfiguration(classes = { ResourceTestConfiguration.class })
@@ -22,7 +29,21 @@ public class SubscriptionResourceTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private SubscriptionResource resource;
 
+    @Autowired
+    private SubscriptionEventResource subscriptionEventResource;
+
     private String email;
+
+    @BeforeMethod
+    public void initExecutionContextDate() {
+
+        OffsetDateTime now = OffsetDateTime.now();
+        ServiceContextExecution.context().setDate(now);
+        ServiceContextExecution.context().setPrincipal(() -> "user");
+        ServiceContextExecution.context().setApp("test");
+        ServiceContextExecution.context().setVersion("v1");
+
+    }
 
     @Test
     public void save() {
@@ -33,6 +54,10 @@ public class SubscriptionResourceTest extends AbstractTestNGSpringContextTests {
         model.put(SubscriptionField.EMAIL.field, email);
 
         resource.save(JsonNodeUtils.create(model));
+
+        SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
+        assertThat(event.getEventType(), is(EventType.CREATE));
+        assertThat(event.getData().get("email").textValue(), is(email));
 
     }
 
@@ -49,6 +74,10 @@ public class SubscriptionResourceTest extends AbstractTestNGSpringContextTests {
 
         resource.delete(email);
         assertThat(resource.get(email).isPresent(), is(false));
+
+        SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
+        assertThat(event.getEventType(), is(EventType.DELETE));
+        assertThat(event.getData(), is(nullValue()));
 
     }
 
