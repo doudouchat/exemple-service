@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
-import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.account.AccountField;
 import com.exemple.service.resource.account.history.dao.AccountHistoryDao;
@@ -67,12 +66,9 @@ public class AccountHistoryResource {
         return dao().findByIdAndField(id, field);
     }
 
-    public Collection<BoundStatement> saveHistories(JsonNode source, JsonNode previousSource, OffsetDateTime now) {
+    public Collection<BoundStatement> saveHistories(JsonNode source, JsonNode previousSource) {
 
-        return this.createHistories(source, previousSource, now);
-    }
-
-    private Collection<BoundStatement> createHistories(JsonNode source, JsonNode previousSource, OffsetDateTime now) {
+        OffsetDateTime now = ServiceContextExecution.context().getDate();
 
         UUID id = UUID.fromString(source.get(AccountField.ID.field).textValue());
 
@@ -82,21 +78,14 @@ public class AccountHistoryResource {
 
         Collection<BoundStatement> statements = new ArrayList<>();
 
-        PreparedStatement insertStatement = session.prepare("INSERT INTO " + ResourceExecutionContext.get().keyspace()
-                + ".account_history (id,date,field,value,previous_value,application,version,user) VALUES (?,?,?,?,?,?,?,?)");
-
         Streams.stream(patchs.elements())
 
                 .map((JsonNode patch) -> buildHistory(patch, id, now, histories))
 
                 .map((AccountHistory history) -> {
                     LOG.debug("save history account {} {} {}", history.getId(), history.getField(), history.getValue());
-                    return insertStatement.bind(history.getId(), history.getDate(), history.getField(), history.getValue(),
-                            history.getPreviousValue(), history.getApplication(), history.getVersion(), history.getUser());
+                    return dao().save(history);
                 }).forEach(statements::add);
-
-        PreparedStatement deleteStatement = session
-                .prepare("DELETE FROM " + ResourceExecutionContext.get().keyspace() + ".account_history WHERE id = ? AND field = ?");
 
         histories.keySet().stream()
 
@@ -106,7 +95,7 @@ public class AccountHistoryResource {
 
                 .map((String path) -> {
                     LOG.debug("delete history account {} {}", id, path);
-                    return deleteStatement.bind(id, path);
+                    return dao().deleteByIdAndField(id, path);
                 })
 
                 .forEach(statements::add);

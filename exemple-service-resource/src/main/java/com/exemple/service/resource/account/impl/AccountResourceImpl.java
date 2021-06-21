@@ -1,6 +1,5 @@
 package com.exemple.service.resource.account.impl;
 
-import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -20,7 +19,6 @@ import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.insert.Insert;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
-import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.account.AccountField;
 import com.exemple.service.resource.account.AccountResource;
 import com.exemple.service.resource.account.history.AccountHistoryResource;
@@ -63,19 +61,17 @@ public class AccountResourceImpl implements AccountResource {
     }
 
     @Override
-    public void save(JsonNode source, JsonNode previousAccount) {
+    public void save(JsonNode account, JsonNode previousAccount) {
 
-        Assert.isTrue(source.path(AccountField.ID.field).isTextual(), AccountField.ID.field + " is required");
+        Assert.isTrue(account.path(AccountField.ID.field).isTextual(), AccountField.ID.field + " is required");
 
-        LOG.debug("save account {}", source);
+        LOG.debug("save account {}", account);
 
-        OffsetDateTime now = ServiceContextExecution.context().getDate();
-
-        Insert account = jsonQueryBuilder.insert(source);
+        Insert insertAccount = jsonQueryBuilder.insert(account);
 
         BatchStatementBuilder batch = new BatchStatementBuilder(BatchType.LOGGED);
-        batch.addStatement(account.build());
-        accountHistoryResource.saveHistories(source, previousAccount, now).forEach(batch::addStatements);
+        batch.addStatement(insertAccount.build());
+        accountHistoryResource.saveHistories(account, previousAccount).forEach(batch::addStatements);
 
         session.execute(batch.build());
 
