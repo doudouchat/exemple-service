@@ -40,6 +40,8 @@ public class AccountHistoryResource {
 
     private static final AccountHistory DEFAULT_HISTORY;
 
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     static {
 
         DEFAULT_HISTORY = new AccountHistory();
@@ -64,6 +66,11 @@ public class AccountHistoryResource {
     public AccountHistory findByIdAndField(UUID id, String field) {
 
         return dao().findByIdAndField(id, field);
+    }
+
+    public Collection<BoundStatement> saveHistories(JsonNode source) {
+
+        return saveHistories(source, MAPPER.createObjectNode());
     }
 
     public Collection<BoundStatement> saveHistories(JsonNode source, JsonNode previousSource) {

@@ -21,8 +21,10 @@ import com.datastax.oss.driver.api.querybuilder.insert.Insert;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
 import com.exemple.service.resource.account.AccountField;
 import com.exemple.service.resource.account.AccountResource;
+import com.exemple.service.resource.account.event.AccountEventResource;
 import com.exemple.service.resource.account.history.AccountHistoryResource;
 import com.exemple.service.resource.common.JsonQueryBuilder;
+import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -39,22 +41,33 @@ public class AccountResourceImpl implements AccountResource {
 
     private final AccountHistoryResource accountHistoryResource;
 
+    private final AccountEventResource accountEventResource;
+
     private final JsonQueryBuilder jsonQueryBuilder;
 
-    public AccountResourceImpl(CqlSession session, AccountHistoryResource accountHistoryResource) {
+    public AccountResourceImpl(CqlSession session, AccountHistoryResource accountHistoryResource, AccountEventResource accountEventResource) {
         this.session = session;
         this.accountHistoryResource = accountHistoryResource;
+        this.accountEventResource = accountEventResource;
         this.jsonQueryBuilder = new JsonQueryBuilder(session, ACCOUNT_TABLE);
 
     }
 
     @Override
-    public UUID save(JsonNode source) {
+    public UUID save(JsonNode account) {
 
         UUID id = UUID.randomUUID();
 
-        JsonNodeUtils.set(source, id, AccountField.ID.field);
-        save(source, JsonNodeUtils.init());
+        JsonNodeUtils.set(account, id, AccountField.ID.field);
+
+        Insert insertAccount = jsonQueryBuilder.insert(account);
+
+        BatchStatementBuilder batch = new BatchStatementBuilder(BatchType.LOGGED);
+        batch.addStatement(insertAccount.build());
+        accountHistoryResource.saveHistories(account).forEach(batch::addStatements);
+        batch.addStatement(accountEventResource.saveEvent(account, EventType.CREATE));
+
+        session.execute(batch.build());
 
         return id;
 
@@ -72,6 +85,7 @@ public class AccountResourceImpl implements AccountResource {
         BatchStatementBuilder batch = new BatchStatementBuilder(BatchType.LOGGED);
         batch.addStatement(insertAccount.build());
         accountHistoryResource.saveHistories(account, previousAccount).forEach(batch::addStatements);
+        batch.addStatement(accountEventResource.saveEvent(account, EventType.UPDATE));
 
         session.execute(batch.build());
 

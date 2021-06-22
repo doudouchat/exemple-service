@@ -14,6 +14,7 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
 import com.datastax.oss.driver.api.core.type.codec.ExtraTypeCodecs;
 import com.datastax.oss.driver.api.core.type.codec.registry.MutableCodecRegistry;
+import com.exemple.service.resource.common.model.EventType;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Configuration
@@ -40,6 +41,7 @@ public class ResourceCassandraConfiguration {
         MutableCodecRegistry registry = (MutableCodecRegistry) session().getContext().getCodecRegistry();
         registry.register(ExtraTypeCodecs.json(JsonNode.class));
         registry.register(ExtraTypeCodecs.BLOB_TO_ARRAY);
+        registry.register(ExtraTypeCodecs.enumNamesOf(EventType.class));
 
     }
 
