@@ -26,6 +26,7 @@ import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionBuilder;
 import com.exemple.service.schema.common.exception.ValidationExceptionModel;
 import com.exemple.service.schema.validation.SchemaValidation;
+import com.exemple.service.schema.validation.custom.CustomDateTimeFormatValidator;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -188,7 +189,8 @@ public class SchemaValidationImpl implements SchemaValidation {
         ArrayNode patch = MAPPER.createArrayNode().addAll(patchs);
         JSONObject rawSchema = new JSONObject(new JSONTokener(JsonPatch.apply(patch, schema).toString()));
 
-        SchemaLoader schemaLoader = SchemaLoader.builder().draftV7Support().schemaJson(rawSchema).build();
+        SchemaLoader schemaLoader = SchemaLoader.builder().draftV7Support().schemaJson(rawSchema)
+                .addFormatValidator(new CustomDateTimeFormatValidator()).enableOverrideOfBuiltInFormatValidators().build();
         return schemaLoader.load().build();
 
     }

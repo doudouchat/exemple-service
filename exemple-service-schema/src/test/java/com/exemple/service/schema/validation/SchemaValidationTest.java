@@ -51,6 +51,7 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
         model.put("firstname", "Jean");
         model.put("opt_in_email", true);
         model.put("civility", "Mr");
+        model.put("creation_date", "2019-06-17T19:16:40Z");
 
         validation.validate("default", "default", "default", "schema_test", MAPPER.convertValue(model, JsonNode.class));
 
@@ -178,8 +179,8 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
                 { "maxItems", "/cgus", patch41, patch42, patch43 },
                 // bad birthday
                 { "format", "/birthday", patch5 },
-                // FIXME bad creation date
-                // { "format", "/creation_date", patch6 },
+                // bad creation date
+                { "format", "/creation_date", patch6 },
                 // id read only
                 { "readOnly", "/id", patch7 },
                 // bad email
