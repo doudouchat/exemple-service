@@ -44,6 +44,7 @@ public class AccountEventResource {
         accountEvent.setVersion(context.getVersion());
         accountEvent.setApplication(context.getApp());
         accountEvent.setDate(context.getDate().toInstant());
+        accountEvent.setLocalDate(context.getDate().toLocalDate());
         accountEvent.setEventType(eventType);
 
         return dao().create(accountEvent);

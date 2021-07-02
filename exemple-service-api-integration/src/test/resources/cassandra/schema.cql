@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS account_history (
 CREATE TABLE IF NOT EXISTS account_event ( 
 	id UUID,
 	date timestamp,
+	local_date date,
 	data text,
 	event_type text,
 	application text,
@@ -74,6 +75,7 @@ CREATE TABLE IF NOT EXISTS account_event (
 CREATE TABLE IF NOT EXISTS subscription_event ( 
 	email text,
 	date timestamp,
+	local_date date,
 	data text,
 	event_type text,
 	application text,
@@ -98,6 +100,12 @@ CREATE INDEX IF NOT EXISTS account_status
 
 CREATE INDEX IF NOT EXISTS login_id
 	ON login ( id );
+	
+CREATE INDEX IF NOT EXISTS account_event_local_date
+	ON account_event ( local_date );
+	
+CREATE INDEX IF NOT EXISTS subscription_event_local_date
+	ON subscription_event ( local_date );
 	
 CREATE TABLE IF NOT EXISTS stock ( 
 	store text,

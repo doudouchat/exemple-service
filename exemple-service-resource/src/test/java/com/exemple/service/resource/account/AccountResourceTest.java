@@ -2,6 +2,7 @@ package com.exemple.service.resource.account;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -26,6 +27,9 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.ResultSet;
+import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.account.event.AccountEventResource;
 import com.exemple.service.resource.account.history.AccountHistoryResource;
@@ -57,6 +61,9 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private AccountEventResource accountEventResource;
+
+    @Autowired
+    private CqlSession session;
 
     @BeforeMethod
     public void initExecutionContextDate() {
@@ -107,7 +114,12 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
         AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
         assertThat(event.getEventType(), is(EventType.CREATE));
+        assertThat(event.getLocalDate(), is(ServiceContextExecution.context().getDate().toLocalDate()));
         assertThat(event.getData(), is(notNullValue()));
+
+        ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
+                .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
+        assertThat(countAccountEvents.all().size(), greaterThanOrEqualTo(1));
 
     }
 
@@ -195,7 +207,12 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), previousHistoryId.getValue(), previousHistoryId.getDate());
 
         AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+        assertThat(event.getLocalDate(), is(ServiceContextExecution.context().getDate().toLocalDate()));
         assertThat(event.getEventType(), is(EventType.UPDATE));
+
+        ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
+                .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
+        assertThat(countAccountEvents.all().size(), greaterThanOrEqualTo(2));
     }
 
     @Test(dependsOnMethods = "update")
