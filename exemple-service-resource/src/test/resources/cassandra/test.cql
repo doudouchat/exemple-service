@@ -59,6 +59,7 @@ CREATE TABLE test.account_history (
 CREATE TABLE test.account_event ( 
 	id UUID,
 	date timestamp,
+	local_date date,
 	data text,
 	event_type text,
 	application text,
@@ -69,6 +70,7 @@ CREATE TABLE test.account_event (
 CREATE TABLE test.subscription_event ( 
 	email text,
 	date timestamp,
+	local_date date,
 	data text,
 	event_type text,
 	application text,
@@ -92,6 +94,12 @@ CREATE INDEX account_status
 
 CREATE INDEX login_id
 	ON test.login ( id );
+
+CREATE INDEX account_event_local_date
+	ON test.account_event ( local_date );
+	
+CREATE INDEX subscription_event_local_date
+	ON test.subscription_event ( local_date );
 
 CREATE TABLE test.stock ( 
 	store text,

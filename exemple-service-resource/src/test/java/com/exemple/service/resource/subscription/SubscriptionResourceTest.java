@@ -15,6 +15,9 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.ResultSet;
+import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
@@ -31,6 +34,9 @@ public class SubscriptionResourceTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private SubscriptionEventResource subscriptionEventResource;
+
+    @Autowired
+    private CqlSession session;
 
     private String email;
 
@@ -57,7 +63,12 @@ public class SubscriptionResourceTest extends AbstractTestNGSpringContextTests {
 
         SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
         assertThat(event.getEventType(), is(EventType.CREATE));
+        assertThat(event.getLocalDate(), is(ServiceContextExecution.context().getDate().toLocalDate()));
         assertThat(event.getData().get("email").textValue(), is(email));
+
+        ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("local_date")
+                .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
+        assertThat(countAccountEvents.all().size(), is(1));
 
     }
 
@@ -77,7 +88,12 @@ public class SubscriptionResourceTest extends AbstractTestNGSpringContextTests {
 
         SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
         assertThat(event.getEventType(), is(EventType.DELETE));
+        assertThat(event.getLocalDate(), is(ServiceContextExecution.context().getDate().toLocalDate()));
         assertThat(event.getData(), is(nullValue()));
+
+        ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("local_date")
+                .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
+        assertThat(countAccountEvents.all().size(), is(2));
 
     }
 
