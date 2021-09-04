@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>exemple</groupId>
 	<artifactId>exemple-service</artifactId>
-	<version>2.0.0</version>
+	<version>3.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<organization>
 		<name>EXEMPLE</name>
@@ -25,7 +25,7 @@
 		<connection>scm:git:git://github.com/doudouchat/exemple-service.git</connection>
 		<developerConnection>scm:git:https://github.com/doudouchat/exemple-service.git</developerConnection>
 		<url>https://github.com/doudouchat/exemple-service</url>
-	  <tag>exemple-service-2.0.0</tag>
+	  <tag>HEAD</tag>
   </scm>
 
 	<distributionManagement>
