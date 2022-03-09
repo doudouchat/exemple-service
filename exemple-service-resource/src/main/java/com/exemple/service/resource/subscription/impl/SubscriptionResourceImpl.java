@@ -22,7 +22,7 @@ import com.exemple.service.resource.subscription.SubscriptionResource;
 import com.exemple.service.resource.subscription.event.SubscriptionEventResource;
 import com.fasterxml.jackson.databind.JsonNode;
 
-@Service
+@Service("subscriptionResource")
 @Validated
 public class SubscriptionResourceImpl implements SubscriptionResource {
 

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:lang="http://www.springframework.org/schema/lang"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/lang 
+        http://www.springframework.org/schema/lang/spring-lang.xsd">
+
+	<lang:groovy id="accountService">
+		<lang:inline-script>
+			package com.exemple.service.customer.account
+
+			import com.exemple.service.resource.account.AccountResource
+			import com.fasterxml.jackson.databind.JsonNode
+			import com.fasterxml.jackson.databind.ObjectMapper
+
+			class AccountServiceTest implements AccountService {
+
+				JsonNode save(JsonNode account) {
+					account
+				}
+
+				JsonNode save(JsonNode account, JsonNode previousSource) {
+					account
+				}
+
+				JsonNode get(UUID uuid){
+					ObjectMapper mapper = new ObjectMapper()
+					mapper.createObjectNode().put("note", "default value")
+				}
+			}
+		</lang:inline-script>
+
+	</lang:groovy>
+
+</beans>

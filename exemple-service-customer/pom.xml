@@ -41,13 +41,6 @@
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
 
-		<!-- APACHE -->
-
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-		</dependency>
-
 		<!-- TEST -->
 
 		<dependency>

@@ -4,6 +4,7 @@
 	<test name="ut common">
 		<packages>
 			<package name="com.exemple.service.api.common" />
+			<package name="com.exemple.service.api.common.script" />
 		</packages>
 	</test>
 	<test name="ut api">

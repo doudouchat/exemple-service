@@ -8,20 +8,16 @@
         http://www.springframework.org/schema/lang 
         http://www.springframework.org/schema/lang/spring-lang.xsd">
 
-	<lang:groovy id="accountServiceResource"
-		script-source="classpath:com/exemple/service/customer/account/resource/AccountServiceResourceImpl.groovy">
+	<lang:groovy id="accountService"
+		script-source="classpath:com/exemple/service/customer/account/AccountService.groovy">
+		<lang:property name="accountResource" ref="accountResource"/>
+		<lang:property name="customerEventPublisher" ref="customerEventPublisher"/>
 	</lang:groovy>
 
-	<lang:groovy id="accountValidationCustom"
-		script-source="classpath:com/exemple/service/customer/account/validation/AccountValidationCustomImpl.groovy">
-	</lang:groovy>
-
-	<lang:groovy id="subscriptionServiceResource"
-		script-source="classpath:com/exemple/service/customer/subscription/resource/SubscriptionServiceResourceImpl.groovy">
-	</lang:groovy>
-
-	<lang:groovy id="subscriptionValidationCustom"
-		script-source="classpath:com/exemple/service/customer/subscription/validation/SubscriptionValidationCustomImpl.groovy">
+	<lang:groovy id="subscriptionService"
+		script-source="classpath:com/exemple/service/customer/subscription/SubscriptionService.groovy">
+		<lang:property name="subscriptionResource" ref="subscriptionResource" />
+		<lang:property name="customerEventPublisher" ref="customerEventPublisher"/>
 	</lang:groovy>
 
 </beans>

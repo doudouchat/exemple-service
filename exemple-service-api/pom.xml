@@ -254,6 +254,11 @@
 			<artifactId>commons-codec</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+
 		<!-- GOOGLE GUAVA -->
 
 		<dependency>

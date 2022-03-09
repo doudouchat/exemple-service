@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:lang="http://www.springframework.org/schema/lang"
 	xsi:schemaLocation="
         http://www.springframework.org/schema/beans 
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/lang 
         http://www.springframework.org/schema/lang/spring-lang.xsd">
 
-	<lang:groovy id="accountServiceResource"
-		script-source="file:${project.build.testOutputDirectory}/contexts/test_company/AccountServiceResource.groovy">
+	<lang:groovy id="accountService"
+		script-source="file:${project.build.testOutputDirectory}/contexts/test_company/AccountService.groovy">
+		<lang:property name="accountResource" ref="accountResource"/>
+		<lang:property name="customerEventPublisher" ref="customerEventPublisher"/>
 	</lang:groovy>
-	
+
 
 </beans>

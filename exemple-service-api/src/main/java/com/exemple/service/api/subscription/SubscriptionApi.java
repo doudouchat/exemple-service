@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.schema.FilterHelper;
 import com.exemple.service.api.common.schema.ValidationHelper;
+import com.exemple.service.api.common.script.CustomerScriptFactory;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.subscription.SubscriptionService;
 import com.exemple.service.customer.subscription.exception.SubscriptionServiceNotFoundException;
@@ -53,7 +54,9 @@ public class SubscriptionApi {
 
     private static final String SUBSCRIPTION_RESOURCE = "subscription";
 
-    private final SubscriptionService service;
+    private static final String SUBSCRIPTION_BEAN = "subscriptionService";
+
+    private final CustomerScriptFactory scriptFactory;
 
     private final ValidationHelper schemaValidation;
 
@@ -62,9 +65,9 @@ public class SubscriptionApi {
     @Context
     private ContainerRequestContext servletContext;
 
-    public SubscriptionApi(SubscriptionService service, ValidationHelper schemaValidation, FilterHelper schemaFilter) {
+    public SubscriptionApi(CustomerScriptFactory scriptFactory, ValidationHelper schemaValidation, FilterHelper schemaFilter) {
 
-        this.service = service;
+        this.scriptFactory = scriptFactory;
         this.schemaValidation = schemaValidation;
         this.schemaFilter = schemaFilter;
     }
@@ -84,7 +87,7 @@ public class SubscriptionApi {
     public JsonNode get(@NotNull @PathParam("email") String email,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws SubscriptionServiceNotFoundException {
 
-        JsonNode subscription = service.get(email);
+        JsonNode subscription = scriptFactory.getBean(SUBSCRIPTION_BEAN, SubscriptionService.class).get(email);
 
         return schemaFilter.filter(subscription, SUBSCRIPTION_RESOURCE, servletContext);
 
@@ -111,7 +114,7 @@ public class SubscriptionApi {
         JsonNodeUtils.set(subscription, email, SubscriptionField.EMAIL.field);
         schemaValidation.validate(subscription, SUBSCRIPTION_RESOURCE, servletContext);
 
-        boolean created = service.save(subscription);
+        boolean created = scriptFactory.getBean(SUBSCRIPTION_BEAN, SubscriptionService.class).save(subscription);
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
         builder.path(email);
