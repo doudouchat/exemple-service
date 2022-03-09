@@ -5,6 +5,7 @@ import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 
@@ -17,6 +18,7 @@ import com.exemple.service.resource.subscription.SubscriptionResource;
 
 @Configuration
 @Import(CustomerConfiguration.class)
+@ImportResource("classpath:exemple-service-customer.xml")
 public class CustomerTestConfiguration {
 
     @Bean

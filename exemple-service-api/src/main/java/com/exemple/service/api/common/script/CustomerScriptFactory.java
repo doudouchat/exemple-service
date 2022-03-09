@@ -1,4 +1,4 @@
-package com.exemple.service.customer.common;
+package com.exemple.service.api.common.script;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -38,16 +40,26 @@ public class CustomerScriptFactory {
 
     private final ConcurrentMap<String, Long> checksumApplicationContexts;
 
+    private final ApplicationContext applicationContext;
+
     private final String contextsPath;
 
     private static final ApplicationContext EMPTY_CONTEXT = new GenericApplicationContext();
 
-    public CustomerScriptFactory(ApplicationDetailService applicationDetailService, @Value("${customer.contexts.path}") String contextsPath) {
-        this.defaultApplicationContext = new FileSystemXmlApplicationContext("classpath:exemple-service-customer.xml");
+    public CustomerScriptFactory(ApplicationDetailService applicationDetailService, @Value("${customer.contexts.path}") String contextsPath,
+            ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+        this.defaultApplicationContext = new FileSystemXmlApplicationContext(new String[] { "classpath:exemple-service-customer.xml" },
+                this.applicationContext);
         this.scriptApplicationContexts = new ConcurrentHashMap<>();
         this.checksumApplicationContexts = new ConcurrentHashMap<>();
         this.applicationDetailService = applicationDetailService;
         this.contextsPath = contextsPath;
+    }
+
+    @PostConstruct
+    public void initScriptApplicationContexts() throws IOException {
+        completeScriptApplicationContexts();
     }
 
     public <T> T getBean(String beanName, Class<T> beanClass) {
@@ -55,13 +67,13 @@ public class CustomerScriptFactory {
         String app = ServiceContextExecution.context().getApp();
         ApplicationDetail applicationDetail = applicationDetailService.get(app);
 
-        ApplicationContext applicationContext = defaultApplicationContext;
+        ApplicationContext applicationScriptContext = defaultApplicationContext;
         if (checkIfBeanIsPresent(applicationDetail.getCompany(), beanName)) {
 
-            applicationContext = scriptApplicationContexts.get(applicationDetail.getCompany());
+            applicationScriptContext = scriptApplicationContexts.get(applicationDetail.getCompany());
         }
 
-        return applicationContext.getBean(beanName, beanClass);
+        return applicationScriptContext.getBean(beanName, beanClass);
     }
 
     private boolean checkIfBeanIsPresent(String company, String beanName) {
@@ -99,7 +111,8 @@ public class CustomerScriptFactory {
             String configLocation = contextPath.toString();
             LOG.debug("loading context {}", configLocation);
 
-            scriptApplicationContexts.put(contextKey, new FileSystemXmlApplicationContext("file:///" + configLocation));
+            scriptApplicationContexts.put(contextKey,
+                    new FileSystemXmlApplicationContext(new String[] { "file:///" + configLocation }, this.applicationContext));
             checksumApplicationContexts.put(contextKey, checksum);
         }
 

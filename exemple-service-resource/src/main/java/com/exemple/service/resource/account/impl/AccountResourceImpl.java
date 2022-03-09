@@ -29,7 +29,7 @@ import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.fasterxml.jackson.databind.JsonNode;
 
-@Service
+@Service("accountResource")
 @Validated
 public class AccountResourceImpl implements AccountResource {
 

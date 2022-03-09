@@ -30,6 +30,7 @@ import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.schema.FilterHelper;
 import com.exemple.service.api.common.schema.SchemaHelper;
 import com.exemple.service.api.common.schema.ValidationHelper;
+import com.exemple.service.api.common.script.CustomerScriptFactory;
 import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
@@ -63,7 +64,9 @@ public class AccountApi {
 
     private static final String ACCOUNT_RESOURCE = "account";
 
-    private final AccountService service;
+    private static final String ACCOUNT_BEAN = "accountService";
+
+    private final CustomerScriptFactory scriptFactory;
 
     private final ValidationHelper schemaValidation;
 
@@ -76,10 +79,10 @@ public class AccountApi {
     @Context
     private ContainerRequestContext servletContext;
 
-    public AccountApi(AccountService service, ValidationHelper schemaValidation, FilterHelper schemaFilter, SchemaHelper schemaMerge,
+    public AccountApi(CustomerScriptFactory scriptFactory, ValidationHelper schemaValidation, FilterHelper schemaFilter, SchemaHelper schemaMerge,
             AuthorizationCheckService authorizationCheckService) {
 
-        this.service = service;
+        this.scriptFactory = scriptFactory;
         this.schemaValidation = schemaValidation;
         this.schemaFilter = schemaFilter;
         this.schemaMerge = schemaMerge;
@@ -104,7 +107,7 @@ public class AccountApi {
 
         authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
 
-        JsonNode account = service.get(id);
+        JsonNode account = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).get(id);
 
         return schemaFilter.filter(account, ACCOUNT_RESOURCE, servletContext);
 
@@ -126,7 +129,7 @@ public class AccountApi {
 
         schemaValidation.validate(account, ACCOUNT_RESOURCE, servletContext);
 
-        JsonNode source = service.save(account);
+        JsonNode source = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).save(account);
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
         builder.path(source.get(AccountField.ID.field).textValue());
@@ -152,13 +155,13 @@ public class AccountApi {
 
         authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
 
-        JsonNode previousSource = service.get(id);
+        JsonNode previousSource = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).get(id);
 
         JsonNode source = JsonPatch.apply(patch, previousSource);
 
         schemaValidation.validate(source, previousSource, ACCOUNT_RESOURCE, servletContext);
 
-        service.save(source, previousSource);
+        scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).save(source, previousSource);
 
         return Response.status(Status.NO_CONTENT).build();
 
@@ -182,13 +185,13 @@ public class AccountApi {
 
         authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
 
-        JsonNode previousSource = service.get(id);
+        JsonNode previousSource = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).get(id);
 
         schemaMerge.complete(account, previousSource, ACCOUNT_RESOURCE, servletContext);
 
         schemaValidation.validate(account, previousSource, ACCOUNT_RESOURCE, servletContext);
 
-        service.save(account, previousSource);
+        scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).save(account, previousSource);
 
         return Response.status(Status.NO_CONTENT).build();
 

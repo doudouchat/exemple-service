@@ -9,6 +9,7 @@ import javax.naming.NamingException;
 import org.mockito.Mockito;
 import org.osjava.sj.SimpleJndi;
 import org.osjava.sj.loader.JndiLoader;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -16,6 +17,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jndi.JndiObjectFactoryBean;
 
 import com.exemple.service.api.common.JsonNodeUtils;
+import com.exemple.service.api.common.script.CustomerScriptFactory;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.subscription.SubscriptionService;
@@ -88,6 +90,16 @@ public class ApiTestConfiguration extends ApiConfiguration {
     @Bean
     public ApplicationDetailService ApplicationDetailService() {
         return Mockito.mock(ApplicationDetailService.class);
+    }
+
+    @Bean
+    public CustomerScriptFactory customerScriptFactory(ApplicationContext context) {
+        CustomerScriptFactory customerScriptFactory = Mockito.mock(CustomerScriptFactory.class);
+        Mockito.when(customerScriptFactory.getBean(Mockito.anyString(), Mockito.eq(SubscriptionService.class)))
+                .thenReturn(context.getBean(SubscriptionService.class));
+        Mockito.when(customerScriptFactory.getBean(Mockito.anyString(), Mockito.eq(AccountService.class)))
+                .thenReturn(context.getBean(AccountService.class));
+        return customerScriptFactory;
     }
 
     @Bean
