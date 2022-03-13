@@ -4,6 +4,7 @@ import static nl.fd.hamcrest.jackson.HasJsonField.hasJsonField;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.runner.RunWith;
@@ -20,7 +21,6 @@ import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.account.AccountService;
-import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -45,7 +45,7 @@ public class CustomerScriptFactoryTest {
     }
 
     @Test
-    public void getDefaultBean() throws AccountServiceNotFoundException {
+    public void getDefaultBean() {
 
         // Setup context
         ServiceContextExecution.context().setApp("test");
@@ -62,13 +62,13 @@ public class CustomerScriptFactoryTest {
         mapper.createObjectNode().put("note", "default value");
 
         // then check get response
-        JsonNode account = service.get(UUID.randomUUID());
-        assertThat(account, hasJsonField("note", "default value"));
+        Optional<JsonNode> account = service.get(UUID.randomUUID());
+        assertThat(account.get(), hasJsonField("note", "default value"));
 
     }
 
     @Test
-    public void getOverrideBean() throws AccountServiceNotFoundException {
+    public void getOverrideBean() {
 
         // Setup context
         ServiceContextExecution.context().setApp("test");
@@ -85,8 +85,8 @@ public class CustomerScriptFactoryTest {
         mapper.createObjectNode().put("note", "default value");
 
         // then check get response
-        JsonNode account = service.get(UUID.randomUUID());
-        assertThat(account, hasJsonField("note", "override value"));
+        Optional<JsonNode> account = service.get(UUID.randomUUID());
+        assertThat(account.get(), hasJsonField("note", "override value"));
 
     }
 

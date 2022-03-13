@@ -23,7 +23,6 @@ import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.common.JsonNodeUtils;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
-import com.exemple.service.customer.subscription.exception.SubscriptionServiceNotFoundException;
 import com.exemple.service.event.model.EventData;
 import com.exemple.service.event.model.EventType;
 import com.exemple.service.resource.login.LoginResource;
@@ -129,7 +128,7 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void get() throws SubscriptionServiceNotFoundException {
+    public void get() {
 
         // Given email
 
@@ -149,24 +148,11 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
 
         // When perform get
 
-        JsonNode subscription = service.get(email);
+        Optional<JsonNode> subscription = service.get(email);
 
         // Then check subscription
 
-        assertThat(subscription, is(source));
-
-    }
-
-    @Test(expectedExceptions = SubscriptionServiceNotFoundException.class)
-    public void getNotFound() throws SubscriptionServiceNotFoundException {
-
-        // Given mock resource
-
-        Mockito.when(resource.get(Mockito.anyString())).thenReturn(Optional.empty());
-
-        // When perform get
-
-        service.get("jean@gmail.com");
+        assertThat(subscription.get(), is(source));
 
     }
 

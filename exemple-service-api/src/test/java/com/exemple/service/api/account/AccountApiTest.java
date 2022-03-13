@@ -7,6 +7,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.ws.rs.client.Entity;
@@ -27,7 +28,6 @@ import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.account.AccountService;
-import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
 import com.exemple.service.schema.merge.SchemaMerge;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -62,7 +62,7 @@ public class AccountApiTest extends JerseySpringSupport {
     public static final String URL = "/v1/accounts";
 
     @Test
-    public void get() throws AccountServiceNotFoundException {
+    public void get() {
 
         // Given account id
 
@@ -70,7 +70,7 @@ public class AccountApiTest extends JerseySpringSupport {
 
         // And mock service
 
-        Mockito.when(service.get(Mockito.eq(id))).thenReturn(account);
+        Mockito.when(service.get(Mockito.eq(id))).thenReturn(Optional.of(account));
 
         // When perform get
 
@@ -91,7 +91,7 @@ public class AccountApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void patch() throws AccountServiceNotFoundException {
+    public void patch() {
 
         // Given account id
 
@@ -99,7 +99,7 @@ public class AccountApiTest extends JerseySpringSupport {
 
         // And mock service
 
-        Mockito.when(service.get(Mockito.eq(id))).thenReturn(account);
+        Mockito.when(service.get(Mockito.eq(id))).thenReturn(Optional.of(account));
 
         // When perform patch
 
@@ -139,14 +139,14 @@ public class AccountApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void put() throws AccountServiceNotFoundException {
+    public void put() {
 
         // Given account id
 
         UUID id = UUID.randomUUID();
 
         // And mock service
-        Mockito.when(service.get(Mockito.eq(id))).thenReturn(this.account);
+        Mockito.when(service.get(Mockito.eq(id))).thenReturn(Optional.of(this.account));
 
         // When perform put
 
@@ -239,89 +239,6 @@ public class AccountApiTest extends JerseySpringSupport {
         Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("account"),
                 account.capture());
         assertThat(account.getValue(), is(source));
-
-    }
-
-    @Test
-    public void patchNotFound() throws AccountServiceNotFoundException {
-
-        // Given account id
-
-        UUID id = UUID.randomUUID();
-
-        // And mock service
-
-        Mockito.when(service.get(Mockito.eq(id))).thenThrow(new AccountServiceNotFoundException());
-
-        // When perform patch
-
-        Map<String, Object> patch = new HashMap<>();
-        patch.put("op", "add");
-        patch.put("path", "/birthday");
-        patch.put("value", "1976-12-12");
-
-        Response response = target(URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true).request(MediaType.APPLICATION_JSON)
-
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
-
-                .method("PATCH", Entity.json(JsonNodeUtils.toString(Collections.singletonList(patch))));
-
-        // Then check status
-
-        assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
-
-    }
-
-    @Test
-    public void putNotFoundFailure() throws AccountServiceNotFoundException {
-
-        // Given account id
-
-        UUID id = UUID.randomUUID();
-
-        // And mock service
-
-        Mockito.when(service.get(Mockito.eq(id))).thenThrow(new AccountServiceNotFoundException());
-
-        // When perform patch
-
-        Map<String, Object> model = new HashMap<>();
-        model.put("lastname", "Dupond");
-
-        Response response = target(URL + "/" + id).request(MediaType.APPLICATION_JSON)
-
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
-
-                .put(Entity.json(model));
-
-        // Then check status
-
-        assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
-
-    }
-
-    @Test
-    public void getNotFound() throws AccountServiceNotFoundException {
-
-        // Given account id
-
-        UUID id = UUID.randomUUID();
-
-        // And mock service
-
-        Mockito.when(service.get(Mockito.eq(id))).thenThrow(new AccountServiceNotFoundException());
-
-        // When perform get
-
-        Response response = target(URL + "/" + id).request(MediaType.APPLICATION_JSON)
-
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
-
-                .get();
-
-        // Then check status
-
-        assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
 
     }
 

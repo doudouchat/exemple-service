@@ -1,7 +1,6 @@
 package com.exemple.service.customer.account
 
 import com.exemple.service.context.ServiceContextExecution
-import com.exemple.service.customer.account.exception.AccountServiceNotFoundException
 import com.exemple.service.customer.common.event.CustomerEventPublisher
 import com.exemple.service.event.model.EventType
 import com.exemple.service.resource.account.AccountResource
@@ -42,10 +41,8 @@ class AccountServiceImpl implements AccountService {
         account
     }
 
-    JsonNode get(UUID id) throws AccountServiceNotFoundException {
+    Optional<JsonNode> get(UUID id) {
 
-        accountResource.get(id).orElseThrow{
-            new AccountServiceNotFoundException()
-        }
+        accountResource.get(id)
     }
 }

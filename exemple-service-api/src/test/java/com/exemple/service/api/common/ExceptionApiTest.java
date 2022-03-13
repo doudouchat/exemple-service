@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.ws.rs.client.Entity;
@@ -26,8 +27,6 @@ import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.api.stock.StockApiTest;
 import com.exemple.service.customer.account.AccountService;
-import com.exemple.service.customer.account.exception.AccountServiceException;
-import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
 
 public class ExceptionApiTest extends JerseySpringSupport {
 
@@ -102,7 +101,7 @@ public class ExceptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void JsonPatchException() throws AccountServiceNotFoundException {
+    public void JsonPatchException() {
 
         // Given account id
 
@@ -110,7 +109,7 @@ public class ExceptionApiTest extends JerseySpringSupport {
 
         // And mock service
 
-        Mockito.when(service.get(Mockito.eq(id))).thenReturn(JsonNodeUtils.create(() -> "{}"));
+        Mockito.when(service.get(Mockito.eq(id))).thenReturn(Optional.of(JsonNodeUtils.create(() -> "{}")));
 
         // When perform patch
 
@@ -154,7 +153,7 @@ public class ExceptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void internalServerError() throws AccountServiceException {
+    public void internalServerError() {
 
         // Given mock service
 

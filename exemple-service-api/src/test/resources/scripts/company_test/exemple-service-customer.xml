@@ -12,7 +12,6 @@
 		<lang:inline-script>
 			package com.exemple.service.customer.account
 
-			import com.exemple.service.resource.account.AccountResource
 			import com.fasterxml.jackson.databind.JsonNode
 			import com.fasterxml.jackson.databind.ObjectMapper
 
@@ -26,9 +25,9 @@
 					account
 				}
 
-				JsonNode get(UUID uuid){
+				Optional get(UUID uuid){
 					ObjectMapper mapper = new ObjectMapper()
-					mapper.createObjectNode().put("note", "override value")
+					Optional.of(mapper.createObjectNode().put("note", "override value"))
 				}
 			}
 		</lang:inline-script>

@@ -30,7 +30,6 @@ import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration
 import com.exemple.service.api.core.authorization.impl.AuthorizationTokenValidation;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.account.AccountService;
-import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
 import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.login.model.LoginEntity;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -123,7 +122,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     }
 
     @Test
-    public void authorizedGetUserFailure() throws AccountServiceNotFoundException, AuthorizationException {
+    public void authorizedGetUserFailure() throws AuthorizationException {
 
         // Given token
 
@@ -148,7 +147,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     }
 
     @Test
-    public void authorizedGetAccount() throws AccountServiceNotFoundException {
+    public void authorizedGetAccount() {
 
         // Given token
 
@@ -157,7 +156,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
 
         // And mock service & resource
 
-        Mockito.when(accountService.get(Mockito.eq(ID))).thenReturn(account);
+        Mockito.when(accountService.get(Mockito.eq(ID))).thenReturn(Optional.of(account));
         Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(ID_RESPONSE_LOGIN);
 
         // When perform get
@@ -213,7 +212,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     }
 
     @Test
-    public void authorizedGetUser() throws AccountServiceNotFoundException {
+    public void authorizedGetUser() {
 
         // Given token
 
@@ -222,7 +221,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
 
         // And mock service & resource
 
-        Mockito.when(accountService.get(Mockito.eq(ID))).thenReturn(account);
+        Mockito.when(accountService.get(Mockito.eq(ID))).thenReturn(Optional.of(account));
         Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(ID_RESPONSE_LOGIN);
 
         // When perform get

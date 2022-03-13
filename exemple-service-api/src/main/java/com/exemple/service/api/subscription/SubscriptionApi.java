@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -17,8 +18,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
 
 import org.springframework.stereotype.Component;
 
@@ -28,7 +27,6 @@ import com.exemple.service.api.common.schema.ValidationHelper;
 import com.exemple.service.api.common.script.CustomerScriptFactory;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.subscription.SubscriptionService;
-import com.exemple.service.customer.subscription.exception.SubscriptionServiceNotFoundException;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.subscription.SubscriptionField;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -85,9 +83,9 @@ public class SubscriptionApi {
     })
     @RolesAllowed("subscription:read")
     public JsonNode get(@NotNull @PathParam("email") String email,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws SubscriptionServiceNotFoundException {
+            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) {
 
-        JsonNode subscription = scriptFactory.getBean(SUBSCRIPTION_BEAN, SubscriptionService.class).get(email);
+        JsonNode subscription = scriptFactory.getBean(SUBSCRIPTION_BEAN, SubscriptionService.class).get(email).orElseThrow(NotFoundException::new);
 
         return schemaFilter.filter(subscription, SUBSCRIPTION_RESOURCE, servletContext);
 
@@ -119,18 +117,6 @@ public class SubscriptionApi {
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
         builder.path(email);
         return Response.status(created ? Status.CREATED : Status.NO_CONTENT).location(builder.build()).build();
-
-    }
-
-    @Provider
-    public static class SubscriptionServiceNotFoundExceptionMapper implements ExceptionMapper<SubscriptionServiceNotFoundException> {
-
-        @Override
-        public Response toResponse(SubscriptionServiceNotFoundException ex) {
-
-            return Response.status(Status.NOT_FOUND).type(MediaType.APPLICATION_JSON).build();
-
-        }
 
     }
 
