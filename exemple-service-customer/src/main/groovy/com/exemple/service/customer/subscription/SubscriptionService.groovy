@@ -4,7 +4,6 @@ import org.springframework.util.Assert
 
 import com.exemple.service.context.ServiceContextExecution
 import com.exemple.service.customer.common.event.CustomerEventPublisher
-import com.exemple.service.customer.subscription.exception.SubscriptionServiceNotFoundException
 import com.exemple.service.event.model.EventType
 import com.exemple.service.resource.subscription.SubscriptionField
 import com.exemple.service.resource.subscription.SubscriptionResource
@@ -42,10 +41,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    JsonNode get(String email) throws SubscriptionServiceNotFoundException {
+    Optional<JsonNode> get(String email) {
 
-        subscriptionResource.get(email).orElseThrow{
-            new SubscriptionServiceNotFoundException()
-        }
+        subscriptionResource.get(email)
     }
 }

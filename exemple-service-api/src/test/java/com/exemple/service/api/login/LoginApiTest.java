@@ -209,31 +209,6 @@ public class LoginApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void getNotFound() {
-
-        // Given user_name
-
-        String username = "jean.dupond@gmail.com";
-
-        // And mock service
-
-        Mockito.when(resource.get(Mockito.eq(username))).thenReturn(Optional.empty());
-
-        // When perform get
-
-        Response response = target(URL + "/" + username).request(MediaType.APPLICATION_JSON)
-
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
-
-                .get();
-
-        // Then check status
-
-        assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
-
-    }
-
-    @Test
     public void delete() {
 
         // Given user_name

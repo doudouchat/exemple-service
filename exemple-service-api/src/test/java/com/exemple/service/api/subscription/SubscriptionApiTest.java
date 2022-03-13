@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
@@ -24,7 +25,6 @@ import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.subscription.SubscriptionService;
-import com.exemple.service.customer.subscription.exception.SubscriptionServiceNotFoundException;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -117,7 +117,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void get() throws SubscriptionServiceNotFoundException {
+    public void get() {
 
         // Given email
 
@@ -125,7 +125,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
         // And mock service
 
-        Mockito.when(service.get(Mockito.eq(email))).thenReturn(subscription);
+        Mockito.when(service.get(Mockito.eq(email))).thenReturn(Optional.of(subscription));
 
         // When perform get
 
@@ -142,31 +142,6 @@ public class SubscriptionApiTest extends JerseySpringSupport {
         // And check body
 
         assertThat(response.readEntity(JsonNode.class), is(subscription));
-
-    }
-
-    @Test
-    public void getNotFound() throws SubscriptionServiceNotFoundException {
-
-        // Given email
-
-        String email = "jean.dupond@gmail.com";
-
-        // And mock service
-
-        Mockito.when(service.get(Mockito.eq(email))).thenThrow(new SubscriptionServiceNotFoundException());
-
-        // When perform get
-
-        Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
-
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
-
-                .get();
-
-        // Then check status
-
-        assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
 
     }
 

@@ -23,8 +23,6 @@ import org.testng.annotations.Test;
 
 import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
-import com.exemple.service.customer.account.exception.AccountServiceException;
-import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
 import com.exemple.service.customer.common.JsonNodeUtils;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.exemple.service.event.model.EventData;
@@ -159,7 +157,7 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void get() throws AccountServiceException {
+    public void get() {
 
         // Given account id
 
@@ -182,28 +180,11 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
 
         // When perform get
 
-        JsonNode account = service.get(id);
+        Optional<JsonNode> account = service.get(id);
 
         // Then check account
 
-        assertThat(account, is(source));
-
-    }
-
-    @Test(expectedExceptions = AccountServiceNotFoundException.class)
-    public void getNotFound() throws AccountServiceException {
-
-        // Given account id
-
-        UUID id = UUID.randomUUID();
-
-        // And mock resource
-
-        Mockito.when(resource.get(Mockito.eq(id))).thenReturn(Optional.empty());
-
-        // When perform get
-
-        service.get(id);
+        assertThat(account.get(), is(source));
 
     }
 

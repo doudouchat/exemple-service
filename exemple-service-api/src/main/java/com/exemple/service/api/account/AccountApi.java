@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -21,8 +22,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
 
 import org.springframework.stereotype.Component;
 
@@ -35,7 +34,6 @@ import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.account.AccountService;
-import com.exemple.service.customer.account.exception.AccountServiceNotFoundException;
 import com.exemple.service.resource.account.AccountField;
 import com.exemple.service.resource.common.validator.NotEmpty;
 import com.exemple.service.schema.validation.annotation.Patch;
@@ -102,12 +100,11 @@ public class AccountApi {
 
     })
     @RolesAllowed("account:read")
-    public JsonNode get(@NotNull @PathParam("id") UUID id, @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam)
-            throws AccountServiceNotFoundException {
+    public JsonNode get(@NotNull @PathParam("id") UUID id, @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) {
 
         authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
 
-        JsonNode account = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).get(id);
+        JsonNode account = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).get(id).orElseThrow(NotFoundException::new);
 
         return schemaFilter.filter(account, ACCOUNT_RESOURCE, servletContext);
 
@@ -151,11 +148,11 @@ public class AccountApi {
     })
     @RolesAllowed("account:update")
     public Response update(@NotNull @PathParam("id") UUID id, @NotEmpty @Patch @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws AccountServiceNotFoundException {
+            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) {
 
         authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
 
-        JsonNode previousSource = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).get(id);
+        JsonNode previousSource = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).get(id).orElseThrow(NotFoundException::new);
 
         JsonNode source = JsonPatch.apply(patch, previousSource);
 
@@ -181,11 +178,11 @@ public class AccountApi {
     })
     @RolesAllowed("account:update")
     public Response update(@NotNull @PathParam("id") UUID id, @NotNull @Parameter(schema = @Schema(ref = ACCOUNT_SCHEMA)) JsonNode account,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws AccountServiceNotFoundException {
+            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) {
 
         authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
 
-        JsonNode previousSource = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).get(id);
+        JsonNode previousSource = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).get(id).orElseThrow(NotFoundException::new);
 
         schemaMerge.complete(account, previousSource, ACCOUNT_RESOURCE, servletContext);
 
@@ -194,18 +191,6 @@ public class AccountApi {
         scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).save(account, previousSource);
 
         return Response.status(Status.NO_CONTENT).build();
-
-    }
-
-    @Provider
-    public static class AccountServiceNotFoundExceptionMapper implements ExceptionMapper<AccountServiceNotFoundException> {
-
-        @Override
-        public Response toResponse(AccountServiceNotFoundException ex) {
-
-            return Response.status(Status.NOT_FOUND).type(MediaType.APPLICATION_JSON).build();
-
-        }
 
     }
 }
