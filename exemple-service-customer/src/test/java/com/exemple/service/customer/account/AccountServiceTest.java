@@ -27,7 +27,6 @@ import com.exemple.service.customer.common.JsonNodeUtils;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.exemple.service.event.model.EventData;
 import com.exemple.service.event.model.EventType;
-import com.exemple.service.resource.account.AccountResource;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @RecordApplicationEvents

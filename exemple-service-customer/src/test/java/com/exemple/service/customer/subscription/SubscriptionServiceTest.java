@@ -25,8 +25,6 @@ import com.exemple.service.customer.common.JsonNodeUtils;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.exemple.service.event.model.EventData;
 import com.exemple.service.event.model.EventType;
-import com.exemple.service.resource.login.LoginResource;
-import com.exemple.service.resource.subscription.SubscriptionResource;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
@@ -43,13 +41,10 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private SubscriptionService service;
 
-    @Autowired
-    private LoginResource loginResource;
-
     @BeforeMethod
     private void before() {
 
-        Mockito.reset(resource, loginResource);
+        Mockito.reset(resource);
 
     }
 

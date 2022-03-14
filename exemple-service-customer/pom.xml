@@ -11,11 +11,19 @@
 
 	<dependencies>
 
-		<!-- RESOURCE -->
+		<!-- CONTEXT -->
 
 		<dependency>
 			<groupId>exemple</groupId>
-			<artifactId>exemple-service-resource</artifactId>
+			<artifactId>exemple-service-context</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- APPLICATION -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-application</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

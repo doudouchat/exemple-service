@@ -1,11 +1,11 @@
-package com.exemple.service.resource.account;
+package com.exemple.service.customer.account;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import com.exemple.service.resource.common.validator.Json;
-import com.exemple.service.resource.common.validator.NotEmpty;
+import com.exemple.service.customer.common.validator.Json;
+import com.exemple.service.customer.common.validator.NotEmpty;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public interface AccountResource {

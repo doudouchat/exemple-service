@@ -1,10 +1,10 @@
-package com.exemple.service.resource.subscription;
+package com.exemple.service.customer.subscription;
 
 import java.util.Optional;
 
 import javax.validation.constraints.NotBlank;
 
-import com.exemple.service.resource.common.validator.Json;
+import com.exemple.service.customer.common.validator.Json;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public interface SubscriptionResource {

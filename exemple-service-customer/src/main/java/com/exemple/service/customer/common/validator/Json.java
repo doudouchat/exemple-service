@@ -1,4 +1,4 @@
-package com.exemple.service.resource.common.validator;
+package com.exemple.service.customer.common.validator;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -14,12 +14,14 @@ import javax.validation.constraints.NotNull;
 @Target({ ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Constraint(validatedBy = NotEmptyConstraintValidator.class)
+@Constraint(validatedBy = {})
 @ReportAsSingleViolation
 @NotNull
-public @interface NotEmpty {
+public @interface Json {
 
-    String message() default "{javax.validation.constraints.NotEmpty.jsonNode.message}";
+    String table();
+
+    String message() default "{javax.validation.constraints.jsonNode}";
 
     Class<?>[] groups() default {};
 

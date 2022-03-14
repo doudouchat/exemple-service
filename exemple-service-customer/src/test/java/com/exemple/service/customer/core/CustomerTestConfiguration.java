@@ -11,10 +11,8 @@ import org.springframework.core.io.ClassPathResource;
 
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
-import com.exemple.service.resource.account.AccountResource;
-import com.exemple.service.resource.login.LoginResource;
-import com.exemple.service.resource.schema.SchemaResource;
-import com.exemple.service.resource.subscription.SubscriptionResource;
+import com.exemple.service.customer.account.AccountResource;
+import com.exemple.service.customer.subscription.SubscriptionResource;
 
 @Configuration
 @Import(CustomerConfiguration.class)
@@ -24,16 +22,6 @@ public class CustomerTestConfiguration {
     @Bean
     public AccountResource accountResource() {
         return Mockito.mock(AccountResource.class);
-    }
-
-    @Bean
-    public LoginResource loginResource() {
-        return Mockito.mock(LoginResource.class);
-    }
-
-    @Bean
-    public SchemaResource schemaResource() {
-        return Mockito.mock(SchemaResource.class);
     }
 
     @Bean
