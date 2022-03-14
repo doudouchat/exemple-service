@@ -8,8 +8,6 @@ import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 
-import com.exemple.service.application.common.model.ApplicationDetail;
-import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.customer.common.event.ResourceEventPublisher;
 import com.exemple.service.customer.subscription.SubscriptionResource;
@@ -33,22 +31,6 @@ public class CustomerTestConfiguration {
         return Mockito.mock(ResourceEventPublisher.class);
     }
 
-    @Bean
-    public ApplicationDetailService applicationDetailService() {
-        ApplicationDetailService applicationDetailService = Mockito.mock(ApplicationDetailService.class);
-
-        ApplicationDetail defaultApplication = new ApplicationDetail();
-        defaultApplication.setCompany("default");
-        Mockito.when(applicationDetailService.get("default")).thenReturn(defaultApplication);
-
-        ApplicationDetail testApplication = new ApplicationDetail();
-        testApplication.setCompany("test");
-        Mockito.when(applicationDetailService.get("test")).thenReturn(testApplication);
-
-        return applicationDetailService;
-    }
-
-    @Bean
     public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
 
         PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = new PropertySourcesPlaceholderConfigurer();
