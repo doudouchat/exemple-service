@@ -3,8 +3,8 @@ package com.exemple.service.customer.subscription
 import org.springframework.util.Assert
 
 import com.exemple.service.context.ServiceContextExecution
-import com.exemple.service.customer.common.event.CustomerEventPublisher
-import com.exemple.service.event.model.EventType
+import com.exemple.service.customer.common.event.EventType
+import com.exemple.service.customer.common.event.ResourceEventPublisher
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
@@ -18,7 +18,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     SubscriptionResource subscriptionResource
 
-    CustomerEventPublisher customerEventPublisher
+    ResourceEventPublisher resourceEventPublisher
 
     @Override
     boolean save(JsonNode subscription) {
@@ -33,7 +33,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         subscriptionResource.save(subscription)
 
-        customerEventPublisher.publish(subscription, SUBSCRIPTION, EventType.CREATE)
+        resourceEventPublisher.publish(subscription, SUBSCRIPTION, EventType.CREATE)
 
         created
     }

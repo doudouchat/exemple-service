@@ -1,20 +1,20 @@
-package com.exemple.service.customer.common.event;
+package com.exemple.service.event.publisher;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
-import com.exemple.service.event.model.EventData;
-import com.exemple.service.event.model.EventType;
+import com.exemple.service.customer.common.event.EventType;
+import com.exemple.service.customer.common.event.ResourceEventPublisher;
 import com.fasterxml.jackson.databind.JsonNode;
 
-@Component
-public class CustomerEventPublisher {
+@Component("resourceEventPublisher")
+public class DataEventPublisher implements ResourceEventPublisher {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public CustomerEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+    public DataEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 

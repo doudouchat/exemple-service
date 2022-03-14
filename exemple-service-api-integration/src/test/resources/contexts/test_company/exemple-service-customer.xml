@@ -11,7 +11,7 @@
 	<lang:groovy id="accountService"
 		script-source="file:${project.build.testOutputDirectory}/contexts/test_company/AccountService.groovy">
 		<lang:property name="accountResource" ref="accountResource"/>
-		<lang:property name="customerEventPublisher" ref="customerEventPublisher"/>
+		<lang:property name="resourceEventPublisher" ref="resourceEventPublisher"/>
 	</lang:groovy>
 
 

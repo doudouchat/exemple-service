@@ -15,7 +15,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
-import com.exemple.service.event.model.EventData;
+import com.exemple.service.event.publisher.EventData;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Component

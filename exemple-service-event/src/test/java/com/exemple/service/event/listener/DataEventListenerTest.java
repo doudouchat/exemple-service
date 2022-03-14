@@ -12,14 +12,14 @@ import java.util.concurrent.TimeUnit;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
+import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.customer.common.event.EventType;
 import com.exemple.service.event.core.EventTestConfiguration;
-import com.exemple.service.event.model.EventData;
-import com.exemple.service.event.model.EventType;
+import com.exemple.service.event.publisher.DataEventPublisher;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class DataEventListenerTest extends KafkaTestEvent {
 
     @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
+    private DataEventPublisher dataEventPublisher;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -46,8 +46,13 @@ public class DataEventListenerTest extends KafkaTestEvent {
 
         JsonNode resource = MAPPER.convertValue(data, JsonNode.class);
 
-        EventData eventData = new EventData(resource, "account", EventType.CREATE, origin, originVersion, date.toString());
-        applicationEventPublisher.publishEvent(eventData);
+        // and build context
+        ServiceContextExecution.context().setDate(date);
+        ServiceContextExecution.context().setApp(origin);
+        ServiceContextExecution.context().setVersion(originVersion);
+
+        // when publish event
+        dataEventPublisher.publish(resource, "account", EventType.CREATE);
 
         ConsumerRecord<String, JsonNode> received = records.poll(10, TimeUnit.SECONDS);
 

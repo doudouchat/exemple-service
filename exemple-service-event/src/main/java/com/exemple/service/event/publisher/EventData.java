@@ -1,7 +1,8 @@
-package com.exemple.service.event.model;
+package com.exemple.service.event.publisher;
 
 import org.springframework.context.ApplicationEvent;
 
+import com.exemple.service.customer.common.event.EventType;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class EventData extends ApplicationEvent {
