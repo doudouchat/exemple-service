@@ -11,8 +11,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.event.ApplicationEvents;
-import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -22,13 +20,12 @@ import org.testng.annotations.Test;
 import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.common.JsonNodeUtils;
+import com.exemple.service.customer.common.event.EventType;
+import com.exemple.service.customer.common.event.ResourceEventPublisher;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
-import com.exemple.service.event.model.EventData;
-import com.exemple.service.event.model.EventType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
-@RecordApplicationEvents
 @ContextConfiguration(classes = { CustomerTestConfiguration.class })
 public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
 
@@ -36,7 +33,7 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
     private SubscriptionResource resource;
 
     @Autowired
-    private ApplicationEvents applicationEvents;
+    private ResourceEventPublisher publisher;
 
     @Autowired
     private SubscriptionService service;
@@ -44,7 +41,7 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
     @BeforeMethod
     private void before() {
 
-        Mockito.reset(resource);
+        Mockito.reset(resource, publisher);
 
     }
 
@@ -114,11 +111,9 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
 
         // And check publish resource
 
-        Optional<EventData> event = applicationEvents.stream(EventData.class).findFirst();
-        assertThat(event.isPresent(), is(true));
-        assertThat(event.get().getSource(), is(expectedSubscription));
-        assertThat(event.get().getEventType(), is(EventType.CREATE));
-        assertThat(event.get().getResource(), is("subscription"));
+        ArgumentCaptor<JsonNode> eventCaptor = ArgumentCaptor.forClass(JsonNode.class);
+        Mockito.verify(publisher).publish(eventCaptor.capture(), Mockito.eq("subscription"), Mockito.eq(EventType.CREATE));
+        assertThat(eventCaptor.getValue(), is(expectedSubscription));
 
     }
 

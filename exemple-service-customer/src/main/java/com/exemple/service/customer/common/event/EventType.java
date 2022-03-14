@@ -1,4 +1,4 @@
-package com.exemple.service.event.model;
+package com.exemple.service.customer.common.event;
 
 public enum EventType {
 

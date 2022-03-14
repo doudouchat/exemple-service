@@ -14,8 +14,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.event.ApplicationEvents;
-import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -24,12 +22,11 @@ import org.testng.annotations.Test;
 import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.common.JsonNodeUtils;
+import com.exemple.service.customer.common.event.EventType;
+import com.exemple.service.customer.common.event.ResourceEventPublisher;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
-import com.exemple.service.event.model.EventData;
-import com.exemple.service.event.model.EventType;
 import com.fasterxml.jackson.databind.JsonNode;
 
-@RecordApplicationEvents
 @ContextConfiguration(classes = { CustomerTestConfiguration.class })
 public class AccountServiceTest extends AbstractTestNGSpringContextTests {
 
@@ -40,12 +37,12 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
     private AccountResource resource;
 
     @Autowired
-    private ApplicationEvents applicationEvents;
+    private ResourceEventPublisher publisher;
 
     @BeforeMethod
     private void before() {
 
-        Mockito.reset(resource);
+        Mockito.reset(resource, publisher);
 
     }
 
@@ -94,11 +91,9 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
 
         // And check publish resource
 
-        Optional<EventData> event = applicationEvents.stream(EventData.class).findFirst();
-        assertThat(event.isPresent(), is(true));
-        assertThat(event.get().getSource(), is(account));
-        assertThat(event.get().getEventType(), is(EventType.CREATE));
-        assertThat(event.get().getResource(), is("account"));
+        ArgumentCaptor<JsonNode> eventCaptor = ArgumentCaptor.forClass(JsonNode.class);
+        Mockito.verify(publisher).publish(eventCaptor.capture(), Mockito.eq("account"), Mockito.eq(EventType.CREATE));
+        assertThat(accountCaptor.getValue(), is(account));
 
     }
 
@@ -147,11 +142,9 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
 
         // And check publish resource
 
-        Optional<EventData> event = applicationEvents.stream(EventData.class).findFirst();
-        assertThat(event.isPresent(), is(true));
-        assertThat(event.get().getSource(), is(account));
-        assertThat(event.get().getEventType(), is(EventType.UPDATE));
-        assertThat(event.get().getResource(), is("account"));
+        ArgumentCaptor<JsonNode> eventCaptor = ArgumentCaptor.forClass(JsonNode.class);
+        Mockito.verify(publisher).publish(eventCaptor.capture(), Mockito.eq("account"), Mockito.eq(EventType.UPDATE));
+        assertThat(eventCaptor.getValue(), is(account));
 
     }
 

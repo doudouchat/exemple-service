@@ -11,13 +11,13 @@
 	<lang:groovy id="accountService"
 		script-source="classpath:com/exemple/service/customer/account/AccountService.groovy">
 		<lang:property name="accountResource" ref="accountResource"/>
-		<lang:property name="customerEventPublisher" ref="customerEventPublisher"/>
+		<lang:property name="resourceEventPublisher" ref="resourceEventPublisher"/>
 	</lang:groovy>
 
 	<lang:groovy id="subscriptionService"
 		script-source="classpath:com/exemple/service/customer/subscription/SubscriptionService.groovy">
 		<lang:property name="subscriptionResource" ref="subscriptionResource" />
-		<lang:property name="customerEventPublisher" ref="customerEventPublisher"/>
+		<lang:property name="resourceEventPublisher" ref="resourceEventPublisher"/>
 	</lang:groovy>
 
 </beans>

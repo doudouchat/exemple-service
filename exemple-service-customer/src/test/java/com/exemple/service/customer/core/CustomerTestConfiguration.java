@@ -4,7 +4,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
@@ -12,10 +11,10 @@ import org.springframework.core.io.ClassPathResource;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.customer.account.AccountResource;
+import com.exemple.service.customer.common.event.ResourceEventPublisher;
 import com.exemple.service.customer.subscription.SubscriptionResource;
 
 @Configuration
-@Import(CustomerConfiguration.class)
 @ImportResource("classpath:exemple-service-customer.xml")
 public class CustomerTestConfiguration {
 
@@ -27,6 +26,11 @@ public class CustomerTestConfiguration {
     @Bean
     public SubscriptionResource subscriptionResource() {
         return Mockito.mock(SubscriptionResource.class);
+    }
+
+    @Bean
+    public ResourceEventPublisher resourceEventPublisher() {
+        return Mockito.mock(ResourceEventPublisher.class);
     }
 
     @Bean

@@ -1,8 +1,8 @@
 package com.exemple.service.customer.account
 
 import com.exemple.service.context.ServiceContextExecution
-import com.exemple.service.customer.account.AccountResource
-import com.exemple.service.customer.common.event.CustomerEventPublisherimport com.exemple.service.event.model.EventType
+import com.exemple.service.customer.common.event.EventType
+import com.exemple.service.customer.common.event.ResourceEventPublisher
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
@@ -16,7 +16,7 @@ class AccountServiceImpl implements AccountService {
 
     AccountResource accountResource
 
-    CustomerEventPublisher customerEventPublisher
+    ResourceEventPublisher resourceEventPublisher
 
     @Override
     JsonNode save(JsonNode account) {
@@ -25,7 +25,7 @@ class AccountServiceImpl implements AccountService {
 
         accountResource.save(account)
 
-        customerEventPublisher.publish(account, ACCOUNT, EventType.CREATE)
+        resourceEventPublisher.publish(account, ACCOUNT, EventType.CREATE)
 
         account
     }
@@ -37,7 +37,7 @@ class AccountServiceImpl implements AccountService {
 
         accountResource.save(account, previousSource)
 
-        customerEventPublisher.publish(account, ACCOUNT, EventType.UPDATE)
+        resourceEventPublisher.publish(account, ACCOUNT, EventType.UPDATE)
 
         account
     }

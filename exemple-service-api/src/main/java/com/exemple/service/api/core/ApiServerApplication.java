@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import com.exemple.service.application.core.ApplicationConfiguration;
-import com.exemple.service.customer.core.CustomerConfiguration;
 import com.exemple.service.event.core.EventConfiguration;
 import com.exemple.service.resource.core.ResourceConfiguration;
 import com.exemple.service.schema.core.SchemaConfiguration;
@@ -22,8 +21,7 @@ import com.exemple.service.store.core.StoreConfiguration;
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class, SecurityAutoConfiguration.class, ManagementWebSecurityAutoConfiguration.class,
         CassandraAutoConfiguration.class })
 @EnableCaching
-@Import({ SchemaConfiguration.class, ApplicationConfiguration.class, CustomerConfiguration.class, StoreConfiguration.class,
-        ResourceConfiguration.class })
+@Import({ SchemaConfiguration.class, ApplicationConfiguration.class, StoreConfiguration.class, ResourceConfiguration.class })
 public class ApiServerApplication extends SpringBootServletInitializer {
 
     @Override
