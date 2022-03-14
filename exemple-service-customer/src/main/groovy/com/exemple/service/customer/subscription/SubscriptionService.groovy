@@ -5,8 +5,6 @@ import org.springframework.util.Assert
 import com.exemple.service.context.ServiceContextExecution
 import com.exemple.service.customer.common.event.CustomerEventPublisher
 import com.exemple.service.event.model.EventType
-import com.exemple.service.resource.subscription.SubscriptionField
-import com.exemple.service.resource.subscription.SubscriptionResource
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
@@ -25,9 +23,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     boolean save(JsonNode subscription) {
 
-        Assert.isTrue(subscription.path(SubscriptionField.EMAIL.field).isTextual(), SubscriptionField.EMAIL.field + " is required")
+        Assert.isTrue(subscription.path('email').isTextual(), 'email is required')
 
-        String email = subscription.get(SubscriptionField.EMAIL.field).textValue()
+        String email = subscription.get('email').textValue()
 
         boolean created = !subscriptionResource.get(email).isPresent()
 

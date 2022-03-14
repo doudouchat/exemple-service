@@ -1,4 +1,4 @@
-package com.exemple.service.resource.account.impl;
+package com.exemple.service.resource.account;
 
 import java.util.Optional;
 import java.util.Set;
@@ -19,8 +19,7 @@ import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.insert.Insert;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
-import com.exemple.service.resource.account.AccountField;
-import com.exemple.service.resource.account.AccountResource;
+import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.account.event.AccountEventResource;
 import com.exemple.service.resource.account.history.AccountHistoryResource;
 import com.exemple.service.resource.common.JsonQueryBuilder;

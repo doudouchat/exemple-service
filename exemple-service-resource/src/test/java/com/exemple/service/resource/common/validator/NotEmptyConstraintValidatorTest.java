@@ -14,7 +14,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.exemple.service.resource.account.AccountResource;
+import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.account.model.Account;
 import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceTestConfiguration;

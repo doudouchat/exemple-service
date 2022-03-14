@@ -1,4 +1,4 @@
-package com.exemple.service.resource.subscription.impl;
+package com.exemple.service.resource.subscription;
 
 import java.util.Optional;
 
@@ -14,11 +14,10 @@ import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.delete.Delete;
 import com.datastax.oss.driver.api.querybuilder.insert.Insert;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
+import com.exemple.service.customer.subscription.SubscriptionResource;
 import com.exemple.service.resource.common.JsonQueryBuilder;
 import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.core.ResourceExecutionContext;
-import com.exemple.service.resource.subscription.SubscriptionField;
-import com.exemple.service.resource.subscription.SubscriptionResource;
 import com.exemple.service.resource.subscription.event.SubscriptionEventResource;
 import com.fasterxml.jackson.databind.JsonNode;
 

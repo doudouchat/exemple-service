@@ -6,6 +6,7 @@ import javax.validation.ConstraintValidatorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.exemple.service.customer.common.validator.Json;
 import com.exemple.service.resource.common.JsonValidatorException;
 import com.exemple.service.resource.common.validator.json.JsonValidator;
 import com.fasterxml.jackson.databind.JsonNode;

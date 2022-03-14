@@ -1,9 +1,8 @@
 package com.exemple.service.customer.account
 
 import com.exemple.service.context.ServiceContextExecution
-import com.exemple.service.customer.common.event.CustomerEventPublisher
-import com.exemple.service.event.model.EventType
-import com.exemple.service.resource.account.AccountResource
+import com.exemple.service.customer.account.AccountResource
+import com.exemple.service.customer.common.event.CustomerEventPublisherimport com.exemple.service.event.model.EventType
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode

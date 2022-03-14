@@ -31,6 +31,7 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.account.event.AccountEventResource;
 import com.exemple.service.resource.account.history.AccountHistoryResource;
 import com.exemple.service.resource.account.model.Account;
