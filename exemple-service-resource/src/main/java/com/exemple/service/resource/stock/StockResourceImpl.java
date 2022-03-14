@@ -1,4 +1,4 @@
-package com.exemple.service.resource.stock.impl;
+package com.exemple.service.resource.stock;
 
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -10,7 +10,7 @@ import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
 import com.datastax.oss.driver.api.querybuilder.update.Update;
 import com.exemple.service.resource.core.ResourceExecutionContext;
-import com.exemple.service.resource.stock.StockResource;
+import com.exemple.service.store.stock.StockResource;
 
 @Service
 @Validated

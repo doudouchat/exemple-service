@@ -11,6 +11,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
 import com.exemple.service.resource.core.ResourceTestConfiguration;
+import com.exemple.service.store.stock.StockResource;
 
 @ContextConfiguration(classes = { ResourceTestConfiguration.class })
 public class StockResourceTest extends AbstractTestNGSpringContextTests {

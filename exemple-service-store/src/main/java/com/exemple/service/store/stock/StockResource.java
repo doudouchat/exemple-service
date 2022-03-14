@@ -1,4 +1,4 @@
-package com.exemple.service.resource.stock;
+package com.exemple.service.store.stock;
 
 import javax.validation.constraints.NotBlank;
 
