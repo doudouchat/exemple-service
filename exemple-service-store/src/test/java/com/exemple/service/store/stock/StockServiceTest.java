@@ -20,7 +20,6 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.exemple.service.resource.stock.StockResource;
 import com.exemple.service.store.common.InsufficientStockException;
 import com.exemple.service.store.common.NoFoundStockException;
 import com.exemple.service.store.core.StoreTestConfiguration;

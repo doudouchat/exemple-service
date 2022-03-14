@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 
-import com.exemple.service.resource.stock.StockResource;
+import com.exemple.service.store.stock.StockResource;
 
 @Configuration
 @Import(StoreConfiguration.class)

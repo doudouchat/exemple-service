@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import com.exemple.service.resource.stock.StockResource;
 import com.exemple.service.store.common.InsufficientStockException;
 import com.exemple.service.store.common.NoFoundStockException;
+import com.exemple.service.store.stock.StockResource;
 import com.exemple.service.store.stock.StockService;
 import com.exemple.service.store.stock.distribution.StockDistribution;
 import com.google.common.primitives.Longs;
