@@ -19,14 +19,6 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- APPLICATION -->
-
-		<dependency>
-			<groupId>exemple</groupId>
-			<artifactId>exemple-service-application</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<!-- FASTER JACKSON -->
 
 		<dependency>
