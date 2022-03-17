@@ -46,6 +46,25 @@
 			<artifactId>guava</artifactId>
 		</dependency>
 
+		<!-- ASPECTJ -->
+
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+		</dependency>
+
+		<!-- EXCEPTION LAMBDA -->
+
+		<dependency>
+			<groupId>com.pivovarit</groupId>
+			<artifactId>throwing-function</artifactId>
+		</dependency>
+
 		<!-- TEST -->
 
 		<dependency>

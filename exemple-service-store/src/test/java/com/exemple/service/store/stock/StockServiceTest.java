@@ -21,7 +21,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.exemple.service.store.common.InsufficientStockException;
-import com.exemple.service.store.common.NoFoundStockException;
 import com.exemple.service.store.core.StoreTestConfiguration;
 
 @ContextConfiguration(classes = { StoreTestConfiguration.class })
@@ -69,9 +68,9 @@ public class StockServiceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "update")
-    public void get() throws NoFoundStockException {
+    public void get() {
 
-        assertThat(service.get(company, store, product), is(140L));
+        assertThat(service.get(company, store, product).get(), is(140L));
 
     }
 
@@ -81,17 +80,7 @@ public class StockServiceTest extends AbstractTestNGSpringContextTests {
         String product = "/product#" + UUID.randomUUID();
         String store = "/store#" + UUID.randomUUID();
 
-        try {
-
-            service.get(company, store, product);
-
-            Assert.fail("NoFoundStockException must be throwed");
-
-        } catch (NoFoundStockException e) {
-
-            assertThat(e.getStore(), is(store));
-            assertThat(e.getProduct(), is(product));
-        }
+        assertThat(service.get(company, store, product).isPresent(), is(false));
 
     }
 
@@ -146,7 +135,7 @@ public class StockServiceTest extends AbstractTestNGSpringContextTests {
 
         } catch (Exception e) {
 
-            assertThat(e.getCause(), instanceOf(IllegalStateException.class));
+            assertThat(e, instanceOf(IllegalStateException.class));
 
         }
 
