@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -24,7 +25,6 @@ import com.exemple.service.api.stock.model.Stock;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.store.common.InsufficientStockException;
-import com.exemple.service.store.common.NoFoundStockException;
 import com.exemple.service.store.stock.StockService;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -76,13 +76,13 @@ public class StockApi {
     @ApiResponse(description = "Stock Data", responseCode = "200", content = @Content(schema = @Schema(implementation = Stock.class)))
     @RolesAllowed("stock:read")
     public Stock get(@PathParam("store") String store, @PathParam("product") String product,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) ApplicationBeanParam applicationBeanParam) throws NoFoundStockException {
+            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) ApplicationBeanParam applicationBeanParam) {
 
         Stock stock = new Stock();
 
         ApplicationDetail applicationDetail = applicationDetailService.get(applicationBeanParam.app);
 
-        stock.setAmount(service.get("/" + applicationDetail.getCompany(), "/" + store, "/" + product));
+        stock.setAmount(service.get("/" + applicationDetail.getCompany(), "/" + store, "/" + product).orElseThrow(NotFoundException::new));
 
         return stock;
 
@@ -95,17 +95,6 @@ public class StockApi {
         public Response toResponse(InsufficientStockException e) {
 
             return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
-        }
-
-    }
-
-    @Provider
-    public static class NoFoundStockExceptionMapper implements ExceptionMapper<NoFoundStockException> {
-
-        @Override
-        public Response toResponse(NoFoundStockException e) {
-
-            return Response.status(Status.NOT_FOUND).entity(e.getMessage()).build();
         }
 
     }

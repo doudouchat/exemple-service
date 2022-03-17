@@ -4,6 +4,8 @@ import static com.exemple.service.api.common.model.ApplicationBeanParam.APP_HEAD
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import java.util.Optional;
+
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -20,7 +22,6 @@ import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.store.common.InsufficientStockException;
-import com.exemple.service.store.common.NoFoundStockException;
 import com.exemple.service.store.stock.StockService;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -148,7 +149,7 @@ public class StockApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void get() throws NoFoundStockException {
+    public void get() {
 
         // Given stock
 
@@ -164,7 +165,7 @@ public class StockApiTest extends JerseySpringSupport {
 
         Mockito.when(applicationDetailService.get(application)).thenReturn(detail);
 
-        Mockito.when(service.get(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product))).thenReturn(5L);
+        Mockito.when(service.get(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product))).thenReturn(Optional.of(5L));
 
         // When perform service
 
@@ -183,7 +184,7 @@ public class StockApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void getNotFoundStockFailure() throws NoFoundStockException {
+    public void getNotFoundStockFailure() {
 
         // Given stock
 
@@ -199,8 +200,7 @@ public class StockApiTest extends JerseySpringSupport {
 
         Mockito.when(applicationDetailService.get(application)).thenReturn(detail);
 
-        Mockito.when(service.get(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product)))
-                .thenThrow(new NoFoundStockException("/" + store, "/" + product, new RuntimeException()));
+        Mockito.when(service.get(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product))).thenReturn(Optional.empty());
 
         // When perform service
 

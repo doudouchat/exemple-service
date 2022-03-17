@@ -1,5 +1,7 @@
 package com.exemple.service.store.stock.distribution;
 
+import java.util.Optional;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.locks.InterProcessLock;
 import org.apache.curator.framework.recipes.locks.InterProcessSemaphoreMutex;
@@ -7,15 +9,16 @@ import org.apache.curator.framework.recipes.nodes.PersistentNode;
 import org.apache.curator.framework.recipes.nodes.PersistentTtlNode;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.exemple.service.store.common.NoFoundStockException;
-import com.google.common.base.Throwables;
-
 @Component
 public class StockDistribution {
+
+    private static final Logger LOG = LoggerFactory.getLogger(StockDistribution.class);
 
     private final long productTtlMs;
 
@@ -28,7 +31,7 @@ public class StockDistribution {
         this.productTtlMs = productTtlMs;
     }
 
-    public <T, E extends Exception> T lockStock(String company, String store, String product, LockStock<T> action, Class<E> exception) throws E {
+    public <T> T lockStock(String company, String store, String product, LockStock<T> action) throws Exception {
 
         try (PersistentTtlNode node = createProduct(company, store, product)) {
 
@@ -40,10 +43,6 @@ public class StockDistribution {
             } finally {
                 lock.release();
             }
-
-        } catch (Exception e) {
-            Throwables.throwIfInstanceOf(e, exception);
-            throw new IllegalStateException(e);
         }
 
     }
@@ -52,23 +51,24 @@ public class StockDistribution {
     public interface LockStock<T> {
         T get() throws Exception;
 
-        static <T> T accessStock(String store, String product, LockStock<T> action) throws NoFoundStockException {
+        static <T> Optional<T> accessStock(LockStock<T> action) {
             try {
-                return action.get();
+                return Optional.of(action.get());
             } catch (KeeperException.NoNodeException e) {
-                throw new NoFoundStockException(store, product, e);
+                LOG.warn(e.getMessage(), e);
+                return Optional.empty();
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
         }
     }
 
-    public byte[] getStock(String company, String store, String product) throws NoFoundStockException {
-        return LockStock.accessStock(store, product, () -> client.getData().forPath(company + store + product));
+    public Optional<byte[]> getStock(String company, String store, String product) {
+        return LockStock.accessStock(() -> client.getData().forPath(company + store + product));
     }
 
-    public void updateStock(String company, String store, String product, byte[] stock) throws NoFoundStockException {
-        LockStock.accessStock(store, product, () -> client.setData().forPath(company + store + product, stock));
+    public void updateStock(String company, String store, String product, byte[] stock) {
+        LockStock.accessStock(() -> client.setData().forPath(company + store + product, stock));
     }
 
     private PersistentTtlNode createProduct(String company, String store, String product) throws Exception {
