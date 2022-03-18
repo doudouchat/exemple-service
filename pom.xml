@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>exemple</groupId>
 	<artifactId>exemple-service</artifactId>
@@ -25,8 +27,8 @@
 		<connection>scm:git:git://github.com/doudouchat/exemple-service.git</connection>
 		<developerConnection>scm:git:https://github.com/doudouchat/exemple-service.git</developerConnection>
 		<url>https://github.com/doudouchat/exemple-service</url>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 
 	<distributionManagement>
 		<repository>
@@ -56,6 +58,8 @@
 		<com.fasterxml.jackson-version>2.12.3</com.fasterxml.jackson-version>
 		<groovy-version>3.0.8</groovy-version>
 		<cassandra-version>3.11.9</cassandra-version>
+		<lombok.version>1.18.22</lombok.version>
+
 		<!-- SONAR -->
 
 		<!-- force sonar to use jacoco -->
@@ -364,6 +368,15 @@
 				<version>2.1.9</version>
 			</dependency>
 
+			<!-- LOMBOK -->
+
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>${lombok.version}</version>
+				<scope>provided</scope>
+			</dependency>
+
 			<!-- MOCKITO -->
 
 			<dependency>
@@ -552,6 +565,13 @@
 			<artifactId>snakeyaml</artifactId>
 		</dependency>
 
+		<!-- LOMBOK -->
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+
 		<!-- TESTNG -->
 		<dependency>
 			<groupId>org.testng</groupId>
@@ -576,6 +596,15 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.8.1</version>
+					<configuration>
+						<annotationProcessorPaths>
+							<path>
+								<groupId>org.projectlombok</groupId>
+								<artifactId>lombok</artifactId>
+								<version>${lombok.version}</version>
+							</path>
+						</annotationProcessorPaths>
+					</configuration>
 				</plugin>
 
 				<!-- RESSOURCES -->
