@@ -36,21 +36,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
 @Path("/v1/stocks")
 @OpenAPIDefinition(tags = @Tag(name = "stock"))
 @Component
+@RequiredArgsConstructor
 public class StockApi {
 
     private final StockService service;
 
     private final ApplicationDetailService applicationDetailService;
-
-    public StockApi(StockService service, ApplicationDetailService applicationDetailService) {
-
-        this.service = service;
-        this.applicationDetailService = applicationDetailService;
-    }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -78,13 +74,11 @@ public class StockApi {
     public Stock get(@PathParam("store") String store, @PathParam("product") String product,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) ApplicationBeanParam applicationBeanParam) {
 
-        Stock stock = new Stock();
-
         ApplicationDetail applicationDetail = applicationDetailService.get(applicationBeanParam.app);
 
-        stock.setAmount(service.get("/" + applicationDetail.getCompany(), "/" + store, "/" + product).orElseThrow(NotFoundException::new));
+        Long amount = service.get("/" + applicationDetail.getCompany(), "/" + store, "/" + product).orElseThrow(NotFoundException::new);
 
-        return stock;
+        return Stock.builder().amount(amount).build();
 
     }
 

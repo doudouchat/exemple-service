@@ -15,8 +15,11 @@ import com.exemple.service.api.core.authorization.AuthorizationException;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
 @Profile("!noSecurity")
+@RequiredArgsConstructor
 public class AuthorizationTokenValidation {
 
     public static final String TOKEN_BLACK_LIST = "token.black_list";
@@ -26,14 +29,6 @@ public class AuthorizationTokenValidation {
     private final ApplicationDetailService applicationDetailService;
 
     private final AuthorizationAlgorithmFactory authorizationAlgorithmFactory;
-
-    public AuthorizationTokenValidation(AuthorizationTokenManager authorizationTokenManager, ApplicationDetailService applicationDetailService,
-            AuthorizationAlgorithmFactory authorizationAlgorithmFactory) {
-
-        this.authorizationTokenManager = authorizationTokenManager;
-        this.applicationDetailService = applicationDetailService;
-        this.authorizationAlgorithmFactory = authorizationAlgorithmFactory;
-    }
 
     public void checkSignature(DecodedJWT jwt) throws AuthorizationException {
 

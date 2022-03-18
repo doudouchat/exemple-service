@@ -31,7 +31,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.common.collect.Streams;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class AccountHistoryResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(AccountHistoryResource.class);
@@ -50,13 +53,7 @@ public class AccountHistoryResource {
 
     private final CqlSession session;
 
-    private final ConcurrentMap<String, AccountHistoryMapper> mappers;
-
-    public AccountHistoryResource(CqlSession session) {
-        this.session = session;
-        this.mappers = new ConcurrentHashMap<>();
-
-    }
+    private final ConcurrentMap<String, AccountHistoryMapper> mappers = new ConcurrentHashMap<>();
 
     public List<AccountHistory> findById(UUID id) {
 

@@ -17,18 +17,16 @@ import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.api.core.authorization.AuthorizationContextService;
 import com.exemple.service.api.core.authorization.AuthorizationException;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Profile("!noSecurity")
+@RequiredArgsConstructor
 public class AuthorizationContextServiceImpl implements AuthorizationContextService {
 
     private static final Pattern BEARER;
 
     private final AuthorizationTokenValidation authorizationTokenValidation;
-
-    public AuthorizationContextServiceImpl(AuthorizationTokenValidation authorizationTokenValidation) {
-
-        this.authorizationTokenValidation = authorizationTokenValidation;
-    }
 
     static {
 

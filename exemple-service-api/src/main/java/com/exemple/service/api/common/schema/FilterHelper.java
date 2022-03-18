@@ -10,15 +10,13 @@ import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.schema.filter.SchemaFilter;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class FilterHelper {
 
     private final SchemaFilter schemaFilter;
-
-    public FilterHelper(SchemaFilter schemaFilter) {
-
-        this.schemaFilter = schemaFilter;
-    }
 
     public JsonNode filter(JsonNode source, String resourceName, ContainerRequestContext requestContext) {
 

@@ -7,11 +7,11 @@ import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SchemaBuilder {
-
-    private SchemaBuilder() {
-
-    }
 
     public static Schema build(InputStream source) {
 

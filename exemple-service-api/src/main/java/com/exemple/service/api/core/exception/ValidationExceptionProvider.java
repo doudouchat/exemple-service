@@ -19,19 +19,17 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Iterables;
 
+import lombok.RequiredArgsConstructor;
+
 @Provider
 @Component
+@RequiredArgsConstructor
 public class ValidationExceptionProvider implements ExceptionMapper<ConstraintViolationException> {
 
     private final MessageSource messageSource;
 
     @Context
     private ContainerRequestContext requestContext;
-
-    public ValidationExceptionProvider(MessageSource messageSource) {
-
-        this.messageSource = messageSource;
-    }
 
     @Override
     public Response toResponse(ConstraintViolationException e) {

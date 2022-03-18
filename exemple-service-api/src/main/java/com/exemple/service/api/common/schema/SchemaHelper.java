@@ -10,15 +10,13 @@ import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.schema.merge.SchemaMerge;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class SchemaHelper {
 
     private final SchemaMerge schemaMerge;
-
-    public SchemaHelper(SchemaMerge schemaMerge) {
-
-        this.schemaMerge = schemaMerge;
-    }
 
     public void complete(JsonNode source, JsonNode orignalSource, String resourceName, ContainerRequestContext requestContext) {
 

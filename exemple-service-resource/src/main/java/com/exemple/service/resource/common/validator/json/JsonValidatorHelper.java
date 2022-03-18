@@ -11,14 +11,13 @@ import com.exemple.service.resource.common.JsonValidatorException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class JsonValidatorHelper {
 
     private final CqlSession session;
-
-    public JsonValidatorHelper(CqlSession session) {
-        this.session = session;
-    }
 
     public void valid(DataType dataType, String value, String root) throws JsonValidatorException {
 

@@ -64,7 +64,7 @@ public class DocumentApiCustom extends AbstractSpecFilter {
 
                         header.getValue().stream().map((String version) -> {
                             String[] values = version.split("\\|");
-                            return new SchemaVersionProfileEntity(values[0], values[1]);
+                            return SchemaVersionProfileEntity.builder().version(values[0]).profile(values[1]).build();
                         }).forEach((SchemaVersionProfileEntity v) -> {
 
                             Schema<?> schema = new Schema<>();
@@ -140,7 +140,7 @@ public class DocumentApiCustom extends AbstractSpecFilter {
 
                     header.getValue().stream().map((String version) -> {
                         String[] values = version.split("\\|");
-                        return new SchemaVersionProfileEntity(values[0], values[1]);
+                        return SchemaVersionProfileEntity.builder().version(values[0]).profile(values[1]).build();
                     }).forEach((SchemaVersionProfileEntity v) -> {
 
                         Map<String, Object> extensions = new HashMap<>();

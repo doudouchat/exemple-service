@@ -9,16 +9,15 @@ import org.springframework.stereotype.Component;
 
 import com.exemple.service.resource.core.keystore.ResourceKeystore;
 
+import lombok.RequiredArgsConstructor;
+
 @Aspect
 @Component
 @Order(0)
+@RequiredArgsConstructor
 public class SchemaResourceAspect {
 
     private final ResourceKeystore resourceKeystore;
-
-    public SchemaResourceAspect(ResourceKeystore resourceKeystore) {
-        this.resourceKeystore = resourceKeystore;
-    }
 
     @Before("@within(org.springframework.stereotype.Service) && execution(public * com.exemple.service.resource.schema..*.*(*,..)) && args(app, ..))")
     public void initResourceContext(@NotNull String app) {

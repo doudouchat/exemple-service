@@ -27,7 +27,10 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Streams;
 import com.pivovarit.function.ThrowingConsumer;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class JsonValidator {
 
     private static final Set<JsonNodeType> EXCLUDE_TYPES = EnumSet.of(JsonNodeType.NULL, JsonNodeType.MISSING);
@@ -39,11 +42,6 @@ public class JsonValidator {
     private final CqlSession session;
 
     private final JsonValidatorHelper jsonValidatorHelper;
-
-    public JsonValidator(CqlSession session, JsonValidatorHelper jsonValidatorHelper) {
-        this.session = session;
-        this.jsonValidatorHelper = jsonValidatorHelper;
-    }
 
     public void valid(JsonNode source, String table) throws JsonValidatorException {
 

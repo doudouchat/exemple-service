@@ -18,8 +18,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Validated
+@RequiredArgsConstructor
 public class ApplicationDetailServiceImpl implements ApplicationDetailService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationDetailServiceImpl.class);
@@ -30,11 +33,8 @@ public class ApplicationDetailServiceImpl implements ApplicationDetailService {
         MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
+    @Qualifier("applicationDetailCuratorFramework")
     private final CuratorFramework client;
-
-    public ApplicationDetailServiceImpl(@Qualifier("applicationDetailCuratorFramework") CuratorFramework client) {
-        this.client = client;
-    }
 
     @Override
     public ApplicationDetail get(String application) {

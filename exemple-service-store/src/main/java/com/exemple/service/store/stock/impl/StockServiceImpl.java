@@ -13,8 +13,11 @@ import com.exemple.service.store.stock.StockService;
 import com.exemple.service.store.stock.distribution.StockDistribution;
 import com.google.common.primitives.Longs;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Validated
+@RequiredArgsConstructor
 public class StockServiceImpl implements StockService {
 
     private static final Logger LOG = LoggerFactory.getLogger(StockServiceImpl.class);
@@ -22,12 +25,6 @@ public class StockServiceImpl implements StockService {
     private final StockDistribution distribution;
 
     private final StockResource resource;
-
-    public StockServiceImpl(StockDistribution distribution, StockResource resource) {
-
-        this.distribution = distribution;
-        this.resource = resource;
-    }
 
     @Override
     public Long update(String company, String store, String product, int quantity) throws InsufficientStockException {

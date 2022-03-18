@@ -7,14 +7,13 @@ import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class ResourceKeystore {
 
     private final ApplicationDetailService applicationDetailService;
-
-    public ResourceKeystore(ApplicationDetailService applicationDetailService) {
-        this.applicationDetailService = applicationDetailService;
-    }
 
     public void initKeyspaceResourceContext(String app) {
 

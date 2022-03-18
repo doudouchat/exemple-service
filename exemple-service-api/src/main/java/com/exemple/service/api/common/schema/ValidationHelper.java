@@ -10,15 +10,13 @@ import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class ValidationHelper {
 
     private final SchemaValidation schemaValidation;
-
-    public ValidationHelper(SchemaValidation schemaValidation) {
-
-        this.schemaValidation = schemaValidation;
-    }
 
     public void validate(JsonNode source, String resourceName, ContainerRequestContext requestContext) {
 

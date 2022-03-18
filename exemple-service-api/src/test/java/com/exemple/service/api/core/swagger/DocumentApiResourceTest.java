@@ -63,8 +63,9 @@ public class DocumentApiResourceTest extends JerseySpringSupport {
 
         // Given service mock
 
-        Mockito.when(schemaResource.allVersions(Mockito.anyString())).thenReturn(Collections.singletonMap("account",
-                Arrays.asList(new SchemaVersionProfileEntity("v1", "user"), new SchemaVersionProfileEntity("v2", "admin"))));
+        Mockito.when(schemaResource.allVersions(Mockito.anyString())).thenReturn(
+                Collections.singletonMap("account", Arrays.asList(SchemaVersionProfileEntity.builder().version("v1").profile("user").build(),
+                        SchemaVersionProfileEntity.builder().version("v2").profile("admin").build())));
 
         // When perform get
 

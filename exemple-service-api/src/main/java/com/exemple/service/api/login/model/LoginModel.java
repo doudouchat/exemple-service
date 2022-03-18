@@ -8,7 +8,14 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.jackson.Jacksonized;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
+@Jacksonized
+@Getter
 public class LoginModel {
 
     @NotBlank
@@ -17,21 +24,5 @@ public class LoginModel {
 
     @NotNull
     private UUID id;
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
 
 }

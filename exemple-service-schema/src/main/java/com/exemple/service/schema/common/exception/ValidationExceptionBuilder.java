@@ -10,15 +10,15 @@ import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.core.JsonPointer;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ValidationExceptionBuilder {
 
     private static final Pattern PATTERN;
 
     private static final Pattern SEPARATOR;
-
-    private ValidationExceptionBuilder() {
-
-    }
 
     static {
 

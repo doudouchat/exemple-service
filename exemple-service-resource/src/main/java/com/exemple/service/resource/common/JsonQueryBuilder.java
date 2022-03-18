@@ -7,16 +7,14 @@ import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class JsonQueryBuilder {
+import lombok.RequiredArgsConstructor;
 
-    private final String table;
+@RequiredArgsConstructor
+public class JsonQueryBuilder {
 
     private final CqlSession session;
 
-    public JsonQueryBuilder(CqlSession session, String table) {
-        this.table = table;
-        this.session = session;
-    }
+    private final String table;
 
     public Insert insert(JsonNode source) {
 

@@ -13,11 +13,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Streams;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class JsonNodeFilterUtils {
-
-    private JsonNodeFilterUtils() {
-
-    }
 
     public static JsonNode clean(JsonNode source) {
 

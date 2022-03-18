@@ -42,10 +42,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
 @Path("/v1/subscriptions")
 @OpenAPIDefinition(tags = @Tag(name = "subscription"))
 @Component
+@RequiredArgsConstructor
 public class SubscriptionApi {
 
     private static final String SUBSCRIPTION_SCHEMA = "Subscription";
@@ -62,13 +64,6 @@ public class SubscriptionApi {
 
     @Context
     private ContainerRequestContext servletContext;
-
-    public SubscriptionApi(CustomerScriptFactory scriptFactory, ValidationHelper schemaValidation, FilterHelper schemaFilter) {
-
-        this.scriptFactory = scriptFactory;
-        this.schemaValidation = schemaValidation;
-        this.schemaFilter = schemaFilter;
-    }
 
     @GET
     @Path("/{email}")

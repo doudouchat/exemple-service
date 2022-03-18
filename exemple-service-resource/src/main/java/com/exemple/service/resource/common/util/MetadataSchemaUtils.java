@@ -4,11 +4,11 @@ import com.datastax.oss.driver.api.core.metadata.schema.TableMetadata;
 import com.datastax.oss.driver.api.core.session.Session;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MetadataSchemaUtils {
-
-    private MetadataSchemaUtils() {
-
-    }
 
     public static TableMetadata getTableMetadata(Session session, String table) {
 

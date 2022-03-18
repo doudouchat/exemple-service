@@ -15,19 +15,16 @@ import com.exemple.service.resource.login.exception.UsernameAlreadyExistsExcepti
 import com.exemple.service.resource.login.mapper.LoginMapper;
 import com.exemple.service.resource.login.model.LoginEntity;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Validated
+@RequiredArgsConstructor
 public class LoginResourceImpl implements LoginResource {
 
     private final CqlSession session;
 
-    private final ConcurrentMap<String, LoginMapper> mappers;
-
-    public LoginResourceImpl(CqlSession session) {
-
-        this.session = session;
-        this.mappers = new ConcurrentHashMap<>();
-    }
+    private final ConcurrentMap<String, LoginMapper> mappers = new ConcurrentHashMap<>();
 
     @Override
     public Optional<LoginEntity> get(String username) {

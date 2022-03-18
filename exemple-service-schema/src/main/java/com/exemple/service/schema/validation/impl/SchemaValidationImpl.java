@@ -38,7 +38,10 @@ import com.flipkart.zjsonpatch.JsonPatch;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Streams;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class SchemaValidationImpl implements SchemaValidation {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -46,12 +49,6 @@ public class SchemaValidationImpl implements SchemaValidation {
     private final SchemaResource schemaResource;
 
     private final Schema patchSchema;
-
-    public SchemaValidationImpl(SchemaResource schemaResource, Schema patchSchema) {
-
-        this.schemaResource = schemaResource;
-        this.patchSchema = patchSchema;
-    }
 
     @Override
     public void validate(String app, String version, String profile, String resource, JsonNode form) {

@@ -13,17 +13,15 @@ import com.flipkart.zjsonpatch.JsonPatch;
 import com.flipkart.zjsonpatch.JsonPatchApplicationException;
 import com.google.common.collect.Streams;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class SchemaMergeImpl implements SchemaMerge {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final SchemaResource schemaResource;
-
-    public SchemaMergeImpl(SchemaResource schemaResource) {
-
-        this.schemaResource = schemaResource;
-    }
 
     @Override
     public void mergeMissingFieldFromOriginal(String app, String version, String resource, String profile, JsonNode source, JsonNode orignalSource) {

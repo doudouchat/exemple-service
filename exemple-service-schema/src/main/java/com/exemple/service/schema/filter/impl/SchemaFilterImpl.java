@@ -8,15 +8,13 @@ import com.exemple.service.schema.common.FilterBuilder;
 import com.exemple.service.schema.filter.SchemaFilter;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class SchemaFilterImpl implements SchemaFilter {
 
     private final SchemaResource schemaResource;
-
-    public SchemaFilterImpl(SchemaResource schemaResource) {
-
-        this.schemaResource = schemaResource;
-    }
 
     @Override
     public JsonNode filter(String app, String version, String resource, String profile, JsonNode source) {

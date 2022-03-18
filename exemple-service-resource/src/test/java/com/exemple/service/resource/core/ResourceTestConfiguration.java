@@ -90,9 +90,7 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
 
         ApplicationDetailService service = Mockito.mock(ApplicationDetailService.class);
 
-        ApplicationDetail detail = new ApplicationDetail();
-        detail.setKeyspace("test");
-        Mockito.when(service.get(Mockito.anyString())).thenReturn(detail);
+        Mockito.when(service.get(Mockito.anyString())).thenReturn(ApplicationDetail.builder().keyspace("test").build());
 
         return service;
     }
