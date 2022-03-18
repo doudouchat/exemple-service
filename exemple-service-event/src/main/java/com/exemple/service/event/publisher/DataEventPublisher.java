@@ -9,14 +9,13 @@ import com.exemple.service.customer.common.event.EventType;
 import com.exemple.service.customer.common.event.ResourceEventPublisher;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.RequiredArgsConstructor;
+
 @Component("resourceEventPublisher")
+@RequiredArgsConstructor
 public class DataEventPublisher implements ResourceEventPublisher {
 
     private final ApplicationEventPublisher applicationEventPublisher;
-
-    public DataEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
-        this.applicationEventPublisher = applicationEventPublisher;
-    }
 
     public void publish(JsonNode data, String resource, EventType type) {
 

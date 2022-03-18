@@ -15,21 +15,19 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class StockDistribution {
 
     private static final Logger LOG = LoggerFactory.getLogger(StockDistribution.class);
 
+    @Value("${store.zookeeper.ttlMs.product:30000}")
     private final long productTtlMs;
 
+    @Qualifier("stockCuratorFramework")
     private final CuratorFramework client;
-
-    public StockDistribution(@Qualifier("stockCuratorFramework") CuratorFramework client,
-            @Value("${store.zookeeper.ttlMs.product:30000}") long productTtlMs) {
-
-        this.client = client;
-        this.productTtlMs = productTtlMs;
-    }
 
     public <T> T lockStock(String company, String store, String product, LockStock<T> action) throws Exception {
 

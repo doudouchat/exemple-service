@@ -13,16 +13,14 @@ import com.exemple.service.api.core.authorization.AuthorizationCheckService;
 import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.login.model.LoginEntity;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Profile("!noSecurity")
+@RequiredArgsConstructor
 public class AuthorizationCheckServiceImpl implements AuthorizationCheckService {
 
     private final LoginResource loginResource;
-
-    public AuthorizationCheckServiceImpl(LoginResource loginResource) {
-
-        this.loginResource = loginResource;
-    }
 
     @Override
     public void verifyAccountId(UUID id, ApiSecurityContext securityContext) {

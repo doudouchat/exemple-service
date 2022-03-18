@@ -22,7 +22,6 @@ import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Sets;
 
 @Component
 @DependsOn("initCassandra")
@@ -53,10 +52,9 @@ public class InitData {
 
         // APP
 
-        ApplicationDetail detail = new ApplicationDetail();
-        detail.setKeyspace("test_keyspace");
-        detail.setCompany("test_company");
-        detail.setClientIds(Sets.newHashSet("test", "test_user"));
+        ApplicationDetail detail = ApplicationDetail.builder()
+
+                .keyspace("test_keyspace").company("test_company").clientId("test").clientId("test_user").build();
 
         Set<String> accountFilter = new HashSet<>();
         accountFilter.add("lastname");
@@ -117,10 +115,9 @@ public class InitData {
 
         // STOCK
 
-        ApplicationDetail backDetail = new ApplicationDetail();
-        backDetail.setKeyspace("test_keyspace");
-        backDetail.setCompany("test_company");
-        backDetail.setClientIds(Sets.newHashSet("back", "back_user"));
+        ApplicationDetail backDetail = ApplicationDetail.builder()
+
+                .keyspace("test_keyspace").company("test_company").clientId("back").clientId("back_user").build();
 
         applicationDetailService.put(BACK_APP, MAPPER.convertValue(backDetail, JsonNode.class));
 
@@ -131,10 +128,9 @@ public class InitData {
 
         // APP
 
-        ApplicationDetail detail = new ApplicationDetail();
-        detail.setKeyspace("other_keyspace");
-        detail.setCompany("other_company");
-        detail.setClientIds(Sets.newHashSet("test", "test_user"));
+        ApplicationDetail detail = ApplicationDetail.builder()
+
+                .keyspace("other_keyspace").company("other_company").clientId("test").clientId("test_user").build();
 
         ResourceExecutionContext.get().setKeyspace(detail.getKeyspace());
 

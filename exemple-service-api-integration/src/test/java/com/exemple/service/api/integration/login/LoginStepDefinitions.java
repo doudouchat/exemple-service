@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.is;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.login.LoginResource;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -36,10 +35,7 @@ public class LoginStepDefinitions {
     @Before
     public void initKeyspace() {
 
-        ApplicationDetail detail = new ApplicationDetail();
-        detail.setKeyspace("test_keyspace");
-
-        ResourceExecutionContext.get().setKeyspace(detail.getKeyspace());
+        ResourceExecutionContext.get().setKeyspace("test_keyspace");
 
     }
 

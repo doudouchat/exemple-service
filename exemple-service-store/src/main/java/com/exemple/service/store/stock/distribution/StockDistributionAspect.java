@@ -5,18 +5,15 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 @Aspect
 @Component
+@RequiredArgsConstructor
 public class StockDistributionAspect {
 
     private final StockDistribution distribution;
-
-    public StockDistributionAspect(StockDistribution distribution) {
-
-        this.distribution = distribution;
-    }
 
     @Around("execution(public * com.exemple.service.store.stock.StockService.update(..)) && args(company,store,product,quantity))")
     public Object lock(ProceedingJoinPoint joinPoint, String company, String store, String product, int quantity) throws Exception {

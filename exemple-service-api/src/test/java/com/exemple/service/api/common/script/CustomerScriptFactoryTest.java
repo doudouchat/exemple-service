@@ -51,9 +51,7 @@ public class CustomerScriptFactoryTest {
         ServiceContextExecution.context().setApp("test");
 
         // And init ApplicationDetail
-        ApplicationDetail applicationDetail = new ApplicationDetail();
-        applicationDetail.setCompany("default");
-        Mockito.when(applicationDetailService.get("test")).thenReturn(applicationDetail);
+        Mockito.when(applicationDetailService.get("test")).thenReturn(ApplicationDetail.builder().company("default").build());
 
         // when perform
         AccountService service = factory.getBean("accountService", AccountService.class);
@@ -74,9 +72,7 @@ public class CustomerScriptFactoryTest {
         ServiceContextExecution.context().setApp("test");
 
         // And init ApplicationDetail
-        ApplicationDetail applicationDetail = new ApplicationDetail();
-        applicationDetail.setCompany("company_test");
-        Mockito.when(applicationDetailService.get("test")).thenReturn(applicationDetail);
+        Mockito.when(applicationDetailService.get("test")).thenReturn(ApplicationDetail.builder().company("company_test").build());
 
         // when perform
         AccountService service = factory.getBean("accountService", AccountService.class);

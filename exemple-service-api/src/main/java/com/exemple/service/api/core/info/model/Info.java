@@ -2,27 +2,16 @@ package com.exemple.service.api.core.info.model;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import lombok.Builder;
+import lombok.Getter;
+
 @XmlRootElement
+@Builder
+@Getter
 public class Info {
 
-    private String version;
+    private final String version;
 
-    private String buildTime;
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getBuildTime() {
-        return buildTime;
-    }
-
-    public void setBuildTime(String buildTime) {
-        this.buildTime = buildTime;
-    }
+    private final String buildTime;
 
 }

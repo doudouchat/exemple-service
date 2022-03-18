@@ -18,18 +18,15 @@ import com.exemple.service.resource.subscription.event.mapper.SubscriptionEventM
 import com.exemple.service.resource.subscription.model.SubscriptionEvent;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class SubscriptionEventResource {
 
     private final CqlSession session;
 
-    private final ConcurrentMap<String, SubscriptionEventMapper> mappers;
-
-    public SubscriptionEventResource(CqlSession session) {
-        this.session = session;
-        this.mappers = new ConcurrentHashMap<>();
-
-    }
+    private final ConcurrentMap<String, SubscriptionEventMapper> mappers = new ConcurrentHashMap<>();
 
     public BoundStatement saveEvent(JsonNode source, EventType eventType) {
 

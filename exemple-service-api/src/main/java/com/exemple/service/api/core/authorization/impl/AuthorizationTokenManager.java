@@ -6,18 +6,16 @@ import org.springframework.stereotype.Component;
 import com.auth0.jwt.interfaces.Payload;
 import com.hazelcast.core.HazelcastInstance;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
 @Profile("!noSecurity")
+@RequiredArgsConstructor
 public class AuthorizationTokenManager {
 
     public static final String TOKEN_BLACK_LIST = "token.black_list";
 
     private final HazelcastInstance hazelcastInstance;
-
-    public AuthorizationTokenManager(HazelcastInstance hazelcastInstance) {
-
-        this.hazelcastInstance = hazelcastInstance;
-    }
 
     public boolean containsToken(Payload payload) {
 

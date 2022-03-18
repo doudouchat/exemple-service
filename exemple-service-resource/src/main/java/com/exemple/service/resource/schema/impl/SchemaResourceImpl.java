@@ -22,8 +22,11 @@ import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Validated
+@RequiredArgsConstructor
 public class SchemaResourceImpl implements SchemaResource {
 
     public static final JsonNode SCHEMA_DEFAULT;
@@ -40,13 +43,7 @@ public class SchemaResourceImpl implements SchemaResource {
 
     private final CqlSession session;
 
-    private final ConcurrentMap<String, ResourceSchemaMapper> mappers;
-
-    public SchemaResourceImpl(CqlSession session) {
-
-        this.session = session;
-        this.mappers = new ConcurrentHashMap<>();
-    }
+    private final ConcurrentMap<String, ResourceSchemaMapper> mappers = new ConcurrentHashMap<>();
 
     @Override
     @Cacheable("schema_resource")
@@ -73,7 +70,8 @@ public class SchemaResourceImpl implements SchemaResource {
 
         dao().findByApplication(app).all().forEach((SchemaEntity resource) -> {
             versions.putIfAbsent(resource.getResource(), new ArrayList<>());
-            versions.get(resource.getResource()).add(new SchemaVersionProfileEntity(resource.getVersion(), resource.getProfile()));
+            versions.get(resource.getResource())
+                    .add(SchemaVersionProfileEntity.builder().version(resource.getVersion()).profile(resource.getProfile()).build());
         });
 
         return versions;

@@ -49,10 +49,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
 @Path("/v1/logins")
 @OpenAPIDefinition(tags = @Tag(name = "login"))
 @Component
+@RequiredArgsConstructor
 public class LoginApi {
 
     private static final String LOGIN_SCHEMA = "Login";
@@ -63,12 +65,6 @@ public class LoginApi {
 
     @Context
     private ContainerRequestContext servletContext;
-
-    public LoginApi(LoginResource loginResource, AuthorizationCheckService authorizationCheckService) {
-
-        this.loginResource = loginResource;
-        this.authorizationCheckService = authorizationCheckService;
-    }
 
     @HEAD
     @Path("/{username}")
@@ -177,11 +173,7 @@ public class LoginApi {
 
     private static LoginModel toLoginModel(LoginEntity resource) {
 
-        LoginModel model = new LoginModel();
-        model.setUsername(resource.getUsername());
-        model.setId(resource.getId());
-
-        return model;
+        return LoginModel.builder().username(resource.getUsername()).id(resource.getId()).build();
 
     }
 

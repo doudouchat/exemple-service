@@ -40,7 +40,6 @@ import com.exemple.service.api.core.authorization.impl.AuthorizationAlgorithmFac
 import com.exemple.service.api.core.authorization.impl.AuthorizationTokenManager;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
-import com.google.common.collect.Sets;
 import com.hazelcast.core.HazelcastInstance;
 
 @ContextConfiguration(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
@@ -113,10 +112,7 @@ public class AuthorizationContextServiceTest extends AbstractTestNGSpringContext
         hazelcastInstance.getMap(AuthorizationTokenManager.TOKEN_BLACK_LIST).put(DEPRECATED_TOKEN_ID.toString(), Date.from(Instant.now()));
         authorizationClient.reset();
 
-        ApplicationDetail detail = new ApplicationDetail();
-        detail.setClientIds(Sets.newHashSet("clientId1"));
-
-        Mockito.when(applicationDetailService.get("test")).thenReturn(detail);
+        Mockito.when(applicationDetailService.get("test")).thenReturn(ApplicationDetail.builder().clientId("clientId1").build());
 
     }
 

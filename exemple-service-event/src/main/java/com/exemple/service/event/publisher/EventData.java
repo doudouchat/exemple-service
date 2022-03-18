@@ -5,6 +5,9 @@ import org.springframework.context.ApplicationEvent;
 import com.exemple.service.customer.common.event.EventType;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.Getter;
+
+@Getter
 public class EventData extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
@@ -24,26 +27,6 @@ public class EventData extends ApplicationEvent {
         this.origin = origin;
         this.originVersion = originVersion;
         this.date = date;
-    }
-
-    public String getResource() {
-        return resource;
-    }
-
-    public EventType getEventType() {
-        return eventType;
-    }
-
-    public String getOrigin() {
-        return origin;
-    }
-
-    public String getOriginVersion() {
-        return originVersion;
-    }
-
-    public String getDate() {
-        return date;
     }
 
 }

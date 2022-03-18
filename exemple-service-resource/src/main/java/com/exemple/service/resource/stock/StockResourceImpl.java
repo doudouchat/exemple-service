@@ -12,18 +12,16 @@ import com.datastax.oss.driver.api.querybuilder.update.Update;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.store.stock.StockResource;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Validated
+@RequiredArgsConstructor
 public class StockResourceImpl implements StockResource {
 
     private static final String STOCK_TABLE = "stock";
 
     private final CqlSession session;
-
-    public StockResourceImpl(CqlSession session) {
-
-        this.session = session;
-    }
 
     @Override
     public void update(String store, String product, long quantity) {

@@ -52,10 +52,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
 @Path("/v1/accounts")
 @OpenAPIDefinition(tags = @Tag(name = "account"))
 @Component
+@RequiredArgsConstructor
 public class AccountApi {
 
     private static final String ACCOUNT_SCHEMA = "Account";
@@ -76,16 +78,6 @@ public class AccountApi {
 
     @Context
     private ContainerRequestContext servletContext;
-
-    public AccountApi(CustomerScriptFactory scriptFactory, ValidationHelper schemaValidation, FilterHelper schemaFilter, SchemaHelper schemaMerge,
-            AuthorizationCheckService authorizationCheckService) {
-
-        this.scriptFactory = scriptFactory;
-        this.schemaValidation = schemaValidation;
-        this.schemaFilter = schemaFilter;
-        this.schemaMerge = schemaMerge;
-        this.authorizationCheckService = authorizationCheckService;
-    }
 
     @GET
     @Path("/{id}")

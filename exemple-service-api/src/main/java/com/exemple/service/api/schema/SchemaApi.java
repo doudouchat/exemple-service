@@ -13,17 +13,14 @@ import com.exemple.service.schema.description.SchemaDescription;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 
 @Path("/v1/schemas")
 @Component
+@RequiredArgsConstructor
 public class SchemaApi {
 
     private final SchemaDescription service;
-
-    public SchemaApi(SchemaDescription service) {
-
-        this.service = service;
-    }
 
     @GET
     @Path("/{resource}/{app}/{version}/{profile}")

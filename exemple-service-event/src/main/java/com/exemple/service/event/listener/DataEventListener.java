@@ -18,7 +18,10 @@ import org.springframework.stereotype.Component;
 import com.exemple.service.event.publisher.EventData;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class DataEventListener {
 
     public static final String X_ORIGIN = "X_Origin";
@@ -31,15 +34,10 @@ public class DataEventListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(DataEventListener.class);
 
+    @Value("${event.timeout:3000}")
     private final Long timeout;
 
     private final KafkaTemplate<String, JsonNode> template;
-
-    public DataEventListener(KafkaTemplate<String, JsonNode> template, @Value("${event.timeout:3000}") Long timeout) {
-
-        this.template = template;
-        this.timeout = timeout;
-    }
 
     @EventListener
     public void eventConsumer(EventData event) {

@@ -11,6 +11,9 @@ import com.exemple.service.resource.common.JsonValidatorException;
 import com.exemple.service.resource.common.validator.json.JsonValidator;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class JsonConstraintValidator implements ConstraintValidator<Json, JsonNode> {
 
     private static final Logger LOG = LoggerFactory.getLogger(JsonConstraintValidator.class);
@@ -20,10 +23,6 @@ public class JsonConstraintValidator implements ConstraintValidator<Json, JsonNo
     private String messageTemplate;
 
     private final JsonValidator jsonValidator;
-
-    public JsonConstraintValidator(JsonValidator jsonValidator) {
-        this.jsonValidator = jsonValidator;
-    }
 
     @Override
     public boolean isValid(JsonNode source, ConstraintValidatorContext context) {

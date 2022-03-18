@@ -14,6 +14,10 @@ import com.flipkart.zjsonpatch.DiffFlags;
 import com.flipkart.zjsonpatch.JsonDiff;
 import com.google.common.collect.Streams;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class JsonPatchUtils {
 
     public static final String OP = "op";
@@ -23,10 +27,6 @@ public final class JsonPatchUtils {
     public static final String VALUE = "value";
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-
-    private JsonPatchUtils() {
-
-    }
 
     public static ArrayNode diff(Map<String, Object> source, Map<String, Object> target) {
 

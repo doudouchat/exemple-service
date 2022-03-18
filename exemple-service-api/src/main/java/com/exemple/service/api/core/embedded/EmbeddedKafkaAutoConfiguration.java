@@ -12,28 +12,24 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 
 import kafka.server.KafkaConfig;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @ConditionalOnProperty(value = { "port", "dir", "defaultTopic" }, prefix = "kafka.embedded")
 @ConditionalOnClass(EmbeddedKafkaBroker.class)
+@RequiredArgsConstructor
 public class EmbeddedKafkaAutoConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmbeddedKafkaAutoConfiguration.class);
 
+    @Value("${kafka.embedded.port:0}")
     private final int kafkaPort;
 
+    @Value("${kafka.embedded.dir:#{systemProperties['java.io.tmpdir']}}")
     private final String logDir;
 
+    @Value("${kafka.embedded.defaultTopic:...}")
     private final String[] defaultTopic;
-
-    public EmbeddedKafkaAutoConfiguration(@Value("${kafka.embedded.port:0}") int kafkaPort,
-            @Value("${kafka.embedded.dir:#{systemProperties['java.io.tmpdir']}}") String logDir,
-            @Value("${kafka.embedded.defaultTopic:...}") String[] defaultTopic) {
-        this.kafkaPort = kafkaPort;
-        this.logDir = logDir;
-        this.defaultTopic = defaultTopic.clone();
-
-    }
 
     @Bean(destroyMethod = "destroy")
     public EmbeddedKafkaBroker embeddedKafka() {

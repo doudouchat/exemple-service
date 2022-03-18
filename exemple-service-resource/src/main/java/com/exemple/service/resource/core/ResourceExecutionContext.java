@@ -2,15 +2,15 @@ package com.exemple.service.resource.core;
 
 import org.springframework.util.Assert;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ResourceExecutionContext {
 
     private static ThreadLocal<ResourceExecutionContext> executionContext = ThreadLocal.withInitial(ResourceExecutionContext::new);
 
     private String keyspace;
-
-    private ResourceExecutionContext() {
-
-    }
 
     public static ResourceExecutionContext get() {
 

@@ -12,17 +12,15 @@ import com.exemple.service.api.core.swagger.DocumentApiResource;
 import io.swagger.v3.oas.models.security.OAuthFlow;
 import io.swagger.v3.oas.models.security.OAuthFlows;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @Profile("!noSecurity")
+@RequiredArgsConstructor
 public class DocumentApiSecurity {
 
+    @Value("${api.swagger.authorization.path:}")
     private final String path;
-
-    public DocumentApiSecurity(@Value("${api.swagger.authorization.path:}") String path) {
-
-        this.path = path;
-    }
 
     public Map<String, SecurityScheme> buildSecurityScheme() {
 
