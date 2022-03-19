@@ -17,7 +17,7 @@ import org.springframework.mock.env.MockEnvironment;
 import kafka.server.KafkaConfig;
 
 @Configuration
-@Import(EventConfiguration.class)
+@Import({ EventPublisherConfiguration.class, EventKafkaConfiguration.class })
 public class EventTestFailureConfiguration {
 
     @Value("${event.kafka.embedded.port}")

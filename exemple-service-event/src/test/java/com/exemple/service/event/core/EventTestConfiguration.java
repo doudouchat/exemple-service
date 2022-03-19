@@ -14,7 +14,7 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import kafka.server.KafkaConfig;
 
 @Configuration
-@Import(EventConfiguration.class)
+@Import({ EventPublisherConfiguration.class, EventKafkaConfiguration.class })
 public class EventTestConfiguration {
 
     @Value("${event.kafka.embedded.port}")

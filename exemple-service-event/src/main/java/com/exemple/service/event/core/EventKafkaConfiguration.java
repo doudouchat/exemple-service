@@ -22,11 +22,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
-@ComponentScan(basePackages = "com.exemple.service.event")
+@ComponentScan(basePackages = "com.exemple.service.event.listener")
 @RequiredArgsConstructor
-public class EventConfiguration {
+public class EventKafkaConfiguration {
 
-    private static final Logger LOG = LoggerFactory.getLogger(EventConfiguration.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EventKafkaConfiguration.class);
 
     @Value("${event.kafka.bootstrap-servers}")
     private final String bootstrapServers;
