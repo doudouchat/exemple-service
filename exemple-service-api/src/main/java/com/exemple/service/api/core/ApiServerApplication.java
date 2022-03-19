@@ -13,7 +13,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import com.exemple.service.application.core.ApplicationConfiguration;
-import com.exemple.service.event.core.EventConfiguration;
+import com.exemple.service.event.core.EventKafkaConfiguration;
+import com.exemple.service.event.core.EventPublisherConfiguration;
 import com.exemple.service.resource.core.ResourceConfiguration;
 import com.exemple.service.schema.core.SchemaConfiguration;
 import com.exemple.service.store.core.StoreConfiguration;
@@ -21,7 +22,8 @@ import com.exemple.service.store.core.StoreConfiguration;
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class, SecurityAutoConfiguration.class, ManagementWebSecurityAutoConfiguration.class,
         CassandraAutoConfiguration.class })
 @EnableCaching
-@Import({ SchemaConfiguration.class, ApplicationConfiguration.class, StoreConfiguration.class, ResourceConfiguration.class })
+@Import({ SchemaConfiguration.class, ApplicationConfiguration.class, StoreConfiguration.class, ResourceConfiguration.class,
+        EventPublisherConfiguration.class })
 public class ApiServerApplication extends SpringBootServletInitializer {
 
     @Override
@@ -30,7 +32,7 @@ public class ApiServerApplication extends SpringBootServletInitializer {
     }
 
     @Configuration
-    @Import(EventConfiguration.class)
+    @Import(EventKafkaConfiguration.class)
     @ConditionalOnProperty(value = { "kafka.bootstrap-servers", "topic" }, prefix = "event")
     public static class EventApiConfiguration {
 
