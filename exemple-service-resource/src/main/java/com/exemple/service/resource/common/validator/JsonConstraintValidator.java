@@ -37,10 +37,13 @@ public class JsonConstraintValidator implements ConstraintValidator<Json, JsonNo
 
             valid = false;
 
-            LOG.trace(e.getMessage(messageTemplate), e);
+            StringBuilder message = new StringBuilder();
+            message.append(messageTemplate.replace("{", "").replace("}", "")).append('.').append(e.getKey());
+
+            LOG.trace(message.toString(), e);
 
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(e.getMessage(this.messageTemplate)).addPropertyNode(e.getNode()).addConstraintViolation();
+            context.buildConstraintViolationWithTemplate(message.toString()).addPropertyNode(e.getNode()).addConstraintViolation();
         }
 
         return valid;

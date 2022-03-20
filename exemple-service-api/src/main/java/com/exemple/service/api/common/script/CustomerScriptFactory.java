@@ -24,7 +24,8 @@ import org.springframework.stereotype.Component;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.context.ServiceContextExecution;
-import com.pivovarit.function.ThrowingConsumer;
+
+import lombok.SneakyThrows;
 
 @Component
 @EnableScheduling
@@ -86,16 +87,17 @@ public class CustomerScriptFactory {
 
         try (Stream<Path> paths = Files.list(Paths.get(this.contextsPath))) {
 
-            paths.forEach(ThrowingConsumer.sneaky(path -> saveContextIfPresent(path, "exemple-service-customer.xml")));
+            paths.forEach(path -> saveContextIfPresent(path, "exemple-service-customer.xml"));
         }
 
     }
 
-    private void saveContextIfPresent(Path path, String contextName) throws IOException {
+    @SneakyThrows
+    private void saveContextIfPresent(Path path, String contextName) {
 
         try (Stream<Path> paths = Files.list(path)) {
 
-            paths.filter((Path p) -> Paths.get(contextName).equals(p.getFileName())).findFirst().ifPresent(ThrowingConsumer.sneaky((Path p) -> {
+            paths.filter((Path p) -> Paths.get(contextName).equals(p.getFileName())).findFirst().ifPresent(((Path p) -> {
                 String contextKey = path.getFileName().toString();
                 saveContextIfUpdated(contextKey, p);
             }));
@@ -103,7 +105,8 @@ public class CustomerScriptFactory {
 
     }
 
-    private void saveContextIfUpdated(String contextKey, Path contextPath) throws IOException {
+    @SneakyThrows
+    private void saveContextIfUpdated(String contextKey, Path contextPath) {
 
         long checksum = FileUtils.checksumCRC32(contextPath.toFile());
         if (checksum != checksumApplicationContexts.getOrDefault(contextKey, 0L)) {

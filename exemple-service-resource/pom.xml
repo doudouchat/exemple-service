@@ -158,13 +158,6 @@
 			<artifactId>hamcrest-jackson</artifactId>
 		</dependency>
 
-		<!-- EXCEPTION LAMBDA -->
-
-		<dependency>
-			<groupId>com.pivovarit</groupId>
-			<artifactId>throwing-function</artifactId>
-		</dependency>
-
 		<!-- CASSANDRA EMBEDDED -->
 
 		<dependency>
