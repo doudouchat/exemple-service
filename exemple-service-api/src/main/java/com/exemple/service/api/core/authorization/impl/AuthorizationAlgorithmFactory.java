@@ -26,7 +26,8 @@ import org.springframework.util.Assert;
 
 import com.auth0.jwt.algorithms.Algorithm;
 import com.exemple.service.api.core.authorization.AuthorizationException;
-import com.pivovarit.function.ThrowingFunction;
+
+import lombok.SneakyThrows;
 
 @Component
 @Profile("!noSecurity")
@@ -63,7 +64,17 @@ public class AuthorizationAlgorithmFactory {
         this.clientSecret = clientSecret;
     }
 
-    private Algorithm buildAlgorithm(String path) throws AuthorizationException {
+    public Algorithm getAlgorithm() {
+
+        return algorithms.computeIfAbsent(defaultPath, this::buildAlgorithm);
+    }
+
+    public void resetAlgorithm() {
+        algorithms.compute(defaultPath, (String path, Algorithm algorithm) -> null);
+    }
+
+    @SneakyThrows(AuthorizationException.class)
+    private Algorithm buildAlgorithm(String path) {
 
         Response response = this.authorizationClient.tokenKey(path, clientId, clientSecret);
 
@@ -93,12 +104,4 @@ public class AuthorizationAlgorithmFactory {
         return Algorithm.RSA256((RSAPublicKey) publicKey, null);
     }
 
-    public Algorithm getAlgorithm() {
-
-        return algorithms.computeIfAbsent(defaultPath, ThrowingFunction.sneaky(this::buildAlgorithm));
-    }
-
-    public void resetAlgorithm() {
-        algorithms.compute(defaultPath, (String path, Algorithm algorithm) -> null);
-    }
 }

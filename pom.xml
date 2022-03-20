@@ -297,15 +297,6 @@
 				<version>30.1.1-jre</version>
 			</dependency>
 
-			<!-- EXCEPTION LAMBDA -->
-
-			<!-- https://github.com/pivovarit/throwing-function -->
-			<dependency>
-				<groupId>com.pivovarit</groupId>
-				<artifactId>throwing-function</artifactId>
-				<version>1.5.1</version>
-			</dependency>
-
 			<!-- JSOUP -->
 
 			<!-- https://jsoup.org/ -->
