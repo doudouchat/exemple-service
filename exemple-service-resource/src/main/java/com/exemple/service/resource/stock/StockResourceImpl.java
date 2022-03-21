@@ -1,5 +1,7 @@
 package com.exemple.service.resource.stock;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -34,14 +36,14 @@ public class StockResourceImpl implements StockResource {
     }
 
     @Override
-    public long get(String store, String product) {
+    public Optional<Long> get(String store, String product) {
 
         Select select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), STOCK_TABLE).column("quantity").whereColumn("store")
                 .isEqualTo(QueryBuilder.literal(store)).whereColumn("product").isEqualTo(QueryBuilder.literal(product));
 
         Row row = session.execute(select.build().setConsistencyLevel(ConsistencyLevel.QUORUM)).one();
 
-        return row != null ? row.getLong(0) : 0L;
+        return Optional.ofNullable(row != null ? row.getLong(0) :null);
     }
 
 }

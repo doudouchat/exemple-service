@@ -11,7 +11,6 @@ import com.exemple.service.store.common.InsufficientStockException;
 import com.exemple.service.store.stock.StockResource;
 import com.exemple.service.store.stock.StockService;
 import com.exemple.service.store.stock.distribution.StockDistribution;
-import com.google.common.primitives.Longs;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +28,7 @@ public class StockServiceImpl implements StockService {
     @Override
     public Long update(String company, String store, String product, int quantity) throws InsufficientStockException {
 
-        long stock = get(company, store, product).orElseThrow(IllegalArgumentException::new);
+        long stock = get(company, store, product).orElse(0L);
 
         if (stock + quantity < 0) {
             throw new InsufficientStockException(company, store, product, stock, quantity);
@@ -38,19 +37,18 @@ public class StockServiceImpl implements StockService {
         LOG.debug("incrementation stock {} {} {} {}", company, store, product, quantity);
 
         resource.update(store, product, quantity);
-        distribution.updateStock(company, store, product, Longs.toByteArray(stock + quantity));
+        distribution.updateStock(company, store, product, stock + quantity);
         return stock + quantity;
     }
 
     @Override
     public Optional<Long> get(String company, String store, String product) {
 
-        return this.distribution.getStock(company, store, product).map((byte[] data) -> {
-            if (data.length == 0) {
-                return resource.get(store, product);
-            }
-            return Longs.fromByteArray(data);
-        });
+        Optional<Long> stock = this.distribution.getStock(company, store, product);
+        if (!stock.isPresent()) {
+            return resource.get(store, product);
+        }
+        return stock;
 
     }
 

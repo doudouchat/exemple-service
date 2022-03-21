@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -45,7 +46,7 @@ public class StockServiceTest extends AbstractTestNGSpringContextTests {
     @Test
     public void update() throws InterruptedException {
 
-        Mockito.when(resource.get(Mockito.eq(store), Mockito.eq(product))).thenReturn(100L);
+        Mockito.when(resource.get(Mockito.eq(store), Mockito.eq(product))).thenReturn(Optional.of(100L));
 
         ExecutorService executorService = new ThreadPoolExecutor(5, 100, 1000, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
 
@@ -94,12 +95,12 @@ public class StockServiceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void updateFailureInsufficientStock() throws InterruptedException, InsufficientStockException {
+    public void updateFailureInsufficientStock() throws InsufficientStockException {
 
         String product = "/product#" + UUID.randomUUID();
         String store = "/store#" + UUID.randomUUID();
 
-        Mockito.when(resource.get(Mockito.eq(store), Mockito.eq(product))).thenReturn(5L);
+        Mockito.when(resource.get(Mockito.eq(store), Mockito.eq(product))).thenReturn(Optional.of(5L));
         service.update(company, store, product, -3);
         try {
             service.update(company, store, product, -3);
@@ -112,6 +113,31 @@ public class StockServiceTest extends AbstractTestNGSpringContextTests {
             assertThat(e.getStore(), is(store));
             assertThat(e.getProduct(), is(product));
             assertThat(e.getStock(), is(2L));
+            assertThat(e.getQuantity(), is(-3L));
+
+        }
+
+        Mockito.verify(resource).get(Mockito.eq(store), Mockito.eq(product));
+
+    }
+
+    @Test
+    public void updateFailureInsufficientStockBecauseNonStock() throws InsufficientStockException {
+
+        String product = "/product#" + UUID.randomUUID();
+        String store = "/store#" + UUID.randomUUID();
+
+        try {
+            service.update(company, store, product, -3);
+
+            Assert.fail("InsufficientStockException must be throwed");
+
+        } catch (InsufficientStockException e) {
+
+            assertThat(e.getCompany(), is(company));
+            assertThat(e.getStore(), is(store));
+            assertThat(e.getProduct(), is(product));
+            assertThat(e.getStock(), is(0L));
             assertThat(e.getQuantity(), is(-3L));
 
         }
