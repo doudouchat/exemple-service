@@ -30,14 +30,14 @@ public class StockResourceTest extends AbstractTestNGSpringContextTests {
     @Test(dependsOnMethods = "update")
     public void get() {
 
-        assertThat(resource.get("store1", "product1"), is(-10L));
+        assertThat(resource.get("store1", "product1").get(), is(-10L));
 
     }
 
     @Test
     public void getNotExist() {
 
-        assertThat(resource.get(UUID.randomUUID().toString(), UUID.randomUUID().toString()), is(0L));
+        assertThat(resource.get(UUID.randomUUID().toString(), UUID.randomUUID().toString()).isPresent(), is(false));
 
     }
 

@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.google.common.primitives.Longs;
+
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -61,12 +63,14 @@ public class StockDistribution {
         }
     }
 
-    public Optional<byte[]> getStock(String company, String store, String product) {
-        return LockStock.accessStock(() -> client.getData().forPath(company + store + product));
+    public Optional<Long> getStock(String company, String store, String product) {
+        return LockStock.accessStock(() -> client.getData().forPath(company + store + product))
+
+                .filter((byte[] stock) -> stock.length > 0).map(Longs::fromByteArray);
     }
 
-    public void updateStock(String company, String store, String product, byte[] stock) {
-        LockStock.accessStock(() -> client.setData().forPath(company + store + product, stock));
+    public void updateStock(String company, String store, String product, long stock) {
+        LockStock.accessStock(() -> client.setData().forPath(company + store + product, Longs.toByteArray(stock)));
     }
 
     private PersistentTtlNode createProduct(String company, String store, String product) throws Exception {
