@@ -29,8 +29,7 @@ public class NotEmptyConstraintValidatorTest extends AbstractTestNGSpringContext
     @Test
     public void updateSuccess() {
 
-        Account model = new Account();
-        model.setEmail("jean.dupont@gmail.com");
+        Account model = Account.builder().email("jean.dupont@gmail.com").build();
 
         UUID id = resource.save(JsonNodeUtils.create(model));
 

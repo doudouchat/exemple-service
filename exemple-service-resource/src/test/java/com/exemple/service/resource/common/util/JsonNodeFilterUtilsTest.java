@@ -26,16 +26,16 @@ public class JsonNodeFilterUtilsTest {
         Map<String, Object> model = new HashMap<>();
         model.put("email", "jean.dupont@gmail.com");
         model.put("birthday", null);
-        Address address = new Address("1 rue de la paix", null);
+        Address address = Address.builder().street("1 rue de la paix").build();
         model.put("address", address);
 
         Map<String, Object> addresses = new HashMap<>();
-        Address home = new Address("1 rue de de la poste", null);
+        Address home = Address.builder().street("1 rue de de la poste").build();
         addresses.put("home", home);
         addresses.put("job", null);
         model.put("addresses", addresses);
 
-        Cgu cgu = new Cgu("code_1", null);
+        Cgu cgu = Cgu.builder().code("code_1").build();
         Set<Object> cgus = new HashSet<>();
         cgus.add(cgu);
         cgus.add(null);

@@ -80,16 +80,16 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
     @Test
     public void save() {
 
-        Account model = new Account();
-        model.setEmail("jean.dupont@gmail.com");
+        Account model = Account.builder()
 
-        model.setAddresses(new HashMap<>());
-        model.getAddresses().put("home", new Address("1 rue de la poste", null, null, null));
-        model.getAddresses().put("job", new Address("1 rue de paris", null, null, 5));
+                .email("jean.dupont@gmail.com")
 
-        model.setCgus(new HashSet<>());
-        model.getCgus().add(new Cgu("code_1", "v1"));
-        model.getCgus().add(null);
+                .address("home", Address.builder().street("1 rue de la poste").build())
+                .address("job", Address.builder().street("1 rue de paris").floor(5).build())
+
+                .cgu(Cgu.builder().code("code_1").version("v1").build()).cgu(null)
+
+                .build();
 
         this.id = resource.save(JsonNodeUtils.create(model));
 
@@ -150,13 +150,13 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         model.put(AccountField.ID.field, id);
 
         Map<String, Address> addresses = new HashMap<>();
-        addresses.put("home", new Address("10 rue de de la poste", null, null, 2));
+        addresses.put("home", Address.builder().street("10 rue de de la poste").floor(2).build());
         addresses.put("job", null);
-        addresses.put("holidays", new Address("10 rue de paris", null, null, 5));
+        addresses.put("holidays", Address.builder().street("10 rue de paris").floor(5).build());
         model.put("addresses", addresses);
 
         Set<Cgu> cgus = new HashSet<>();
-        Cgu cgu1 = new Cgu("code_1", "v2");
+        Cgu cgu1 = Cgu.builder().code("code_1").version("v2").build();
         cgus.add(cgu1);
         model.put("cgus", cgus);
 
@@ -167,7 +167,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         AccountHistory previousHistoryId = accountHistoryResource.findByIdAndField(id, "/id");
         AccountHistory previousHistoryCgus = accountHistoryResource.findByIdAndField(id, "/cgus/0/code");
 
-        resource.save(JsonNodeUtils.create(model), this.account);
+        resource.save(JsonNodeUtils.create(model), resource.get(id).get());
 
         this.account = resource.get(id).get();
 

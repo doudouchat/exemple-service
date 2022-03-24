@@ -74,19 +74,19 @@ public class JsonQueryBuilderTest extends AbstractTestNGSpringContextTests {
         model.put("age", 18);
         model.put("enabled", true);
         model.put("creation_date", "2010-06-30 01:20:30.002Z");
-        model.put("address", new Address("1 rue de la paix", "Paris", "75002", 5));
+        model.put("address", Address.builder().street("1 rue de la paix").city("Paris").zip("75002").floor(5).build());
 
         Map<String, Object> addresses = new HashMap<>();
-        addresses.put("home", new Address("1 rue de de la poste", null, null, null));
-        addresses.put("job", new Address("1 rue de paris", null, null, 5));
+        addresses.put("home", Address.builder().street("1 rue de de la poste").build());
+        addresses.put("job", Address.builder().street("1 rue de paris").floor(5).build());
         model.put("addresses", addresses);
 
         Map<String, Object> children = new HashMap<>();
-        children.put("2", new Child("2001-01-01"));
+        children.put("2", Child.builder().birthday("2001-01-01").build());
         model.put("children", children);
 
         Set<Object> cgus = new HashSet<>();
-        cgus.add(new Cgu("code_1", "v1"));
+        cgus.add(Cgu.builder().code("code_1").version("v1").build());
         cgus.add(null);
         model.put("cgus", cgus);
 

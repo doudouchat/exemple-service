@@ -4,11 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.UUID;
 
 import javax.validation.ConstraintViolationException;
@@ -35,20 +32,19 @@ public class JsonConstraintValidatorTest extends AbstractTestNGSpringContextTest
     @Test
     public void success() {
 
-        Account model = new Account();
-        model.setEmail("jean.dupont@gmail.com");
-        model.setBirthday(null);
+        Account model = Account.builder()
 
-        model.setAddress(new Address("1 rue de la paix", "Paris", "75002", 5));
+                .email("jean.dupont@gmail.com")
 
-        model.setAddresses(new HashMap<>());
-        model.getAddresses().put("home", new Address("1 rue de de la poste", null, null, null));
+                .address(Address.builder().street("1 rue de la paix").city("Paris").zip("75002").floor(5).build())
 
-        model.setProfils(new HashSet<>());
-        model.getProfils().add("profil 1");
+                .address("home", Address.builder().street("1 rue de de la poste").build())
 
-        model.setPreferences(new ArrayList<>());
-        model.getPreferences().add(Arrays.asList("pref1", "value1", 10, "2001-01-01 00:00:00.000Z"));
+                .profil("profil 1")
+
+                .preference(Arrays.asList("pref1", "value1", 10, "2001-01-01 00:00:00.000Z"))
+
+                .build();
 
         UUID id = resource.save(JsonNodeUtils.create(model));
         JsonNode account = resource.get(id).get();
@@ -109,7 +105,7 @@ public class JsonConstraintValidatorTest extends AbstractTestNGSpringContextTest
     @Test(dataProvider = "failures", expectedExceptions = ConstraintViolationException.class)
     public void saveFailure(String property, Object value) {
 
-        JsonNode node = JsonNodeUtils.create(new Account());
+        JsonNode node = JsonNodeUtils.create(Account.builder().build());
         JsonNodeUtils.set(node, value, property);
 
         resource.save(node);
