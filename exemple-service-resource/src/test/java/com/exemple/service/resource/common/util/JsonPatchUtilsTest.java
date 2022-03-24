@@ -12,11 +12,14 @@ import java.util.stream.Collectors;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.common.collect.Streams;
 
 public class JsonPatchUtilsTest {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Test
     public void patchProperty() {
@@ -27,7 +30,7 @@ public class JsonPatchUtilsTest {
         Map<String, Object> target = new HashMap<>();
         target.put("email", "jean.dupond@gmail.com");
 
-        ArrayNode patch = JsonPatchUtils.diff(model, target);
+        ArrayNode patch = JsonPatchUtils.diff(MAPPER.convertValue(model, JsonNode.class), MAPPER.convertValue(target, JsonNode.class));
 
         assertThat(patch.size(), is(1));
         assertThat(patch.get(0).get(JsonPatchUtils.OP).textValue(), is("replace"));
@@ -45,7 +48,7 @@ public class JsonPatchUtilsTest {
         Map<String, Object> target = new HashMap<>();
         target.put("address", new Address(null, "Paris"));
 
-        ArrayNode patch = JsonPatchUtils.diff(model, target);
+        ArrayNode patch = JsonPatchUtils.diff(MAPPER.convertValue(model, JsonNode.class), MAPPER.convertValue(target, JsonNode.class));
         List<JsonNode> result = sortPatchByPath(patch);
 
         assertThat(result.size(), is(2));
@@ -78,7 +81,7 @@ public class JsonPatchUtilsTest {
 
         target.put("addresses", addresses);
 
-        ArrayNode patch = JsonPatchUtils.diff(model, target);
+        ArrayNode patch = JsonPatchUtils.diff(MAPPER.convertValue(model, JsonNode.class), MAPPER.convertValue(target, JsonNode.class));
         List<JsonNode> result = sortPatchByPath(patch);
 
         assertThat(result.size(), is(4));
@@ -113,7 +116,7 @@ public class JsonPatchUtilsTest {
 
         target.put("preferences", preference);
 
-        ArrayNode patch = JsonPatchUtils.diff(model, target);
+        ArrayNode patch = JsonPatchUtils.diff(MAPPER.convertValue(model, JsonNode.class), MAPPER.convertValue(target, JsonNode.class));
         List<JsonNode> result = sortPatchByPath(patch);
 
         assertThat(result.size(), is(1));
@@ -136,7 +139,7 @@ public class JsonPatchUtilsTest {
 
         target.put("cgus", cgus);
 
-        ArrayNode patch = JsonPatchUtils.diff(model, target);
+        ArrayNode patch = JsonPatchUtils.diff(MAPPER.convertValue(model, JsonNode.class), MAPPER.convertValue(target, JsonNode.class));
         List<JsonNode> result = sortPatchByPath(patch);
 
         assertThat(result.size(), is(2));

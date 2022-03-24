@@ -28,11 +28,6 @@ public final class JsonPatchUtils {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    public static ArrayNode diff(Map<String, Object> source, Map<String, Object> target) {
-
-        return diff(MAPPER.convertValue(source, JsonNode.class), MAPPER.convertValue(target, JsonNode.class));
-    }
-
     public static ArrayNode diff(JsonNode source, JsonNode target) {
 
         ArrayNode patchs = (ArrayNode) JsonDiff.asJson(source, target, EnumSet.of(DiffFlags.OMIT_COPY_OPERATION, DiffFlags.OMIT_MOVE_OPERATION));
