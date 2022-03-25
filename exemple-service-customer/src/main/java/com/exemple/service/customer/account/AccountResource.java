@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public interface AccountResource {
 
-    UUID save(@NotEmpty @Json(table = "account") JsonNode account);
+    void save(@NotEmpty @Json(table = "account") JsonNode account);
 
     void save(@NotEmpty @Json(table = "account") JsonNode account, @NotEmpty JsonNode previousAccount);
 

@@ -37,6 +37,8 @@ public class JsonConstraintValidatorTest extends AbstractTestNGSpringContextTest
 
         Account model = Account.builder()
 
+                .id(UUID.randomUUID())
+
                 .email("jean.dupont@gmail.com")
 
                 .address(Address.builder().street("1 rue de la paix").city("Paris").zip("75002").floor(5).build())
@@ -49,8 +51,8 @@ public class JsonConstraintValidatorTest extends AbstractTestNGSpringContextTest
 
                 .build();
 
-        UUID id = resource.save(MAPPER.convertValue(model, JsonNode.class));
-        JsonNode account = resource.get(id).get();
+        resource.save(MAPPER.convertValue(model, JsonNode.class));
+        JsonNode account = resource.get(model.getId()).get();
         assertThat(account.get("email"), is(notNullValue()));
         assertThat(account.get("address"), is(notNullValue()));
         assertThat(account.get("addresses"), is(notNullValue()));
