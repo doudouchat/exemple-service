@@ -56,11 +56,6 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
     @Test
     public void save() {
 
-        // Given mock service
-
-        UUID accountId = UUID.randomUUID();
-        Mockito.when(resource.save(Mockito.any(JsonNode.class))).thenReturn(accountId);
-
         // When perform save
 
         JsonNode source = JsonNodeUtils.create(() -> {

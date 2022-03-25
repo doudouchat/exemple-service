@@ -26,7 +26,6 @@ import com.exemple.service.resource.common.JsonQueryBuilder;
 import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Service("accountResource")
 @Validated
@@ -53,11 +52,9 @@ public class AccountResourceImpl implements AccountResource {
     }
 
     @Override
-    public UUID save(JsonNode account) {
+    public void save(JsonNode account) {
 
-        UUID id = UUID.randomUUID();
-
-        ((ObjectNode) account).put(AccountField.ID.field, id.toString());
+        Assert.isTrue(account.path(AccountField.ID.field).isTextual(), AccountField.ID.field + " is required");
 
         Insert insertAccount = jsonQueryBuilder.insert(account);
 
@@ -67,8 +64,6 @@ public class AccountResourceImpl implements AccountResource {
         batch.addStatement(accountEventResource.saveEvent(account, EventType.CREATE));
 
         session.execute(batch.build());
-
-        return id;
 
     }
 

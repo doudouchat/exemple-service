@@ -3,6 +3,7 @@ package com.exemple.service.resource.account.model;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +12,8 @@ import lombok.Singular;
 @Builder
 @Getter
 public class Account {
+
+    private final UUID id;
 
     private final Object email;
 

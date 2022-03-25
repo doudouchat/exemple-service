@@ -5,7 +5,6 @@ import com.exemple.service.customer.common.event.EventType
 import com.exemple.service.customer.common.event.ResourceEventPublisher
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.databind.node.TextNode
 
 import groovy.transform.CompileDynamic
 
@@ -21,7 +20,8 @@ class AccountServiceTestImpl implements AccountService {
     @Override
     JsonNode save(JsonNode account) {
 
-        ((ObjectNode) account).set('creation_date', new TextNode(ServiceContextExecution.context().date.toString()))
+        ((ObjectNode) account).put('id', UUID.randomUUID().toString())
+        ((ObjectNode) account).put('creation_date', ServiceContextExecution.context().date.toString())
 
         accountResource.save(account)
 
@@ -33,7 +33,7 @@ class AccountServiceTestImpl implements AccountService {
     @Override
     JsonNode save(JsonNode account, JsonNode previousSource) {
 
-        ((ObjectNode) account).set('update_date', new TextNode(ServiceContextExecution.context().date.toString()))
+        ((ObjectNode) account).put('update_date', ServiceContextExecution.context().date.toString())
 
         accountResource.save(account, previousSource)
 

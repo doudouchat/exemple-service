@@ -12,7 +12,6 @@ import static org.hamcrest.Matchers.nullValue;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -83,7 +82,11 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
     @Test
     public void save() {
 
+        this.id = UUID.randomUUID();
+
         Account model = Account.builder()
+
+                .id(id)
 
                 .email("jean.dupont@gmail.com")
 
@@ -94,7 +97,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
                 .build();
 
-        this.id = resource.save(MAPPER.convertValue(model, JsonNode.class));
+        resource.save(MAPPER.convertValue(model, JsonNode.class));
 
         this.account = MAPPER.convertValue(model, JsonNode.class);
         this.account = JsonNodeFilterUtils.clean(this.account);
@@ -261,9 +264,13 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
     @Test
     public void findByIndex() {
 
-        UUID id1 = resource.save(MAPPER.convertValue(Collections.singletonMap("status", "NEW"), JsonNode.class));
-        UUID id2 = resource.save(MAPPER.convertValue(Collections.singletonMap("status", "NEW"), JsonNode.class));
-        UUID id3 = resource.save(MAPPER.convertValue(Collections.singletonMap("status", "OLD"), JsonNode.class));
+        UUID id1 = UUID.randomUUID();
+        UUID id2 = UUID.randomUUID();
+        UUID id3 = UUID.randomUUID();
+
+        resource.save(MAPPER.convertValue(Account.builder().status("NEW").id(id1).build(), JsonNode.class));
+        resource.save(MAPPER.convertValue(Account.builder().status("NEW").id(id2).build(), JsonNode.class));
+        resource.save(MAPPER.convertValue(Account.builder().status("OLD").id(id3).build(), JsonNode.class));
 
         Set<JsonNode> accounts = resource.findByIndex("status", "NEW");
 
