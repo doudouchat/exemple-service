@@ -16,9 +16,12 @@ import org.testng.annotations.Test;
 import com.exemple.service.resource.account.model.Address;
 import com.exemple.service.resource.account.model.Cgu;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 public class JsonNodeFilterUtilsTest {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Test
     public void clean() {
@@ -53,7 +56,7 @@ public class JsonNodeFilterUtilsTest {
         preferences.add(null);
         model.put("preferences", preferences);
 
-        JsonNode source = JsonNodeFilterUtils.clean(JsonNodeUtils.create(model));
+        JsonNode source = JsonNodeFilterUtils.clean(MAPPER.convertValue(model, JsonNode.class));
 
         assertThat(source.path("email").textValue(), is(model.get("email")));
         assertThat(source.path("birthday").getNodeType(), is(JsonNodeType.MISSING));

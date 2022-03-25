@@ -30,13 +30,15 @@ import com.exemple.service.resource.account.model.Address;
 import com.exemple.service.resource.account.model.Cgu;
 import com.exemple.service.resource.account.model.Child;
 import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ContextConfiguration(classes = { ResourceTestConfiguration.class })
 public class JsonQueryBuilderTest extends AbstractTestNGSpringContextTests {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private JsonQueryBuilder resource;
 
@@ -113,12 +115,12 @@ public class JsonQueryBuilderTest extends AbstractTestNGSpringContextTests {
 
         model.put("content", ByteUtils.toHexString(schemaResource));
 
-        session.execute(resource.insert(JsonNodeUtils.create(model)).build());
+        session.execute(resource.insert(MAPPER.convertValue(model, JsonNode.class)).build());
 
         this.exemple = get(id);
         this.exemple = JsonNodeFilterUtils.clean(this.exemple);
 
-        JsonNode expected = JsonNodeUtils.create(model);
+        JsonNode expected = MAPPER.convertValue(model, JsonNode.class);
         expected = JsonNodeFilterUtils.clean(expected);
 
         assertThat(this.exemple.get("email"), is(expected.get("email")));

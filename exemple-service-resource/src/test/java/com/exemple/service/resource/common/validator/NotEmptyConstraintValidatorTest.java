@@ -16,12 +16,14 @@ import org.testng.annotations.Test;
 
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.account.model.Account;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ContextConfiguration(classes = { ResourceTestConfiguration.class })
 public class NotEmptyConstraintValidatorTest extends AbstractTestNGSpringContextTests {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private AccountResource resource;
@@ -31,7 +33,7 @@ public class NotEmptyConstraintValidatorTest extends AbstractTestNGSpringContext
 
         Account model = Account.builder().email("jean.dupont@gmail.com").build();
 
-        UUID id = resource.save(JsonNodeUtils.create(model));
+        UUID id = resource.save(MAPPER.convertValue(model, JsonNode.class));
 
         JsonNode account = resource.get(id).get();
         assertThat(account.get("email"), is(notNullValue()));
@@ -45,7 +47,7 @@ public class NotEmptyConstraintValidatorTest extends AbstractTestNGSpringContext
                 // null
                 { null },
                 // empty
-                { JsonNodeUtils.init() } };
+                { MAPPER.createObjectNode() } };
 
     }
 

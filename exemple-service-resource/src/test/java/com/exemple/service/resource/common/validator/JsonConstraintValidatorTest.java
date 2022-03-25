@@ -19,12 +19,15 @@ import org.testng.annotations.Test;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.account.model.Account;
 import com.exemple.service.resource.account.model.Address;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @ContextConfiguration(classes = { ResourceTestConfiguration.class })
 public class JsonConstraintValidatorTest extends AbstractTestNGSpringContextTests {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private AccountResource resource;
@@ -46,7 +49,7 @@ public class JsonConstraintValidatorTest extends AbstractTestNGSpringContextTest
 
                 .build();
 
-        UUID id = resource.save(JsonNodeUtils.create(model));
+        UUID id = resource.save(MAPPER.convertValue(model, JsonNode.class));
         JsonNode account = resource.get(id).get();
         assertThat(account.get("email"), is(notNullValue()));
         assertThat(account.get("address"), is(notNullValue()));
@@ -105,8 +108,8 @@ public class JsonConstraintValidatorTest extends AbstractTestNGSpringContextTest
     @Test(dataProvider = "failures", expectedExceptions = ConstraintViolationException.class)
     public void saveFailure(String property, Object value) {
 
-        JsonNode node = JsonNodeUtils.create(Account.builder().build());
-        JsonNodeUtils.set(node, value, property);
+        JsonNode node = MAPPER.convertValue((Account.builder().build()), JsonNode.class);
+        ((ObjectNode) node).set(property, MAPPER.convertValue(value, JsonNode.class));
 
         resource.save(node);
     }

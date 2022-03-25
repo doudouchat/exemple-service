@@ -26,7 +26,6 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.exemple.service.resource.schema.impl.SchemaResourceImpl;
@@ -67,7 +66,7 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
         resourceSchema.setContent(schemaResource);
         resourceSchema.setFilters(Collections.singleton("filter"));
         resourceSchema.setFields((Collections.singleton("field")));
-        resourceSchema.setPatchs(Collections.singleton(JsonNodeUtils.create(Collections.singletonMap("op", "add"))));
+        resourceSchema.setPatchs(Collections.singleton(MAPPER.convertValue(Collections.singletonMap("op", "add"), JsonNode.class)));
 
         resource.save(resourceSchema);
 
@@ -95,7 +94,7 @@ public class SchemaResourceTest extends AbstractTestNGSpringContextTests {
         resourceSchema.setResource("account");
         resourceSchema.setProfile("example");
         resourceSchema.setFilters(Collections.singleton("filter"));
-        resourceSchema.setPatchs(Collections.singleton(JsonNodeUtils.init()));
+        resourceSchema.setPatchs(Collections.singleton(MAPPER.createObjectNode()));
 
         resource.update(resourceSchema);
 

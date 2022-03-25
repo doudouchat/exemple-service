@@ -41,14 +41,17 @@ import com.exemple.service.resource.account.model.Address;
 import com.exemple.service.resource.account.model.Cgu;
 import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Iterators;
 
 @ContextConfiguration(classes = { ResourceTestConfiguration.class })
 public class AccountResourceTest extends AbstractTestNGSpringContextTests {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private AccountResource resource;
@@ -91,11 +94,11 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
                 .build();
 
-        this.id = resource.save(JsonNodeUtils.create(model));
+        this.id = resource.save(MAPPER.convertValue(model, JsonNode.class));
 
-        this.account = JsonNodeUtils.create(model);
+        this.account = MAPPER.convertValue(model, JsonNode.class);
         this.account = JsonNodeFilterUtils.clean(this.account);
-        JsonNodeUtils.set(this.account, id, AccountField.ID.field);
+        ((ObjectNode) this.account).put(AccountField.ID.field, id.toString());
 
         List<AccountHistory> histories = accountHistoryResource.findById(id);
 
@@ -167,7 +170,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         AccountHistory previousHistoryId = accountHistoryResource.findByIdAndField(id, "/id");
         AccountHistory previousHistoryCgus = accountHistoryResource.findByIdAndField(id, "/cgus/0/code");
 
-        resource.save(JsonNodeUtils.create(model), resource.get(id).get());
+        resource.save(MAPPER.convertValue(model, JsonNode.class), resource.get(id).get());
 
         this.account = resource.get(id).get();
 
@@ -184,7 +187,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         assertThat(this.account.get("addresses").get("holidays").get("zip"), is(nullValue()));
 
         assertThat(this.account.get("age").asInt(), is(model.get("age")));
-        assertThat(this.account.get("cgus"), hasItems(Iterators.toArray(JsonNodeUtils.create(cgus).elements(), JsonNode.class)));
+        assertThat(this.account.get("cgus"), hasItems(Iterators.toArray(MAPPER.convertValue(cgus, JsonNode.class).elements(), JsonNode.class)));
 
         List<AccountHistory> histories = accountHistoryResource.findById(id);
 
@@ -230,7 +233,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
         AccountHistory previousHistoryAge = accountHistoryResource.findByIdAndField(id, "/age");
         AccountHistory previousHistoryId = accountHistoryResource.findByIdAndField(id, "/id");
 
-        resource.save(JsonNodeUtils.create(model), this.account);
+        resource.save(MAPPER.convertValue(model, JsonNode.class), this.account);
 
         this.account = resource.get(id).get();
 
@@ -258,9 +261,9 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
     @Test
     public void findByIndex() {
 
-        UUID id1 = resource.save(JsonNodeUtils.create(Collections.singletonMap("status", "NEW")));
-        UUID id2 = resource.save(JsonNodeUtils.create(Collections.singletonMap("status", "NEW")));
-        UUID id3 = resource.save(JsonNodeUtils.create(Collections.singletonMap("status", "OLD")));
+        UUID id1 = resource.save(MAPPER.convertValue(Collections.singletonMap("status", "NEW"), JsonNode.class));
+        UUID id2 = resource.save(MAPPER.convertValue(Collections.singletonMap("status", "NEW"), JsonNode.class));
+        UUID id3 = resource.save(MAPPER.convertValue(Collections.singletonMap("status", "OLD"), JsonNode.class));
 
         Set<JsonNode> accounts = resource.findByIndex("status", "NEW");
 
@@ -282,7 +285,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
     private static void assertHistory(AccountHistory accountHistory, Object expectedValue, Instant expectedDate) {
 
-        assertHistory(accountHistory, JsonNodeFilterUtils.clean(JsonNodeUtils.create(expectedValue)), expectedDate);
+        assertHistory(accountHistory, JsonNodeFilterUtils.clean(MAPPER.convertValue(expectedValue, JsonNode.class)), expectedDate);
 
     }
 
@@ -308,7 +311,8 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
     private static void assertHistory(AccountHistory accountHistory, Object expectedValue, Instant expectedDate,
             JsonNodeType expectedPreviousJsonNodeType) {
 
-        assertHistory(accountHistory, JsonNodeFilterUtils.clean(JsonNodeUtils.create(expectedValue)), expectedDate, expectedPreviousJsonNodeType);
+        assertHistory(accountHistory, JsonNodeFilterUtils.clean(MAPPER.convertValue(expectedValue, JsonNode.class)), expectedDate,
+                expectedPreviousJsonNodeType);
 
     }
 

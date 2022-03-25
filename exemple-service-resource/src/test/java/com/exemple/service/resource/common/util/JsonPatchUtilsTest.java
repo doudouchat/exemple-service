@@ -15,7 +15,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Streams;
+
+import lombok.Builder;
+import lombok.Getter;
 
 public class JsonPatchUtilsTest {
 
@@ -43,10 +47,10 @@ public class JsonPatchUtilsTest {
     public void patchObject() {
 
         Map<String, Object> model = new HashMap<>();
-        model.put("address", new Address("1 rue de la paix", null));
+        model.put("address", Address.builder().street("1 rue de la paix").build());
 
         Map<String, Object> target = new HashMap<>();
-        target.put("address", new Address(null, "Paris"));
+        target.put("address", Address.builder().city("Paris").build());
 
         ArrayNode patch = JsonPatchUtils.diff(MAPPER.convertValue(model, JsonNode.class), MAPPER.convertValue(target, JsonNode.class));
         List<JsonNode> result = sortPatchByPath(patch);
@@ -65,24 +69,30 @@ public class JsonPatchUtilsTest {
     @Test
     public void patchMultiObject() {
 
-        Map<String, Object> model = new HashMap<>();
+        // setup build source
 
         Map<String, Object> addresses = new HashMap<>();
-        addresses.put("home", new Address("1 rue de la paix", null));
-        addresses.put("job", new Address("1 rue de la paix", "Paris"));
+        addresses.put("home", Address.builder().street("1 rue de la paix").build());
+        addresses.put("job", Address.builder().street("1 rue de la paix").city("Paris").build());
 
-        model.put("addresses", addresses);
+        JsonNode model = MAPPER.createObjectNode();
+        ((ObjectNode) model).set("addresses", MAPPER.convertValue(addresses, JsonNode.class));
 
-        Map<String, Object> target = new HashMap<>();
+        // and build target
 
         addresses = new HashMap<>();
-        addresses.put("home", new Address("1 rue de la paix", "Paris"));
-        addresses.put("holidays", new Address("1 rue de la paix", "Paris"));
+        addresses.put("home", Address.builder().street("1 rue de la paix").city("Paris").build());
+        addresses.put("holidays", Address.builder().street("1 rue de la paix").city("Paris").build());
 
-        target.put("addresses", addresses);
+        JsonNode target = MAPPER.createObjectNode();
+        ((ObjectNode) target).set("addresses", MAPPER.convertValue(addresses, JsonNode.class));
 
-        ArrayNode patch = JsonPatchUtils.diff(MAPPER.convertValue(model, JsonNode.class), MAPPER.convertValue(target, JsonNode.class));
+        // when perform diff
+
+        ArrayNode patch = JsonPatchUtils.diff(model, target);
         List<JsonNode> result = sortPatchByPath(patch);
+
+        // then check diffs
 
         assertThat(result.size(), is(4));
 
@@ -100,7 +110,8 @@ public class JsonPatchUtilsTest {
 
         assertThat(result.get(3).get(JsonPatchUtils.OP).textValue(), is("remove"));
         assertThat(result.get(3).get(JsonPatchUtils.PATH).textValue(), is("/addresses/job"));
-        assertThat(result.get(3).path(JsonPatchUtils.VALUE), is(JsonNodeUtils.create(new Address("1 rue de la paix", "Paris"))));
+        assertThat(result.get(3).path(JsonPatchUtils.VALUE),
+                is(MAPPER.convertValue(Address.builder().street("1 rue de la paix").city("Paris").build(), JsonNode.class)));
 
     }
 
@@ -135,7 +146,7 @@ public class JsonPatchUtilsTest {
         Map<String, Object> target = new HashMap<>();
 
         List<Cgu> cgus = new ArrayList<>();
-        cgus.add(new Cgu("code 1", "version 1"));
+        cgus.add(Cgu.builder().code("code 1").version("version 1").build());
 
         target.put("cgus", cgus);
 
@@ -160,70 +171,23 @@ public class JsonPatchUtilsTest {
                 .collect(Collectors.toList());
     }
 
+    @Builder
+    @Getter
     private static class Address {
 
-        private Object street;
+        private final Object street;
 
-        private Object city;
-
-        public Address(Object street, Object city) {
-            this.street = street;
-            this.city = city;
-        }
-
-        @SuppressWarnings("unused")
-        public Object getStreet() {
-            return street;
-        }
-
-        @SuppressWarnings("unused")
-        public void setStreet(Object street) {
-            this.street = street;
-        }
-
-        @SuppressWarnings("unused")
-        public Object getCity() {
-            return city;
-        }
-
-        @SuppressWarnings("unused")
-        public void setCity(Object city) {
-            this.city = city;
-        }
+        private final Object city;
 
     }
 
+    @Builder
+    @Getter
     private static class Cgu {
 
-        private Object code;
+        private final Object code;
 
-        private Object version;
-
-        public Cgu(Object code, Object version) {
-            this.code = code;
-            this.version = version;
-        }
-
-        @SuppressWarnings("unused")
-        public Object getCode() {
-            return code;
-        }
-
-        @SuppressWarnings("unused")
-        public void setCode(Object code) {
-            this.code = code;
-        }
-
-        @SuppressWarnings("unused")
-        public Object getVersion() {
-            return version;
-        }
-
-        @SuppressWarnings("unused")
-        public void setVersion(Object version) {
-            this.version = version;
-        }
+        private final Object version;
 
     }
-
 }
