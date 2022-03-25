@@ -21,14 +21,16 @@ import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.subscription.SubscriptionResource;
 import com.exemple.service.resource.common.model.EventType;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.exemple.service.resource.subscription.event.SubscriptionEventResource;
 import com.exemple.service.resource.subscription.model.SubscriptionEvent;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ContextConfiguration(classes = { ResourceTestConfiguration.class })
 public class SubscriptionResourceTest extends AbstractTestNGSpringContextTests {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private SubscriptionResource resource;
@@ -60,7 +62,7 @@ public class SubscriptionResourceTest extends AbstractTestNGSpringContextTests {
         Map<String, Object> model = new HashMap<>();
         model.put(SubscriptionField.EMAIL.field, email);
 
-        resource.save(JsonNodeUtils.create(model));
+        resource.save(MAPPER.convertValue(model, JsonNode.class));
 
         SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
         assertThat(event.getEventType(), is(EventType.CREATE));

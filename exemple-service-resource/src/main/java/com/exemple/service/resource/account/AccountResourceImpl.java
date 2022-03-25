@@ -24,9 +24,9 @@ import com.exemple.service.resource.account.event.AccountEventResource;
 import com.exemple.service.resource.account.history.AccountHistoryResource;
 import com.exemple.service.resource.common.JsonQueryBuilder;
 import com.exemple.service.resource.common.model.EventType;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Service("accountResource")
 @Validated
@@ -57,7 +57,7 @@ public class AccountResourceImpl implements AccountResource {
 
         UUID id = UUID.randomUUID();
 
-        JsonNodeUtils.set(account, id, AccountField.ID.field);
+        ((ObjectNode) account).put(AccountField.ID.field, id.toString());
 
         Insert insertAccount = jsonQueryBuilder.insert(account);
 
