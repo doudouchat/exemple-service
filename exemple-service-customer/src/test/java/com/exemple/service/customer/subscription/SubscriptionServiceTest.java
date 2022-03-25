@@ -3,6 +3,7 @@ package com.exemple.service.customer.subscription;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -85,15 +86,9 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
 
         // When perform save
 
-        JsonNode source = JsonNodeUtils.create(() -> {
+        JsonNode source = JsonNodeUtils.create(Collections::emptyMap);
 
-            Map<String, Object> model = new HashMap<>();
-            model.put("email", email);
-            return model;
-
-        });
-
-        boolean created = service.save(source);
+        boolean created = service.save(email, source);
 
         // Then check subscription
 

@@ -27,9 +27,9 @@ import com.exemple.service.api.common.schema.ValidationHelper;
 import com.exemple.service.api.common.script.CustomerScriptFactory;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.subscription.SubscriptionService;
-import com.exemple.service.resource.common.util.JsonNodeUtils;
 import com.exemple.service.resource.subscription.SubscriptionField;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -104,10 +104,11 @@ public class SubscriptionApi {
             @NotNull @Parameter(schema = @Schema(ref = SUBSCRIPTION_SCHEMA)) JsonNode subscription,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam, @Context UriInfo uriInfo) {
 
-        JsonNodeUtils.set(subscription, email, SubscriptionField.EMAIL.field);
-        schemaValidation.validate(subscription, SUBSCRIPTION_RESOURCE, servletContext);
+        JsonNode subscriptionClone = subscription.deepCopy();
+        ((ObjectNode) subscriptionClone).put(SubscriptionField.EMAIL.field, email);
+        schemaValidation.validate(subscriptionClone, SUBSCRIPTION_RESOURCE, servletContext);
 
-        boolean created = scriptFactory.getBean(SUBSCRIPTION_BEAN, SubscriptionService.class).save(subscription);
+        boolean created = scriptFactory.getBean(SUBSCRIPTION_BEAN, SubscriptionService.class).save(email, subscription);
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
         builder.path(email);

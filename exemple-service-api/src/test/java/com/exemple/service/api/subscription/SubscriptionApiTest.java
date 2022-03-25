@@ -27,7 +27,6 @@ import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.subscription.SubscriptionService;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 
 public class SubscriptionApiTest extends JerseySpringSupport {
 
@@ -75,7 +74,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
         // And mock service
 
-        Mockito.when(service.save(Mockito.any(JsonNode.class))).thenReturn(created);
+        Mockito.when(service.save(Mockito.eq(email), Mockito.any(JsonNode.class))).thenReturn(created);
 
         // When perform put
 
@@ -102,17 +101,25 @@ public class SubscriptionApiTest extends JerseySpringSupport {
         // And check service
 
         ArgumentCaptor<JsonNode> subscription = ArgumentCaptor.forClass(JsonNode.class);
-
-        JsonNode expectedSubscription = JsonNodeUtils.set(source, "email", new TextNode(email));
-
-        Mockito.verify(service).save(subscription.capture());
-        assertThat(subscription.getValue(), is(expectedSubscription));
+        Mockito.verify(service).save(Mockito.eq(email), subscription.capture());
+        assertThat(subscription.getValue(), is(source));
 
         // And check validation
 
+        JsonNode sourceToValidate = JsonNodeUtils.create(() -> {
+
+            Map<String, Object> model = new HashMap<>();
+            model.put("lastname", "dupond");
+            model.put("firstname", "jean");
+            model.put("email", email);
+
+            return model;
+
+        });
+
         Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("subscription"),
                 subscription.capture());
-        assertThat(subscription.getValue(), is(expectedSubscription));
+        assertThat(subscription.getValue(), is(sourceToValidate));
 
     }
 
