@@ -3,17 +3,20 @@ package com.exemple.service.resource.subscription;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
+import java.io.IOException;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
@@ -27,8 +30,10 @@ import com.exemple.service.resource.subscription.model.SubscriptionEvent;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@ContextConfiguration(classes = { ResourceTestConfiguration.class })
-public class SubscriptionResourceTest extends AbstractTestNGSpringContextTests {
+@TestMethodOrder(OrderAnnotation.class)
+@SpringJUnitConfig(ResourceTestConfiguration.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class SubscriptionResourceTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -41,9 +46,9 @@ public class SubscriptionResourceTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private CqlSession session;
 
-    private String email;
+    private final String email = UUID.randomUUID() + "@gmail.com";
 
-    @BeforeMethod
+    @BeforeEach
     public void initExecutionContextDate() {
 
         OffsetDateTime now = OffsetDateTime.now();
@@ -55,19 +60,25 @@ public class SubscriptionResourceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void save() {
+    @Order(0)
+    public void save() throws IOException {
 
-        email = UUID.randomUUID() + "@gmail.com";
+        // Given build account
+        JsonNode subscription = MAPPER.readTree("{\"email\": \"" + email + "\"}");
 
-        Map<String, Object> model = new HashMap<>();
-        model.put(SubscriptionField.EMAIL.field, email);
+        // When perform save
+        resource.save(subscription);
 
-        resource.save(MAPPER.convertValue(model, JsonNode.class));
+        // Then check subscription
+        JsonNode result = resource.get(email).get();
+        assertThat(result, is(MAPPER.readTree("{\"email\": \"" + email + "\"}")));
 
+        // And check event
         SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
-        assertThat(event.getEventType(), is(EventType.CREATE));
-        assertThat(event.getLocalDate(), is(ServiceContextExecution.context().getDate().toLocalDate()));
-        assertThat(event.getData().get("email").textValue(), is(email));
+        assertAll(
+                () -> assertThat(event.getEventType(), is(EventType.CREATE)),
+                () -> assertThat(event.getLocalDate(), is(ServiceContextExecution.context().getDate().toLocalDate())),
+                () -> assertThat(event.getData().get("email").textValue(), is(email)));
 
         ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("local_date")
                 .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
@@ -75,20 +86,17 @@ public class SubscriptionResourceTest extends AbstractTestNGSpringContextTests {
 
     }
 
-    @Test(dependsOnMethods = "save")
-    public void get() {
-
-        JsonNode subscription = resource.get(email).get();
-        assertThat(subscription.get(SubscriptionField.EMAIL.field).textValue(), is(email));
-
-    }
-
-    @Test(dependsOnMethods = "get")
+    @Test
+    @Order(1)
     public void delete() {
 
+        // When perform delete
         resource.delete(email);
+
+        // Then check subscription
         assertThat(resource.get(email).isPresent(), is(false));
 
+        // And check event
         SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
         assertThat(event.getEventType(), is(EventType.DELETE));
         assertThat(event.getLocalDate(), is(ServiceContextExecution.context().getDate().toLocalDate()));

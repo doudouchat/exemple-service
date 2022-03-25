@@ -377,6 +377,13 @@
 				<scope>test</scope>
 			</dependency>
 
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-junit-jupiter</artifactId>
+				<version>3.10.0</version>
+				<scope>test</scope>
+			</dependency>
+
 			<!-- CASSANDRA EMBEDDED -->
 			<!-- https://nosan.github.io/embedded-cassandra -->
 
@@ -421,12 +428,19 @@
 				<scope>runtime</scope>
 			</dependency>
 
-			<!-- TESTNG -->
+			<!-- JUNIT -->
 
 			<dependency>
-				<groupId>org.testng</groupId>
-				<artifactId>testng</artifactId>
-				<version>7.4.0</version>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-engine</artifactId>
+				<version>5.7.0</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-params</artifactId>
+				<version>5.7.0</version>
 				<scope>test</scope>
 			</dependency>
 
@@ -563,10 +577,23 @@
 			<artifactId>lombok</artifactId>
 		</dependency>
 
-		<!-- TESTNG -->
+		<!-- JUNIT -->
+
 		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-params</artifactId>
+		</dependency>
+
+		<!-- ASSERTJ -->
+
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
 		</dependency>
 
 	</dependencies>
@@ -659,11 +686,8 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.0.0-M4</version>
+					<version>3.0.0-M5</version>
 					<configuration>
-						<suiteXmlFiles>
-							<suiteXmlFile>testng.xml</suiteXmlFile>
-						</suiteXmlFiles>
 						<argLine>${jacoco.test.agent.argLine}</argLine>
 					</configuration>
 				</plugin>

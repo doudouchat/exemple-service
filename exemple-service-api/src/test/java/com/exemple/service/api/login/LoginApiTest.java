@@ -3,6 +3,7 @@ package com.exemple.service.api.login;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.net.URI;
 import java.util.Collections;
@@ -17,11 +18,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import com.exemple.service.api.common.JsonNodeUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
@@ -42,7 +43,7 @@ public class LoginApiTest extends JerseySpringSupport {
     @Autowired
     private LoginResource resource;
 
-    @BeforeMethod
+    @BeforeEach
     public void before() {
 
         Mockito.reset(resource);
@@ -125,8 +126,9 @@ public class LoginApiTest extends JerseySpringSupport {
 
         ArgumentCaptor<LoginEntity> login = ArgumentCaptor.forClass(LoginEntity.class);
         Mockito.verify(resource).save(login.capture());
-        assertThat(login.getValue().getUsername(), is(username));
-        assertThat(login.getValue().getId(), is(model.get("id")));
+        assertAll(
+                () -> assertThat(login.getValue().getUsername(), is(username)),
+                () -> assertThat(login.getValue().getId(), is(model.get("id"))));
 
     }
 
@@ -203,8 +205,9 @@ public class LoginApiTest extends JerseySpringSupport {
         // And check body
         @SuppressWarnings("unchecked")
         Map<String, Object> actualModel = response.readEntity(Map.class);
-        assertThat(actualModel.get("username"), is(nullValue()));
-        assertThat(actualModel.get("id"), is(entity.getId().toString()));
+        assertAll(
+                () -> assertThat(actualModel.get("username"), is(nullValue())),
+                () -> assertThat(actualModel.get("id"), is(entity.getId().toString())));
 
     }
 

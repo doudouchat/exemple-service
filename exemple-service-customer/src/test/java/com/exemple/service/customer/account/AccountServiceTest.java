@@ -4,20 +4,21 @@ import static nl.fd.hamcrest.jackson.HasJsonField.hasJsonField;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
@@ -27,8 +28,8 @@ import com.exemple.service.customer.common.event.ResourceEventPublisher;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 
-@ContextConfiguration(classes = { CustomerTestConfiguration.class })
-public class AccountServiceTest extends AbstractTestNGSpringContextTests {
+@SpringJUnitConfig(CustomerTestConfiguration.class)
+public class AccountServiceTest {
 
     @Autowired
     private AccountService service;
@@ -39,21 +40,22 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private ResourceEventPublisher publisher;
 
-    @BeforeMethod
+    @BeforeEach
     private void before() {
 
         Mockito.reset(resource, publisher);
 
     }
 
-    @BeforeClass
-    private void initServiceContextExecution() {
+    @BeforeAll
+    public static void initServiceContextExecution() {
 
         ServiceContext context = ServiceContextExecution.context();
         context.setApp("default");
     }
 
     @Test
+    @DisplayName("save account")
     public void save() {
 
         // When perform save
@@ -73,10 +75,11 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
 
         // Then check account
 
-        assertThat(account, is(notNullValue()));
-        assertThat(account, hasJsonField("email", "jean.dupont@gmail.com"));
-        assertThat(account, hasJsonField("lastname", "Dupont"));
-        assertThat(account, hasJsonField("firstname", "Jean"));
+        assertAll(
+                () -> assertThat(account, is(notNullValue())),
+                () -> assertThat(account, hasJsonField("email", "jean.dupont@gmail.com")),
+                () -> assertThat(account, hasJsonField("lastname", "Dupont")),
+                () -> assertThat(account, hasJsonField("firstname", "Jean")));
 
         // And check save resource
 
@@ -93,6 +96,7 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
+    @DisplayName("update account")
     public void update() {
 
         // When perform save
@@ -122,9 +126,10 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
 
         // Then check account
 
-        assertThat(account, is(notNullValue()));
-        assertThat(account, hasJsonField("email", "jean.dupont@gmail.com"));
-        assertThat(account, hasJsonField("lastname", "Dupond"));
+        assertAll(
+                () -> assertThat(account, is(notNullValue())),
+                () -> assertThat(account, hasJsonField("email", "jean.dupont@gmail.com")),
+                () -> assertThat(account, hasJsonField("lastname", "Dupond")));
 
         // And check save resource
 
@@ -132,8 +137,9 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
         ArgumentCaptor<JsonNode> previousAccountCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
         Mockito.verify(resource).save(accountCaptor.capture(), previousAccountCaptor.capture());
-        assertThat(accountCaptor.getValue(), is(account));
-        assertThat(previousAccountCaptor.getValue(), is(previousSource));
+        assertAll(
+                () -> assertThat(accountCaptor.getValue(), is(account)),
+                () -> assertThat(previousAccountCaptor.getValue(), is(previousSource)));
 
         // And check publish resource
 
@@ -144,6 +150,7 @@ public class AccountServiceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
+    @DisplayName("get account")
     public void get() {
 
         // Given account id

@@ -4,23 +4,24 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
 
 import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.test.JerseyTestNg;
+import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 
 @WebAppConfiguration
-@ContextConfiguration(classes = ApiTestConfiguration.class)
+@SpringJUnitConfig(ApiTestConfiguration.class)
 @ActiveProfiles("noSecurity")
-public abstract class JerseySpringSupport extends AbstractTestNGSpringContextTests {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public abstract class JerseySpringSupport {
 
-    private JerseyTestNg.ContainerPerClassTest jerseyTest;
+    private JerseyTest jerseyTest;
 
     public final WebTarget target(final String path) {
         return jerseyTest.target(path);
@@ -29,10 +30,10 @@ public abstract class JerseySpringSupport extends AbstractTestNGSpringContextTes
     @Autowired
     private ApplicationContext context;
 
-    @BeforeClass
+    @BeforeAll
     public void setup() throws Exception {
 
-        jerseyTest = new JerseyTestNg.ContainerPerClassTest() {
+        jerseyTest = new JerseyTest() {
 
             @Override
             protected Application configure() {
@@ -47,7 +48,7 @@ public abstract class JerseySpringSupport extends AbstractTestNGSpringContextTes
         jerseyTest.setUp();
     }
 
-    @AfterClass
+    @AfterAll
     public void tearDown() throws Exception {
         jerseyTest.tearDown();
     }

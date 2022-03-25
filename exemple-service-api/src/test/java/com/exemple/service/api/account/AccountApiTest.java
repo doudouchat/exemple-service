@@ -2,6 +2,7 @@ package com.exemple.service.api.account;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.net.URI;
 import java.util.Collections;
@@ -17,11 +18,11 @@ import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import com.exemple.service.api.common.JsonNodeUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
@@ -48,7 +49,7 @@ public class AccountApiTest extends JerseySpringSupport {
     @Autowired
     private JsonNode account;
 
-    @BeforeMethod
+    @BeforeEach
     private void before() {
 
         Mockito.reset(service, schemaValidation);
@@ -122,15 +123,17 @@ public class AccountApiTest extends JerseySpringSupport {
         JsonNode expectedAccount = JsonNodeUtils.set(this.account, "birthday", new TextNode("1976-12-12"));
 
         Mockito.verify(service).save(account.capture(), previousAccount.capture());
-        assertThat(previousAccount.getValue(), is(this.account));
-        assertThat(account.getValue(), is(expectedAccount));
+        assertAll(
+                () -> assertThat(previousAccount.getValue(), is(this.account)),
+                () -> assertThat(account.getValue(), is(expectedAccount)));
 
         // And check validation
 
         Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("account"), account.capture(),
                 previousAccount.capture());
-        assertThat(previousAccount.getValue(), is(this.account));
-        assertThat(account.getValue(), is(expectedAccount));
+        assertAll(
+                () -> assertThat(previousAccount.getValue(), is(this.account)),
+                () -> assertThat(account.getValue(), is(expectedAccount)));
 
     }
 
@@ -181,15 +184,17 @@ public class AccountApiTest extends JerseySpringSupport {
         ArgumentCaptor<JsonNode> account = ArgumentCaptor.forClass(JsonNode.class);
 
         Mockito.verify(service).save(account.capture(), previousAccount.capture());
-        assertThat(previousAccount.getValue(), is(this.account));
-        assertThat(account.getValue(), is(sourceToValidate));
+        assertAll(
+                () -> assertThat(previousAccount.getValue(), is(this.account)),
+                () -> assertThat(account.getValue(), is(sourceToValidate)));
 
         // And check validation
 
         Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("account"), account.capture(),
                 previousAccount.capture());
-        assertThat(previousAccount.getValue(), is(this.account));
-        assertThat(account.getValue(), is(sourceToValidate));
+        assertAll(
+                () -> assertThat(previousAccount.getValue(), is(this.account)),
+                () -> assertThat(account.getValue(), is(sourceToValidate)));
 
     }
 

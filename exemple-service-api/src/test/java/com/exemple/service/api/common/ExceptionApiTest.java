@@ -16,10 +16,10 @@ import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import com.exemple.service.api.account.AccountApiTest;
 import com.exemple.service.api.common.model.SchemaBeanParam;
@@ -38,7 +38,7 @@ public class ExceptionApiTest extends JerseySpringSupport {
     @Autowired
     private AccountService service;
 
-    @BeforeMethod
+    @BeforeEach
     private void before() {
 
         Mockito.reset(service);

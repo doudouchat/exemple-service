@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -14,8 +16,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.ResourceUtils;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
@@ -35,7 +35,7 @@ public class CustomerScriptFactoryTest {
     @Mock
     private ApplicationContext applicationContext;
 
-    @BeforeMethod
+    @BeforeEach
     private void build() throws IOException {
         MockitoAnnotations.openMocks(this);
         factory = new CustomerScriptFactory(applicationDetailService, ResourceUtils.getFile("classpath:scripts").getAbsolutePath(),

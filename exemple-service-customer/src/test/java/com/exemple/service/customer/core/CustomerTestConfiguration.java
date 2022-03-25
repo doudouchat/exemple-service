@@ -1,12 +1,9 @@
 package com.exemple.service.customer.core;
 
 import org.mockito.Mockito;
-import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.io.ClassPathResource;
 
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.customer.common.event.ResourceEventPublisher;
@@ -29,17 +26,6 @@ public class CustomerTestConfiguration {
     @Bean
     public ResourceEventPublisher resourceEventPublisher() {
         return Mockito.mock(ResourceEventPublisher.class);
-    }
-
-    public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
-
-        PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = new PropertySourcesPlaceholderConfigurer();
-
-        YamlPropertiesFactoryBean properties = new YamlPropertiesFactoryBean();
-        properties.setResources(new ClassPathResource("exemple-service-customer-test.yml"));
-
-        propertySourcesPlaceholderConfigurer.setProperties(properties.getObject());
-        return propertySourcesPlaceholderConfigurer;
     }
 
 }

@@ -7,16 +7,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
@@ -27,8 +30,8 @@ import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
-@ContextConfiguration(classes = { CustomerTestConfiguration.class })
-public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
+@SpringJUnitConfig(CustomerTestConfiguration.class)
+public class SubscriptionServiceTest {
 
     @Autowired
     private SubscriptionResource resource;
@@ -39,22 +42,21 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private SubscriptionService service;
 
-    @BeforeMethod
+    @BeforeEach
     private void before() {
 
         Mockito.reset(resource, publisher);
 
     }
 
-    @BeforeClass
-    private void initServiceContextExecution() {
+    @BeforeAll
+    public static void initServiceContextExecution() {
 
         ServiceContext context = ServiceContextExecution.context();
         context.setApp("default");
     }
 
-    @DataProvider(name = "save")
-    private static Object[][] update() {
+    private static Stream<Arguments> save() {
 
         JsonNode source = JsonNodeUtils.create(() -> {
 
@@ -64,16 +66,14 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
 
         });
 
-        return new Object[][] {
-                // created
-                { Optional.empty(), true },
-                // updated
-                { Optional.of(JsonNodeUtils.create(() -> source)), false }
-                //
-        };
+        return Stream.of(
+                Arguments.of(Optional.empty(), true),
+                Arguments.of(Optional.of(JsonNodeUtils.create(() -> source)), false));
     }
 
-    @Test(dataProvider = "save")
+    @DisplayName("save subscription")
+    @ParameterizedTest
+    @MethodSource
     public void save(Optional<JsonNode> subscription, boolean expectedCreated) {
 
         // Given email
@@ -112,6 +112,7 @@ public class SubscriptionServiceTest extends AbstractTestNGSpringContextTests {
 
     }
 
+    @DisplayName("get subscription")
     @Test
     public void get() {
 
