@@ -1,22 +1,24 @@
 package com.exemple.service.resource.login;
 
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.Optional;
 import java.util.UUID;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.Test;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.exemple.service.resource.login.exception.UsernameAlreadyExistsException;
 import com.exemple.service.resource.login.model.LoginEntity;
 
-@ContextConfiguration(classes = { ResourceTestConfiguration.class })
-public class LoginResourceTest extends AbstractTestNGSpringContextTests {
+@SpringJUnitConfig(ResourceTestConfiguration.class)
+public class LoginResourceTest {
 
     @Autowired
     private LoginResource resource;
@@ -40,12 +42,13 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         // Then check login
 
         LoginEntity actualLogin = resource.get(username).get();
-        assertThat(actualLogin.getUsername(), is(username));
-        assertThat(actualLogin.getId(), is(id));
+        assertAll(
+                () -> assertThat(actualLogin.getUsername(), is(username)),
+                () -> assertThat(actualLogin.getId(), is(id)));
     }
 
-    @Test(expectedExceptions = UsernameAlreadyExistsException.class)
-    public void createFailureIfUsernameAlreadyExists() throws UsernameAlreadyExistsException {
+    @Test
+    public void createFailureIfUsernameAlreadyExists() {
 
         // Given login
 
@@ -53,22 +56,11 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         login.setUsername("jean.dupond@gmail.com");
 
         // When perform
+        Throwable throwable = catchThrowable(() -> resource.save(login));
 
-        resource.save(login);
+        // Then check throwable
+        assertThat(throwable, instanceOf(UsernameAlreadyExistsException.class));
 
-    }
-
-    @Test
-    public void get() {
-
-        // When perform get
-
-        LoginEntity login = resource.get("jean.dupond@gmail.com").get();
-
-        // Then check login
-
-        assertThat(login.getUsername(), is("jean.dupond@gmail.com"));
-        assertThat(login.getId(), is(UUID.fromString("e2b0fdc7-bd69-410d-b684-207c8cbf7598")));
     }
 
     @Test

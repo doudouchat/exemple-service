@@ -2,11 +2,13 @@ package com.exemple.service.api.account;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
@@ -15,11 +17,13 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 
 import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 import com.auth0.jwt.JWT;
 import com.exemple.service.api.common.model.SchemaBeanParam;
@@ -55,7 +59,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     @Autowired
     private JsonNode account;
 
-    @BeforeMethod
+    @BeforeEach
     private void before() {
 
         Mockito.reset(accountService);
@@ -83,8 +87,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
         RANDOM_RESPONSE_LOGIN = Optional.of(random);
     }
 
-    @DataProvider(name = "notAuthorized")
-    private static Object[][] notAuthorized() {
+    private Stream<Arguments> authorizedGetUserFailure() {
 
         String token1 = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe")
                 .withArrayClaim("scope", new String[] { "account:write" }).sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
@@ -92,18 +95,14 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
         String token2 = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe")
                 .withArrayClaim("scope", new String[] { "account:read" }).sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
 
-        return new Object[][] {
-
-                { token1, ID_RESPONSE_LOGIN },
-
-                { token2, RANDOM_RESPONSE_LOGIN },
-
-                { token2, Optional.empty() }
-
-        };
+        return Stream.of(
+                Arguments.of(token1, ID_RESPONSE_LOGIN),
+                Arguments.of(token2, RANDOM_RESPONSE_LOGIN),
+                Arguments.of(token2, Optional.empty()));
     }
 
-    @Test(dataProvider = "notAuthorized")
+    @ParameterizedTest
+    @MethodSource
     public void authorizedGetUserFailure(String token, Optional<LoginEntity> loginResponse) {
 
         // Given mock service
@@ -122,7 +121,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     }
 
     @Test
-    public void authorizedGetUserFailure() throws AuthorizationException {
+    public void authorizedGetUserFailures() throws AuthorizationException {
 
         // Given token
 
@@ -171,9 +170,10 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
 
         // And check security context
 
-        assertThat(testFilter.context.getUserPrincipal().getName(), is("john_doe"));
-        assertThat(testFilter.context.isSecure(), is(true));
-        assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH));
+        assertAll(
+                () -> assertThat(testFilter.context.getUserPrincipal().getName(), is("john_doe")),
+                () -> assertThat(testFilter.context.isSecure(), is(true)),
+                () -> assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH)));
 
     }
 
@@ -205,9 +205,10 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
 
         // And check security context
 
-        assertThat(testFilter.context.getUserPrincipal().getName(), is("clientId1"));
-        assertThat(testFilter.context.isSecure(), is(true));
-        assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH));
+        assertAll(
+                () -> assertThat(testFilter.context.getUserPrincipal().getName(), is("clientId1")),
+                () -> assertThat(testFilter.context.isSecure(), is(true)),
+                () -> assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH)));
 
     }
 
@@ -236,9 +237,10 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
 
         // And check security context
 
-        assertThat(testFilter.context.getUserPrincipal().getName(), is("john_doe"));
-        assertThat(testFilter.context.isSecure(), is(true));
-        assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH));
+        assertAll(
+                () -> assertThat(testFilter.context.getUserPrincipal().getName(), is("john_doe")),
+                () -> assertThat(testFilter.context.isSecure(), is(true)),
+                () -> assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH)));
 
     }
 

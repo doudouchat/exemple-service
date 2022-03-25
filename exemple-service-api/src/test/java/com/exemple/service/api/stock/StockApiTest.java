@@ -3,6 +3,7 @@ package com.exemple.service.api.stock;
 import static com.exemple.service.api.common.model.ApplicationBeanParam.APP_HEADER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.Optional;
 
@@ -12,10 +13,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
@@ -38,7 +39,7 @@ public class StockApiTest extends JerseySpringSupport {
     @Autowired
     private ApplicationDetailService applicationDetailService;
 
-    @BeforeMethod
+    @BeforeEach
     private void before() {
 
         Mockito.reset(service, applicationDetailService);
@@ -166,8 +167,9 @@ public class StockApiTest extends JerseySpringSupport {
         // and check body
 
         JsonNode responseEntity = response.readEntity(JsonNode.class);
-        assertThat(responseEntity.get("amount").asLong(), is(5L));
-        assertThat(responseEntity.has("increment"), is(false));
+        assertAll(
+                () -> assertThat(responseEntity.get("amount").asLong(), is(5L)),
+                () -> assertThat(responseEntity.has("increment"), is(false)));
 
     }
 

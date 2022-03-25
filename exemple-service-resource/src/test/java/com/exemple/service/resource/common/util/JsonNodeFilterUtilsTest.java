@@ -3,76 +3,71 @@ package com.exemple.service.resource.common.util;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.IOException;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
-import com.exemple.service.resource.account.model.Address;
-import com.exemple.service.resource.account.model.Cgu;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 public class JsonNodeFilterUtilsTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Test
-    public void clean() {
+    public void clean() throws IOException {
 
-        Map<String, Object> model = new HashMap<>();
-        model.put("email", "jean.dupont@gmail.com");
-        model.put("birthday", null);
-        Address address = Address.builder().street("1 rue de la paix").build();
-        model.put("address", address);
+        // Given build account
+        JsonNode account = MAPPER.readTree("{"
+                + "  \"birthday\" : null,"
+                + "  \"addresses\" : {"
+                + "    \"job\" : null,"
+                + "    \"home\" : {"
+                + "      \"street\" : \"1 rue de de la poste\","
+                + "      \"city\" : null,"
+                + "      \"zip\" : null,"
+                + "      \"floor\" : null,"
+                + "      \"enable\" : null"
+                + "    }"
+                + "  },"
+                + "  \"preferences\" : [ [ \"pref1\", 10 ], null ],"
+                + "  \"address\" : {"
+                + "    \"street\" : \"1 rue de la paix\","
+                + "    \"city\" : null,"
+                + "    \"zip\" : null,"
+                + "    \"floor\" : null,"
+                + "    \"enable\" : null"
+                + "  },"
+                + "  \"profils\" : [ null, \"profil 1\" ],"
+                + "  \"cgus\" : [ null, {"
+                + "    \"code\" : \"code_1\","
+                + "    \"version\" : null"
+                + "  } ],"
+                + "  \"email\" : \"jean.dupont@gmail.com\""
+                + "}");
 
-        Map<String, Object> addresses = new HashMap<>();
-        Address home = Address.builder().street("1 rue de de la poste").build();
-        addresses.put("home", home);
-        addresses.put("job", null);
-        model.put("addresses", addresses);
+        // When perform clean
+        JsonNode source = JsonNodeFilterUtils.clean(account);
 
-        Cgu cgu = Cgu.builder().code("code_1").build();
-        Set<Object> cgus = new HashSet<>();
-        cgus.add(cgu);
-        cgus.add(null);
-        model.put("cgus", cgus);
+        // Then check clean source
+        JsonNode expectedResult = MAPPER.readTree("{"
+                + "  \"addresses\" : {"
+                + "    \"home\" : {"
+                + "      \"street\" : \"1 rue de de la poste\""
+                + "    }"
+                + "  },"
+                + "  \"preferences\" : [ [ \"pref1\", 10 ] ],"
+                + "  \"address\" : {"
+                + "    \"street\" : \"1 rue de la paix\""
+                + "  },"
+                + "  \"profils\" : [ \"profil 1\" ],"
+                + "  \"cgus\" : [ {"
+                + "    \"code\" : \"code_1\""
+                + "  } ],"
+                + "  \"email\" : \"jean.dupont@gmail.com\""
+                + "}");
 
-        String profil = "profil 1";
-        Set<Object> profils = new HashSet<>();
-        profils.add(profil);
-        profils.add(null);
-        model.put("profils", profils);
-
-        List<?> preference = Arrays.asList("pref1", 10);
-        List<Object> preferences = new ArrayList<>();
-        preferences.add(preference);
-        preferences.add(null);
-        model.put("preferences", preferences);
-
-        JsonNode source = JsonNodeFilterUtils.clean(MAPPER.convertValue(model, JsonNode.class));
-
-        assertThat(source.path("email").textValue(), is(model.get("email")));
-        assertThat(source.path("birthday").getNodeType(), is(JsonNodeType.MISSING));
-        assertThat(source.path("address").path("street").textValue(), is(address.getStreet()));
-        assertThat(source.path("address").path("city").getNodeType(), is(JsonNodeType.MISSING));
-        assertThat(source.path("addresses").path("home").path("street").textValue(), is(home.getStreet()));
-        assertThat(source.path("addresses").path("home").path("city").getNodeType(), is(JsonNodeType.MISSING));
-        assertThat(source.path("addresses").path("job").getNodeType(), is(JsonNodeType.MISSING));
-        assertThat(source.path("cgus").size(), is(1));
-        assertThat(source.path("cgus").get(0).path("code").textValue(), is(cgu.getCode()));
-        assertThat(source.path("cgus").get(0).path("version").getNodeType(), is(JsonNodeType.MISSING));
-        assertThat(source.path("profils").size(), is(1));
-        assertThat(source.path("profils").get(0).textValue(), is(profil));
-        assertThat(source.path("preferences").size(), is(1));
-        assertThat(source.path("preferences").get(0).get(0).textValue(), is(preference.get(0)));
-        assertThat(source.path("preferences").get(0).get(1).intValue(), is(preference.get(1)));
+        assertThat(expectedResult, is(source));
 
     }
 

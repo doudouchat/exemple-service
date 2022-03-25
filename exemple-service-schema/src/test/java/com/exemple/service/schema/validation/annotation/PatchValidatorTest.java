@@ -1,25 +1,24 @@
 package com.exemple.service.schema.validation.annotation;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.Path.Node;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.validation.annotation.Validated;
-import org.testng.Assert;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 import com.exemple.service.schema.core.SchemaTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,14 +26,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.Iterables;
 
-@ContextConfiguration(classes = { SchemaTestConfiguration.class })
-public class PatchValidatorTest extends AbstractTestNGSpringContextTests {
+@SpringJUnitConfig(SchemaTestConfiguration.class)
+public class PatchValidatorTest {
 
     @Autowired
     private IExemple exemple;
 
-    @DataProvider(name = "success")
-    public static Object[][] success() {
+    private static Stream<Arguments> patchSuccess() {
 
         Map<String, Object> patch = new HashMap<>();
         patch.put("op", "add");
@@ -45,15 +43,16 @@ public class PatchValidatorTest extends AbstractTestNGSpringContextTests {
         ArrayNode argumentPatch = mapper.createArrayNode();
         argumentPatch.add(mapper.convertValue(patch, JsonNode.class));
 
-        return new Object[][] {
+        return Stream.of(
                 // patch correct
-                { argumentPatch },
+                Arguments.of(argumentPatch),
                 // empty
-                { mapper.createArrayNode() } };
+                Arguments.of(mapper.createArrayNode()));
 
     }
 
-    @Test(dataProvider = "success")
+    @ParameterizedTest
+    @MethodSource
     public void patchSuccess(ArrayNode argument) {
 
         exemple.exemple(argument);
@@ -63,6 +62,7 @@ public class PatchValidatorTest extends AbstractTestNGSpringContextTests {
     @Test
     public void patchFailure() {
 
+        // setup source
         Map<String, Object> patch0 = new HashMap<>();
         patch0.put("op", "add");
         patch0.put("value", "Dupond");
@@ -76,28 +76,27 @@ public class PatchValidatorTest extends AbstractTestNGSpringContextTests {
         argument.add(mapper.convertValue(patch0, JsonNode.class));
         argument.add(mapper.convertValue(patch1, JsonNode.class));
 
-        try {
+        // When perform
+        Throwable throwable = catchThrowable(() -> exemple.exemple(argument));
 
-            exemple.exemple(argument);
-
-            Assert.fail("expected ValidationException");
-
-        } catch (ConstraintViolationException e) {
-
-            List<String> paths = e.getConstraintViolations().stream()
-                    .map((ConstraintViolation<?> violation) -> Iterables.getLast(violation.getPropertyPath()).getName()).collect(Collectors.toList());
-
-            assertThat(paths, hasSize(2));
-            assertThat(paths, hasItems("/0/path", "/1/path"));
-        }
-
+        // Then check throwable
+        assertThat(throwable).isInstanceOfSatisfying(ConstraintViolationException.class,
+                exception -> assertAll(
+                        () -> assertThat(exception.getConstraintViolations()).hasSize(2),
+                        () -> assertThat(exception.getConstraintViolations())
+                                .extracting(violation -> Iterables.getLast(violation.getPropertyPath()))
+                                .extracting(Node::getName).contains("/0/path", "/1/path")));
     }
 
-    @Test(expectedExceptions = ConstraintViolationException.class)
+    @Test
     public void patchNullFailure() {
 
-        exemple.exemple(null);
+        // When perform
+        Throwable throwable = catchThrowable(() -> exemple.exemple(null));
 
+        // Then check throwable
+        assertThat(throwable).isInstanceOfSatisfying(ConstraintViolationException.class,
+                exception -> assertThat(exception.getConstraintViolations()).hasSize(1));
     }
 
     private static interface IExemple {

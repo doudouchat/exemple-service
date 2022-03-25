@@ -1,6 +1,8 @@
 package com.exemple.service.api.core.authorization;
 
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 
 import java.time.Instant;
@@ -8,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
@@ -15,6 +18,14 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.commons.codec.binary.Base64;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
@@ -24,13 +35,7 @@ import org.mockserver.model.HttpResponse;
 import org.mockserver.model.JsonBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.auth0.jwt.JWT;
 import com.exemple.service.api.common.model.ApplicationBeanParam;
@@ -42,8 +47,9 @@ import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.hazelcast.core.HazelcastInstance;
 
-@ContextConfiguration(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
-public class AuthorizationContextServiceTest extends AbstractTestNGSpringContextTests {
+@SpringJUnitConfig({ ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class AuthorizationContextServiceTest {
 
     @Autowired
     private AuthorizationContextService service;
@@ -68,13 +74,13 @@ public class AuthorizationContextServiceTest extends AbstractTestNGSpringContext
 
     protected MockServerClient authorizationClient;
 
-    @BeforeClass
+    @BeforeAll
     public final void authorizationServer() {
         this.authorizationServer = ClientAndServer.startClientAndServer(authorizationPort);
         this.authorizationClient = new MockServerClient("localhost", authorizationPort);
     }
 
-    @AfterClass
+    @AfterAll
     public final void closeMockServer() {
 
         this.authorizationServer.close();
@@ -104,7 +110,7 @@ public class AuthorizationContextServiceTest extends AbstractTestNGSpringContext
                 "-----BEGIN PUBLIC KEY-----\n" + new String(Base64.encodeBase64("123".getBytes())) + "\n-----END PUBLIC KEY-----");
     }
 
-    @BeforeMethod
+    @BeforeEach
     private void before() {
 
         authorizationAlgorithmFactory.resetAlgorithm();
@@ -116,8 +122,7 @@ public class AuthorizationContextServiceTest extends AbstractTestNGSpringContext
 
     }
 
-    @DataProvider(name = "authorizedFailure")
-    private static Object[][] failure() {
+    private static Stream<Arguments> authorizedFailure() {
 
         String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe")
                 .withArrayClaim("scope", new String[] { "account:write" }).withJWTId(UUID.randomUUID().toString())
@@ -131,23 +136,17 @@ public class AuthorizationContextServiceTest extends AbstractTestNGSpringContext
                 .withArrayClaim("scope", new String[] { "account:write" }).withJWTId(DEPRECATED_TOKEN_ID.toString())
                 .sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
 
-        return new Object[][] {
-
-                { token, TOKEN_KEY_CORRECT_RESPONSE, Status.BAD_REQUEST },
-
-                { token, TOKEN_KEY_OTHER_RESPONSE, Status.OK },
-
-                { badClientIdToken, TOKEN_KEY_CORRECT_RESPONSE, Status.OK },
-
-                { token, TOKEN_KEY_INCORRECT_RESPONSE, Status.OK },
-
-                { deprecatedToken, TOKEN_KEY_CORRECT_RESPONSE, Status.OK },
-
-        };
+        return Stream.of(
+                Arguments.of(token, TOKEN_KEY_CORRECT_RESPONSE, Status.BAD_REQUEST),
+                Arguments.of(token, TOKEN_KEY_OTHER_RESPONSE, Status.OK),
+                Arguments.of(badClientIdToken, TOKEN_KEY_CORRECT_RESPONSE, Status.OK),
+                Arguments.of(token, TOKEN_KEY_INCORRECT_RESPONSE, Status.OK),
+                Arguments.of(deprecatedToken, TOKEN_KEY_CORRECT_RESPONSE, Status.OK));
     }
 
-    @Test(dataProvider = "authorizedFailure", expectedExceptions = AuthorizationException.class)
-    public void authorizedFailure(String token, Map<String, String> tokenKey, Status status) throws AuthorizationException {
+    @ParameterizedTest
+    @MethodSource
+    public void authorizedFailure(String token, Map<String, String> tokenKey, Status status) {
 
         authorizationClient.when(HttpRequest.request().withMethod("GET").withPath("/oauth/token_key"))
                 .respond(HttpResponse.response().withHeaders(new Header("Content-Type", "application/json;charset=UTF-8"))
@@ -157,7 +156,11 @@ public class AuthorizationContextServiceTest extends AbstractTestNGSpringContext
         headers.putSingle("Authorization", "Bearer " + token);
         headers.putSingle(ApplicationBeanParam.APP_HEADER, "test");
 
-        service.buildContext(headers);
+        // When perform
+        Throwable throwable = catchThrowable(() -> service.buildContext(headers));
+
+        // Then check throwable
+        assertThat(throwable, instanceOf(AuthorizationException.class));
 
     }
 

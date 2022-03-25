@@ -9,6 +9,9 @@ import java.util.stream.StreamSupport;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.TestInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +24,11 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class KafkaTestEvent extends AbstractTestNGSpringContextTests {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class KafkaTestEvent {
 
     private static final Logger LOG = LoggerFactory.getLogger(DataEventListener.class);
 
@@ -41,7 +42,7 @@ public class KafkaTestEvent extends AbstractTestNGSpringContextTests {
 
     protected BlockingQueue<ConsumerRecord<String, JsonNode>> records;
 
-    @BeforeClass
+    @BeforeAll
     public void createConsumer() throws Exception {
 
         records = new LinkedBlockingQueue<>();
@@ -67,7 +68,7 @@ public class KafkaTestEvent extends AbstractTestNGSpringContextTests {
         ContainerTestUtils.waitForAssignment(container, embeddedKafka.getPartitionsPerTopic());
     }
 
-    @AfterClass
+    @AfterAll
     public void stop() {
 
         container.stop();

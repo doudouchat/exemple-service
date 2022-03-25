@@ -3,28 +3,31 @@ package com.exemple.service.resource.account;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
@@ -33,31 +36,22 @@ import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.account.event.AccountEventResource;
 import com.exemple.service.resource.account.history.AccountHistoryResource;
-import com.exemple.service.resource.account.model.Account;
 import com.exemple.service.resource.account.model.AccountEvent;
 import com.exemple.service.resource.account.model.AccountHistory;
-import com.exemple.service.resource.account.model.Address;
-import com.exemple.service.resource.account.model.Cgu;
 import com.exemple.service.resource.common.model.EventType;
-import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Iterators;
 
-@ContextConfiguration(classes = { ResourceTestConfiguration.class })
-public class AccountResourceTest extends AbstractTestNGSpringContextTests {
+@TestMethodOrder(OrderAnnotation.class)
+@SpringJUnitConfig(ResourceTestConfiguration.class)
+public class AccountResourceTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private AccountResource resource;
-
-    private UUID id;
-
-    private JsonNode account;
 
     @Autowired
     private AccountHistoryResource accountHistoryResource;
@@ -68,7 +62,7 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private CqlSession session;
 
-    @BeforeMethod
+    @BeforeEach
     public void initExecutionContextDate() {
 
         OffsetDateTime now = OffsetDateTime.now();
@@ -79,256 +73,406 @@ public class AccountResourceTest extends AbstractTestNGSpringContextTests {
 
     }
 
-    @Test
-    public void save() {
+    @Nested
+    @TestMethodOrder(OrderAnnotation.class)
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class saveField {
 
-        this.id = UUID.randomUUID();
+        private final UUID id = UUID.randomUUID();
 
-        Account model = Account.builder()
+        private OffsetDateTime createDate;
 
-                .id(id)
+        @Test
+        @DisplayName("save email")
+        @Order(1)
+        public void save() throws IOException {
 
-                .email("jean.dupont@gmail.com")
+            // Given build account
+            JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupond@gmail\"}");
 
-                .address("home", Address.builder().street("1 rue de la poste").build())
-                .address("job", Address.builder().street("1 rue de paris").floor(5).build())
+            // When perform save
+            resource.save(account);
 
-                .cgu(Cgu.builder().code("code_1").version("v1").build()).cgu(null)
+            // Then check history
+            List<AccountHistory> histories = accountHistoryResource.findById(id);
+            createDate = ServiceContextExecution.context().getDate();
+            assertAll(
+                    () -> assertThat(histories, is(hasSize(2))),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/email"), "jean.dupond@gmail", createDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
 
-                .build();
+            // And check account
+            JsonNode result = resource.get(id).get();
+            assertThat(result, is(MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupond@gmail\"}")));
 
-        resource.save(MAPPER.convertValue(model, JsonNode.class));
+            // And check event
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            assertAll(
+                    () -> assertThat(event.getEventType(), is(EventType.CREATE)),
+                    () -> assertThat(event.getLocalDate(), is(ServiceContextExecution.context().getDate().toLocalDate())),
+                    () -> assertThat(event.getData(), is(notNullValue())));
 
-        this.account = MAPPER.convertValue(model, JsonNode.class);
-        this.account = JsonNodeFilterUtils.clean(this.account);
-        ((ObjectNode) this.account).put(AccountField.ID.field, id.toString());
+            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
+                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
+            assertThat(acountAccountEvents.all().size(), greaterThanOrEqualTo(1));
+        }
 
-        List<AccountHistory> histories = accountHistoryResource.findById(id);
+        @Test
+        @DisplayName("update email and add age")
+        @Order(2)
+        public void update() throws IOException {
 
-        assertThat(histories, is(hasSize(7)));
+            // Given build account
+            JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupont@gmail\", \"age\": 19}");
 
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/email"), this.account.get("email"),
-                ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/street"), "1 rue de la poste",
-                ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/job/street"), "1 rue de paris",
-                ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/job/floor"), 5,
-                ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/code"), "code_1", ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/version"), "v1", ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id.toString(), ServiceContextExecution.context().getDate().toInstant());
+            // When perform save
+            resource.save(account, resource.get(id).get());
 
-        AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
-        assertThat(event.getEventType(), is(EventType.CREATE));
-        assertThat(event.getLocalDate(), is(ServiceContextExecution.context().getDate().toLocalDate()));
-        assertThat(event.getData(), is(notNullValue()));
+            // Then check history
+            List<AccountHistory> histories = accountHistoryResource.findById(id);
+            OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
+            assertAll(
+                    () -> assertThat(histories, is(hasSize(3))),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/email"), "jean.dupont@gmail", updateDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/age"), 19, updateDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
 
-        ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
-                .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-        assertThat(countAccountEvents.all().size(), greaterThanOrEqualTo(1));
+            // And check account
+            JsonNode result = resource.get(id).get();
+            assertThat(result, is(MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupont@gmail\", \"age\": 19}")));
+
+            // And check event
+            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
+                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
+            assertThat(acountAccountEvents.all().size(), greaterThanOrEqualTo(2));
+        }
+
+        @Test
+        @DisplayName("remove email and age")
+        @Order(3)
+        public void remove() throws IOException {
+
+            // Given build account
+            JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": null, \"age\": null}");
+
+            // When perform save
+            resource.save(account, resource.get(id).get());
+
+            // Then check history
+            List<AccountHistory> histories = accountHistoryResource.findById(id);
+            OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
+            assertAll(
+                    () -> assertThat(histories, is(hasSize(3))),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/email"), JsonNodeType.NULL, updateDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/age"), JsonNodeType.NULL, updateDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            // And check account
+            JsonNode result = resource.get(id).get();
+            assertThat(result, is(MAPPER.readTree("{\"id\": \"" + id + "\"}")));
+        }
 
     }
 
-    @Test(dependsOnMethods = "save")
-    public void get() {
+    @Nested
+    @TestMethodOrder(OrderAnnotation.class)
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class saveMap {
 
-        JsonNode result = resource.get(id).get();
+        private final UUID id = UUID.randomUUID();
 
-        assertThat(result.get("email"), is(this.account.get("email")));
-        assertThat(result.get("addresses"), is(this.account.get("addresses")));
-        assertThat(result.get("cgus"), is(this.account.get("cgus")));
-        assertThat(result.get("id").asText(), is(id.toString()));
+        private OffsetDateTime createDate;
 
+        @Test
+        @DisplayName("save addresses")
+        @Order(1)
+        public void save() throws IOException {
+
+            // Given build account
+            JsonNode account = MAPPER
+                    .readTree("{\"id\": \"" + id + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}}}");
+
+            // When perform save
+            resource.save(account);
+
+            // Then check history
+            List<AccountHistory> histories = accountHistoryResource.findById(id);
+            createDate = ServiceContextExecution.context().getDate();
+            assertAll(
+                    () -> assertThat(histories, is(hasSize(3))),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/street"), "1 rue de la poste",
+                            createDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/floor"), 5, createDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            // And check account
+            JsonNode result = resource.get(id).get();
+            assertThat(result,
+                    is(MAPPER.readTree("{\"id\": \"" + id + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}}}")));
+        }
+
+        @Test
+        @DisplayName("add 1 addresse")
+        @Order(2)
+        public void addAdresse() throws IOException {
+
+            // Given build account
+            JsonNode account = MAPPER
+                    .readTree("{\"id\": \"" + id
+                            + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}, \"job\": {\"street\": \"1 rue de la paris\"}}}");
+
+            // When perform save
+            resource.save(account, resource.get(id).get());
+
+            // Then check history
+            List<AccountHistory> histories = accountHistoryResource.findById(id);
+            OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
+            assertAll(
+                    () -> assertThat(histories, is(hasSize(4))),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/street"), "1 rue de la poste",
+                            createDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/floor"), 5, createDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/job/street"), "1 rue de la paris",
+                            updateDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            // And check account
+            JsonNode result = resource.get(id).get();
+            assertThat(result, is(MAPPER
+                    .readTree("{\"id\": \"" + id
+                            + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}, \"job\": {\"street\": \"1 rue de la paris\"}}}")));
+        }
+
+        @Test
+        @DisplayName("update addresse")
+        @Order(3)
+        public void updateAddresse() throws IOException {
+
+            // Given build account
+            JsonNode account = MAPPER
+                    .readTree("{\"id\": \"" + id
+                            + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}, \"job\": {\"street\": \"10 rue de la paris\", \"floor\": 5}}}");
+
+            // When perform save
+            resource.save(account, resource.get(id).get());
+
+            // Then check history
+            List<AccountHistory> histories = accountHistoryResource.findById(id);
+            OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
+            assertAll(
+                    () -> assertThat(histories, is(hasSize(5))),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/street"), "1 rue de la poste",
+                            createDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/floor"), 5, createDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/job/street"), "10 rue de la paris",
+                            updateDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/job/floor"), 5,
+                            updateDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            // And check account
+            JsonNode result = resource.get(id).get();
+            assertThat(result, is(MAPPER
+                    .readTree("{\"id\": \"" + id
+                            + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}, \"job\": {\"street\": \"10 rue de la paris\", \"floor\": 5}}}")));
+        }
+
+        @Test
+        @DisplayName("delete addresse")
+        @Order(4)
+        public void deleteAddresse() throws IOException {
+
+            // Given build account
+            JsonNode account = MAPPER
+                    .readTree(
+                            "{\"id\": \"" + id + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}, \"job\": null}}");
+
+            // When perform save
+            resource.save(account, resource.get(id).get());
+
+            // Then check history
+            List<AccountHistory> histories = accountHistoryResource.findById(id);
+            OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
+            assertAll(
+                    () -> assertThat(histories, is(hasSize(4))),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/street"), "1 rue de la poste",
+                            createDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/floor"), 5, createDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/job"), JsonNodeType.NULL,
+                            updateDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            // And check account
+            JsonNode result = resource.get(id).get();
+            assertThat(result, is(MAPPER
+                    .readTree("{\"id\": \"" + id + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}}}")));
+        }
+
+        @Test
+        @DisplayName("remove all addresses")
+        @Order(5)
+        public void remove() throws IOException {
+
+            // Given build account
+            JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"addresses\": null}");
+
+            // When perform save
+            resource.save(account, resource.get(id).get());
+
+            // Then check history
+            List<AccountHistory> histories = accountHistoryResource.findById(id);
+            OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
+            assertAll(
+                    () -> assertThat(histories, is(hasSize(2))),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses"), JsonNodeType.NULL, updateDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            // And check account
+            JsonNode result = resource.get(id).get();
+            assertThat(result, is(MAPPER.readTree("{\"id\": \"" + id + "\"}")));
+        }
+    }
+
+    @Nested
+    @TestMethodOrder(OrderAnnotation.class)
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class saveSet {
+
+        private final UUID id = UUID.randomUUID();
+
+        private OffsetDateTime createDate;
+
+        @Test
+        @DisplayName("save cgus")
+        @Order(1)
+        public void save() throws IOException {
+
+            // Given build account
+            JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"cgus\": [{\"code\": \"code_1\", \"version\": \"v1\"}]}");
+
+            // When perform save
+            resource.save(account);
+
+            // Then check history
+            List<AccountHistory> histories = accountHistoryResource.findById(id);
+            createDate = ServiceContextExecution.context().getDate();
+            assertAll(
+                    () -> assertThat(histories, is(hasSize(3))),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/code"), "code_1", createDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/version"), "v1", createDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            // And check account
+            JsonNode result = resource.get(id).get();
+            assertThat(result, is(MAPPER.readTree("{\"id\": \"" + id + "\", \"cgus\": [{\"code\": \"code_1\", \"version\": \"v1\"}]}")));
+        }
+
+        @Test
+        @DisplayName("add 1 cgu")
+        @Order(2)
+        public void addCgu() throws IOException {
+
+            // Given build account
+            JsonNode account = MAPPER.readTree(
+                    "{\"id\": \"" + id + "\", \"cgus\": [{\"code\": \"code_1\", \"version\": \"v1\"}, {\"code\": \"code_1\", \"version\": \"v2\"}]}");
+
+            // When perform save
+            resource.save(account, resource.get(id).get());
+
+            // Then check history
+            List<AccountHistory> histories = accountHistoryResource.findById(id);
+            OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
+            assertAll(
+                    () -> assertThat(histories, is(hasSize(5))),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/code"), "code_1", createDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/version"), "v1", createDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/1/code"), "code_1", updateDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/1/version"), "v2", updateDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            // And check account
+            JsonNode result = resource.get(id).get();
+            assertThat(result, is(MAPPER
+                    .readTree("{\"id\": \"" + id
+                            + "\", \"cgus\": [{\"code\": \"code_1\", \"version\": \"v1\"}, {\"code\": \"code_1\", \"version\": \"v2\"}]}")));
+        }
+
+        @Test
+        @DisplayName("remove all cgus")
+        @Order(3)
+        public void remove() throws IOException {
+
+            // Given build account
+            JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"cgus\": null}");
+
+            // When perform save
+            resource.save(account, resource.get(id).get());
+
+            // Then check history
+            List<AccountHistory> histories = accountHistoryResource.findById(id);
+            OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
+            assertAll(
+                    () -> assertThat(histories, is(hasSize(2))),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus"), JsonNodeType.NULL, updateDate.toInstant()),
+                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            // And check account
+            JsonNode result = resource.get(id).get();
+            assertThat(result, is(MAPPER.readTree("{\"id\": \"" + id + "\"}")));
+        }
     }
 
     @Test
     public void getNotExist() {
 
-        assertThat(resource.get(UUID.randomUUID()).isPresent(), is(false));
+        // When perform get
+        Optional<JsonNode> account = resource.get(UUID.randomUUID());
 
-    }
-
-    @Test(dependsOnMethods = "get")
-    public void update() {
-
-        Map<String, Object> model = new HashMap<>();
-        model.put(AccountField.ID.field, id);
-
-        Map<String, Address> addresses = new HashMap<>();
-        addresses.put("home", Address.builder().street("10 rue de de la poste").floor(2).build());
-        addresses.put("job", null);
-        addresses.put("holidays", Address.builder().street("10 rue de paris").floor(5).build());
-        model.put("addresses", addresses);
-
-        Set<Cgu> cgus = new HashSet<>();
-        Cgu cgu1 = Cgu.builder().code("code_1").version("v2").build();
-        cgus.add(cgu1);
-        model.put("cgus", cgus);
-
-        model.put("email", "jean.dupont@gmail.com");
-        model.put("age", 19);
-
-        AccountHistory previousHistoryEmail = accountHistoryResource.findByIdAndField(id, "/email");
-        AccountHistory previousHistoryId = accountHistoryResource.findByIdAndField(id, "/id");
-        AccountHistory previousHistoryCgus = accountHistoryResource.findByIdAndField(id, "/cgus/0/code");
-
-        resource.save(MAPPER.convertValue(model, JsonNode.class), resource.get(id).get());
-
-        this.account = resource.get(id).get();
-
-        assertThat(this.account.get("addresses").get("home").get("street").asText(), is(addresses.get("home").getStreet()));
-        assertThat(this.account.get("addresses").get("home").get("floor").asInt(), is(addresses.get("home").getFloor()));
-        assertThat(this.account.get("addresses").get("home").get("city"), is(nullValue()));
-        assertThat(this.account.get("addresses").get("home").get("zip"), is(nullValue()));
-
-        assertThat(this.account.get("addresses").get("job"), is(nullValue()));
-
-        assertThat(this.account.get("addresses").get("holidays").get("street").asText(), is(addresses.get("holidays").getStreet()));
-        assertThat(this.account.get("addresses").get("holidays").get("floor").asInt(), is(addresses.get("holidays").getFloor()));
-        assertThat(this.account.get("addresses").get("holidays").get("city"), is(nullValue()));
-        assertThat(this.account.get("addresses").get("holidays").get("zip"), is(nullValue()));
-
-        assertThat(this.account.get("age").asInt(), is(model.get("age")));
-        assertThat(this.account.get("cgus"), hasItems(Iterators.toArray(MAPPER.convertValue(cgus, JsonNode.class).elements(), JsonNode.class)));
-
-        List<AccountHistory> histories = accountHistoryResource.findById(id);
-
-        assertThat(histories, is(hasSize(10)));
-
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/email"), previousHistoryEmail.getValue(), previousHistoryEmail.getDate());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/street"), addresses.get("home").getStreet(),
-                ServiceContextExecution.context().getDate().toInstant(), JsonNodeType.STRING);
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/floor"), addresses.get("home").getFloor(),
-                ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/job"), ServiceContextExecution.context().getDate().toInstant(),
-                JsonNodeType.OBJECT);
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/holidays/street"), addresses.get("holidays").getStreet(),
-                ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/holidays/floor"), addresses.get("holidays").getFloor(),
-                ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/code"), previousHistoryCgus.getValue(), previousHistoryCgus.getDate());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/version"), cgu1.getVersion(),
-                ServiceContextExecution.context().getDate().toInstant(), JsonNodeType.STRING);
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/age"), model.get("age"), ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), previousHistoryId.getValue(), previousHistoryId.getDate());
-
-        AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
-        assertThat(event.getLocalDate(), is(ServiceContextExecution.context().getDate().toLocalDate()));
-        assertThat(event.getEventType(), is(EventType.UPDATE));
-
-        ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
-                .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-        assertThat(countAccountEvents.all().size(), greaterThanOrEqualTo(2));
-    }
-
-    @Test(dependsOnMethods = "update")
-    public void updateNull() {
-
-        Map<String, Object> model = new HashMap<>();
-        model.put(AccountField.ID.field, id);
-
-        model.put("addresses", null);
-        model.put("cgus", null);
-        model.put("email", null);
-
-        AccountHistory previousHistoryEmail = accountHistoryResource.findByIdAndField(id, "/email");
-        AccountHistory previousHistoryAge = accountHistoryResource.findByIdAndField(id, "/age");
-        AccountHistory previousHistoryId = accountHistoryResource.findByIdAndField(id, "/id");
-
-        resource.save(MAPPER.convertValue(model, JsonNode.class), this.account);
-
-        this.account = resource.get(id).get();
-
-        assertThat(this.account.get("addresses"), is(nullValue()));
-        assertThat(this.account.get("email"), is(nullValue()));
-        assertThat(this.account.get("age"), is(nullValue()));
-        assertThat(this.account.get("cgus"), is(nullValue()));
-
-        List<AccountHistory> histories = accountHistoryResource.findById(id);
-
-        assertThat(histories, is(hasSize(5)));
-
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/email"), JsonNodeType.NULL, previousHistoryEmail.getValue(),
-                ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/age"), JsonNodeType.NULL, previousHistoryAge.getValue(),
-                ServiceContextExecution.context().getDate().toInstant());
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus"), ServiceContextExecution.context().getDate().toInstant(),
-                JsonNodeType.ARRAY);
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses"), ServiceContextExecution.context().getDate().toInstant(),
-                JsonNodeType.OBJECT);
-        assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), previousHistoryId.getValue(), previousHistoryId.getDate());
-
+        // And check account
+        assertThat(account.isPresent(), is(false));
     }
 
     @Test
-    public void findByIndex() {
+    public void findByIndex() throws IOException {
 
+        // Given build accounts
         UUID id1 = UUID.randomUUID();
         UUID id2 = UUID.randomUUID();
         UUID id3 = UUID.randomUUID();
 
-        resource.save(MAPPER.convertValue(Account.builder().status("NEW").id(id1).build(), JsonNode.class));
-        resource.save(MAPPER.convertValue(Account.builder().status("NEW").id(id2).build(), JsonNode.class));
-        resource.save(MAPPER.convertValue(Account.builder().status("OLD").id(id3).build(), JsonNode.class));
+        JsonNode account1 = MAPPER.readTree("{\"id\": \"" + id1 + "\", \"status\": \"NEW\"}");
+        JsonNode account2 = MAPPER.readTree("{\"id\": \"" + id2 + "\", \"status\": \"NEW\"}");
+        JsonNode account3 = MAPPER.readTree("{\"id\": \"" + id3 + "\", \"status\": \"OLD\"}");
 
+        resource.save(account1);
+        resource.save(account2);
+        resource.save(account3);
+
+        // When perform
         Set<JsonNode> accounts = resource.findByIndex("status", "NEW");
+
+        // And check accounts
 
         List<String> ids = accounts.stream().map(account -> account.get(AccountField.ID.field).asText()).collect(Collectors.toList());
 
-        assertThat(ids, hasSize(2));
-        assertThat(ids, containsInAnyOrder(id1.toString(), id2.toString()));
-        assertThat(ids, not(containsInAnyOrder(id3.toString())));
+        assertAll(
+                () -> assertThat(ids, hasSize(2)),
+                () -> assertThat(ids, containsInAnyOrder(id1.toString(), id2.toString())),
+                () -> assertThat(ids, not(containsInAnyOrder(id3.toString()))));
     }
 
-    private static void assertHistory(AccountHistory accountHistory, JsonNode expectedValue, Instant expectedDate) {
+    private static void assertHistory(AccountHistory accountHistory, JsonNodeType expectedJsonNodeType, Instant expectedDate) {
 
-        assertThat(accountHistory.getValue(), is(expectedValue));
+        assertThat(accountHistory.getValue().getNodeType(), is(expectedJsonNodeType));
         assertThat(accountHistory.getDate(), is(expectedDate));
-        assertThat(accountHistory.getPreviousValue().getNodeType(), is(JsonNodeType.NULL));
         assertHistory(accountHistory);
 
     }
 
     private static void assertHistory(AccountHistory accountHistory, Object expectedValue, Instant expectedDate) {
 
-        assertHistory(accountHistory, JsonNodeFilterUtils.clean(MAPPER.convertValue(expectedValue, JsonNode.class)), expectedDate);
-
-    }
-
-    private static void assertHistory(AccountHistory accountHistory, Instant expectedDate, JsonNodeType expectedPreviousJsonNodeType) {
-
-        assertThat(accountHistory.getValue().getNodeType(), is(JsonNodeType.NULL));
+        assertThat(accountHistory.getValue().asText(), is(expectedValue.toString()));
         assertThat(accountHistory.getDate(), is(expectedDate));
-        assertThat(accountHistory.getPreviousValue().getNodeType(), is(expectedPreviousJsonNodeType));
-        assertHistory(accountHistory);
-
-    }
-
-    private static void assertHistory(AccountHistory accountHistory, JsonNode expectedValue, Instant expectedDate,
-            JsonNodeType expectedPreviousJsonNodeType) {
-
-        assertThat(accountHistory.getValue(), is(expectedValue));
-        assertThat(accountHistory.getDate(), is(expectedDate));
-        assertThat(accountHistory.getPreviousValue().getNodeType(), is(expectedPreviousJsonNodeType));
-        assertHistory(accountHistory);
-
-    }
-
-    private static void assertHistory(AccountHistory accountHistory, Object expectedValue, Instant expectedDate,
-            JsonNodeType expectedPreviousJsonNodeType) {
-
-        assertHistory(accountHistory, JsonNodeFilterUtils.clean(MAPPER.convertValue(expectedValue, JsonNode.class)), expectedDate,
-                expectedPreviousJsonNodeType);
-
-    }
-
-    private static void assertHistory(AccountHistory accountHistory, JsonNodeType expectedJsonNodeType, JsonNode expectedPreviousValue,
-            Instant expectedDate) {
-
-        assertThat(accountHistory.getValue().getNodeType(), is(expectedJsonNodeType));
-        assertThat(accountHistory.getDate(), is(expectedDate));
-        assertThat(accountHistory.getPreviousValue(), is(expectedPreviousValue));
         assertHistory(accountHistory);
 
     }

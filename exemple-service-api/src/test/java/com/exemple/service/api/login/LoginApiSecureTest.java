@@ -2,6 +2,7 @@ package com.exemple.service.api.login;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -12,10 +13,10 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 
 import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import com.auth0.jwt.JWT;
 import com.exemple.service.api.common.model.SchemaBeanParam;
@@ -38,7 +39,7 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
     @Autowired
     private LoginResource loginResource;
 
-    @BeforeMethod
+    @BeforeEach
     private void before() {
         Mockito.reset(loginResource);
 
@@ -78,9 +79,10 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
 
         // And check security context
 
-        assertThat(testFilter.context.getUserPrincipal().getName(), is(username));
-        assertThat(testFilter.context.isSecure(), is(true));
-        assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH));
+        assertAll(
+                () -> assertThat(testFilter.context.getUserPrincipal().getName(), is(username)),
+                () -> assertThat(testFilter.context.isSecure(), is(true)),
+                () -> assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH)));
 
     }
 
@@ -125,9 +127,10 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
 
         // And check security context
 
-        assertThat(testFilter.context.getUserPrincipal().getName(), is(secondUsername));
-        assertThat(testFilter.context.isSecure(), is(true));
-        assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH));
+        assertAll(
+                () -> assertThat(testFilter.context.getUserPrincipal().getName(), is(secondUsername)),
+                () -> assertThat(testFilter.context.isSecure(), is(true)),
+                () -> assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH)));
 
     }
 

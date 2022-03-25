@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
@@ -13,12 +14,14 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 import com.exemple.service.api.common.JsonNodeUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
@@ -44,7 +47,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
     @Autowired
     private JsonNode subscription;
 
-    @BeforeMethod
+    @BeforeEach
     public void before() {
 
         Mockito.reset(service, schemaValidation);
@@ -53,19 +56,17 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
     public static final String URL = "/v1/subscriptions";
 
-    @DataProvider(name = "update")
-    private static Object[][] update() {
+    private static Stream<Arguments> update() {
 
-        return new Object[][] {
+        return Stream.of(
                 // created
-                { true, Status.CREATED },
+                Arguments.of(true, Status.CREATED),
                 // updated
-                { false, Status.NO_CONTENT }
-                //
-        };
+                Arguments.of(false, Status.NO_CONTENT));
     }
 
-    @Test(dataProvider = "update")
+    @ParameterizedTest
+    @MethodSource
     public void update(boolean created, Status expectedStatus) {
 
         // Given email

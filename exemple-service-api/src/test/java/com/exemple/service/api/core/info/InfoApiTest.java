@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response.Status;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.Viewable;
 import org.glassfish.jersey.server.mvc.spi.TemplateProcessor;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.fasterxml.jackson.databind.ObjectMapper;

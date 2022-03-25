@@ -1,18 +1,17 @@
 package com.exemple.service.application.detail;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.service.application.common.exception.NotFoundApplicationException;
 import com.exemple.service.application.common.model.ApplicationDetail;
@@ -21,8 +20,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 
-@ContextConfiguration(classes = { ApplicationTestConfiguration.class })
-public class ApplicationDetailServiceTest extends AbstractTestNGSpringContextTests {
+@SpringJUnitConfig(ApplicationTestConfiguration.class)
+public class ApplicationDetailServiceTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -30,44 +29,41 @@ public class ApplicationDetailServiceTest extends AbstractTestNGSpringContextTes
     private ApplicationDetailService service;
 
     @Test
-    public void put() {
+    @DisplayName("create application in zookeeper")
+    public void createApplication() {
 
-        Map<String, Object> detail = new HashMap<>();
-        detail.put("keyspace", "keyspace1");
-        detail.put("company", "company1");
-        detail.put("clientIds", Sets.newHashSet("clientId1"));
-        detail.put("other", "other");
+        // setup application
+        Map<String, Object> application = new HashMap<>();
+        application.put("keyspace", "keyspace1");
+        application.put("company", "company1");
+        application.put("clientIds", Sets.newHashSet("clientId1"));
+        application.put("other", "other");
 
-        service.put("app", MAPPER.convertValue(detail, JsonNode.class));
+        // when save application
+        service.put("app", MAPPER.convertValue(application, JsonNode.class));
 
-    }
-
-    @Test(dependsOnMethods = "put")
-    public void get() {
-
+        // Then retrieve application
         ApplicationDetail detail = service.get("app");
 
-        assertThat(detail.getKeyspace(), is("keyspace1"));
-        assertThat(detail.getCompany(), is("company1"));
-        assertThat(detail.getClientIds(), contains("clientId1"));
-
+        // And check details
+        assertAll(
+                () -> assertThat(detail.getKeyspace()).isEqualTo("keyspace1"),
+                () -> assertThat(detail.getCompany()).isEqualTo("company1"),
+                () -> assertThat(detail.getClientIds()).containsOnly("clientId1"));
     }
 
     @Test
+    @DisplayName("check exception if application is not found")
     public void getFailureNotFoundApplication() {
 
+        // setup random application
         String application = UUID.randomUUID().toString();
 
-        try {
+        // When perform get
+        Throwable throwable = catchThrowable(() -> service.get(application));
 
-            service.get(application);
-
-            Assert.fail("NotFoundApplicationException must be throwed");
-
-        } catch (NotFoundApplicationException e) {
-
-            assertThat(e.getApplication(), is(application));
-        }
+        // Then check throwable
+        assertThat(throwable).isInstanceOf(NotFoundApplicationException.class);
 
     }
 

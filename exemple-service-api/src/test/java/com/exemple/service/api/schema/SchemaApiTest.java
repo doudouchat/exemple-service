@@ -8,10 +8,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
@@ -32,7 +32,7 @@ public class SchemaApiTest extends JerseySpringSupport {
     @Autowired
     private JsonNode schema;
 
-    @BeforeMethod
+    @BeforeEach
     public void before() {
 
         Mockito.reset(service);
