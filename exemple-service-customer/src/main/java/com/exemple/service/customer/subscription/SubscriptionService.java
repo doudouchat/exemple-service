@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public interface SubscriptionService {
 
-    boolean save(@NotNull JsonNode source);
+    boolean save(@NotBlank String email, @NotNull JsonNode source);
 
     Optional<JsonNode> get(@NotBlank String email);
 }

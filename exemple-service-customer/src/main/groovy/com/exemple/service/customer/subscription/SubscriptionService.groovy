@@ -1,7 +1,5 @@
 package com.exemple.service.customer.subscription
 
-import org.springframework.util.Assert
-
 import com.exemple.service.context.ServiceContextExecution
 import com.exemple.service.customer.common.event.EventType
 import com.exemple.service.customer.common.event.ResourceEventPublisher
@@ -21,14 +19,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     ResourceEventPublisher resourceEventPublisher
 
     @Override
-    boolean save(JsonNode subscription) {
-
-        Assert.isTrue(subscription.path('email').isTextual(), 'email is required')
-
-        String email = subscription.get('email').textValue()
+    boolean save(String email, JsonNode subscription) {
 
         boolean created = !subscriptionResource.get(email).isPresent()
 
+        ((ObjectNode) subscription).set('email', new TextNode(email))
         ((ObjectNode) subscription).set('subscription_date', new TextNode(ServiceContextExecution.context().date.toString()))
 
         subscriptionResource.save(subscription)
