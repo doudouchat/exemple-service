@@ -2,6 +2,9 @@ package com.exemple.service.api.core.authorization;
 
 import javax.ws.rs.core.Response;
 
+import lombok.Getter;
+
+@Getter
 public class AuthorizationException extends Exception {
 
     private static final long serialVersionUID = 1L;
@@ -25,10 +28,6 @@ public class AuthorizationException extends Exception {
     public AuthorizationException(String message, Throwable cause) {
         super(message, cause);
         this.status = Response.Status.FORBIDDEN;
-    }
-
-    public Response.Status getStatus() {
-        return status;
     }
 
 }

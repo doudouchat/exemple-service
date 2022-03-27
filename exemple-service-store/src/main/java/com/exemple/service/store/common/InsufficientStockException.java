@@ -2,6 +2,9 @@ package com.exemple.service.store.common;
 
 import java.text.MessageFormat;
 
+import lombok.Getter;
+
+@Getter
 public class InsufficientStockException extends Exception {
 
     protected static final String EXCEPTION_MESSAGE = "Stock {0}:{1} is insufficient for quantity {2}";
@@ -25,26 +28,6 @@ public class InsufficientStockException extends Exception {
         this.product = product;
         this.stock = stock;
         this.quantity = quantity;
-    }
-
-    public String getCompany() {
-        return company;
-    }
-
-    public String getStore() {
-        return store;
-    }
-
-    public String getProduct() {
-        return product;
-    }
-
-    public long getStock() {
-        return stock;
-    }
-
-    public long getQuantity() {
-        return quantity;
     }
 
 }

@@ -1,5 +1,8 @@
 package com.exemple.service.resource.common;
 
+import lombok.Getter;
+
+@Getter
 public class JsonValidatorException extends Exception {
 
     private static final long serialVersionUID = 1L;
@@ -16,14 +19,6 @@ public class JsonValidatorException extends Exception {
         super(cause);
         this.key = key;
         this.node = node;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public String getNode() {
-        return node;
     }
 
 }

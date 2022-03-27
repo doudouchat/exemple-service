@@ -9,6 +9,9 @@ import org.springframework.util.Assert;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonPointer;
 
+import lombok.Getter;
+
+@Getter
 public class ValidationExceptionModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -27,22 +30,6 @@ public class ValidationExceptionModel implements Serializable {
         this.path = this.pointer.toString();
         this.code = code;
         this.message = message;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public JsonPointer getPointer() {
-        return pointer;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public String getMessage() {
-        return message;
     }
 
     @Override
