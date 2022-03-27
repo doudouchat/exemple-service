@@ -8,6 +8,8 @@ import javax.ws.rs.core.SecurityContext;
 
 import org.apache.commons.lang3.ObjectUtils;
 
+import lombok.Getter;
+
 public class ApiSecurityContext implements SecurityContext {
 
     private final Principal principal;
@@ -16,6 +18,7 @@ public class ApiSecurityContext implements SecurityContext {
 
     private final Predicate<String> containsRole;
 
+    @Getter
     private String profile;
 
     private ApiSecurityContext(Principal principal, String scheme, Predicate<String> containsRole, String profile) {
@@ -51,10 +54,6 @@ public class ApiSecurityContext implements SecurityContext {
     @Override
     public String getAuthenticationScheme() {
         return SecurityContext.BASIC_AUTH;
-    }
-
-    public String getProfile() {
-        return profile;
     }
 
 }

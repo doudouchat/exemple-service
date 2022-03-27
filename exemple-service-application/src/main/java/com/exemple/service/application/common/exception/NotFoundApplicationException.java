@@ -1,5 +1,8 @@
 package com.exemple.service.application.common.exception;
 
+import lombok.Getter;
+
+@Getter
 public class NotFoundApplicationException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
@@ -10,9 +13,4 @@ public class NotFoundApplicationException extends RuntimeException {
         super(e);
         this.application = application;
     }
-
-    public String getApplication() {
-        return application;
-    }
-
 }
