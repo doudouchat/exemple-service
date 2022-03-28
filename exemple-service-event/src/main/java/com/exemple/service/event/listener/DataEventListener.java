@@ -1,9 +1,7 @@
 package com.exemple.service.event.listener;
 
 import java.time.OffsetDateTime;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +17,7 @@ import com.exemple.service.event.publisher.EventData;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 @Component
 @RequiredArgsConstructor
@@ -40,6 +39,7 @@ public class DataEventListener {
     private final KafkaTemplate<String, JsonNode> template;
 
     @EventListener
+    @SneakyThrows
     public void eventConsumer(EventData event) {
 
         JsonNode data = (JsonNode) event.getSource();
@@ -52,13 +52,7 @@ public class DataEventListener {
                 .setHeader(X_EVENT_TYPE, event.getEventType().toString()).setHeader(X_ORIGIN, event.getOrigin())
                 .setHeader(X_ORIGIN_VERSION, event.getOriginVersion()).build();
 
-        try {
-            template.send(message).get(timeout, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            Thread.currentThread().interrupt();
-            LOG.warn("Kafka Message in topic " + this.template.getDefaultTopic() + " fails in " + timeout + "ms", e);
-        }
-
+        template.send(message).get(timeout, TimeUnit.MILLISECONDS);
     }
 
 }
