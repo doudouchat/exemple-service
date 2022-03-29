@@ -27,7 +27,6 @@ import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.schema.FilterHelper;
-import com.exemple.service.api.common.schema.SchemaHelper;
 import com.exemple.service.api.common.schema.ValidationHelper;
 import com.exemple.service.api.common.script.CustomerScriptFactory;
 import com.exemple.service.api.common.security.ApiSecurityContext;
@@ -39,6 +38,7 @@ import com.exemple.service.resource.account.AccountField;
 import com.exemple.service.schema.validation.annotation.Patch;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.flipkart.zjsonpatch.JsonPatch;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -71,8 +71,6 @@ public class AccountApi {
     private final ValidationHelper schemaValidation;
 
     private final FilterHelper schemaFilter;
-
-    private final SchemaHelper schemaMerge;
 
     private final AuthorizationCheckService authorizationCheckService;
 
@@ -176,8 +174,7 @@ public class AccountApi {
 
         JsonNode previousSource = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).get(id).orElseThrow(NotFoundException::new);
 
-        schemaMerge.complete(account, previousSource, ACCOUNT_RESOURCE, servletContext);
-
+        ((ObjectNode) account).put(AccountField.ID.field, id.toString());
         schemaValidation.validate(account, previousSource, ACCOUNT_RESOURCE, servletContext);
 
         scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).save(account, previousSource);

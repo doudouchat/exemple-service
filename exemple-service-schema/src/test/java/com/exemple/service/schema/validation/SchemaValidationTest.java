@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.everit.json.schema.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +28,7 @@ import com.exemple.service.schema.core.SchemaTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.flipkart.zjsonpatch.JsonPatch;
 
@@ -326,30 +326,6 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
                 MAPPER.convertValue(origin, JsonNode.class));
     }
 
-    @Test
-    public void validationPatchSuccessWithNotAccessProperty() {
-
-        Map<String, Object> origin = new HashMap<>();
-        origin.put("email", "jean.dupont@gmail.com");
-        origin.put("lastname", "Dupont");
-        origin.put("firstname", "Jean");
-        origin.put("opt_in_email", true);
-        origin.put("civility", "Mr");
-        origin.put("hide", true);
-
-        Map<String, Object> model = new HashMap<>();
-        model.put("email", "jack.dupont@gmail.com");
-        model.put("lastname", "Dupont");
-        model.put("firstname", "Jean");
-        model.put("opt_in_email", true);
-        model.put("civility", "Mr");
-        model.put("hide", true);
-
-        validation.validate("default", "default", "default", "schema_test", MAPPER.convertValue(model, JsonNode.class),
-                MAPPER.convertValue(origin, JsonNode.class));
-
-    }
-
     @DataProvider(name = "validationPatchFailures")
     private static Object[][] validationPatchFailures() {
 
@@ -359,20 +335,22 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
         patch1.put("value", UUID.randomUUID().toString());
 
         ObjectNode patch2 = MAPPER.createObjectNode();
-        patch2.put("op", "remove");
+        patch2.put("op", "add");
         patch2.put("path", "/hide");
+        patch2.put("value", false);
 
         ObjectNode patch3 = MAPPER.createObjectNode();
         patch3.put("op", "remove");
         patch3.put("path", "/external_id");
 
-        return ArrayUtils.addAll(failure(), new Object[][] {
+        return new Object[][] {
                 // external_id create only
                 { "readOnly", "/external_id", patch1 },
                 // additionalProperties hide unknown
                 { "additionalProperties", "/hide", patch2 },
                 // external_id create only
-                { "readOnly", "/external_id", patch3 } });
+                { "readOnly", "/external_id", patch3 }
+        };
 
     }
 
@@ -386,7 +364,6 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
         origin.put("firstname", "john");
         origin.put("cgus", MAPPER.createArrayNode());
         origin.put("addresses", MAPPER.createObjectNode());
-        origin.put("hide", true);
 
         JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
 
@@ -394,6 +371,8 @@ public class SchemaValidationTest extends AbstractTestNGSpringContextTests {
         patch.addAll(Arrays.asList(patchs));
 
         JsonNode model = JsonPatch.apply(patch, old);
+
+        ((ObjectNode) old).set("hide", BooleanNode.TRUE);
 
         try {
 
