@@ -1,10 +1,7 @@
 package com.exemple.service.store.stock;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.Optional;
@@ -83,7 +80,7 @@ public class StockServiceTest {
 
             // And check stock
 
-            assertThat(service.get(company, store, product).get(), is(140L));
+            assertThat(service.get(company, store, product)).hasValue(140L);
 
         }
 
@@ -110,7 +107,7 @@ public class StockServiceTest {
         Optional<Long> stock = service.get(company, store, product);
 
         // Then check stock is missing
-        assertThat(stock.isPresent(), is(false));
+        assertThat(stock).isEmpty();
 
     }
 
@@ -133,8 +130,8 @@ public class StockServiceTest {
 
         // Then check throwable
         assertAll(
-                () -> assertThat(throwable, instanceOf(InsufficientStockException.class)),
-                () -> assertThat(throwable.getMessage(), endsWith("2 is insufficient for quantity -3")));
+                () -> assertThat(throwable).isInstanceOf(InsufficientStockException.class),
+                () -> assertThat(throwable).hasMessageEndingWith("2 is insufficient for quantity -3"));
 
     }
 
@@ -152,8 +149,8 @@ public class StockServiceTest {
 
         // Then check throwable
         assertAll(
-                () -> assertThat(throwable, instanceOf(InsufficientStockException.class)),
-                () -> assertThat(throwable.getMessage(), endsWith("0 is insufficient for quantity -3")));
+                () -> assertThat(throwable).isInstanceOf(InsufficientStockException.class),
+                () -> assertThat(throwable).hasMessageEndingWith("0 is insufficient for quantity -3"));
     }
 
     @Nested
@@ -175,7 +172,7 @@ public class StockServiceTest {
             Throwable throwable = catchThrowable(() -> service.update(company, store, product, 5));
 
             // Then check throwable
-            assertThat(throwable, instanceOf(IllegalStateException.class));
+            assertThat(throwable).isInstanceOf(IllegalStateException.class);
 
         }
 
@@ -188,7 +185,7 @@ public class StockServiceTest {
             Throwable throwable = catchThrowable(() -> service.get(company, store, product));
 
             // Then check throwable
-            assertThat(throwable, instanceOf(IllegalStateException.class));
+            assertThat(throwable).isInstanceOf(IllegalStateException.class);
 
         }
     }

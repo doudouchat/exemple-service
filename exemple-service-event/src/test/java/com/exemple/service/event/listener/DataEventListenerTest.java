@@ -1,8 +1,6 @@
 package com.exemple.service.event.listener;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
@@ -53,19 +51,19 @@ public class DataEventListenerTest extends KafkaTestEvent {
         ConsumerRecord<String, JsonNode> received = records.poll(10, TimeUnit.SECONDS);
 
         assertAll(
-                () -> assertThat(received, is(notNullValue())),
-                () -> assertThat(received.value(), is(resource)),
-                () -> assertThat(received.timestamp(), is(date.toInstant().toEpochMilli())));
+                () -> assertThat(received).isNotNull(),
+                () -> assertThat(received.value()).isEqualTo(resource),
+                () -> assertThat(received.timestamp()).isEqualTo(date.toInstant().toEpochMilli()));
         try (StringDeserializer deserializer = new StringDeserializer()) {
             assertAll(
-                    () -> assertThat(deserializer.deserialize(null, received.headers().lastHeader(DataEventListener.X_ORIGIN_VERSION).value()),
-                            is(originVersion)),
-                    () -> assertThat(deserializer.deserialize(null, received.headers().lastHeader(DataEventListener.X_ORIGIN).value()),
-                            is(origin)),
-                    () -> assertThat(deserializer.deserialize(null, received.headers().lastHeader(DataEventListener.X_RESOURCE).value()),
-                            is("account")),
-                    () -> assertThat(deserializer.deserialize(null, received.headers().lastHeader(DataEventListener.X_EVENT_TYPE).value()),
-                            is(EventType.CREATE.toString())));
+                    () -> assertThat(deserializer.deserialize(null, received.headers().lastHeader(DataEventListener.X_ORIGIN_VERSION).value()))
+                            .isEqualTo(originVersion),
+                    () -> assertThat(deserializer.deserialize(null, received.headers().lastHeader(DataEventListener.X_ORIGIN).value())).isEqualTo(
+                            origin),
+                    () -> assertThat(deserializer.deserialize(null, received.headers().lastHeader(DataEventListener.X_RESOURCE).value())).isEqualTo(
+                            "account"),
+                    () -> assertThat(deserializer.deserialize(null, received.headers().lastHeader(DataEventListener.X_EVENT_TYPE).value()))
+                            .isEqualTo(EventType.CREATE.toString()));
         }
 
     }

@@ -1,11 +1,8 @@
 package com.exemple.service.customer.subscription;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -23,15 +20,17 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
-import com.exemple.service.customer.common.JsonNodeUtils;
 import com.exemple.service.customer.common.event.EventType;
 import com.exemple.service.customer.common.event.ResourceEventPublisher;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @SpringJUnitConfig(CustomerTestConfiguration.class)
 public class SubscriptionServiceTest {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private SubscriptionResource resource;
@@ -56,19 +55,13 @@ public class SubscriptionServiceTest {
         context.setApp("default");
     }
 
-    private static Stream<Arguments> save() {
+    private static Stream<Arguments> save() throws IOException {
 
-        JsonNode source = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("email", "jean.dupont@gmail.com");
-            return model;
-
-        });
+        JsonNode source = MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\"}");
 
         return Stream.of(
                 Arguments.of(Optional.empty(), true),
-                Arguments.of(Optional.of(JsonNodeUtils.create(() -> source)), false));
+                Arguments.of(Optional.of(source), false));
     }
 
     @DisplayName("save subscription")
@@ -86,35 +79,34 @@ public class SubscriptionServiceTest {
 
         // When perform save
 
-        JsonNode source = JsonNodeUtils.create(Collections::emptyMap);
+        JsonNode source = MAPPER.createObjectNode();
 
         boolean created = service.save(email, source);
 
         // Then check subscription
 
-        assertThat(created, is(expectedCreated));
+        assertThat(created).isEqualTo(expectedCreated);
 
         // And check save resource
 
-        JsonNode expectedSubscription = JsonNodeUtils.set(source, "subscription_date",
-                new TextNode(ServiceContextExecution.context().getDate().toString()));
+        JsonNode expectedSubscription = ((ObjectNode) source).put("subscription_date", ServiceContextExecution.context().getDate().toString());
 
         ArgumentCaptor<JsonNode> subscriptionCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
         Mockito.verify(resource).save(subscriptionCaptor.capture());
-        assertThat(subscriptionCaptor.getValue(), is(expectedSubscription));
+        assertThat(subscriptionCaptor.getValue()).isEqualTo(expectedSubscription);
 
         // And check publish resource
 
         ArgumentCaptor<JsonNode> eventCaptor = ArgumentCaptor.forClass(JsonNode.class);
         Mockito.verify(publisher).publish(eventCaptor.capture(), Mockito.eq("subscription"), Mockito.eq(EventType.CREATE));
-        assertThat(eventCaptor.getValue(), is(expectedSubscription));
+        assertThat(eventCaptor.getValue()).isEqualTo(expectedSubscription);
 
     }
 
     @DisplayName("get subscription")
     @Test
-    public void get() {
+    public void get() throws IOException {
 
         // Given email
 
@@ -122,13 +114,7 @@ public class SubscriptionServiceTest {
 
         // And mock resource
 
-        JsonNode source = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("email", "jean.dupont@gmail.com");
-            return model;
-
-        });
+        JsonNode source = MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\"}");
 
         Mockito.when(resource.get(email)).thenReturn(Optional.of(source));
 
@@ -138,7 +124,7 @@ public class SubscriptionServiceTest {
 
         // Then check subscription
 
-        assertThat(subscription.get(), is(source));
+        assertThat(subscription).hasValue(source);
 
     }
 

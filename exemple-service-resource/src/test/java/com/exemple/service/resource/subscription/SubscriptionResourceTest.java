@@ -1,12 +1,11 @@
 package com.exemple.service.resource.subscription;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -70,19 +69,19 @@ public class SubscriptionResourceTest {
         resource.save(subscription);
 
         // Then check subscription
-        JsonNode result = resource.get(email).get();
-        assertThat(result, is(MAPPER.readTree("{\"email\": \"" + email + "\"}")));
+        Optional<JsonNode> result = resource.get(email);
+        assertThat(result).hasValue(MAPPER.readTree("{\"email\": \"" + email + "\"}"));
 
         // And check event
         SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
         assertAll(
-                () -> assertThat(event.getEventType(), is(EventType.CREATE)),
-                () -> assertThat(event.getLocalDate(), is(ServiceContextExecution.context().getDate().toLocalDate())),
-                () -> assertThat(event.getData().get("email").textValue(), is(email)));
+                () -> assertThat(event.getEventType()).isEqualTo(EventType.CREATE),
+                () -> assertThat(event.getLocalDate()).isEqualTo(ServiceContextExecution.context().getDate().toLocalDate()),
+                () -> assertThat(event.getData().get("email").textValue()).isEqualTo(email));
 
         ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("local_date")
                 .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-        assertThat(countAccountEvents.all().size(), is(1));
+        assertThat(countAccountEvents.all()).hasSize(1);
 
     }
 
@@ -94,17 +93,17 @@ public class SubscriptionResourceTest {
         resource.delete(email);
 
         // Then check subscription
-        assertThat(resource.get(email).isPresent(), is(false));
+        assertThat(resource.get(email)).isEmpty();
 
         // And check event
         SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
-        assertThat(event.getEventType(), is(EventType.DELETE));
-        assertThat(event.getLocalDate(), is(ServiceContextExecution.context().getDate().toLocalDate()));
-        assertThat(event.getData(), is(nullValue()));
+        assertThat(event.getEventType()).isEqualTo(EventType.DELETE);
+        assertThat(event.getLocalDate()).isEqualTo(ServiceContextExecution.context().getDate().toLocalDate());
+        assertThat(event.getData()).isNull();
 
         ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("local_date")
                 .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-        assertThat(countAccountEvents.all().size(), is(2));
+        assertThat(countAccountEvents.all()).hasSize(2);
 
     }
 

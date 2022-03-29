@@ -1,9 +1,8 @@
 package com.exemple.service.api.core.authorization;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.Instant;
 import java.util.Date;
@@ -160,7 +159,7 @@ public class AuthorizationContextServiceTest {
         Throwable throwable = catchThrowable(() -> service.buildContext(headers));
 
         // Then check throwable
-        assertThat(throwable, instanceOf(AuthorizationException.class));
+        assertThat(throwable).isInstanceOf(AuthorizationException.class);
 
     }
 
@@ -179,11 +178,14 @@ public class AuthorizationContextServiceTest {
         headers.putSingle("Authorization", "Bearer " + token);
         headers.putSingle(ApplicationBeanParam.APP_HEADER, "test");
 
+        // When perform
         ApiSecurityContext securityContext = service.buildContext(headers);
 
-        assertThat(securityContext.getUserPrincipal().getName(), is("john_doe"));
-        assertThat(securityContext.isSecure(), is(true));
-        assertThat(securityContext.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH));
+        // Then check security context
+        assertAll(
+                () -> assertThat(securityContext.getUserPrincipal().getName()).isEqualTo("john_doe"),
+                () -> assertThat(securityContext.isSecure()).isTrue(),
+                () -> assertThat(securityContext.getAuthenticationScheme()).isEqualTo((SecurityContext.BASIC_AUTH)));
 
     }
 

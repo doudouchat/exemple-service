@@ -1,7 +1,6 @@
 package com.exemple.service.resource.common.util;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 
@@ -67,7 +66,7 @@ public class JsonNodeFilterUtilsTest {
                 + "  \"email\" : \"jean.dupont@gmail.com\""
                 + "}");
 
-        assertThat(expectedResult, is(source));
+        assertThat(expectedResult).isEqualTo(source);
 
     }
 

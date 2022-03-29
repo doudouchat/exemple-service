@@ -1,10 +1,8 @@
 package com.exemple.service.api.subscription;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -23,15 +21,17 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.exemple.service.api.common.JsonNodeUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.subscription.SubscriptionService;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SubscriptionApiTest extends JerseySpringSupport {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
     protected ResourceConfig configure() {
@@ -67,7 +67,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
     @ParameterizedTest
     @MethodSource
-    public void update(boolean created, Status expectedStatus) {
+    public void update(boolean created, Status expectedStatus) throws IOException {
 
         // Given email
 
@@ -79,15 +79,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
         // When perform put
 
-        JsonNode source = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("lastname", "dupond");
-            model.put("firstname", "jean");
-
-            return model;
-
-        });
+        JsonNode source = MAPPER.readTree("{\"lastname\": \"dupond\", \"firstname\":\"jean\"}");
 
         Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
 
@@ -97,30 +89,21 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(expectedStatus.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(expectedStatus.getStatusCode());
 
         // And check service
 
         ArgumentCaptor<JsonNode> subscription = ArgumentCaptor.forClass(JsonNode.class);
         Mockito.verify(service).save(Mockito.eq(email), subscription.capture());
-        assertThat(subscription.getValue(), is(source));
+        assertThat(subscription.getValue()).isEqualTo(source);
 
         // And check validation
 
-        JsonNode sourceToValidate = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("lastname", "dupond");
-            model.put("firstname", "jean");
-            model.put("email", email);
-
-            return model;
-
-        });
+        JsonNode sourceToValidate = MAPPER.readTree("{\"email\": \"" + email + "\", \"lastname\": \"dupond\", \"firstname\":\"jean\"}");
 
         Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("subscription"),
                 subscription.capture());
-        assertThat(subscription.getValue(), is(sourceToValidate));
+        assertThat(subscription.getValue()).isEqualTo(sourceToValidate);
 
     }
 
@@ -145,11 +128,11 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
         // And check body
 
-        assertThat(response.readEntity(JsonNode.class), is(subscription));
+        assertThat(response.readEntity(JsonNode.class)).isEqualTo(subscription);
 
     }
 

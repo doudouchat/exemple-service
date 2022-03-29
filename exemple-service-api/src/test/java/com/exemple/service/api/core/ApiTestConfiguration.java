@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jndi.JndiObjectFactoryBean;
+import org.springframework.util.ResourceUtils;
 
-import com.exemple.service.api.common.JsonNodeUtils;
 import com.exemple.service.api.common.script.CustomerScriptFactory;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.customer.account.AccountService;
@@ -28,9 +28,12 @@ import com.exemple.service.schema.filter.SchemaFilter;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.exemple.service.store.stock.StockService;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 public class ApiTestConfiguration extends ApiConfiguration {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Bean
     public AccountService accountService() {
@@ -119,33 +122,34 @@ public class ApiTestConfiguration extends ApiConfiguration {
     }
 
     @Bean(name = "account")
-    public JsonNode account() {
+    public JsonNode account() throws IOException {
 
-        return JsonNodeUtils.create("classpath:model/account.json");
+        return MAPPER.readTree(ResourceUtils.getFile("classpath:model/account.json"));
     }
 
     @Bean(name = "subscription")
-    public JsonNode subscription() {
+    public JsonNode subscription() throws IOException {
 
-        return JsonNodeUtils.create("classpath:model/subscription.json");
+        return MAPPER.readTree(ResourceUtils.getFile("classpath:model/subscription.json"));
+
     }
 
     @Bean(name = "schema")
-    public JsonNode schema() {
+    public JsonNode schema() throws IOException {
 
-        return JsonNodeUtils.create("classpath:model/schema.json");
+        return MAPPER.readTree(ResourceUtils.getFile("classpath:model/schema.json"));
     }
 
     @Bean(name = "swagger")
-    public JsonNode swagger() {
+    public JsonNode swagger() throws IOException {
 
-        return JsonNodeUtils.create("classpath:model/swagger.json");
+        return MAPPER.readTree(ResourceUtils.getFile("classpath:model/swagger.json"));
     }
 
     @Bean(name = "swagger_security")
-    public JsonNode swaggerSecurity() {
+    public JsonNode swaggerSecurity() throws IOException {
 
-        return JsonNodeUtils.create("classpath:model/swagger_security.json");
+        return MAPPER.readTree(ResourceUtils.getFile("classpath:model/swagger_security.json"));
     }
 
 }

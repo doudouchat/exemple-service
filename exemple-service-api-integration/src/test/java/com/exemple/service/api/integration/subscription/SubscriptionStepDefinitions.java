@@ -2,9 +2,7 @@ package com.exemple.service.api.integration.subscription;
 
 import static com.exemple.service.api.integration.core.InitData.TEST_APP;
 import static com.exemple.service.api.integration.core.InitData.VERSION_V1;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
 
@@ -71,7 +69,7 @@ public class SubscriptionStepDefinitions {
     @Then("subscription status is {int}")
     public void checkStatus(int status) {
 
-        assertThat(context.lastResponse().getStatusCode(), is(status));
+        assertThat(context.lastResponse().getStatusCode()).isEqualTo(status);
 
     }
 
@@ -83,14 +81,14 @@ public class SubscriptionStepDefinitions {
         ObjectNode expectedBody = (ObjectNode) MAPPER.readTree(context.lastGet().asString());
         expectedBody.remove("subscription_date");
 
-        assertThat(expectedBody, is(body));
+        assertThat(expectedBody).isEqualTo(body);
 
     }
 
     @And("subscription contains {string}")
     public void checkProperty(String property) {
 
-        assertThat(context.lastGet().jsonPath().getString(property), is(notNullValue()));
+        assertThat(context.lastGet().jsonPath().getString(property)).isNotNull();
 
     }
 
@@ -100,7 +98,7 @@ public class SubscriptionStepDefinitions {
         ArrayNode errors = (ArrayNode) MAPPER.readTree(context.lastPut().asString());
         Streams.stream(errors.elements()).map(ObjectNode.class::cast).forEach((ObjectNode error) -> error.remove("message"));
 
-        assertThat(errors, is(body));
+        assertThat(errors).isEqualTo(body);
 
     }
 

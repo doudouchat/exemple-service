@@ -1,12 +1,6 @@
 package com.exemple.service.resource.account;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
@@ -97,24 +91,24 @@ public class AccountResourceTest {
             List<AccountHistory> histories = accountHistoryResource.findById(id);
             createDate = ServiceContextExecution.context().getDate();
             assertAll(
-                    () -> assertThat(histories, is(hasSize(2))),
+                    () -> assertThat(histories).hasSize(2),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/email"), "jean.dupond@gmail", createDate.toInstant()),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
 
             // And check account
-            JsonNode result = resource.get(id).get();
-            assertThat(result, is(MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupond@gmail\"}")));
+            Optional<JsonNode> result = resource.get(id);
+            assertThat(result).hasValue(MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupond@gmail\"}"));
 
             // And check event
             AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
             assertAll(
-                    () -> assertThat(event.getEventType(), is(EventType.CREATE)),
-                    () -> assertThat(event.getLocalDate(), is(ServiceContextExecution.context().getDate().toLocalDate())),
-                    () -> assertThat(event.getData(), is(notNullValue())));
+                    () -> assertThat(event.getEventType()).isEqualTo(EventType.CREATE),
+                    () -> assertThat(event.getLocalDate()).isEqualTo(ServiceContextExecution.context().getDate().toLocalDate()),
+                    () -> assertThat(event.getData()).isNotNull());
 
             ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
                     .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-            assertThat(acountAccountEvents.all().size(), greaterThanOrEqualTo(1));
+            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(1);
         }
 
         @Test
@@ -132,19 +126,19 @@ public class AccountResourceTest {
             List<AccountHistory> histories = accountHistoryResource.findById(id);
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
             assertAll(
-                    () -> assertThat(histories, is(hasSize(3))),
+                    () -> assertThat(histories).hasSize(3),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/email"), "jean.dupont@gmail", updateDate.toInstant()),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/age"), 19, updateDate.toInstant()),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
 
             // And check account
-            JsonNode result = resource.get(id).get();
-            assertThat(result, is(MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupont@gmail\", \"age\": 19}")));
+            Optional<JsonNode> result = resource.get(id);
+            assertThat(result).hasValue(MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupont@gmail\", \"age\": 19}"));
 
             // And check event
             ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
                     .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-            assertThat(acountAccountEvents.all().size(), greaterThanOrEqualTo(2));
+            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(2);
         }
 
         @Test
@@ -162,14 +156,14 @@ public class AccountResourceTest {
             List<AccountHistory> histories = accountHistoryResource.findById(id);
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
             assertAll(
-                    () -> assertThat(histories, is(hasSize(3))),
+                    () -> assertThat(histories).hasSize(3),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/email"), JsonNodeType.NULL, updateDate.toInstant()),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/age"), JsonNodeType.NULL, updateDate.toInstant()),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
 
             // And check account
-            JsonNode result = resource.get(id).get();
-            assertThat(result, is(MAPPER.readTree("{\"id\": \"" + id + "\"}")));
+            Optional<JsonNode> result = resource.get(id);
+            assertThat(result).hasValue(MAPPER.readTree("{\"id\": \"" + id + "\"}"));
         }
 
     }
@@ -199,16 +193,16 @@ public class AccountResourceTest {
             List<AccountHistory> histories = accountHistoryResource.findById(id);
             createDate = ServiceContextExecution.context().getDate();
             assertAll(
-                    () -> assertThat(histories, is(hasSize(3))),
+                    () -> assertThat(histories).hasSize(3),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/street"), "1 rue de la poste",
                             createDate.toInstant()),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/floor"), 5, createDate.toInstant()),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
 
             // And check account
-            JsonNode result = resource.get(id).get();
-            assertThat(result,
-                    is(MAPPER.readTree("{\"id\": \"" + id + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}}}")));
+            Optional<JsonNode> result = resource.get(id);
+            assertThat(result).hasValue(
+                    MAPPER.readTree("{\"id\": \"" + id + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}}}"));
         }
 
         @Test
@@ -228,7 +222,7 @@ public class AccountResourceTest {
             List<AccountHistory> histories = accountHistoryResource.findById(id);
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
             assertAll(
-                    () -> assertThat(histories, is(hasSize(4))),
+                    () -> assertThat(histories).hasSize(4),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/street"), "1 rue de la poste",
                             createDate.toInstant()),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/floor"), 5, createDate.toInstant()),
@@ -237,10 +231,10 @@ public class AccountResourceTest {
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
 
             // And check account
-            JsonNode result = resource.get(id).get();
-            assertThat(result, is(MAPPER
+            Optional<JsonNode> result = resource.get(id);
+            assertThat(result).hasValue(MAPPER
                     .readTree("{\"id\": \"" + id
-                            + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}, \"job\": {\"street\": \"1 rue de la paris\"}}}")));
+                            + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}, \"job\": {\"street\": \"1 rue de la paris\"}}}"));
         }
 
         @Test
@@ -260,7 +254,7 @@ public class AccountResourceTest {
             List<AccountHistory> histories = accountHistoryResource.findById(id);
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
             assertAll(
-                    () -> assertThat(histories, is(hasSize(5))),
+                    () -> assertThat(histories).hasSize(5),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/street"), "1 rue de la poste",
                             createDate.toInstant()),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/floor"), 5, createDate.toInstant()),
@@ -271,10 +265,10 @@ public class AccountResourceTest {
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
 
             // And check account
-            JsonNode result = resource.get(id).get();
-            assertThat(result, is(MAPPER
+            Optional<JsonNode> result = resource.get(id);
+            assertThat(result).hasValue(MAPPER
                     .readTree("{\"id\": \"" + id
-                            + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}, \"job\": {\"street\": \"10 rue de la paris\", \"floor\": 5}}}")));
+                            + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}, \"job\": {\"street\": \"10 rue de la paris\", \"floor\": 5}}}"));
         }
 
         @Test
@@ -294,7 +288,7 @@ public class AccountResourceTest {
             List<AccountHistory> histories = accountHistoryResource.findById(id);
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
             assertAll(
-                    () -> assertThat(histories, is(hasSize(4))),
+                    () -> assertThat(histories).hasSize(4),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/street"), "1 rue de la poste",
                             createDate.toInstant()),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/floor"), 5, createDate.toInstant()),
@@ -303,9 +297,9 @@ public class AccountResourceTest {
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
 
             // And check account
-            JsonNode result = resource.get(id).get();
-            assertThat(result, is(MAPPER
-                    .readTree("{\"id\": \"" + id + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}}}")));
+            Optional<JsonNode> result = resource.get(id);
+            assertThat(result).hasValue(MAPPER
+                    .readTree("{\"id\": \"" + id + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}}}"));
         }
 
         @Test
@@ -323,13 +317,13 @@ public class AccountResourceTest {
             List<AccountHistory> histories = accountHistoryResource.findById(id);
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
             assertAll(
-                    () -> assertThat(histories, is(hasSize(2))),
+                    () -> assertThat(histories).hasSize(2),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses"), JsonNodeType.NULL, updateDate.toInstant()),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
 
             // And check account
-            JsonNode result = resource.get(id).get();
-            assertThat(result, is(MAPPER.readTree("{\"id\": \"" + id + "\"}")));
+            Optional<JsonNode> result = resource.get(id);
+            assertThat(result).hasValue(MAPPER.readTree("{\"id\": \"" + id + "\"}"));
         }
     }
 
@@ -357,14 +351,14 @@ public class AccountResourceTest {
             List<AccountHistory> histories = accountHistoryResource.findById(id);
             createDate = ServiceContextExecution.context().getDate();
             assertAll(
-                    () -> assertThat(histories, is(hasSize(3))),
+                    () -> assertThat(histories).hasSize(3),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/code"), "code_1", createDate.toInstant()),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/version"), "v1", createDate.toInstant()),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
 
             // And check account
-            JsonNode result = resource.get(id).get();
-            assertThat(result, is(MAPPER.readTree("{\"id\": \"" + id + "\", \"cgus\": [{\"code\": \"code_1\", \"version\": \"v1\"}]}")));
+            Optional<JsonNode> result = resource.get(id);
+            assertThat(result).hasValue(MAPPER.readTree("{\"id\": \"" + id + "\", \"cgus\": [{\"code\": \"code_1\", \"version\": \"v1\"}]}"));
         }
 
         @Test
@@ -383,7 +377,7 @@ public class AccountResourceTest {
             List<AccountHistory> histories = accountHistoryResource.findById(id);
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
             assertAll(
-                    () -> assertThat(histories, is(hasSize(5))),
+                    () -> assertThat(histories).hasSize(5),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/code"), "code_1", createDate.toInstant()),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/version"), "v1", createDate.toInstant()),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/1/code"), "code_1", updateDate.toInstant()),
@@ -391,10 +385,10 @@ public class AccountResourceTest {
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
 
             // And check account
-            JsonNode result = resource.get(id).get();
-            assertThat(result, is(MAPPER
+            Optional<JsonNode> result = resource.get(id);
+            assertThat(result).hasValue(MAPPER
                     .readTree("{\"id\": \"" + id
-                            + "\", \"cgus\": [{\"code\": \"code_1\", \"version\": \"v1\"}, {\"code\": \"code_1\", \"version\": \"v2\"}]}")));
+                            + "\", \"cgus\": [{\"code\": \"code_1\", \"version\": \"v1\"}, {\"code\": \"code_1\", \"version\": \"v2\"}]}"));
         }
 
         @Test
@@ -412,13 +406,13 @@ public class AccountResourceTest {
             List<AccountHistory> histories = accountHistoryResource.findById(id);
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
             assertAll(
-                    () -> assertThat(histories, is(hasSize(2))),
+                    () -> assertThat(histories).hasSize(2),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus"), JsonNodeType.NULL, updateDate.toInstant()),
                     () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
 
             // And check account
-            JsonNode result = resource.get(id).get();
-            assertThat(result, is(MAPPER.readTree("{\"id\": \"" + id + "\"}")));
+            Optional<JsonNode> result = resource.get(id);
+            assertThat(result).hasValue(MAPPER.readTree("{\"id\": \"" + id + "\"}"));
         }
     }
 
@@ -429,7 +423,7 @@ public class AccountResourceTest {
         Optional<JsonNode> account = resource.get(UUID.randomUUID());
 
         // And check account
-        assertThat(account.isPresent(), is(false));
+        assertThat(account).isEmpty();
     }
 
     @Test
@@ -456,32 +450,34 @@ public class AccountResourceTest {
         List<String> ids = accounts.stream().map(account -> account.get(AccountField.ID.field).asText()).collect(Collectors.toList());
 
         assertAll(
-                () -> assertThat(ids, hasSize(2)),
-                () -> assertThat(ids, containsInAnyOrder(id1.toString(), id2.toString())),
-                () -> assertThat(ids, not(containsInAnyOrder(id3.toString()))));
+                () -> assertThat(ids).hasSize(2),
+                () -> assertThat(ids).containsOnly(id1.toString(), id2.toString()));
     }
 
     private static void assertHistory(AccountHistory accountHistory, JsonNodeType expectedJsonNodeType, Instant expectedDate) {
 
-        assertThat(accountHistory.getValue().getNodeType(), is(expectedJsonNodeType));
-        assertThat(accountHistory.getDate(), is(expectedDate));
-        assertHistory(accountHistory);
+        assertAll(
+                () -> assertThat(accountHistory.getValue().getNodeType()).isEqualTo(expectedJsonNodeType),
+                () -> assertThat(accountHistory.getDate()).isEqualTo(expectedDate),
+                () -> assertHistory(accountHistory));
 
     }
 
     private static void assertHistory(AccountHistory accountHistory, Object expectedValue, Instant expectedDate) {
 
-        assertThat(accountHistory.getValue().asText(), is(expectedValue.toString()));
-        assertThat(accountHistory.getDate(), is(expectedDate));
-        assertHistory(accountHistory);
+        assertAll(
+                () -> assertThat(accountHistory.getValue().asText()).isEqualTo(expectedValue.toString()),
+                () -> assertThat(accountHistory.getDate()).isEqualTo(expectedDate),
+                () -> assertHistory(accountHistory));
 
     }
 
     private static void assertHistory(AccountHistory accountHistory) {
 
-        assertThat(accountHistory.getApplication(), is("test"));
-        assertThat(accountHistory.getVersion(), is("v1"));
-        assertThat(accountHistory.getUser(), is("user"));
+        assertAll(
+                () -> assertThat(accountHistory.getApplication()).isEqualTo("test"),
+                () -> assertThat(accountHistory.getVersion()).isEqualTo("v1"),
+                () -> assertThat(accountHistory.getUser()).isEqualTo("user"));
 
     }
 }

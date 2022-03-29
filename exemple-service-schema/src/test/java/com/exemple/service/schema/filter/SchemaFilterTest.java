@@ -1,9 +1,7 @@
 package com.exemple.service.schema.filter;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -55,7 +53,7 @@ public class SchemaFilterTest {
         JsonNode newSource = schemaFilter.filter(app, "default", "schema_test", "default", source);
 
         // Then check source after filter
-        assertThat(newSource, is(MAPPER.readTree("{\"field1\": \"value1\", \"field3\": {\"object2\": \"value2\"}}")));
+        assertThat(newSource).isEqualTo(MAPPER.readTree("{\"field1\": \"value1\", \"field3\": {\"object2\": \"value2\"}}"));
     }
 
     @Test
@@ -76,7 +74,7 @@ public class SchemaFilterTest {
         Throwable throwable = catchThrowable(() -> schemaFilter.filter(app, "default", "schema_test", "default", source));
 
         // Then check throwable
-        assertThat(throwable, instanceOf(IllegalArgumentException.class));
+        assertThat(throwable).isInstanceOf(IllegalArgumentException.class);
 
     }
 

@@ -1,12 +1,10 @@
 package com.exemple.service.api.login;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -24,7 +22,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.exemple.service.api.common.JsonNodeUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
@@ -32,8 +29,11 @@ import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.login.exception.UsernameAlreadyExistsException;
 import com.exemple.service.resource.login.model.LoginEntity;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class LoginApiTest extends JerseySpringSupport {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
     protected ResourceConfig configure() {
@@ -69,7 +69,7 @@ public class LoginApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.NO_CONTENT.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
 
     }
 
@@ -90,7 +90,7 @@ public class LoginApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 
     }
 
@@ -115,25 +115,25 @@ public class LoginApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.CREATED.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
 
         // And check location
 
         URI baseUri = target(URL).getUri();
-        assertThat(response.getLocation(), is(URI.create(baseUri + "/" + username)));
+        assertThat(response.getLocation()).isEqualTo(URI.create(baseUri + "/" + username));
 
         // And check service
 
         ArgumentCaptor<LoginEntity> login = ArgumentCaptor.forClass(LoginEntity.class);
         Mockito.verify(resource).save(login.capture());
         assertAll(
-                () -> assertThat(login.getValue().getUsername(), is(username)),
-                () -> assertThat(login.getValue().getId(), is(model.get("id"))));
+                () -> assertThat(login.getValue().getUsername()).isEqualTo(username),
+                () -> assertThat(login.getValue().getId()).isEqualTo(model.get("id")));
 
     }
 
     @Test
-    public void createAlreadyExistFailure() throws UsernameAlreadyExistsException {
+    public void createAlreadyExistFailure() throws UsernameAlreadyExistsException, IOException {
 
         // Given user_name
 
@@ -157,21 +157,14 @@ public class LoginApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
 
         // And check body
 
-        JsonNode expectedMessage = JsonNodeUtils.create(() -> {
+        JsonNode expectedMessage = MAPPER
+                .readTree("[{\"path\": \"/username\", \"code\": \"username\", \"message\":\"[" + username + "] already exists\"}]");
 
-            Map<String, Object> message = new HashMap<>();
-            message.put("path", "/username");
-            message.put("code", "username");
-            message.put("message", "[" + username + "] already exists");
-
-            return Collections.singletonList(message);
-
-        });
-        assertThat(response.readEntity(JsonNode.class), is(expectedMessage));
+        assertThat(response.readEntity(JsonNode.class)).isEqualTo(expectedMessage);
 
     }
 
@@ -200,14 +193,14 @@ public class LoginApiTest extends JerseySpringSupport {
 
         // And check status
 
-        assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
         // And check body
         @SuppressWarnings("unchecked")
         Map<String, Object> actualModel = response.readEntity(Map.class);
         assertAll(
-                () -> assertThat(actualModel.get("username"), is(nullValue())),
-                () -> assertThat(actualModel.get("id"), is(entity.getId().toString())));
+                () -> assertThat(actualModel.get("username")).isNull(),
+                () -> assertThat(actualModel.get("id")).isEqualTo(entity.getId().toString()));
 
     }
 
@@ -228,7 +221,7 @@ public class LoginApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.NO_CONTENT.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
 
         // And check mock
 

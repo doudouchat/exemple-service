@@ -1,11 +1,9 @@
 package com.exemple.service.api.common;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,8 +25,12 @@ import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.api.stock.StockApiTest;
 import com.exemple.service.customer.account.AccountService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ExceptionApiTest extends JerseySpringSupport {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
     protected ResourceConfig configure() {
@@ -54,7 +56,7 @@ public class ExceptionApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 
     }
 
@@ -67,7 +69,7 @@ public class ExceptionApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.NOT_ACCEPTABLE.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.NOT_ACCEPTABLE.getStatusCode());
 
     }
 
@@ -80,7 +82,7 @@ public class ExceptionApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
     }
 
     @Test
@@ -97,11 +99,11 @@ public class ExceptionApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
     }
 
     @Test
-    public void JsonPatchException() {
+    public void JsonPatchException() throws IOException {
 
         // Given account id
 
@@ -109,25 +111,22 @@ public class ExceptionApiTest extends JerseySpringSupport {
 
         // And mock service
 
-        Mockito.when(service.get(Mockito.eq(id))).thenReturn(Optional.of(JsonNodeUtils.create(() -> "{}")));
+        Mockito.when(service.get(Mockito.eq(id))).thenReturn(Optional.of(MAPPER.createObjectNode()));
 
         // When perform patch
 
-        Map<String, Object> patch = new HashMap<>();
-        patch.put("op", "replace");
-        patch.put("path", "/lastname");
-        patch.put("value", "Dupond");
+        JsonNode patch = MAPPER.readTree("{\"op\": \"replace\", \"path\": \"/lastname\", \"value\":\"Dupond\"}");
 
         Response response = target(AccountApiTest.URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
                 .request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
 
-                .method("PATCH", Entity.json(JsonNodeUtils.toString(Collections.singletonList(patch))));
+                .method("PATCH", Entity.json(Collections.singletonList(patch)));
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
 
     }
 
@@ -144,11 +143,11 @@ public class ExceptionApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
 
         // And check body
 
-        assertThat(response.readEntity(String.class), is("One or more fields are unrecognized"));
+        assertThat(response.readEntity(String.class)).isEqualTo("One or more fields are unrecognized");
 
     }
 
@@ -167,7 +166,7 @@ public class ExceptionApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.INTERNAL_SERVER_ERROR.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 
     }
 

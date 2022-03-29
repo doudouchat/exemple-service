@@ -79,25 +79,6 @@
 			<artifactId>mockito-core</artifactId>
 		</dependency>
 
-		<!-- HAMCREST -->
-
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-all</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>nl.fd</groupId>
-			<artifactId>hamcrest-jackson</artifactId>
-		</dependency>
-
-		<!-- ASSERTJ -->
-
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-		</dependency>
-
 	</dependencies>
 
 	<build>

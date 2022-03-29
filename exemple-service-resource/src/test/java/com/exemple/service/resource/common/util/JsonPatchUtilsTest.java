@@ -1,7 +1,6 @@
 package com.exemple.service.resource.common.util;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
@@ -33,10 +32,10 @@ public class JsonPatchUtilsTest {
 
         // Then check diff
         assertAll(
-                () -> assertThat(patch.size(), is(1)),
-                () -> assertThat(patch.get(0).get(JsonPatchUtils.OP).textValue(), is("replace")),
-                () -> assertThat(patch.get(0).get(JsonPatchUtils.PATH).textValue(), is("/email")),
-                () -> assertThat(patch.get(0).get(JsonPatchUtils.VALUE).textValue(), is("jean.dupond@gmail")));
+                () -> assertThat(patch).hasSize(1),
+                () -> assertThat(patch.get(0).get(JsonPatchUtils.OP).textValue()).isEqualTo("replace"),
+                () -> assertThat(patch.get(0).get(JsonPatchUtils.PATH).textValue()).isEqualTo("/email"),
+                () -> assertThat(patch.get(0).get(JsonPatchUtils.VALUE).textValue()).isEqualTo("jean.dupond@gmail"));
 
     }
 
@@ -55,13 +54,13 @@ public class JsonPatchUtilsTest {
         // Then check diff
         List<JsonNode> result = sortPatchByPath(patch);
         assertAll(
-                () -> assertThat(result.size(), is(2)),
-                () -> assertThat(result.get(0).get(JsonPatchUtils.OP).textValue(), is("add")),
-                () -> assertThat(result.get(0).get(JsonPatchUtils.PATH).textValue(), is("/address/city")),
-                () -> assertThat(result.get(0).get(JsonPatchUtils.VALUE).textValue(), is("Paris")),
-                () -> assertThat(result.get(1).get(JsonPatchUtils.OP).textValue(), is("remove")),
-                () -> assertThat(result.get(1).get(JsonPatchUtils.PATH).textValue(), is("/address/street")),
-                () -> assertThat(result.get(1).get(JsonPatchUtils.VALUE).textValue(), is("1 rue de la paix")));
+                () -> assertThat(result).hasSize(2),
+                () -> assertThat(result.get(0).get(JsonPatchUtils.OP).textValue()).isEqualTo("add"),
+                () -> assertThat(result.get(0).get(JsonPatchUtils.PATH).textValue()).isEqualTo("/address/city"),
+                () -> assertThat(result.get(0).get(JsonPatchUtils.VALUE).textValue()).isEqualTo("Paris"),
+                () -> assertThat(result.get(1).get(JsonPatchUtils.OP).textValue()).isEqualTo("remove"),
+                () -> assertThat(result.get(1).get(JsonPatchUtils.PATH).textValue()).isEqualTo("/address/street"),
+                () -> assertThat(result.get(1).get(JsonPatchUtils.VALUE).textValue()).isEqualTo("1 rue de la paix"));
 
     }
 
@@ -84,20 +83,20 @@ public class JsonPatchUtilsTest {
         // then check diffs
         List<JsonNode> result = sortPatchByPath(patch);
         assertAll(
-                () -> assertThat(result.size(), is(4)),
-                () -> assertThat(result.get(0).get(JsonPatchUtils.OP).textValue(), is("add")),
-                () -> assertThat(result.get(0).get(JsonPatchUtils.PATH).textValue(), is("/addresses/holidays/city")),
-                () -> assertThat(result.get(0).get("value").textValue(), is("Paris")),
-                () -> assertThat(result.get(1).get(JsonPatchUtils.OP).textValue(), is("add")),
-                () -> assertThat(result.get(1).get(JsonPatchUtils.PATH).textValue(), is("/addresses/holidays/street")),
-                () -> assertThat(result.get(1).get(JsonPatchUtils.VALUE).textValue(), is("1 rue de la paix")),
-                () -> assertThat(result.get(2).get(JsonPatchUtils.OP).textValue(), is("replace")),
-                () -> assertThat(result.get(2).get(JsonPatchUtils.PATH).textValue(), is("/addresses/home/city")),
-                () -> assertThat(result.get(2).get(JsonPatchUtils.VALUE).textValue(), is("Paris")),
-                () -> assertThat(result.get(3).get(JsonPatchUtils.OP).textValue(), is("remove")),
-                () -> assertThat(result.get(3).get(JsonPatchUtils.PATH).textValue(), is("/addresses/job")),
-                () -> assertThat(result.get(3).path(JsonPatchUtils.VALUE),
-                        is(MAPPER.readTree("{\"street\": \"1 rue de la paix\", \"city\": \"Paris\"}"))));
+                () -> assertThat(result).hasSize(4),
+                () -> assertThat(result.get(0).get(JsonPatchUtils.OP).textValue()).isEqualTo("add"),
+                () -> assertThat(result.get(0).get(JsonPatchUtils.PATH).textValue()).isEqualTo("/addresses/holidays/city"),
+                () -> assertThat(result.get(0).get("value").textValue()).isEqualTo("Paris"),
+                () -> assertThat(result.get(1).get(JsonPatchUtils.OP).textValue()).isEqualTo("add"),
+                () -> assertThat(result.get(1).get(JsonPatchUtils.PATH).textValue()).isEqualTo("/addresses/holidays/street"),
+                () -> assertThat(result.get(1).get(JsonPatchUtils.VALUE).textValue()).isEqualTo("1 rue de la paix"),
+                () -> assertThat(result.get(2).get(JsonPatchUtils.OP).textValue()).isEqualTo("replace"),
+                () -> assertThat(result.get(2).get(JsonPatchUtils.PATH).textValue()).isEqualTo("/addresses/home/city"),
+                () -> assertThat(result.get(2).get(JsonPatchUtils.VALUE).textValue()).isEqualTo("Paris"),
+                () -> assertThat(result.get(3).get(JsonPatchUtils.OP).textValue()).isEqualTo("remove"),
+                () -> assertThat(result.get(3).get(JsonPatchUtils.PATH).textValue()).isEqualTo("/addresses/job"),
+                () -> assertThat(result.get(3).path(JsonPatchUtils.VALUE))
+                        .isEqualTo(MAPPER.readTree("{\"street\": \"1 rue de la paix\", \"city\": \"Paris\"}")));
 
     }
 
@@ -116,10 +115,10 @@ public class JsonPatchUtilsTest {
         // then check diffs
         List<JsonNode> result = sortPatchByPath(patch);
         assertAll(
-                () -> assertThat(result.size(), is(1)),
-                () -> assertThat(result.get(0).get(JsonPatchUtils.OP).textValue(), is("add")),
-                () -> assertThat(result.get(0).get(JsonPatchUtils.PATH).textValue(), is("/preferences/0")),
-                () -> assertThat(result.get(0).get(JsonPatchUtils.VALUE).textValue(), is("pref 1")));
+                () -> assertThat(result).hasSize(1),
+                () -> assertThat(result.get(0).get(JsonPatchUtils.OP).textValue()).isEqualTo("add"),
+                () -> assertThat(result.get(0).get(JsonPatchUtils.PATH).textValue()).isEqualTo("/preferences/0"),
+                () -> assertThat(result.get(0).get(JsonPatchUtils.VALUE).textValue()).isEqualTo("pref 1"));
 
     }
 
@@ -138,13 +137,13 @@ public class JsonPatchUtilsTest {
         // then check diffs
         List<JsonNode> result = sortPatchByPath(patch);
         assertAll(
-                () -> assertThat(result.size(), is(2)),
-                () -> assertThat(result.get(0).get(JsonPatchUtils.OP).textValue(), is("add")),
-                () -> assertThat(result.get(0).get(JsonPatchUtils.PATH).textValue(), is("/cgus/0/code")),
-                () -> assertThat(result.get(0).get(JsonPatchUtils.VALUE).textValue(), is("code 1")),
-                () -> assertThat(result.get(1).get(JsonPatchUtils.OP).textValue(), is("add")),
-                () -> assertThat(result.get(1).get(JsonPatchUtils.PATH).textValue(), is("/cgus/0/version")),
-                () -> assertThat(result.get(1).get(JsonPatchUtils.VALUE).textValue(), is("version 1")));
+                () -> assertThat(result).hasSize(2),
+                () -> assertThat(result.get(0).get(JsonPatchUtils.OP).textValue()).isEqualTo("add"),
+                () -> assertThat(result.get(0).get(JsonPatchUtils.PATH).textValue()).isEqualTo("/cgus/0/code"),
+                () -> assertThat(result.get(0).get(JsonPatchUtils.VALUE).textValue()).isEqualTo("code 1"),
+                () -> assertThat(result.get(1).get(JsonPatchUtils.OP).textValue()).isEqualTo("add"),
+                () -> assertThat(result.get(1).get(JsonPatchUtils.PATH).textValue()).isEqualTo("/cgus/0/version"),
+                () -> assertThat(result.get(1).get(JsonPatchUtils.VALUE).textValue()).isEqualTo("version 1"));
 
     }
 
