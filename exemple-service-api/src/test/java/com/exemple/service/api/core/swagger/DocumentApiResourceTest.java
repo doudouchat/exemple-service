@@ -1,7 +1,6 @@
 package com.exemple.service.api.core.swagger;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -85,11 +84,11 @@ public class DocumentApiResourceTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
         // And check body
 
-        assertThat(response.readEntity(JsonNode.class), is(swagger));
+        assertThat(response.readEntity(JsonNode.class)).isEqualTo(swagger);
 
     }
 
@@ -116,11 +115,11 @@ public class DocumentApiResourceTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
         // And check body
 
-        assertThat(response.readEntity(JsonNode.class), is(schema));
+        assertThat(response.readEntity(JsonNode.class)).isEqualTo(schema);
 
     }
 
@@ -138,11 +137,11 @@ public class DocumentApiResourceTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
         // And check body
 
-        assertThat(response.readEntity(JsonNode.class), is(schema));
+        assertThat(response.readEntity(JsonNode.class)).isEqualTo(schema);
 
     }
 
@@ -168,12 +167,12 @@ public class DocumentApiResourceTest extends JerseySpringSupport {
 
             // Then check status
 
-            assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+            assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
             // And check body
 
             JsonNode swagger = response.readEntity(JsonNode.class);
-            assertThat(swagger.at("/components/securitySchemes"), is(swaggerSecurity));
+            assertThat(swagger.at("/components/securitySchemes")).isEqualTo(swaggerSecurity);
 
         }
 

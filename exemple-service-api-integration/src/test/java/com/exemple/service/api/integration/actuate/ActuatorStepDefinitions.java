@@ -1,8 +1,6 @@
 package com.exemple.service.api.integration.actuate;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -57,14 +55,14 @@ public class ActuatorStepDefinitions {
     @Then("actuator status is {int}")
     public void checkStatus(int status) {
 
-        assertThat(context.lastResponse().getStatusCode(), is(status));
+        assertThat(context.lastResponse().getStatusCode()).isEqualTo(status);
 
     }
 
     @And("actuator contains {string}")
     public void checkProperty(String property) {
 
-        assertThat(context.lastGet().jsonPath().getString(property), is(notNullValue()));
+        assertThat(context.lastGet().jsonPath().getString(property)).isNotNull();
 
     }
 
@@ -73,7 +71,7 @@ public class ActuatorStepDefinitions {
 
         ObjectNode expectedBody = (ObjectNode) MAPPER.readTree(context.lastGet().asString());
 
-        assertThat(expectedBody, is(body));
+        assertThat(expectedBody).isEqualTo(body);
 
     }
 
@@ -81,7 +79,7 @@ public class ActuatorStepDefinitions {
     public void checkHtmlProperty(String property) {
 
         Document doc = Jsoup.parse(context.lastGet().getBody().print());
-        assertThat(doc.getElementById(property).text(), is(notNullValue()));
+        assertThat(doc.getElementById(property).text()).isNotNull();
 
     }
 

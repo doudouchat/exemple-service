@@ -1,8 +1,7 @@
 package com.exemple.service.api.integration.swagger;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.interceptor.SimpleKey;
@@ -58,7 +57,7 @@ public class SwaggerStepDefinitions {
     @Then("schema status is {int}")
     public void checkStatus(int status) {
 
-        assertThat(context.lastResponse().getStatusCode(), is(status));
+        assertThat(context.lastResponse().getStatusCode()).isEqualTo(status);
 
     }
 
@@ -66,9 +65,10 @@ public class SwaggerStepDefinitions {
     public void checkCache(String application, String keyspace) throws JsonProcessingException {
 
         IMap<SimpleKey, SchemaEntity> schema = cache.getMap("schema_resource");
-        assertThat(schema.get(new SimpleKey(keyspace, application, "v1", "account", "user")), is(notNullValue()));
-        assertThat(schema.get(new SimpleKey(keyspace, application, "v1", "account", "user")).getContent(),
-                is(MAPPER.readTree(context.lastGet().getBody().asString())));
+        assertAll(
+                () -> assertThat(schema.get(new SimpleKey(keyspace, application, "v1", "account", "user"))).isNotNull(),
+                () -> assertThat(schema.get(new SimpleKey(keyspace, application, "v1", "account", "user")).getContent()).isEqualTo(
+                        MAPPER.readTree(context.lastGet().getBody().asString())));
 
     }
 

@@ -1,7 +1,6 @@
 package com.exemple.service.api.core.info;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -40,11 +39,11 @@ public class InfoApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
         // And check body
 
-        assertThat(response.readEntity(String.class), is("{\"version\":\"nc\",\"buildTime\":\"nc\"}"));
+        assertThat(response.readEntity(String.class)).isEqualTo("{\"version\":\"nc\",\"buildTime\":\"nc\"}");
 
     }
 

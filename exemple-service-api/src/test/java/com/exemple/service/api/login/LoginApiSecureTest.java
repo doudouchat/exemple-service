@@ -1,7 +1,6 @@
 package com.exemple.service.api.login;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.Optional;
@@ -75,14 +74,14 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
         // And check security context
 
         assertAll(
-                () -> assertThat(testFilter.context.getUserPrincipal().getName(), is(username)),
-                () -> assertThat(testFilter.context.isSecure(), is(true)),
-                () -> assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH)));
+                () -> assertThat(testFilter.context.getUserPrincipal().getName()).isEqualTo(username),
+                () -> assertThat(testFilter.context.isSecure()).isTrue(),
+                () -> assertThat(testFilter.context.getAuthenticationScheme()).isEqualTo(SecurityContext.BASIC_AUTH));
 
     }
 
@@ -123,14 +122,14 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
         // And check security context
 
         assertAll(
-                () -> assertThat(testFilter.context.getUserPrincipal().getName(), is(secondUsername)),
-                () -> assertThat(testFilter.context.isSecure(), is(true)),
-                () -> assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH)));
+                () -> assertThat(testFilter.context.getUserPrincipal().getName()).isEqualTo(secondUsername),
+                () -> assertThat(testFilter.context.isSecure()).isTrue(),
+                () -> assertThat(testFilter.context.getAuthenticationScheme()).isEqualTo(SecurityContext.BASIC_AUTH));
 
     }
 
@@ -154,7 +153,7 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.FORBIDDEN.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
 
     }
 
@@ -195,7 +194,7 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.FORBIDDEN.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
 
     }
 }

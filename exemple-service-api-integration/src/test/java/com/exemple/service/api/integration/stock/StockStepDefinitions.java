@@ -1,8 +1,7 @@
 package com.exemple.service.api.integration.stock;
 
 import static com.exemple.service.api.integration.core.InitData.BACK_APP;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
 import java.util.Map;
@@ -62,7 +61,7 @@ public class StockStepDefinitions {
     @Then("stock status is {int}")
     public void checkStatus(int status) {
 
-        assertThat(context.lastResponse().getStatusCode(), is(status));
+        assertThat(context.lastResponse().getStatusCode()).isEqualTo(status);
 
     }
 
@@ -71,15 +70,15 @@ public class StockStepDefinitions {
 
         Response response = StockApiClient.get(store + "#" + salt, product, BACK_APP);
 
-        assertThat(response.jsonPath().getLong("amount"), is(amount));
+        assertThat(response.jsonPath().getLong("amount")).isEqualTo(amount);
 
     }
 
     @And("stock of product {string} from store {string} is {long}, is insufficient for {long}")
     public void checkError(String product, String store, long stock, long quantity) throws JsonProcessingException {
 
-        assertThat(context.lastResponse().getBody().asString(),
-                is("Stock /test_company/" + store + "#" + salt + "/" + product + ":" + stock + " is insufficient for quantity " + quantity));
+        assertThat(context.lastResponse().getBody().asString())
+                .isEqualTo("Stock /test_company/" + store + "#" + salt + "/" + product + ":" + stock + " is insufficient for quantity " + quantity);
 
     }
 
@@ -89,7 +88,7 @@ public class StockStepDefinitions {
         ArrayNode errors = (ArrayNode) MAPPER.readTree(context.lastResponse().asString());
         Streams.stream(errors.elements()).map(ObjectNode.class::cast).forEach((ObjectNode error) -> error.remove(expect));
 
-        assertThat(errors, is(body));
+        assertThat(errors).isEqualTo(body);
 
     }
 

@@ -1,8 +1,7 @@
 package com.exemple.service.api.stock;
 
 import static com.exemple.service.api.common.model.ApplicationBeanParam.APP_HEADER;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.Optional;
@@ -71,11 +70,11 @@ public class StockApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
         // And check body
 
-        assertThat(response.readEntity(Long.class), is(18L));
+        assertThat(response.readEntity(Long.class)).isEqualTo(18L);
 
     }
 
@@ -99,11 +98,11 @@ public class StockApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
 
         // And check body
 
-        assertThat(response.readEntity(String.class), is("{\"increment\":\"La valeur doit être renseignée.\"}"));
+        assertThat(response.readEntity(String.class)).isEqualTo("{\"increment\":\"La valeur doit être renseignée.\"}");
 
     }
 
@@ -131,12 +130,12 @@ public class StockApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
 
         // And check body
 
-        assertThat(response.readEntity(String.class),
-                is(new InsufficientStockException("/" + company, "/" + store, "/" + product, 100, 5).getMessage()));
+        assertThat(response.readEntity(String.class))
+                .isEqualTo(new InsufficientStockException("/" + company, "/" + store, "/" + product, 100, 5).getMessage());
 
     }
 
@@ -162,14 +161,14 @@ public class StockApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
         // and check body
 
         JsonNode responseEntity = response.readEntity(JsonNode.class);
         assertAll(
-                () -> assertThat(responseEntity.get("amount").asLong(), is(5L)),
-                () -> assertThat(responseEntity.has("increment"), is(false)));
+                () -> assertThat(responseEntity.get("amount").asLong()).isEqualTo(5L),
+                () -> assertThat(responseEntity.has("increment")).isFalse());
 
     }
 
@@ -195,7 +194,7 @@ public class StockApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.NOT_FOUND.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 
     }
 

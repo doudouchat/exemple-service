@@ -1,7 +1,6 @@
 package com.exemple.service.resource.stock;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;
 
@@ -28,14 +27,14 @@ public class StockResourceTest {
         resource.update("store1", "product1", -15L);
 
         // Then check stock
-        assertThat(resource.get("store1", "product1").get(), is(-10L));
+        assertThat(resource.get("store1", "product1")).hasValue(-10L);
 
     }
 
     @Test
     public void getNotExist() {
 
-        assertThat(resource.get(UUID.randomUUID().toString(), UUID.randomUUID().toString()).isPresent(), is(false));
+        assertThat(resource.get(UUID.randomUUID().toString(), UUID.randomUUID().toString())).isEmpty();
 
     }
 

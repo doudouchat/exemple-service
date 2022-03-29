@@ -1,13 +1,11 @@
 package com.exemple.service.api.account;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,16 +22,18 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.exemple.service.api.common.JsonNodeUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class AccountApiTest extends JerseySpringSupport {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
     protected ResourceConfig configure() {
@@ -79,16 +79,16 @@ public class AccountApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
         // And check body
 
-        assertThat(response.readEntity(JsonNode.class), is(account));
+        assertThat(response.readEntity(JsonNode.class)).isEqualTo(account);
 
     }
 
     @Test
-    public void patch() {
+    public void patch() throws IOException {
 
         // Given account id
 
@@ -100,45 +100,42 @@ public class AccountApiTest extends JerseySpringSupport {
 
         // When perform patch
 
-        Map<String, Object> patch = new HashMap<>();
-        patch.put("op", "add");
-        patch.put("path", "/birthday");
-        patch.put("value", "1976-12-12");
+        JsonNode patch = MAPPER.readTree("{\"op\": \"add\", \"path\": \"/birthday\", \"value\":\"1976-12-12\"}");
 
         Response response = target(URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true).request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
 
-                .method("PATCH", Entity.json(JsonNodeUtils.toString(Collections.singletonList(patch))));
+                .method("PATCH", Entity.json(Collections.singletonList(patch)));
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.NO_CONTENT.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
 
         // And check service
 
         ArgumentCaptor<JsonNode> previousAccount = ArgumentCaptor.forClass(JsonNode.class);
         ArgumentCaptor<JsonNode> account = ArgumentCaptor.forClass(JsonNode.class);
 
-        JsonNode expectedAccount = JsonNodeUtils.set(this.account, "birthday", new TextNode("1976-12-12"));
+        JsonNode expectedAccount = ((ObjectNode) this.account).put("birthday", "1976-12-12");
 
         Mockito.verify(service).save(account.capture(), previousAccount.capture());
         assertAll(
-                () -> assertThat(previousAccount.getValue(), is(this.account)),
-                () -> assertThat(account.getValue(), is(expectedAccount)));
+                () -> assertThat(previousAccount.getValue()).isEqualTo(this.account),
+                () -> assertThat(account.getValue()).isEqualTo(expectedAccount));
 
         // And check validation
 
         Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("account"), account.capture(),
                 previousAccount.capture());
         assertAll(
-                () -> assertThat(previousAccount.getValue(), is(this.account)),
-                () -> assertThat(account.getValue(), is(expectedAccount)));
+                () -> assertThat(previousAccount.getValue()).isEqualTo(this.account),
+                () -> assertThat(account.getValue()).isEqualTo(expectedAccount));
 
     }
 
     @Test
-    public void put() {
+    public void put() throws IOException {
 
         // Given account id
 
@@ -149,14 +146,7 @@ public class AccountApiTest extends JerseySpringSupport {
 
         // When perform put
 
-        JsonNode source = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("lastname", "Dupond");
-
-            return model;
-
-        });
+        JsonNode source = MAPPER.readTree("{\"lastname\": \"Dupond\"}");
 
         Response response = target(URL + "/" + id).request(MediaType.APPLICATION_JSON)
 
@@ -166,40 +156,32 @@ public class AccountApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.NO_CONTENT.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
 
         // And check service
 
-        JsonNode sourceToValidate = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("lastname", "Dupond");
-            model.put("id", id);
-
-            return model;
-
-        });
+        JsonNode sourceToValidate = MAPPER.readTree("{\"id\": \"" + id + "\", \"lastname\": \"Dupond\"}");
 
         ArgumentCaptor<JsonNode> previousAccount = ArgumentCaptor.forClass(JsonNode.class);
         ArgumentCaptor<JsonNode> account = ArgumentCaptor.forClass(JsonNode.class);
 
         Mockito.verify(service).save(account.capture(), previousAccount.capture());
         assertAll(
-                () -> assertThat(previousAccount.getValue(), is(this.account)),
-                () -> assertThat(account.getValue(), is(sourceToValidate)));
+                () -> assertThat(previousAccount.getValue()).isEqualTo(this.account),
+                () -> assertThat(account.getValue()).isEqualTo(sourceToValidate));
 
         // And check validation
 
         Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("account"), account.capture(),
                 previousAccount.capture());
         assertAll(
-                () -> assertThat(previousAccount.getValue(), is(this.account)),
-                () -> assertThat(account.getValue(), is(sourceToValidate)));
+                () -> assertThat(previousAccount.getValue()).isEqualTo(this.account),
+                () -> assertThat(account.getValue()).isEqualTo(sourceToValidate));
 
     }
 
     @Test
-    public void create() {
+    public void create() throws IOException {
 
         // Given mock service
 
@@ -207,16 +189,7 @@ public class AccountApiTest extends JerseySpringSupport {
 
         // When perform post
 
-        JsonNode source = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("email", "jean.dupond@gmail.com");
-            model.put("lastname", "dupond");
-            model.put("firstname", "jean");
-
-            return model;
-
-        });
+        JsonNode source = MAPPER.readTree("{\"email\": \"jean.dupond@gmail.com\", \"lastname\": \"dupond\", \"firstname\":\"jean\"}");
 
         Response response = target(URL).request(MediaType.APPLICATION_JSON)
 
@@ -226,24 +199,24 @@ public class AccountApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.CREATED.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
 
         // And check location
 
         URI baseUri = target(URL).getUri();
-        assertThat(response.getLocation(), is(URI.create(baseUri + "/" + this.account.get("id").textValue())));
+        assertThat(response.getLocation()).isEqualTo(URI.create(baseUri + "/" + this.account.get("id").textValue()));
 
         // And check service
 
         ArgumentCaptor<JsonNode> account = ArgumentCaptor.forClass(JsonNode.class);
         Mockito.verify(service).save(account.capture());
-        assertThat(account.getValue(), is(source));
+        assertThat(account.getValue()).isEqualTo(source);
 
         // And check validation
 
         Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("account"),
                 account.capture());
-        assertThat(account.getValue(), is(source));
+        assertThat(account.getValue()).isEqualTo(source);
 
     }
 

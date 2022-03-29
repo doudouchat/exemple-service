@@ -1,7 +1,6 @@
 package com.exemple.service.api.schema;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -59,11 +58,11 @@ public class SchemaApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
         // And check body
 
-        assertThat(response.readEntity(JsonNode.class), is(schema));
+        assertThat(response.readEntity(JsonNode.class)).isEqualTo(schema);
 
     }
 
@@ -80,11 +79,11 @@ public class SchemaApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
         // And check body
 
-        assertThat(response.readEntity(JsonNode.class), is(schema));
+        assertThat(response.readEntity(JsonNode.class)).isEqualTo(schema);
 
     }
 
@@ -107,7 +106,7 @@ public class SchemaApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus(), is(Status.FORBIDDEN.getStatusCode()));
+        assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
 
     }
 

@@ -2,8 +2,7 @@ package com.exemple.service.api.integration.login;
 
 import static com.exemple.service.api.integration.core.InitData.TEST_APP;
 import static com.exemple.service.api.integration.core.InitData.VERSION_V1;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -76,7 +75,7 @@ public class LoginStepDefinitions {
     @Then("login status is {int}")
     public void checkStatus(int status) {
 
-        assertThat(context.lastResponse().getStatusCode(), is(status));
+        assertThat(context.lastResponse().getStatusCode()).isEqualTo(status);
 
     }
 
@@ -85,7 +84,7 @@ public class LoginStepDefinitions {
 
         Response response = LoginApiClient.head(username, TEST_APP);
 
-        assertThat(response.getStatusCode(), is(204));
+        assertThat(response.getStatusCode()).isEqualTo(204);
 
         getLogin(username, TEST_APP, VERSION_V1);
 
@@ -98,7 +97,7 @@ public class LoginStepDefinitions {
 
         Response response = LoginApiClient.head(username, TEST_APP);
 
-        assertThat(response.getStatusCode(), is(404));
+        assertThat(response.getStatusCode()).isEqualTo(404);
 
         getLogin(username, TEST_APP, VERSION_V1);
 
@@ -111,7 +110,7 @@ public class LoginStepDefinitions {
 
         ObjectNode expectedBody = (ObjectNode) MAPPER.readTree(context.lastGet().asString());
 
-        assertThat(expectedBody, is(body));
+        assertThat(expectedBody).isEqualTo(body);
 
     }
 
@@ -120,7 +119,7 @@ public class LoginStepDefinitions {
 
         ArrayNode errors = (ArrayNode) MAPPER.readTree(context.lastResponse().asString());
 
-        assertThat(errors, is(body));
+        assertThat(errors).isEqualTo(body);
 
     }
 

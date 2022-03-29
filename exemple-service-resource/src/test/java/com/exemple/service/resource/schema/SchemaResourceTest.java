@@ -1,12 +1,6 @@
 package com.exemple.service.resource.schema;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
@@ -17,7 +11,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
-import org.hamcrest.beans.HasPropertyWithValue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Nested;
@@ -89,23 +82,23 @@ public class SchemaResourceTest {
 
             JsonNode schemaResource = resource.get("app1", "v1", "account", "example").getContent();
 
-            assertThat(schemaResource, not(nullValue()));
+            assertThat(schemaResource).isNotNull();
 
             LOG.debug(schemaResource.toPrettyString());
 
-            assertThat(schemaResource, is(this.schemaResource));
+            assertThat(schemaResource).isEqualTo(this.schemaResource);
 
             // And check filter
             Set<String> filter = resource.get("app1", "v1", "account", "example").getFilters();
-            assertThat(filter, hasItem("filter"));
+            assertThat(filter).containsOnly("filter");
 
             // And check fields
             Set<String> fields = resource.get("app1", "v1", "account", "example").getFields();
-            assertThat(fields, hasItem("field"));
+            assertThat(fields).containsOnly("field");
 
             // And check patch
             Set<JsonNode> patchs = resource.get("app1", "v1", "account", "example").getPatchs();
-            patchs.forEach(patch -> assertThat(patch.get("op").textValue(), is("add")));
+            patchs.forEach(patch -> assertThat(patch.get("op").textValue()).isEqualTo("add"));
 
         }
 
@@ -128,19 +121,19 @@ public class SchemaResourceTest {
 
             // Then check schema
             JsonNode schemaResource = resource.get("app1", "v1", "account", "example").getContent();
-            assertThat(schemaResource, is(SchemaResourceImpl.SCHEMA_DEFAULT));
+            assertThat(schemaResource).isEqualTo(SchemaResourceImpl.SCHEMA_DEFAULT);
 
             // And check filter
             Set<String> filter = resource.get("app1", "v1", "account", "example").getFilters();
-            assertThat(filter, empty());
+            assertThat(filter).isEmpty();
 
             // And check fields
             Set<String> fields = resource.get("app1", "v1", "account", "example").getFields();
-            assertThat(fields, empty());
+            assertThat(fields).isEmpty();
 
             // And check patch
             Set<JsonNode> patchs = resource.get("app1", "v1", "account", "example").getPatchs();
-            assertThat(patchs, empty());
+            assertThat(patchs).isEmpty();
 
         }
 
@@ -174,11 +167,9 @@ public class SchemaResourceTest {
 
         // Then check result
         assertAll(
-                () -> assertThat(versions.size(), is(1)),
-                () -> assertThat(versions.get("product"), hasItem(allOf(new HasPropertyWithValue<SchemaVersionProfileEntity>("version", is("v1")),
-                        new HasPropertyWithValue<SchemaVersionProfileEntity>("profile", is("example1"))))),
-                () -> assertThat(versions.get("product"), hasItem(allOf(new HasPropertyWithValue<SchemaVersionProfileEntity>("version", is("v2")),
-                        new HasPropertyWithValue<SchemaVersionProfileEntity>("profile", is("example2"))))));
+                () -> assertThat(versions).hasSize(1),
+                () -> assertThat(versions.get("product")).extracting(SchemaVersionProfileEntity::getVersion).contains("v1", "v2"),
+                () -> assertThat(versions.get("product")).extracting(SchemaVersionProfileEntity::getProfile).contains("example1", "example2"));
 
     }
 
@@ -189,7 +180,7 @@ public class SchemaResourceTest {
         JsonNode schemaResource = resource.get("app3", UUID.randomUUID().toString(), "account", "example").getContent();
 
         // Then check schema
-        assertThat(schemaResource, is((SchemaResourceImpl.SCHEMA_DEFAULT)));
+        assertThat(schemaResource).isEqualTo(SchemaResourceImpl.SCHEMA_DEFAULT);
 
     }
 }

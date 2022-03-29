@@ -1,7 +1,6 @@
 package com.exemple.service.api.common.script;
 
-import static nl.fd.hamcrest.jackson.HasJsonField.hasJsonField;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -45,7 +44,7 @@ public class CustomerScriptFactoryTest {
     }
 
     @Test
-    public void getDefaultBean() {
+    public void getDefaultBean() throws IOException {
 
         // Setup context
         ServiceContextExecution.context().setApp("test");
@@ -61,12 +60,12 @@ public class CustomerScriptFactoryTest {
 
         // then check get response
         Optional<JsonNode> account = service.get(UUID.randomUUID());
-        assertThat(account.get(), hasJsonField("note", "default value"));
+        assertThat(account).hasValue(mapper.readTree("{\"note\": \"default value\"}"));
 
     }
 
     @Test
-    public void getOverrideBean() {
+    public void getOverrideBean() throws IOException {
 
         // Setup context
         ServiceContextExecution.context().setApp("test");
@@ -82,7 +81,7 @@ public class CustomerScriptFactoryTest {
 
         // then check get response
         Optional<JsonNode> account = service.get(UUID.randomUUID());
-        assertThat(account.get(), hasJsonField("note", "override value"));
+        assertThat(account).hasValue(mapper.readTree("{\"note\": \"override value\"}"));
 
     }
 

@@ -1,10 +1,7 @@
 package com.exemple.service.resource.common.validator;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
@@ -66,11 +63,11 @@ public class JsonConstraintValidatorTest {
         // Then check result
         JsonNode result = resource.get(id).get();
         assertAll(
-                () -> assertThat(result.get("email"), is(notNullValue())),
-                () -> assertThat(result.get("address"), is(notNullValue())),
-                () -> assertThat(result.get("addresses"), is(notNullValue())),
-                () -> assertThat(result.get("profils"), is(notNullValue())),
-                () -> assertThat(result.get("preferences"), is(notNullValue())));
+                () -> assertThat(result.get("email")).isNotNull(),
+                () -> assertThat(result.get("address")).isNotNull(),
+                () -> assertThat(result.get("addresses")).isNotNull(),
+                () -> assertThat(result.get("profils")).isNotNull(),
+                () -> assertThat(result.get("preferences")).isNotNull());
 
     }
 
@@ -133,7 +130,7 @@ public class JsonConstraintValidatorTest {
         Throwable throwable = catchThrowable(() -> resource.save(node));
 
         // Then check throwable
-        assertThat(throwable, instanceOf(ConstraintViolationException.class));
+        assertThat(throwable).isInstanceOf(ConstraintViolationException.class);
 
     }
 }

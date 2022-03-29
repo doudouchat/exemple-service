@@ -1,13 +1,9 @@
 package com.exemple.service.customer.account;
 
-import static nl.fd.hamcrest.jackson.HasJsonField.hasJsonField;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,14 +18,16 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
-import com.exemple.service.customer.common.JsonNodeUtils;
 import com.exemple.service.customer.common.event.EventType;
 import com.exemple.service.customer.common.event.ResourceEventPublisher;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringJUnitConfig(CustomerTestConfiguration.class)
 public class AccountServiceTest {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private AccountService service;
@@ -56,80 +54,60 @@ public class AccountServiceTest {
 
     @Test
     @DisplayName("save account")
-    public void save() {
+    public void save() throws IOException {
+
+        // Given account
+
+        JsonNode source = MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\", \"lastname\": \"Dupont\", \"firstname\":\"Jean\"}");
 
         // When perform save
 
-        JsonNode source = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("email", "jean.dupont@gmail.com");
-            model.put("lastname", "Dupont");
-            model.put("firstname", "Jean");
-
-            return model;
-
-        });
-
         JsonNode account = service.save(source);
 
-        // Then check account
-
+        assertThat(account).isNotNull();
         assertAll(
-                () -> assertThat(account, is(notNullValue())),
-                () -> assertThat(account, hasJsonField("email", "jean.dupont@gmail.com")),
-                () -> assertThat(account, hasJsonField("lastname", "Dupont")),
-                () -> assertThat(account, hasJsonField("firstname", "Jean")));
+                () -> assertThat(account).hasSize(5),
+                () -> assertThat(account.get("email")).hasToString("\"jean.dupont@gmail.com\""),
+                () -> assertThat(account.get("lastname")).hasToString("\"Dupont\""),
+                () -> assertThat(account.get("firstname")).hasToString("\"Jean\""),
+                () -> assertThat(account.get("creation_date")).hasToString("\"" + ServiceContextExecution.context().getDate() + "\""),
+                () -> assertThat(account.get("id").isTextual()).isTrue());
 
         // And check save resource
 
         ArgumentCaptor<JsonNode> accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
         Mockito.verify(resource).save(accountCaptor.capture());
-        assertThat(accountCaptor.getValue(), is(account));
+        assertThat(accountCaptor.getValue()).isEqualTo(account);
 
         // And check publish resource
 
         ArgumentCaptor<JsonNode> eventCaptor = ArgumentCaptor.forClass(JsonNode.class);
         Mockito.verify(publisher).publish(eventCaptor.capture(), Mockito.eq("account"), Mockito.eq(EventType.CREATE));
-        assertThat(accountCaptor.getValue(), is(account));
+        assertThat(accountCaptor.getValue()).isEqualTo(account);
 
     }
 
     @Test
     @DisplayName("update account")
-    public void update() {
+    public void update() throws IOException {
+
+        // Given account
+
+        JsonNode source = MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\", \"lastname\": \"Dupond\"}");
+
+        // And previousAccount
+
+        JsonNode previousSource = MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\", \"lastname\": \"Dupont\", \"firstname\":\"Jean\"}");
 
         // When perform save
-
-        JsonNode previousSource = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("email", "jean.dupont@gmail.com");
-            model.put("lastname", "Dupont");
-            model.put("firstname", "Jean");
-
-            return model;
-
-        });
-
-        JsonNode source = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("email", "jean.dupont@gmail.com");
-            model.put("lastname", "Dupond");
-
-            return model;
-
-        });
 
         JsonNode account = service.save(source, previousSource);
 
         // Then check account
 
         assertAll(
-                () -> assertThat(account, is(notNullValue())),
-                () -> assertThat(account, hasJsonField("email", "jean.dupont@gmail.com")),
-                () -> assertThat(account, hasJsonField("lastname", "Dupond")));
+                () -> assertThat(account).isNotNull(),
+                () -> assertThat(account).isEqualTo(MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\", \"lastname\": \"Dupond\"}")));
 
         // And check save resource
 
@@ -138,20 +116,20 @@ public class AccountServiceTest {
 
         Mockito.verify(resource).save(accountCaptor.capture(), previousAccountCaptor.capture());
         assertAll(
-                () -> assertThat(accountCaptor.getValue(), is(account)),
-                () -> assertThat(previousAccountCaptor.getValue(), is(previousSource)));
+                () -> assertThat(accountCaptor.getValue()).isEqualTo(account),
+                () -> assertThat(previousAccountCaptor.getValue()).isEqualTo(previousSource));
 
         // And check publish resource
 
         ArgumentCaptor<JsonNode> eventCaptor = ArgumentCaptor.forClass(JsonNode.class);
         Mockito.verify(publisher).publish(eventCaptor.capture(), Mockito.eq("account"), Mockito.eq(EventType.UPDATE));
-        assertThat(eventCaptor.getValue(), is(account));
+        assertThat(eventCaptor.getValue()).isEqualTo(account);
 
     }
 
     @Test
     @DisplayName("get account")
-    public void get() {
+    public void get() throws IOException {
 
         // Given account id
 
@@ -159,17 +137,7 @@ public class AccountServiceTest {
 
         // And mock resource
 
-        JsonNode source = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("email", "jean.dupont@gmail.com");
-            model.put("lastname", "Dupont");
-            model.put("firstname", "Jean");
-
-            return model;
-
-        });
-
+        JsonNode source = MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\", \"lastname\": \"Dupont\", \"firstname\":\"Jean\"}");
         Mockito.when(resource.get(Mockito.eq(id))).thenReturn(Optional.of(source));
 
         // When perform get
@@ -178,7 +146,7 @@ public class AccountServiceTest {
 
         // Then check account
 
-        assertThat(account.get(), is(source));
+        assertThat(account).hasValue(source);
 
     }
 

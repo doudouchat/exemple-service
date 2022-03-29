@@ -1,10 +1,6 @@
 package com.exemple.service.schema.description;
 
-import static nl.fd.hamcrest.jackson.HasJsonField.hasJsonField;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +22,7 @@ public class SchemaDescriptionTest {
         JsonNode schema = service.get("default", "default", "schema_test", "default");
 
         // Then check response
-        assertAll(
-                () -> assertThat(schema, is(notNullValue())),
-                () -> assertThat(schema, hasJsonField("$schema", "http://json-schema.org/draft-07/schema")));
+        assertThat(schema.get("$schema")).hasToString("\"http://json-schema.org/draft-07/schema\"");
 
     }
 
@@ -39,9 +33,7 @@ public class SchemaDescriptionTest {
         JsonNode schema = service.getPatch();
 
         // Then check response
-        assertAll(
-                () -> assertThat(schema, is(notNullValue())),
-                () -> assertThat(schema, hasJsonField("title", "JSON schema for JSONPatch files")));
+        assertThat(schema.get("title")).hasToString("\"JSON schema for JSONPatch files\"");
 
     }
 

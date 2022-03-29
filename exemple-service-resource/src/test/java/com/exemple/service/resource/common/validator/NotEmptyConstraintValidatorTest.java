@@ -1,10 +1,7 @@
 package com.exemple.service.resource.common.validator;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -46,7 +43,7 @@ public class NotEmptyConstraintValidatorTest {
 
         // Then check result
         JsonNode result = resource.get(id).get();
-        assertThat(result.get("email"), is(notNullValue()));
+        assertThat(result.get("email")).isNotNull();
 
     }
 
@@ -66,7 +63,7 @@ public class NotEmptyConstraintValidatorTest {
         Throwable throwable = catchThrowable(() -> resource.save(account));
 
         // Then check throwable
-        assertThat(throwable, instanceOf(ConstraintViolationException.class));
+        assertThat(throwable).isInstanceOf(ConstraintViolationException.class);
 
     }
 
