@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaEntity;
+import com.exemple.service.schema.common.FilterBuilder;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionBuilder;
 import com.exemple.service.schema.common.exception.ValidationExceptionModel;
@@ -73,10 +74,12 @@ public class SchemaValidationImpl implements SchemaValidation {
 
         SchemaEntity schemaEntity = schemaResource.get(app, version, resource, profile);
         Schema schema = buildSchema(schemaEntity.getContent(), schemaEntity.getPatchs());
+        
+        JsonNode oldFilterBySchema = FilterBuilder.filter(old, schemaEntity.getFields().toArray(new String[0]));
 
-        validateDiff(schema, form, old, Predicates.alwaysTrue());
+        validateDiff(schema, form, oldFilterBySchema, Predicates.alwaysTrue());
 
-        checkRemove(schema, form, old);
+        checkRemove(schema, form, oldFilterBySchema);
 
     }
 

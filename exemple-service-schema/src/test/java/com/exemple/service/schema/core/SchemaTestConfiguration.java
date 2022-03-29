@@ -2,6 +2,8 @@ package com.exemple.service.schema.core;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.validation.Validator;
 
@@ -35,19 +37,36 @@ public class SchemaTestConfiguration {
         Mockito.when(resource.get(Mockito.eq("unknown"), Mockito.eq("unknown"), Mockito.eq("schema_test"), Mockito.eq("unknown")))
                 .thenReturn(unknownResourceSchema);
 
-        SchemaEntity shemaTest = new SchemaEntity();
-        shemaTest.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("schema_test.json").getInputStream())));
+        SchemaEntity schemaTest = new SchemaEntity();
+        schemaTest.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("schema_test.json").getInputStream())));
 
         ObjectNode patch = MAPPER.createObjectNode();
         patch.put("op", "add");
         patch.put("path", "/properties/external_id/readOnly");
         patch.put("value", true);
 
-        shemaTest.setPatchs(Collections.singleton(patch));
+        schemaTest.setPatchs(Collections.singleton(patch));
+        Set<String> schemaTestField = new HashSet<>();
+        schemaTestField.add("id");
+        schemaTestField.add("email");
+        schemaTestField.add("external_id");
+        schemaTestField.add("civility");
+        schemaTestField.add("lastname");
+        schemaTestField.add("firstname");
+        schemaTestField.add("password");
+        schemaTestField.add("birthday");
+        schemaTestField.add("creation_date");
+        schemaTestField.add("opt_in_email");
+        schemaTestField.add("addresses[*[city,street]]");
+        schemaTestField.add("cgus[code,version]");
+        schemaTest.setFields(schemaTestField);
         Mockito.when(resource.get(Mockito.eq("default"), Mockito.eq("default"), Mockito.eq("schema_test"), Mockito.eq("default")))
-                .thenReturn(shemaTest);
-
+                .thenReturn(schemaTest);
+       
         SchemaEntity schemaArray = new SchemaEntity();
+        Set<String> schemaArrayField = new HashSet<>();
+        schemaArrayField.add("items[city,street]");
+        schemaArray.setFields(schemaArrayField);
         schemaArray.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("schema_array.json").getInputStream())));
 
         Mockito.when(resource.get(Mockito.eq("default"), Mockito.eq("default"), Mockito.eq("array_test"), Mockito.eq("default")))

@@ -28,7 +28,6 @@ import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.account.AccountService;
-import com.exemple.service.schema.merge.SchemaMerge;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -47,15 +46,12 @@ public class AccountApiTest extends JerseySpringSupport {
     private SchemaValidation schemaValidation;
 
     @Autowired
-    private SchemaMerge schemaMerge;
-
-    @Autowired
     private JsonNode account;
 
     @BeforeMethod
     private void before() {
 
-        Mockito.reset(service, schemaValidation, schemaMerge);
+        Mockito.reset(service, schemaValidation);
 
     }
 
@@ -171,25 +167,29 @@ public class AccountApiTest extends JerseySpringSupport {
 
         // And check service
 
+        JsonNode sourceToValidate = JsonNodeUtils.create(() -> {
+
+            Map<String, Object> model = new HashMap<>();
+            model.put("lastname", "Dupond");
+            model.put("id", id);
+
+            return model;
+
+        });
+
         ArgumentCaptor<JsonNode> previousAccount = ArgumentCaptor.forClass(JsonNode.class);
         ArgumentCaptor<JsonNode> account = ArgumentCaptor.forClass(JsonNode.class);
 
         Mockito.verify(service).save(account.capture(), previousAccount.capture());
         assertThat(previousAccount.getValue(), is(this.account));
-        assertThat(account.getValue(), is(source));
+        assertThat(account.getValue(), is(sourceToValidate));
 
         // And check validation
 
         Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("account"), account.capture(),
                 previousAccount.capture());
         assertThat(previousAccount.getValue(), is(this.account));
-        assertThat(account.getValue(), is(source));
-
-        // And check merge
-        Mockito.verify(schemaMerge).mergeMissingFieldFromOriginal(Mockito.eq("test"), Mockito.eq("v1"), Mockito.eq("account"), Mockito.anyString(),
-                account.capture(), previousAccount.capture());
-        assertThat(previousAccount.getValue(), is(this.account));
-        assertThat(account.getValue(), is(source));
+        assertThat(account.getValue(), is(sourceToValidate));
 
     }
 
