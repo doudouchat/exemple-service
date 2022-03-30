@@ -7,6 +7,7 @@ import org.springframework.context.annotation.ImportResource;
 
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.customer.common.event.ResourceEventPublisher;
+import com.exemple.service.customer.login.LoginResource;
 import com.exemple.service.customer.subscription.SubscriptionResource;
 
 @Configuration
@@ -16,6 +17,11 @@ public class CustomerTestConfiguration {
     @Bean
     public AccountResource accountResource() {
         return Mockito.mock(AccountResource.class);
+    }
+
+    @Bean
+    public LoginResource loginResource() {
+        return Mockito.mock(LoginResource.class);
     }
 
     @Bean

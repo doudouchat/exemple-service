@@ -23,8 +23,7 @@ import com.exemple.service.api.core.JerseySpringSupportSecure;
 import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration;
 import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration.TestFilter;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
-import com.exemple.service.resource.login.LoginResource;
-import com.exemple.service.resource.login.model.LoginEntity;
+import com.exemple.service.customer.login.LoginResource;
 
 public class LoginApiSecureTest extends JerseySpringSupportSecure {
 
@@ -44,18 +43,12 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
 
     }
 
-    private static UUID ID = UUID.randomUUID();
-
     @Test
-    public void authorizedGetLoginWithPrincipal() {
+    public void authorizedGetLoginSuccess() {
 
         // Given user_name
 
         String username = "jean.dupond@gmail.com";
-
-        LoginEntity first = new LoginEntity();
-        first.setUsername(username);
-        first.setId(ID);
 
         // and token
 
@@ -64,7 +57,7 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
 
         // And mock service
 
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(first));
+        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(UUID.randomUUID()));
 
         // When perform get
 
@@ -80,54 +73,6 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
 
         assertAll(
                 () -> assertThat(testFilter.context.getUserPrincipal().getName()).isEqualTo(username),
-                () -> assertThat(testFilter.context.isSecure()).isTrue(),
-                () -> assertThat(testFilter.context.getAuthenticationScheme()).isEqualTo(SecurityContext.BASIC_AUTH));
-
-    }
-
-    @Test
-    public void authorizedGetLoginWithSecond() {
-
-        // Given user_name
-
-        String username = "jean.dupond@gmail.com";
-
-        LoginEntity first = new LoginEntity();
-        first.setUsername(username);
-        first.setId(ID);
-
-        // And second login
-
-        String secondUsername = "jack.dupond@gmail.com";
-
-        LoginEntity second = new LoginEntity();
-        second.setUsername(secondUsername);
-        second.setId(ID);
-
-        // And token
-
-        String token = JWT.create().withClaim("client_id", "clientId1").withSubject(secondUsername)
-                .withArrayClaim("scope", new String[] { "login:read" }).sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
-
-        // And mock service & resource
-
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(first));
-        Mockito.when(loginResource.get(Mockito.eq(secondUsername))).thenReturn(Optional.of(second));
-
-        // When perform get
-
-        Response response = target(LoginApiTest.URL + "/" + username).request(MediaType.APPLICATION_JSON)
-
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token).get();
-
-        // Then check status
-
-        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
-
-        // And check security context
-
-        assertAll(
-                () -> assertThat(testFilter.context.getUserPrincipal().getName()).isEqualTo(secondUsername),
                 () -> assertThat(testFilter.context.isSecure()).isTrue(),
                 () -> assertThat(testFilter.context.getAuthenticationScheme()).isEqualTo(SecurityContext.BASIC_AUTH));
 
@@ -157,44 +102,4 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
 
     }
 
-    @Test
-    public void authorizedGetLoginWithSecondFailure() {
-
-        // Given user_name
-
-        String username = "jean.dupond@gmail.com";
-
-        LoginEntity first = new LoginEntity();
-        first.setUsername(username);
-        first.setId(ID);
-
-        // And second login
-
-        String secondUsername = "jack.dupond@gmail.com";
-
-        LoginEntity second = new LoginEntity();
-        second.setUsername(secondUsername);
-        second.setId(UUID.randomUUID());
-
-        // And token
-
-        String token = JWT.create().withClaim("client_id", "clientId1").withSubject(secondUsername)
-                .withArrayClaim("scope", new String[] { "login:read" }).sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
-
-        // And mock service & resource
-
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(first));
-        Mockito.when(loginResource.get(Mockito.eq(secondUsername))).thenReturn(Optional.of(second));
-
-        // When perform get
-
-        Response response = target(LoginApiTest.URL + "/" + username).request(MediaType.APPLICATION_JSON)
-
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token).get();
-
-        // Then check status
-
-        assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
-
-    }
 }

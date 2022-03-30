@@ -1,6 +1,7 @@
-package com.exemple.service.resource.login.impl;
+package com.exemple.service.resource.login;
 
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -8,16 +9,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.exemple.service.customer.login.LoginResource;
+import com.exemple.service.customer.login.UsernameAlreadyExistsException;
 import com.exemple.service.resource.core.ResourceExecutionContext;
-import com.exemple.service.resource.login.LoginResource;
 import com.exemple.service.resource.login.dao.LoginDao;
-import com.exemple.service.resource.login.exception.UsernameAlreadyExistsException;
 import com.exemple.service.resource.login.mapper.LoginMapper;
 import com.exemple.service.resource.login.model.LoginEntity;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Service("loginResource")
 @Validated
 @RequiredArgsConstructor
 public class LoginResourceImpl implements LoginResource {
@@ -27,13 +28,18 @@ public class LoginResourceImpl implements LoginResource {
     private final ConcurrentMap<String, LoginMapper> mappers = new ConcurrentHashMap<>();
 
     @Override
-    public Optional<LoginEntity> get(String username) {
+    public Optional<UUID> get(String username) {
 
-        return Optional.ofNullable(dao().findByUsername(username));
+        return Optional.ofNullable(dao().findByUsername(username)).map(LoginEntity::getId);
     }
 
     @Override
-    public void save(LoginEntity source) throws UsernameAlreadyExistsException {
+    public void save(UUID id, String username) {
+
+        LoginEntity source = new LoginEntity();
+        source.setId(id);
+        source.setUsername(username);
+
         boolean notExists = dao().create(source);
 
         if (!notExists) {

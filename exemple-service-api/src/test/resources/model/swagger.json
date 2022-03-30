@@ -362,48 +362,6 @@
 					}
 				]
 			},
-			"delete": {
-				"tags": [
-					"login"
-				],
-				"operationId": "delete",
-				"parameters": [
-					{
-						"name": "username",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "app",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"responses": {
-					"default": {
-						"description": "default response",
-						"content": {
-							"*/*": {
-								
-							}
-						}
-					}
-				},
-				"security": [
-					{
-						"bearer_authentification": []
-					},
-					{
-						"oauth2_password": []
-					}
-				]
-			},
 			"head": {
 				"tags": [
 					"login"
@@ -433,56 +391,6 @@
 						"content": {
 							"*/*": {
 								
-							}
-						}
-					}
-				},
-				"security": [
-					{
-						"bearer_authentification": []
-					},
-					{
-						"oauth2_client_credentials": []
-					}
-				]
-			}
-		},
-		"/ws/v1/logins": {
-			"post": {
-				"tags": [
-					"login"
-				],
-				"operationId": "create_1",
-				"parameters": [
-					{
-						"name": "app",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/LoginModel"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"201": {
-						"description": "login is created",
-						"headers": {
-							"Location": {
-								"description": "Links to Login Data",
-								"style": "simple",
-								"schema": {
-									"type": "string"
-								}
 							}
 						}
 					}
@@ -804,23 +712,6 @@
 					},
 					"buildTime": {
 						"type": "string"
-					}
-				}
-			},
-			"LoginModel": {
-				"required": [
-					"id",
-					"username"
-				],
-				"type": "object",
-				"properties": {
-					"username": {
-						"type": "string",
-						"writeOnly": true
-					},
-					"id": {
-						"type": "string",
-						"format": "uuid"
 					}
 				}
 			},

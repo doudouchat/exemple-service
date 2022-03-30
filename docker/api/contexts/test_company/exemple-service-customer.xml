@@ -11,6 +11,7 @@
 	<lang:groovy id="accountService"
 		script-source="file:/usr/local/tomcat/etc/contexts/test_company/AccountService.groovy">
 		<lang:property name="accountResource" ref="accountResource"/>
+		<lang:property name="loginResource" ref="loginResource"/>
 		<lang:property name="resourceEventPublisher" ref="resourceEventPublisher"/>
 	</lang:groovy>
 
