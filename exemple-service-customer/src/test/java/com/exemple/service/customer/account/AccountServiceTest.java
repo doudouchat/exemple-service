@@ -21,6 +21,7 @@ import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.common.event.EventType;
 import com.exemple.service.customer.common.event.ResourceEventPublisher;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
+import com.exemple.service.customer.login.LoginResource;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -33,7 +34,10 @@ public class AccountServiceTest {
     private AccountService service;
 
     @Autowired
-    private AccountResource resource;
+    private AccountResource accountResource;
+
+    @Autowired
+    private LoginResource loginResource;
 
     @Autowired
     private ResourceEventPublisher publisher;
@@ -41,7 +45,7 @@ public class AccountServiceTest {
     @BeforeEach
     private void before() {
 
-        Mockito.reset(resource, publisher);
+        Mockito.reset(accountResource, loginResource, publisher);
 
     }
 
@@ -73,11 +77,16 @@ public class AccountServiceTest {
                 () -> assertThat(account.get("creation_date")).hasToString("\"" + ServiceContextExecution.context().getDate() + "\""),
                 () -> assertThat(account.get("id").isTextual()).isTrue());
 
-        // And check save resource
+        // And check save account resource
 
         ArgumentCaptor<JsonNode> accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
-        Mockito.verify(resource).save(accountCaptor.capture());
+        Mockito.verify(accountResource).save(accountCaptor.capture());
         assertThat(accountCaptor.getValue()).isEqualTo(account);
+
+        // And check save login resource
+
+        Mockito.verify(loginResource).save(Mockito.eq(UUID.fromString(accountCaptor.getValue().get("id").textValue())),
+                Mockito.eq("jean.dupont@gmail.com"));
 
         // And check publish resource
 
@@ -114,10 +123,61 @@ public class AccountServiceTest {
         ArgumentCaptor<JsonNode> accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
         ArgumentCaptor<JsonNode> previousAccountCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
-        Mockito.verify(resource).save(accountCaptor.capture(), previousAccountCaptor.capture());
+        Mockito.verify(accountResource).save(accountCaptor.capture(), previousAccountCaptor.capture());
         assertAll(
                 () -> assertThat(accountCaptor.getValue()).isEqualTo(account),
                 () -> assertThat(previousAccountCaptor.getValue()).isEqualTo(previousSource));
+
+        // And check save login resource
+
+        Mockito.verify(loginResource, Mockito.never()).save(Mockito.any(), Mockito.any());
+
+        // And check publish resource
+
+        ArgumentCaptor<JsonNode> eventCaptor = ArgumentCaptor.forClass(JsonNode.class);
+        Mockito.verify(publisher).publish(eventCaptor.capture(), Mockito.eq("account"), Mockito.eq(EventType.UPDATE));
+        assertThat(eventCaptor.getValue()).isEqualTo(account);
+
+    }
+
+    @Test
+    @DisplayName("update email")
+    public void updateEmail() throws IOException {
+
+        // Given account
+
+        UUID id = UUID.randomUUID();
+
+        JsonNode source = MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupond@gmail.com\"}");
+
+        // And previousAccount
+
+        JsonNode previousSource = MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupont@gmail.com\"}");
+
+        // When perform save
+
+        JsonNode account = service.save(source, previousSource);
+
+        // Then check account
+
+        assertAll(
+                () -> assertThat(account).isNotNull(),
+                () -> assertThat(account).isEqualTo(MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupond@gmail.com\"}")));
+
+        // And check save resource
+
+        ArgumentCaptor<JsonNode> accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
+        ArgumentCaptor<JsonNode> previousAccountCaptor = ArgumentCaptor.forClass(JsonNode.class);
+
+        Mockito.verify(accountResource).save(accountCaptor.capture(), previousAccountCaptor.capture());
+        assertAll(
+                () -> assertThat(accountCaptor.getValue()).isEqualTo(account),
+                () -> assertThat(previousAccountCaptor.getValue()).isEqualTo(previousSource));
+
+        // And check save login resource
+
+        Mockito.verify(loginResource).save(Mockito.eq(id), Mockito.eq("jean.dupond@gmail.com"));
+        Mockito.verify(loginResource).delete(Mockito.eq("jean.dupont@gmail.com"));
 
         // And check publish resource
 
@@ -138,7 +198,7 @@ public class AccountServiceTest {
         // And mock resource
 
         JsonNode source = MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\", \"lastname\": \"Dupont\", \"firstname\":\"Jean\"}");
-        Mockito.when(resource.get(Mockito.eq(id))).thenReturn(Optional.of(source));
+        Mockito.when(accountResource.get(Mockito.eq(id))).thenReturn(Optional.of(source));
 
         // When perform get
 

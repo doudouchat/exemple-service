@@ -2,9 +2,8 @@ Feature: api subscription
 
   Scenario: create subscription
     Given delete subscription 'jean.dupond@gmail.com'
-    When create subscription 'jean.dupond@gmail.com' for application 'test' and version 'v1'
-    Then subscription status is 201
-    And subscription 'jean.dupond@gmail.com' is
+    When create subscription 'jean.dupond@gmail.com'
+    Then subscription 'jean.dupond@gmail.com' is
       """
       {
       }
@@ -13,10 +12,9 @@ Feature: api subscription
 
   Scenario: update subscription
     Given delete subscription 'jean.dupond@gmail.com'
-    When create subscription 'jean.dupond@gmail.com' for application 'test' and version 'v1'
-    And create subscription 'jean.dupond@gmail.com' for application 'test' and version 'v1'
-    Then subscription status is 204
-    And subscription 'jean.dupond@gmail.com' is
+    When create subscription 'jean.dupond@gmail.com'
+    And create subscription 'jean.dupond@gmail.com'
+    Then subscription 'jean.dupond@gmail.com' is
       """
       {
       }
@@ -24,17 +22,15 @@ Feature: api subscription
     And subscription contains 'subscription_date'
 
   Scenario: get subscription fails because none subscription exists
-    Given delete subscription 'jean.dupond@gmail.com'
-    When get subscription 'jean.dupond@gmail.com' for application 'test' and version 'v1'
-    Then subscription status is 404
+    When delete subscription 'jean.dupond@gmail.com'
+    Then subscription 'jean.dupond@gmail.com' is unknown
 
   Scenario: update subscription fails because email is incorrect
-    When create subscription 'jean.dupond' for application 'test' and version 'v1'
-    Then subscription status is 400
-    And subscription error is
+    When create subscription 'jean.dupond'
+    Then subscription error only contains
       """
-      [{
+      {
           "path": "/email",
           "code": "format"
-      }]
+      }
       """

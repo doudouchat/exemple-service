@@ -1,7 +1,10 @@
 Feature: api account
 
+  Background: 
+    Given delete username 'jean.dupond@gmail.com'
+
   Scenario: create account
-    When create account for application 'test' and version 'v1'
+    When create account
       """
       {
           "optin_mobile": true,
@@ -31,9 +34,8 @@ Feature: api account
           "lastname": "Dupond"
       }
       """
-    Then account status is 201
-    And account exists
-    And account 'creation_date' exists
+    Then account 'jean.dupond@gmail.com' exists
+    And get id account 'jean.dupond@gmail.com'
     And account is
       """
       {
@@ -62,75 +64,70 @@ Feature: api account
           "optin_mobile": true
       }
       """
+    And account property 'creation_date' exists
 
   Scenario: create account fails because lastname is not an integer
-    When create account with 'lastname' and value 10
-    Then account status is 400
-    And account error is
+    When create any account with 'lastname' and value 10
+    Then account error only contains
       """
-      [{
+      {
           "path": "/lastname",
           "code": "type"
-      }]
+      }
       """
 
   Scenario: create account fails because birthday is incorrect
-    When create account with 'birthday' and value '2019-02-30'
-    Then account status is 400
-    And account error is
+    When create any account with 'birthday' and value '2019-02-30'
+    Then account error only contains
       """
-      [{
+      {
           "path": "/birthday",
           "code": "format"
-      }]
+      }
       """
 
   Scenario: create account fails because optin_mobile is not an integer
-    When create account with 'optin_mobile' and value 10
-    Then account status is 400
-    And account error is
+    When create any account with 'optin_mobile' and value 10
+    Then account error only contains
       """
-      [{
+      {
           "path": "/optin_mobile",
           "code": "type"
-      }]
+      }
       """
 
   Scenario: create account fails because cgus is not an integer
-    When create account with 'cgus' and value 10
-    Then account status is 400
-    And account error is
+    When create any account with 'cgus' and value 10
+    Then account error only contains
       """
-      [{
+      {
           "path": "/cgus",
           "code": "type"
-      }]
+      }
       """
 
   Scenario: create account fails because email is empty
-    When create account with 'email' and value ''
-    Then account status is 400
-    And account error is
+    When create any account with 'email' and value ''
+    Then account error only contains
       """
-      [{
+      {
           "path": "/email",
           "code": "format"
-      }]
+      }
       """
 
   Scenario: create account fails because a property is unknown
-    When create account with 'unknown' and value 'nc'
-    Then account status is 400
-    And account error is
+    When create any account with 'unknown' and value 'nc'
+    Then account error only contains
       """
-      [{
+      {
           "path": "/unknown",
           "code": "additionalProperties"
-      }]
+      }
       """
 
   Scenario: create account fails because an address is incomplete
-    When create account with 'addresses'
+    When create any account with 'addresses'
       """
       {
          "job": {
@@ -138,17 +135,16 @@ Feature: api account
          }
       }
       """
-    Then account status is 400
-    And account error is
+    Then account error only contains
       """
-      [{
+      {
           "path": "/addresses/job/street",
           "code": "required"
-      }]
+      }
       """
 
   Scenario: create account fails because two many addresses
-    When create account with 'addresses'
+    When create any account with 'addresses'
       """
       {
          "holidays_1": {
@@ -165,30 +161,33 @@ Feature: api account
          }
       }
       """
-    Then account status is 400
-    And account error is
-      """
-      [{
-          "path": "/addresses",
-          "code": "maxProperties"
-      }]
-      """
-
-  Scenario: create account fails because application not exists
-    When create account for application 'default' and version 'v1'
+    Then account error only contains
       """
       {
-          "email": "jean.dupond@gmail.com",
-          "lastname": "Dupond"
+          "path": "/addresses",
+          "code": "maxProperties"
       }
       """
-    Then account status is 403
 
-  Scenario: get account fails because application not exists
+  Scenario: create account fails because username already exists
     Given create account
-    When get account for application 'default' and version 'v1'
-    Then account status is 403
+      """
+      {
+          "birthday": "1967-06-15",
+          "firstname": "Jean",
+          "email": "jean.dupond@gmail.com",
+          "lastname": "Dupont"
+      }
+      """
+    When create any account with 'email' and value 'jean.dupond@gmail.com'
+    Then account error only contains
+      """
+      {
+          "code": "username",
+          "message": "[jean.dupond@gmail.com] already exists"
+      }
+      """
 
   Scenario: get account fails because account not exists
-    When get account d6233a2e-64f9-4e92-b894-01244515a18e for application 'test' and version 'v1'
-    Then account status is 404
+    When get account by id d6233a2e-64f9-4e92-b894-01244515a18e
+    Then account is unknown

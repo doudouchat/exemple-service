@@ -2,7 +2,6 @@ package com.exemple.service.resource.login;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -11,9 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import com.exemple.service.customer.login.LoginResource;
+import com.exemple.service.customer.login.UsernameAlreadyExistsException;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
-import com.exemple.service.resource.login.exception.UsernameAlreadyExistsException;
-import com.exemple.service.resource.login.model.LoginEntity;
 
 @SpringJUnitConfig(ResourceTestConfiguration.class)
 public class LoginResourceTest {
@@ -22,56 +21,42 @@ public class LoginResourceTest {
     private LoginResource resource;
 
     @Test
-    public void create() throws UsernameAlreadyExistsException {
+    public void create() {
 
         // Given login
 
         String username = UUID.randomUUID() + "gmail.com";
         UUID id = UUID.randomUUID();
 
-        LoginEntity login = new LoginEntity();
-        login.setUsername(username);
-        login.setId(id);
-
         // When perform
 
-        resource.save(login);
+        resource.save(id, username);
 
         // Then check login
 
-        LoginEntity actualLogin = resource.get(username).get();
-        assertAll(
-                () -> assertThat(actualLogin.getUsername()).isEqualTo(username),
-                () -> assertThat(actualLogin.getId()).isEqualTo(id));
+        Optional<UUID> actualLogin = resource.get(username);
+        assertThat(actualLogin).hasValue(id);
     }
 
     @Test
     public void createFailureIfUsernameAlreadyExists() {
 
-        // Given login
-
-        LoginEntity login = new LoginEntity();
-        login.setUsername("jean.dupond@gmail.com");
-
         // When perform
-        Throwable throwable = catchThrowable(() -> resource.save(login));
+        Throwable throwable = catchThrowable(() -> resource.save(UUID.randomUUID(), "jean.dupond@gmail.com"));
 
         // Then check throwable
-        assertThat(throwable).isInstanceOf(UsernameAlreadyExistsException.class);
+        assertThat(throwable).isInstanceOf(UsernameAlreadyExistsException.class).hasMessage("[jean.dupond@gmail.com] already exists");
 
     }
 
     @Test
-    public void delete() throws UsernameAlreadyExistsException {
+    public void delete() {
 
         // Given login
 
         String username = UUID.randomUUID() + "gmail.com";
 
-        LoginEntity login = new LoginEntity();
-        login.setUsername(username);
-
-        resource.save(login);
+        resource.save(UUID.randomUUID(), username);
 
         // When perform
 
@@ -79,7 +64,7 @@ public class LoginResourceTest {
 
         // Then check login
 
-        Optional<LoginEntity> actualLogin = resource.get(username);
+        Optional<UUID> actualLogin = resource.get(username);
         assertThat(actualLogin).isEmpty();
 
     }

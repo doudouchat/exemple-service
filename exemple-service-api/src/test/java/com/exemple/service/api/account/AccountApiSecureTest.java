@@ -33,8 +33,7 @@ import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration
 import com.exemple.service.api.core.authorization.impl.AuthorizationTokenValidation;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.account.AccountService;
-import com.exemple.service.resource.login.LoginResource;
-import com.exemple.service.resource.login.model.LoginEntity;
+import com.exemple.service.customer.login.LoginResource;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class AccountApiSecureTest extends JerseySpringSupportSecure {
@@ -69,22 +68,9 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
 
     private static UUID ID = UUID.randomUUID();
 
-    private static Optional<LoginEntity> ID_RESPONSE_LOGIN;
+    private static final Optional<UUID> ID_RESPONSE_LOGIN = Optional.of(ID);
 
-    private static Optional<LoginEntity> RANDOM_RESPONSE_LOGIN;
-
-    static {
-
-        LoginEntity login = new LoginEntity();
-        login.setId(ID);
-
-        ID_RESPONSE_LOGIN = Optional.of(login);
-
-        LoginEntity random = new LoginEntity();
-        random.setId(UUID.randomUUID());
-
-        RANDOM_RESPONSE_LOGIN = Optional.of(random);
-    }
+    private static final Optional<UUID> RANDOM_RESPONSE_LOGIN = Optional.of(UUID.randomUUID());
 
     private Stream<Arguments> authorizedGetUserFailure() {
 
@@ -102,7 +88,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
 
     @ParameterizedTest
     @MethodSource
-    public void authorizedGetUserFailure(String token, Optional<LoginEntity> loginResponse) {
+    public void authorizedGetUserFailure(String token, Optional<UUID> loginResponse) {
 
         // Given mock service
         Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(loginResponse);

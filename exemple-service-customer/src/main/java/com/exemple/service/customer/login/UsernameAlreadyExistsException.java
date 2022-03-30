@@ -1,13 +1,13 @@
-package com.exemple.service.resource.login.exception;
+package com.exemple.service.customer.login;
 
 import java.text.MessageFormat;
 
 import lombok.Getter;
 
 @Getter
-public class UsernameAlreadyExistsException extends Exception {
+public class UsernameAlreadyExistsException extends RuntimeException {
 
-    protected static final String EXCEPTION_MESSAGE = "Login {0} already exists";
+    protected static final String EXCEPTION_MESSAGE = "[{0}] already exists";
 
     private static final long serialVersionUID = 1L;
 
