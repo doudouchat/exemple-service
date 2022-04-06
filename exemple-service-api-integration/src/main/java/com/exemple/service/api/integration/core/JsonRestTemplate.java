@@ -26,6 +26,7 @@ import io.restassured.response.Response;
 import io.restassured.specification.FilterableRequestSpecification;
 import io.restassured.specification.FilterableResponseSpecification;
 import io.restassured.specification.RequestSpecification;
+import lombok.SneakyThrows;
 
 public final class JsonRestTemplate {
 
@@ -111,13 +112,10 @@ public final class JsonRestTemplate {
             return response;
         }
 
+        @SneakyThrows(UnsupportedEncodingException.class)
         private static PrintStream buildLogPrint() {
 
-            try {
-                return new PrintStream(NullOutputStream.NULL_OUTPUT_STREAM, true, StandardCharsets.UTF_8.name());
-            } catch (UnsupportedEncodingException e) {
-                throw new IllegalStateException(e);
-            }
+            return new PrintStream(NullOutputStream.NULL_OUTPUT_STREAM, true, StandardCharsets.UTF_8.name());
         }
 
     }
