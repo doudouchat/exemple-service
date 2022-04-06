@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.nodes.PersistentNode;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 @Service
 @Validated
@@ -37,13 +39,14 @@ public class ApplicationDetailServiceImpl implements ApplicationDetailService {
     private final CuratorFramework client;
 
     @Override
+    @SneakyThrows
     public ApplicationDetail get(String application) {
 
         try {
 
             return MAPPER.readValue(client.getData().forPath("/" + application), ApplicationDetail.class);
 
-        } catch (Exception e) {
+        } catch (KeeperException.NoNodeException e) {
 
             throw new NotFoundApplicationException(application, e);
         }
