@@ -4,7 +4,7 @@ import java.util.logging.Level;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.MediaType;
 
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
@@ -12,6 +12,8 @@ import org.glassfish.jersey.logging.LoggingFeature;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 @Service
 @Profile("!noSecurity")
@@ -44,13 +46,13 @@ public class AuthorizationClient {
 
     }
 
-    public Response tokenKey(String path, String username, String password) {
+    public JsonNode tokenKey(String path, String username, String password) {
 
         return client.target(path + "/oauth/token_key").request()
-
+                .accept(MediaType.APPLICATION_JSON)
                 .property(HttpAuthenticationFeature.HTTP_AUTHENTICATION_BASIC_USERNAME, username)
-                .property(HttpAuthenticationFeature.HTTP_AUTHENTICATION_BASIC_PASSWORD, password).get();
-
+                .property(HttpAuthenticationFeature.HTTP_AUTHENTICATION_BASIC_PASSWORD, password)
+                .get(JsonNode.class);
     }
 
 }

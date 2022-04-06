@@ -11,10 +11,6 @@ public class AuthorizationException extends Exception {
 
     private final Response.Status status;
 
-    public AuthorizationException(Throwable cause) {
-        this(Response.Status.FORBIDDEN, cause);
-    }
-
     public AuthorizationException(Response.Status status, Throwable cause) {
         super(cause);
         this.status = status;
@@ -23,11 +19,6 @@ public class AuthorizationException extends Exception {
     public AuthorizationException(Response.Status status, String message) {
         super(message);
         this.status = status;
-    }
-
-    public AuthorizationException(String message, Throwable cause) {
-        super(message, cause);
-        this.status = Response.Status.FORBIDDEN;
     }
 
 }
