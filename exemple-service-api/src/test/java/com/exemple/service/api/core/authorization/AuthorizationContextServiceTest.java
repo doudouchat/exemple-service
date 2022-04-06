@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import java.security.spec.InvalidKeySpecException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,6 +12,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
@@ -28,10 +31,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
+import org.mockserver.model.BodyWithContentType;
 import org.mockserver.model.Header;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 import org.mockserver.model.JsonBody;
+import org.mockserver.model.MediaType;
+import org.mockserver.model.StringBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -90,9 +96,9 @@ public class AuthorizationContextServiceTest {
 
     private static Map<String, String> TOKEN_KEY_CORRECT_RESPONSE = new HashMap<>();
 
-    private static Map<String, String> TOKEN_KEY_OTHER_RESPONSE = new HashMap<>();
-
-    private static Map<String, String> TOKEN_KEY_INCORRECT_RESPONSE = new HashMap<>();
+    private static String TOKEN = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe")
+            .withArrayClaim("scope", new String[] { "account:write" }).withJWTId(UUID.randomUUID().toString())
+            .sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
 
     static {
 
@@ -100,13 +106,6 @@ public class AuthorizationContextServiceTest {
         TOKEN_KEY_CORRECT_RESPONSE.put("value", "-----BEGIN PUBLIC KEY-----\n"
                 + new String(Base64.encodeBase64(AuthorizationTestConfiguration.PUBLIC_KEY.getEncoded())) + "\n-----END PUBLIC KEY-----");
 
-        TOKEN_KEY_OTHER_RESPONSE.put("alg", "SHA256withRSA");
-        TOKEN_KEY_OTHER_RESPONSE.put("value", "-----BEGIN PUBLIC KEY-----\n"
-                + new String(Base64.encodeBase64(AuthorizationTestConfiguration.OTHER_PUBLIC_KEY.getEncoded())) + "\n-----END PUBLIC KEY-----");
-
-        TOKEN_KEY_INCORRECT_RESPONSE.put("alg", "SHA256withRSA");
-        TOKEN_KEY_INCORRECT_RESPONSE.put("value",
-                "-----BEGIN PUBLIC KEY-----\n" + new String(Base64.encodeBase64("123".getBytes())) + "\n-----END PUBLIC KEY-----");
     }
 
     @BeforeEach
@@ -123,10 +122,6 @@ public class AuthorizationContextServiceTest {
 
     private static Stream<Arguments> authorizedFailure() {
 
-        String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe")
-                .withArrayClaim("scope", new String[] { "account:write" }).withJWTId(UUID.randomUUID().toString())
-                .sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
-
         String badClientIdToken = JWT.create().withClaim("client_id", "clientId2").withSubject("john_doe")
                 .withArrayClaim("scope", new String[] { "account:write" }).withJWTId(UUID.randomUUID().toString())
                 .sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
@@ -135,27 +130,34 @@ public class AuthorizationContextServiceTest {
                 .withArrayClaim("scope", new String[] { "account:write" }).withJWTId(DEPRECATED_TOKEN_ID.toString())
                 .sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
 
+        Map<String, String> TOKEN_KEY_OTHER_RESPONSE = new HashMap<>();
+        TOKEN_KEY_OTHER_RESPONSE.put("alg", "SHA256withRSA");
+        TOKEN_KEY_OTHER_RESPONSE.put("value", "-----BEGIN PUBLIC KEY-----\n"
+                + new String(Base64.encodeBase64(AuthorizationTestConfiguration.OTHER_PUBLIC_KEY.getEncoded())) + "\n-----END PUBLIC KEY-----");
+
         return Stream.of(
-                Arguments.of(token, TOKEN_KEY_CORRECT_RESPONSE, Status.BAD_REQUEST),
-                Arguments.of(token, TOKEN_KEY_OTHER_RESPONSE, Status.OK),
-                Arguments.of(badClientIdToken, TOKEN_KEY_CORRECT_RESPONSE, Status.OK),
-                Arguments.of(token, TOKEN_KEY_INCORRECT_RESPONSE, Status.OK),
-                Arguments.of(deprecatedToken, TOKEN_KEY_CORRECT_RESPONSE, Status.OK));
+                Arguments.of(TOKEN, JsonBody.json(TOKEN_KEY_OTHER_RESPONSE)),
+                Arguments.of(badClientIdToken, JsonBody.json(TOKEN_KEY_CORRECT_RESPONSE)),
+                Arguments.of(deprecatedToken, JsonBody.json(TOKEN_KEY_CORRECT_RESPONSE)));
     }
 
     @ParameterizedTest
     @MethodSource
-    public void authorizedFailure(String token, Map<String, String> tokenKey, Status status) {
+    public void authorizedFailure(String token, BodyWithContentType<?> body) {
 
-        authorizationClient.when(HttpRequest.request().withMethod("GET").withPath("/oauth/token_key"))
-                .respond(HttpResponse.response().withHeaders(new Header("Content-Type", "application/json;charset=UTF-8"))
-                        .withBody(JsonBody.json(tokenKey)).withStatusCode(status.getStatusCode()));
+        // Given mock client
+        authorizationClient.when(HttpRequest.request()
+                .withMethod("GET")
+                .withPath("/oauth/token_key"))
+                .respond(HttpResponse.response()
+                        .withHeaders(new Header("Content-Type", body.getContentType()))
+                        .withBody(body)
+                        .withStatusCode(200));
 
+        // When perform
         MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
         headers.putSingle("Authorization", "Bearer " + token);
         headers.putSingle(ApplicationBeanParam.APP_HEADER, "test");
-
-        // When perform
         Throwable throwable = catchThrowable(() -> service.buildContext(headers));
 
         // Then check throwable
@@ -163,22 +165,63 @@ public class AuthorizationContextServiceTest {
 
     }
 
+    private static Stream<Arguments> authorizedFailureAlgorithm() {
+
+        Map<String, String> TOKEN_KEY_INCORRECT_RESPONSE = new HashMap<>();
+        TOKEN_KEY_INCORRECT_RESPONSE.put("alg", "SHA256withRSA");
+        TOKEN_KEY_INCORRECT_RESPONSE.put("value",
+                "-----BEGIN PUBLIC KEY-----\n" + new String(Base64.encodeBase64("123".getBytes())) + "\n-----END PUBLIC KEY-----");
+
+        return Stream.of(
+                Arguments.of(JsonBody.json(TOKEN_KEY_CORRECT_RESPONSE), Status.BAD_REQUEST, ClientErrorException.class),
+                Arguments.of(JsonBody.json(TOKEN_KEY_INCORRECT_RESPONSE), Status.OK, InvalidKeySpecException.class),
+                Arguments.of(new StringBody("", MediaType.APPLICATION_JSON), Status.OK, IllegalArgumentException.class),
+                Arguments.of(new StringBody("toto", MediaType.TEXT_PLAIN), Status.OK, ResponseProcessingException.class));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    public void authorizedFailureAlgorithm(BodyWithContentType<?> body, Status status, Class<? extends Throwable> expectedCause) {
+
+        // Given mock client
+        authorizationClient.when(HttpRequest.request()
+                .withMethod("GET")
+                .withPath("/oauth/token_key"))
+                .respond(HttpResponse.response()
+                        .withHeaders(new Header("Content-Type", body.getContentType()))
+                        .withBody(body)
+                        .withStatusCode(status.getStatusCode()));
+
+        // When perform
+        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+        headers.putSingle("Authorization", "Bearer " + TOKEN);
+        headers.putSingle(ApplicationBeanParam.APP_HEADER, "test");
+        Throwable throwable = catchThrowable(() -> service.buildContext(headers));
+
+        // Then check throwable
+        assertThat(throwable).isInstanceOf(AuthorizationAlgorithmException.class).hasCauseInstanceOf(expectedCause);
+
+    }
+
     @Test
     public void authorized() throws AuthorizationException {
 
-        authorizationClient.when(HttpRequest.request().withMethod("GET").withPath("/oauth/token_key"))
-                .respond(HttpResponse.response().withHeaders(new Header("Content-Type", "application/json;charset=UTF-8"))
-                        .withBody(JsonBody.json(TOKEN_KEY_CORRECT_RESPONSE)).withStatusCode(200));
+        // Given build response
+        JsonBody body = JsonBody.json(TOKEN_KEY_CORRECT_RESPONSE);
 
-        String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe")
-                .withArrayClaim("scope", new String[] { "account:write" }).withJWTId(UUID.randomUUID().toString())
-                .sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
-
-        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
-        headers.putSingle("Authorization", "Bearer " + token);
-        headers.putSingle(ApplicationBeanParam.APP_HEADER, "test");
+        // And mock client
+        authorizationClient.when(HttpRequest.request()
+                .withMethod("GET")
+                .withPath("/oauth/token_key"))
+                .respond(HttpResponse.response()
+                        .withHeaders(new Header("Content-Type", body.getContentType()))
+                        .withBody(body)
+                        .withStatusCode(200));
 
         // When perform
+        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+        headers.putSingle("Authorization", "Bearer " + TOKEN);
+        headers.putSingle(ApplicationBeanParam.APP_HEADER, "test");
         ApiSecurityContext securityContext = service.buildContext(headers);
 
         // Then check security context

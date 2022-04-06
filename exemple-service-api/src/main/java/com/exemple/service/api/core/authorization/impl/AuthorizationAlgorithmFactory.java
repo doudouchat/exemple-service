@@ -5,18 +5,12 @@ import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.Response;
 
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +19,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.auth0.jwt.algorithms.Algorithm;
-import com.exemple.service.api.core.authorization.AuthorizationException;
+import com.exemple.service.api.core.authorization.AuthorizationAlgorithmException;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.SneakyThrows;
 
@@ -65,41 +60,33 @@ public class AuthorizationAlgorithmFactory {
     }
 
     public Algorithm getAlgorithm() {
-
-        return algorithms.computeIfAbsent(defaultPath, this::buildAlgorithm);
+        try {
+            return algorithms.computeIfAbsent(defaultPath, this::buildAlgorithm);
+        } catch (Exception e) {
+            throw new AuthorizationAlgorithmException(e);
+        }
     }
 
     public void resetAlgorithm() {
         algorithms.compute(defaultPath, (String path, Algorithm algorithm) -> null);
     }
 
-    @SneakyThrows(AuthorizationException.class)
+    @SneakyThrows
     private Algorithm buildAlgorithm(String path) {
 
-        Response response = this.authorizationClient.tokenKey(path, clientId, clientSecret);
+        JsonNode body = this.authorizationClient.tokenKey(path, clientId, clientSecret);
 
-        if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+        Assert.notNull(body, "Body is missing");
+        Assert.isTrue(body.get("value").isTextual(), "Value is missing");
 
-            throw new AuthorizationException("HTTP GET token_key failed",
-                    new ClientErrorException(response.readEntity(String.class), response.getStatus()));
-        }
-
-        Map<String, String> body = response.readEntity(new GenericType<Map<String, String>>() {
-        });
-
-        Matcher publicKeyMatcher = RSA_PUBLIC_KEY.matcher(body.get("value"));
+        Matcher publicKeyMatcher = RSA_PUBLIC_KEY.matcher(body.get("value").textValue());
 
         Assert.isTrue(publicKeyMatcher.lookingAt(), "Pattern is invalid");
 
         final byte[] content = Base64.decodeBase64(publicKeyMatcher.group(1).getBytes(StandardCharsets.UTF_8));
 
         KeySpec keySpec = new X509EncodedKeySpec(content);
-        PublicKey publicKey;
-        try {
-            publicKey = this.keyFactory.generatePublic(keySpec);
-        } catch (InvalidKeySpecException e) {
-            throw new AuthorizationException(e);
-        }
+        PublicKey publicKey = this.keyFactory.generatePublic(keySpec);
 
         return Algorithm.RSA256((RSAPublicKey) publicKey, null);
     }
