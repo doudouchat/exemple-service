@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.primitives.Longs;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 @Component
 @RequiredArgsConstructor
@@ -51,14 +52,13 @@ public class StockDistribution {
     public interface LockStock<T> {
         T get() throws Exception;
 
+        @SneakyThrows
         static <T> Optional<T> accessStock(LockStock<T> action) {
             try {
                 return Optional.of(action.get());
             } catch (KeeperException.NoNodeException e) {
                 LOG.warn(e.getMessage(), e);
                 return Optional.empty();
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
             }
         }
     }
