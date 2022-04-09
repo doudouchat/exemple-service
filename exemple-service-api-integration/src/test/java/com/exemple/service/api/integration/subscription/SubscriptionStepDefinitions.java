@@ -65,14 +65,14 @@ public class SubscriptionStepDefinitions {
     public void getSubscription(String email, JsonNode body) throws IOException {
 
         assertAll(
-                () -> assertThat(context.lastResponse().getStatusCode()).is(anyOf(
+                () -> assertThat(context.lastResponse().getStatusCode()).as("subscription %s is not created", email).is(anyOf(
                         new Condition<>(status -> status == 204, "status"),
                         new Condition<>(status -> status == 201, "status"))),
                 () -> assertThat(context.lastResponse().asString()).isEmpty());
 
         Response response = SubscriptionApiClient.get(email, TEST_APP, VERSION_V1);
 
-        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getStatusCode()).as("subscription %s not found", email).isEqualTo(200);
 
         ObjectNode expectedBody = (ObjectNode) MAPPER.readTree(response.asString());
         expectedBody.remove("subscription_date");
@@ -88,14 +88,14 @@ public class SubscriptionStepDefinitions {
 
         Response response = SubscriptionApiClient.get(email, TEST_APP, VERSION_V1);
 
-        assertThat(response.getStatusCode()).isEqualTo(404);
+        assertThat(response.getStatusCode()).as("subscription %s exists", email).isEqualTo(404);
 
     }
 
     @And("subscription contains {string}")
     public void checkProperty(String property) {
 
-        assertThat(context.lastGet().jsonPath().getString(property)).isNotNull();
+        assertThat(context.lastGet().jsonPath().getString(property)).as("subscription property %s exists", property).isNotNull();
 
     }
 
@@ -109,11 +109,11 @@ public class SubscriptionStepDefinitions {
     @And("subscription error contains {int} errors")
     public void checkCountError(int count) throws IOException {
 
-        assertThat(context.lastResponse().getStatusCode()).isEqualTo(400);
+        assertThat(context.lastResponse().getStatusCode()).as("subscription is correct").isEqualTo(400);
 
         ArrayNode errors = (ArrayNode) MAPPER.readTree(context.lastResponse().asString());
 
-        assertThat(Streams.stream(errors.elements())).as("errors {} not contain expected errors", errors.toPrettyString()).hasSize(count);
+        assertThat(Streams.stream(errors.elements())).as("errors %s not contain expected errors", errors.toPrettyString()).hasSize(count);
 
     }
 

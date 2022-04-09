@@ -16,7 +16,6 @@ import com.exemple.service.resource.core.ResourceExecutionContext;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
-import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 
 public class LoginStepDefinitions {
@@ -41,14 +40,14 @@ public class LoginStepDefinitions {
 
     }
 
-    @When("get id account {string}")
+    @And("get id account {string}")
     public void getLogin(String username) {
 
         Response response = LoginApiClient.get(username, TEST_APP, VERSION_V1);
 
         assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(200),
-                () -> assertThat(response.as(UUID.class)).isEqualTo(context.lastId()));
+                () -> assertThat(response.getStatusCode()).as("login %s not found", username).isEqualTo(200),
+                () -> assertThat(response.as(UUID.class)).as("login id and creation id not match", username).isEqualTo(context.lastId()));
 
         context.saveId(response.as(UUID.class));
 
@@ -59,7 +58,7 @@ public class LoginStepDefinitions {
 
         Response response = LoginApiClient.head(username, TEST_APP);
 
-        assertThat(response.getStatusCode()).isEqualTo(204);
+        assertThat(response.getStatusCode()).as("login %s not exists", username).isEqualTo(204);
 
     }
 
@@ -68,7 +67,7 @@ public class LoginStepDefinitions {
 
         Response response = LoginApiClient.head(username, TEST_APP);
 
-        assertThat(response.getStatusCode()).isEqualTo(404);
+        assertThat(response.getStatusCode()).as("login %s exists", username).isEqualTo(404);
 
     }
 

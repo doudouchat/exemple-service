@@ -56,15 +56,15 @@ public class StockStepDefinitions {
         Response response = StockApiClient.get(store + "#" + salt, product, BACK_APP);
 
         assertAll(
-                () -> assertThat(context.lastResponse().getStatusCode()).isEqualTo(200),
-                () -> assertThat(response.jsonPath().getLong("amount")).isEqualTo(amount));
+                () -> assertThat(context.lastResponse().getStatusCode()).as("stock %s %s not found", product, store).isEqualTo(200),
+                () -> assertThat(response.jsonPath().getLong("amount")).as("stock %s %s has bad ammount", product, store).isEqualTo(amount));
 
     }
 
     @Then("stock of product {string} from store {string} is unknown")
     public void checkUnknown(String product, String store) throws IOException {
 
-        assertThat(context.lastResponse().getStatusCode()).isEqualTo(404);
+        assertThat(context.lastResponse().getStatusCode()).as("stock %s %s exists", product, store).isEqualTo(404);
 
     }
 
@@ -72,7 +72,7 @@ public class StockStepDefinitions {
     public void checkError(String product, String store, long stock, long quantity) throws IOException {
 
         assertAll(
-                () -> assertThat(context.lastResponse().getStatusCode()).isEqualTo(400),
+                () -> assertThat(context.lastResponse().getStatusCode()).as("stock %s %s is correct", product, store).isEqualTo(400),
                 () -> assertThat(context.lastResponse().getBody().asString())
                         .isEqualTo("Stock /test_company/" + store + "#" + salt + "/" + product + ":" + stock + " is insufficient for quantity "
                                 + quantity));

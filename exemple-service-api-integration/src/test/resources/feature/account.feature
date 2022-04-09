@@ -170,7 +170,7 @@ Feature: api account
       """
 
   Scenario: create account fails because username already exists
-    Given create account
+    Given account
       """
       {
           "birthday": "1967-06-15",

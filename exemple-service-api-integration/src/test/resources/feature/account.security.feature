@@ -16,7 +16,7 @@ Feature: api account security
     Then account is denied
 
   Scenario: get account fails because application not exists
-    Given create account
+    Given account
       """
       {
           "birthday": "1967-06-15",

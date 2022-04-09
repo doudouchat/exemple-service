@@ -2,7 +2,7 @@ Feature: api patch account
 
   Background: 
     Given delete username 'jean.dupond@gmail.com'
-    And create account
+    And account
       """
       {
           "optin_mobile": true,
@@ -264,7 +264,7 @@ Feature: api patch account
 
   Scenario: patch account fails because username already exists
     Given delete username 'jean.dupont@gmail.com'
-    And create account
+    And account
       """
       {
           "birthday": "1967-06-15",
