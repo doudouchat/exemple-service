@@ -144,9 +144,9 @@ public class AccountApi {
 
         JsonNode previousSource = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).get(id).orElseThrow(NotFoundException::new);
 
-        JsonNode source = JsonPatch.apply(patch, previousSource);
+        schemaValidation.validate(patch, previousSource, ACCOUNT_RESOURCE, servletContext);
 
-        schemaValidation.validate(source, previousSource, ACCOUNT_RESOURCE, servletContext);
+        JsonNode source = JsonPatch.apply(patch, previousSource);
 
         scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).save(source, previousSource);
 

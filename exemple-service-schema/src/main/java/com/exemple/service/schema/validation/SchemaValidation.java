@@ -11,8 +11,8 @@ public interface SchemaValidation {
 
     void validate(String app, String version, String profile, String resource, JsonNode form, JsonNode old);
 
-    void validate(Schema schema, JsonNode target);
+    void validate(String app, String version, String profile, String resource, ArrayNode patch, JsonNode old);
 
-    void validatePatch(ArrayNode patch);
+    void validate(Schema schema, JsonNode target);
 
 }

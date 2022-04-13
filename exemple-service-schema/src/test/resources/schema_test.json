@@ -76,6 +76,14 @@
 			"items": {
 				"$ref": "#/definitions/Cgu"
 			}
+		},
+		"cgvs": {
+			"type": "array",
+			"uniqueItems": true,
+			"maxItems": 2,
+			"items": {
+				"$ref": "#/definitions/Cgv"
+			}
 		}
 	},
 	"definitions": {
@@ -95,6 +103,21 @@
 			]
 		},
 		"Cgu": {
+			"type": "object",
+			"properties": {
+				"code": {
+					"type": "string"
+				},
+				"version": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"code",
+				"version"
+			]
+		},
+		"Cgv": {
 			"type": "object",
 			"properties": {
 				"code": {

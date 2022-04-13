@@ -59,6 +59,7 @@ public class SchemaTestConfiguration {
         schemaTestField.add("opt_in_email");
         schemaTestField.add("addresses[*[city,street]]");
         schemaTestField.add("cgus[code,version]");
+        schemaTestField.add("cgvs[code,version]");
         schemaTest.setFields(schemaTestField);
         Mockito.when(resource.get(Mockito.eq("default"), Mockito.eq("default"), Mockito.eq("schema_test"), Mockito.eq("default")))
                 .thenReturn(schemaTest);

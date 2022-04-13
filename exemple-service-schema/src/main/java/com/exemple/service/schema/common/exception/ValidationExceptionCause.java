@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @EqualsAndHashCode
-public class ValidationExceptionModel implements Serializable {
+public class ValidationExceptionCause implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -26,11 +27,14 @@ public class ValidationExceptionModel implements Serializable {
 
     private final String message;
 
-    public ValidationExceptionModel(JsonPointer pointer, String code, String message) {
+    private final JsonNode value;
+
+    public ValidationExceptionCause(JsonPointer pointer, String code, String message, JsonNode value) {
         this.pointer = pointer;
         this.path = this.pointer.toString();
         this.code = code;
         this.message = message;
+        this.value = value;
     }
 
 }
