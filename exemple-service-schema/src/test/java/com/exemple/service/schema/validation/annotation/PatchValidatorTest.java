@@ -59,22 +59,33 @@ public class PatchValidatorTest {
 
     }
 
-    @Test
-    public void patchFailure() {
-
-        // setup source
-        Map<String, Object> patch0 = new HashMap<>();
-        patch0.put("op", "add");
-        patch0.put("value", "Dupond");
+    private static Stream<Arguments> patchFailure() {
 
         Map<String, Object> patch1 = new HashMap<>();
-        patch1.put("op", "replace");
-        patch1.put("value", "Joe");
+        patch1.put("op", "bad");
+        patch1.put("path", "/lastname");
+        patch1.put("value", "Dupond");
 
+        Map<String, Object> patch2 = new HashMap<>();
+        patch2.put("op", "add");
+        patch2.put("path", "lastname");
+        patch2.put("value", "Dupond");
+
+        return Stream.of(
+                // bad op
+                Arguments.of(patch1, 2, new String[] { "/0/from", "/0/op" }),
+                // bad pattern
+                Arguments.of(patch2, 1, new String[] { "/0/path" }));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    public void patchFailure(Map<String, Object> patch, int expectedExceptionSize, String... expectedPropertyPath) {
+
+        // setup source
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode argument = mapper.createArrayNode();
-        argument.add(mapper.convertValue(patch0, JsonNode.class));
-        argument.add(mapper.convertValue(patch1, JsonNode.class));
+        argument.add(mapper.convertValue(patch, JsonNode.class));
 
         // When perform
         Throwable throwable = catchThrowable(() -> exemple.exemple(argument));
@@ -82,10 +93,10 @@ public class PatchValidatorTest {
         // Then check throwable
         assertThat(throwable).isInstanceOfSatisfying(ConstraintViolationException.class,
                 exception -> assertAll(
-                        () -> assertThat(exception.getConstraintViolations()).hasSize(2),
+                        () -> assertThat(exception.getConstraintViolations()).hasSize(expectedExceptionSize),
                         () -> assertThat(exception.getConstraintViolations())
                                 .extracting(violation -> Iterables.getLast(violation.getPropertyPath()))
-                                .extracting(Node::getName).contains("/0/path", "/1/path")));
+                                .extracting(Node::getName).contains(expectedPropertyPath)));
     }
 
     @Test

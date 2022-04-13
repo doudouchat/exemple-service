@@ -6,6 +6,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.everit.json.schema.Schema;
 import org.mockito.Mockito;
 import org.osjava.sj.SimpleJndi;
 import org.osjava.sj.loader.JndiLoader;
@@ -152,4 +153,9 @@ public class ApiTestConfiguration extends ApiConfiguration {
         return MAPPER.readTree(ResourceUtils.getFile("classpath:model/swagger_security.json"));
     }
 
+    @Bean
+    public Schema patchSchema() {
+        return Mockito.mock(Schema.class);
+
+    }
 }

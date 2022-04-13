@@ -14,6 +14,6 @@ public class ServiceValidationExceptionProvider implements ExceptionMapper<Valid
     @Override
     public Response toResponse(ValidationException e) {
 
-        return Response.status(Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(e.getAllExceptions()).build();
+        return Response.status(Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(e.getCauses()).build();
     }
 }

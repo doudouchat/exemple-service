@@ -9,6 +9,7 @@ import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,6 +35,15 @@ public class ValidationHelper {
         String profile = ((ApiSecurityContext) requestContext.getSecurityContext()).getProfile();
 
         schemaValidation.validate(app, version, profile, resourceName, source, previousSource);
+    }
+
+    public void validate(ArrayNode patch, JsonNode previousSource, String resourceName, ContainerRequestContext requestContext) {
+
+        String app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
+        String version = requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER);
+        String profile = ((ApiSecurityContext) requestContext.getSecurityContext()).getProfile();
+
+        schemaValidation.validate(app, version, profile, resourceName, patch, previousSource);
     }
 
 }

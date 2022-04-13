@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,6 +28,7 @@ import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class AccountApiTest extends JerseySpringSupport {
@@ -100,13 +100,13 @@ public class AccountApiTest extends JerseySpringSupport {
 
         // When perform patch
 
-        JsonNode patch = MAPPER.readTree("{\"op\": \"add\", \"path\": \"/birthday\", \"value\":\"1976-12-12\"}");
+        JsonNode patch = MAPPER.readTree("[{\"op\": \"add\", \"path\": \"/birthday\", \"value\":\"1976-12-12\"}]");
 
         Response response = target(URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true).request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
 
-                .method("PATCH", Entity.json(Collections.singletonList(patch)));
+                .method("PATCH", Entity.json(patch));
 
         // Then check status
 
@@ -126,11 +126,14 @@ public class AccountApiTest extends JerseySpringSupport {
 
         // And check validation
 
-        Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("account"), account.capture(),
+        ArgumentCaptor<ArrayNode> patchCapture = ArgumentCaptor.forClass(ArrayNode.class);
+
+        Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("account"),
+                patchCapture.capture(),
                 previousAccount.capture());
         assertAll(
                 () -> assertThat(previousAccount.getValue()).isEqualTo(this.account),
-                () -> assertThat(account.getValue()).isEqualTo(expectedAccount));
+                () -> assertThat(patchCapture.getValue()).isEqualTo(patch));
 
     }
 
