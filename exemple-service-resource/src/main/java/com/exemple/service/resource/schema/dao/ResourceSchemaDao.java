@@ -1,5 +1,7 @@
 package com.exemple.service.resource.schema.dao;
 
+import java.util.Optional;
+
 import com.datastax.oss.driver.api.core.PagingIterable;
 import com.datastax.oss.driver.api.mapper.annotations.Dao;
 import com.datastax.oss.driver.api.mapper.annotations.Insert;
@@ -12,7 +14,7 @@ import com.exemple.service.resource.schema.model.SchemaEntity;
 public interface ResourceSchemaDao {
 
     @Select
-    SchemaEntity findByApplicationAndResourceAndVersionAndProfile(String application, String resource, String version, String profile);
+    Optional<SchemaEntity> findByApplicationAndResourceAndVersionAndProfile(String application, String resource, String version, String profile);
 
     @Select
     PagingIterable<SchemaEntity> findByApplication(String application);

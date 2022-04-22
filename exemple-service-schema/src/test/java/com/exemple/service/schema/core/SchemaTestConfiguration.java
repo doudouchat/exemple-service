@@ -3,6 +3,7 @@ package com.exemple.service.schema.core;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.validation.Validator;
@@ -17,7 +18,6 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import com.exemple.service.resource.schema.SchemaResource;
-import com.exemple.service.resource.schema.impl.SchemaResourceImpl;
 import com.exemple.service.resource.schema.model.SchemaEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -33,9 +33,8 @@ public class SchemaTestConfiguration {
         SchemaResource resource = Mockito.mock(SchemaResource.class);
 
         SchemaEntity unknownResourceSchema = new SchemaEntity();
-        unknownResourceSchema.setContent(SchemaResourceImpl.SCHEMA_DEFAULT);
         Mockito.when(resource.get(Mockito.eq("unknown"), Mockito.eq("unknown"), Mockito.eq("schema_test"), Mockito.eq("unknown")))
-                .thenReturn(unknownResourceSchema);
+                .thenReturn(Optional.of(unknownResourceSchema));
 
         SchemaEntity schemaTest = new SchemaEntity();
         schemaTest.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("schema_test.json").getInputStream())));
@@ -62,8 +61,8 @@ public class SchemaTestConfiguration {
         schemaTestField.add("cgvs[code,version]");
         schemaTest.setFields(schemaTestField);
         Mockito.when(resource.get(Mockito.eq("default"), Mockito.eq("default"), Mockito.eq("schema_test"), Mockito.eq("default")))
-                .thenReturn(schemaTest);
-       
+                .thenReturn(Optional.of(schemaTest));
+
         SchemaEntity schemaArray = new SchemaEntity();
         Set<String> schemaArrayField = new HashSet<>();
         schemaArrayField.add("items[city,street]");
@@ -71,7 +70,7 @@ public class SchemaTestConfiguration {
         schemaArray.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("schema_array.json").getInputStream())));
 
         Mockito.when(resource.get(Mockito.eq("default"), Mockito.eq("default"), Mockito.eq("array_test"), Mockito.eq("default")))
-                .thenReturn(schemaArray);
+                .thenReturn(Optional.of(schemaArray));
 
         return resource;
     }

@@ -424,7 +424,6 @@ public class SchemaValidationTest {
         public void patchFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
 
             // Given origin
-
             Map<String, Object> origin = new HashMap<>();
             origin.put("opt_in_email", false);
             origin.put("lastname", "doe");
@@ -686,6 +685,38 @@ public class SchemaValidationTest {
                             () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains(expectedPath)));
         }
 
+        @Test
+        @DisplayName("source patch fails because schema not exists")
+        public void patchFailureWhenSchemaNotExists() {
+
+            // Given origin
+
+            Map<String, Object> origin = new HashMap<>();
+            origin.put("email", "jean.dupond@gmail.com");
+            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+
+            // And Patch
+            ObjectNode patch = MAPPER.createObjectNode();
+            patch.put("op", "replace");
+            patch.put("path", "/email");
+            patch.put("value", "jack.dupont@gmail.com");
+
+            ArrayNode patchs = MAPPER.createArrayNode();
+            patchs.add(patch);
+
+            // When perform
+            Throwable throwable = catchThrowable(
+                    () -> validation.validate("unknown", "unknown", "unknown", "schema_test", patchs, old));
+
+            // Then check throwable
+            assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
+                    exception -> assertAll(
+                            () -> assertThat(exception.getCauses()).hasSize(1),
+                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode)
+                                    .contains("additionalProperties"),
+                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains("/email")));
+        }
+
     }
 
     @Nested
@@ -835,6 +866,39 @@ public class SchemaValidationTest {
 
             // Then check none exception
             assertThat(throwable).as("None exception is expected").isNull();
+        }
+
+        @Test
+        @DisplayName("source udpate fails because schema not exists")
+        public void updateFailureWhenSchemaNotExists() {
+
+            // Given origin
+            Map<String, Object> origin = new HashMap<>();
+            origin.put("email", "jean.dupont@gmail.com");
+            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+
+            // And Patch
+            ObjectNode patch = MAPPER.createObjectNode();
+            patch.put("op", "replace");
+            patch.put("path", "/email");
+            patch.put("value", "jack.dupont@gmail.com");
+
+            // And form
+            ArrayNode patchs = MAPPER.createArrayNode();
+            patchs.add(patch);
+            JsonNode model = JsonPatch.apply(patchs, old);
+
+            // When perform
+            Throwable throwable = catchThrowable(
+                    () -> validation.validate("unknown", "unknown", "unknown", "schema_test", model, old));
+
+            // Then check throwable
+            assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
+                    exception -> assertAll(
+                            () -> assertThat(exception.getCauses()).hasSize(1),
+                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode)
+                                    .contains("additionalProperties"),
+                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains("/email")));
         }
 
     }

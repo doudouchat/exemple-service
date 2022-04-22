@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -19,8 +20,6 @@ import com.exemple.service.resource.schema.dao.ResourceSchemaDao;
 import com.exemple.service.resource.schema.mapper.ResourceSchemaMapper;
 import com.exemple.service.resource.schema.model.SchemaEntity;
 import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,37 +28,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SchemaResourceImpl implements SchemaResource {
 
-    public static final JsonNode SCHEMA_DEFAULT;
-
-    static {
-
-        Map<String, Object> defaultSchema = new HashMap<>();
-        defaultSchema.put("$schema", "http://json-schema.org/draft-07/schema");
-        defaultSchema.put("additionalProperties", false);
-
-        SCHEMA_DEFAULT = new ObjectMapper().convertValue(defaultSchema, JsonNode.class);
-
-    }
-
     private final CqlSession session;
 
     private final ConcurrentMap<String, ResourceSchemaMapper> mappers = new ConcurrentHashMap<>();
 
     @Override
     @Cacheable("schema_resource")
-    public SchemaEntity get(String app, String version, String resource, String profile) {
+    public Optional<SchemaEntity> get(String app, String version, String resource, String profile) {
 
-        SchemaEntity resourceSchema = dao().findByApplicationAndResourceAndVersionAndProfile(app, resource, version, profile);
-
-        if (resourceSchema == null) {
-            resourceSchema = new SchemaEntity();
-        }
-
-        if (resourceSchema.getContent() == null) {
-            resourceSchema.setContent(SCHEMA_DEFAULT);
-        }
-
-        return resourceSchema;
+        return dao().findByApplicationAndResourceAndVersionAndProfile(app, resource, version, profile);
     }
 
     @Override

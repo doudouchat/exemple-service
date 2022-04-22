@@ -1,9 +1,11 @@
 package com.exemple.service.schema.validation.impl;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -15,6 +17,7 @@ import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.resource.schema.SchemaResource;
@@ -30,21 +33,30 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.flipkart.zjsonpatch.JsonPatch;
 
-import lombok.RequiredArgsConstructor;
-
 @Component
-@RequiredArgsConstructor
 public class SchemaValidationImpl implements SchemaValidation {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final SchemaResource schemaResource;
 
+    private final Schema defaultSchema;
+
+    public SchemaValidationImpl(SchemaResource schemaResource) throws IOException {
+        this.schemaResource = schemaResource;
+
+        JSONObject schemaJson = new JSONObject(new JSONTokener(new ClassPathResource("default-schema.json").getInputStream()));
+        defaultSchema = buildSchema(schemaJson);
+
+    }
+
     @Override
     public void validate(String app, String version, String profile, String resource, JsonNode form) {
 
-        SchemaEntity schemaEntity = schemaResource.get(app, version, resource, profile);
-        Schema schema = buildSchema(schemaEntity.getContent(), Collections.emptySet());
+        Schema schema = schemaResource.get(app, version, resource, profile)
+                .map(SchemaEntity::getContent)
+                .map((JsonNode schemaContent) -> buildSchema(schemaContent, Collections.emptySet()))
+                .orElse(defaultSchema);
         performValidation(schema, form);
 
     }
@@ -52,8 +64,10 @@ public class SchemaValidationImpl implements SchemaValidation {
     @Override
     public void validate(String app, String version, String profile, String resource, JsonNode form, JsonNode old) {
 
-        SchemaEntity schemaEntity = schemaResource.get(app, version, resource, profile);
-        Schema schema = buildSchema(schemaEntity.getContent(), schemaEntity.getPatchs());
+        Schema schema = schemaResource.get(app, version, resource, profile)
+                .filter((SchemaEntity schemaEntity) -> schemaEntity.getContent() != null)
+                .map((SchemaEntity schemaEntity) -> buildSchema(schemaEntity.getContent(), schemaEntity.getPatchs()))
+                .orElse(defaultSchema);
 
         try {
             performValidation(schema, form);
@@ -70,10 +84,17 @@ public class SchemaValidationImpl implements SchemaValidation {
     @Override
     public void validate(String app, String version, String profile, String resource, ArrayNode patch, JsonNode old) {
 
-        SchemaEntity schemaEntity = schemaResource.get(app, version, resource, profile);
-        Schema schema = buildSchema(schemaEntity.getContent(), schemaEntity.getPatchs());
+        Optional<SchemaEntity> schemaEntity = schemaResource.get(app, version, resource, profile);
 
-        JsonNode oldFilterBySchema = FilterBuilder.filter(old, schemaEntity.getFields().toArray(new String[0]));
+        Schema schema = schemaEntity
+                .filter((SchemaEntity entity) -> entity.getContent() != null)
+                .map((SchemaEntity entity) -> buildSchema(entity.getContent(), entity.getPatchs()))
+                .orElse(defaultSchema);
+
+        JsonNode oldFilterBySchema = schemaEntity
+                .filter((SchemaEntity entity) -> entity.getContent() != null)
+                .map((SchemaEntity entity) -> FilterBuilder.filter(old, entity.getFields().toArray(new String[0])))
+                .orElse(old);
 
         JsonNode form = JsonPatch.apply(patch, oldFilterBySchema);
 
@@ -152,6 +173,11 @@ public class SchemaValidationImpl implements SchemaValidation {
 
         ArrayNode patch = MAPPER.createArrayNode().addAll(patchs);
         JSONObject rawSchema = new JSONObject(new JSONTokener(JsonPatch.apply(patch, schema).toString()));
+        return buildSchema(rawSchema);
+
+    }
+
+    private static Schema buildSchema(JSONObject rawSchema) {
 
         SchemaLoader schemaLoader = SchemaLoader.builder().draftV7Support().schemaJson(rawSchema)
                 .addFormatValidator(new CustomDateTimeFormatValidator()).enableOverrideOfBuiltInFormatValidators().build();

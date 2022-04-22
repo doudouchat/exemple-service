@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -43,7 +44,7 @@ public class SchemaFilterTest {
         SchemaEntity resourceSchema = new SchemaEntity();
         resourceSchema.setFilters(filters);
         Mockito.when(schemaResource.get(Mockito.eq(app), Mockito.eq("default"), Mockito.eq("schema_test"), Mockito.eq("default")))
-                .thenReturn(resourceSchema);
+                .thenReturn(Optional.of(resourceSchema));
 
         // And create source
         JsonNode source = MAPPER
@@ -65,7 +66,7 @@ public class SchemaFilterTest {
         resourceSchema.setFilters(Collections.singleton(" ,field1"));
 
         Mockito.when(schemaResource.get(Mockito.eq(app), Mockito.eq("default"), Mockito.eq("schema_test"), Mockito.eq("default")))
-                .thenReturn(resourceSchema);
+                .thenReturn(Optional.of(resourceSchema));
 
         // And create source
         JsonNode source = MAPPER.readTree("{\"field1\": \"value1\"}");
