@@ -57,7 +57,7 @@
 		<com.fasterxml.jackson-version>2.12.3</com.fasterxml.jackson-version>
 		<groovy-version>3.0.10</groovy-version>
 		<cassandra-version>3.11.9</cassandra-version>
-		<lombok.version>1.18.22</lombok.version>
+		<lombok.version>1.18.24</lombok.version>
 
 		<!-- SONAR -->
 
