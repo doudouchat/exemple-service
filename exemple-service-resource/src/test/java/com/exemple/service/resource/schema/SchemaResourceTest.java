@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
@@ -18,15 +18,12 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
-import com.exemple.service.resource.schema.impl.SchemaResourceImpl;
 import com.exemple.service.resource.schema.model.SchemaEntity;
 import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -34,8 +31,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringJUnitConfig(ResourceTestConfiguration.class)
 public class SchemaResourceTest {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SchemaResource.class);
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -79,26 +74,12 @@ public class SchemaResourceTest {
             resource.save(resourceSchema);
 
             // Then check schema
-
-            JsonNode schemaResource = resource.get("app1", "v1", "account", "example").getContent();
-
-            assertThat(schemaResource).isNotNull();
-
-            LOG.debug(schemaResource.toPrettyString());
-
-            assertThat(schemaResource).isEqualTo(this.schemaResource);
-
-            // And check filter
-            Set<String> filter = resource.get("app1", "v1", "account", "example").getFilters();
-            assertThat(filter).containsOnly("filter");
-
-            // And check fields
-            Set<String> fields = resource.get("app1", "v1", "account", "example").getFields();
-            assertThat(fields).containsOnly("field");
-
-            // And check patch
-            Set<JsonNode> patchs = resource.get("app1", "v1", "account", "example").getPatchs();
-            patchs.forEach(patch -> assertThat(patch.get("op").textValue()).isEqualTo("add"));
+            Optional<SchemaEntity> schema = resource.get("app1", "v1", "account", "example");
+            assertAll(
+                    () -> assertThat(schema.get().getContent()).isEqualTo(this.schemaResource),
+                    () -> assertThat(schema.get().getFilters()).containsOnly("filter"),
+                    () -> assertThat(schema.get().getFields()).containsOnly("field"),
+                    () -> assertThat(schema.get().getPatchs()).extracting(patch -> patch.get("op").textValue()).containsOnly("add"));
 
         }
 
@@ -113,28 +94,18 @@ public class SchemaResourceTest {
             resourceSchema.setVersion("v1");
             resourceSchema.setResource("account");
             resourceSchema.setProfile("example");
-            ;
 
             // When perform update
 
             resource.update(resourceSchema);
 
             // Then check schema
-            JsonNode schemaResource = resource.get("app1", "v1", "account", "example").getContent();
-            assertThat(schemaResource).isEqualTo(SchemaResourceImpl.SCHEMA_DEFAULT);
-
-            // And check filter
-            Set<String> filter = resource.get("app1", "v1", "account", "example").getFilters();
-            assertThat(filter).isEmpty();
-
-            // And check fields
-            Set<String> fields = resource.get("app1", "v1", "account", "example").getFields();
-            assertThat(fields).isEmpty();
-
-            // And check patch
-            Set<JsonNode> patchs = resource.get("app1", "v1", "account", "example").getPatchs();
-            assertThat(patchs).isEmpty();
-
+            Optional<SchemaEntity> schema = resource.get("app1", "v1", "account", "example");
+            assertAll(
+                    () -> assertThat(schema.get().getContent()).isNull(),
+                    () -> assertThat(schema.get().getFilters()).isEmpty(),
+                    () -> assertThat(schema.get().getFields()).isEmpty(),
+                    () -> assertThat(schema.get().getPatchs()).isEmpty());
         }
 
     }
@@ -177,10 +148,10 @@ public class SchemaResourceTest {
     public void getEmptySchema() throws IOException {
 
         // When perform get
-        JsonNode schemaResource = resource.get("app3", UUID.randomUUID().toString(), "account", "example").getContent();
+        Optional<SchemaEntity> schemaResource = resource.get("app3", UUID.randomUUID().toString(), "account", "example");
 
         // Then check schema
-        assertThat(schemaResource).isEqualTo(SchemaResourceImpl.SCHEMA_DEFAULT);
+        assertThat(schemaResource).isEmpty();
 
     }
 }
