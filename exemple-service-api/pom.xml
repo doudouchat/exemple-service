@@ -10,34 +10,6 @@
 	<artifactId>exemple-service-api</artifactId>
 	<packaging>war</packaging>
 
-	<dependencyManagement>
-
-		<dependencies>
-
-			<!-- JERSEY -->
-
-			<dependency>
-				<groupId>org.glassfish.jersey</groupId>
-				<artifactId>jersey-bom</artifactId>
-				<version>2.35</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-			<!-- SPRING BOOT -->
-
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-dependencies</artifactId>
-				<version>${org.springframework.boot-version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-		</dependencies>
-
-	</dependencyManagement>
-
 	<dependencies>
 
 		<!-- CUSTOMER -->
@@ -214,18 +186,6 @@
 		<dependency>
 			<groupId>com.auth0</groupId>
 			<artifactId>java-jwt</artifactId>
-		</dependency>
-
-		<!-- SERVLET -->
-
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.servlet.jsp.jstl</groupId>
-			<artifactId>javax.servlet.jsp.jstl-api</artifactId>
 		</dependency>
 
 		<!-- JSON PATH -->
@@ -414,15 +374,6 @@
 					<systemPropertyVariables>
 						<mockserver.logLevel>DEBUG</mockserver.logLevel>
 					</systemPropertyVariables>
-				</configuration>
-			</plugin>
-
-			<!-- VERSION -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>versions-maven-plugin</artifactId>
-				<configuration>
-					<processDependencyManagement>false</processDependencyManagement>
 				</configuration>
 			</plugin>
 

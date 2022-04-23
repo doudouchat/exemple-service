@@ -2,6 +2,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-dependencies</artifactId>
+		<version>2.5.13</version>
+	</parent>
 	<groupId>exemple</groupId>
 	<artifactId>exemple-service</artifactId>
 	<version>3.0.0-SNAPSHOT</version>
@@ -47,17 +52,7 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 
 		<!-- VERSION -->
-
-		<org.springframework-version>5.3.19</org.springframework-version>
-		<org.springframework.security-version>5.5.6</org.springframework.security-version>
-		<org.springframework.kafka-version>2.7.13</org.springframework.kafka-version>
-		<org.springframework.boot-version>2.5.13</org.springframework.boot-version>
-		<org.slf4j-version>1.7.36</org.slf4j-version>
-		<datastax-version>4.14.0</datastax-version>
-		<com.fasterxml.jackson-version>2.12.6</com.fasterxml.jackson-version>
-		<groovy-version>3.0.10</groovy-version>
 		<cassandra-version>3.11.9</cassandra-version>
-		<lombok.version>1.18.24</lombok.version>
 
 		<!-- SONAR -->
 
@@ -72,57 +67,6 @@
 
 		<dependencies>
 
-			<!-- SPRING FRAMEWORK -->
-
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-context</artifactId>
-				<version>${org.springframework-version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-web</artifactId>
-				<version>${org.springframework-version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-test</artifactId>
-				<version>${org.springframework-version}</version>
-				<scope>test</scope>
-			</dependency>
-
-			<!-- SPRING SECURITY -->
-
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-web</artifactId>
-				<version>${org.springframework.security-version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-config</artifactId>
-				<version>${org.springframework.security-version}</version>
-			</dependency>
-
-			<!-- SPRING KAFKA -->
-			<!-- https://spring.io/projects/spring-kafka -->
-
-			<dependency>
-				<groupId>org.springframework.kafka</groupId>
-				<artifactId>spring-kafka</artifactId>
-				<version>${org.springframework.kafka-version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework.kafka</groupId>
-				<artifactId>spring-kafka-test</artifactId>
-				<version>${org.springframework.kafka-version}</version>
-				<scope>test</scope>
-			</dependency>
-
 			<!-- JWT TOKEN -->
 			<!-- https://github.com/auth0/java-jwt -->
 
@@ -130,44 +74,6 @@
 				<groupId>com.auth0</groupId>
 				<artifactId>java-jwt</artifactId>
 				<version>3.19.1</version>
-			</dependency>
-
-			<!-- BCRYPT -->
-
-			<!-- https://www.mindrot.org/projects/jBCrypt/ -->
-			<dependency>
-				<groupId>org.mindrot</groupId>
-				<artifactId>jbcrypt</artifactId>
-				<version>0.4</version>
-			</dependency>
-
-			<!-- SERVLET -->
-
-			<dependency>
-				<groupId>javax.servlet</groupId>
-				<artifactId>javax.servlet-api</artifactId>
-				<version>4.0.1</version>
-				<scope>provided</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>javax.servlet.jsp.jstl</groupId>
-				<artifactId>javax.servlet.jsp.jstl-api</artifactId>
-				<version>1.2.2</version>
-			</dependency>
-
-			<!-- JSR303 -->
-
-			<dependency>
-				<groupId>javax.validation</groupId>
-				<artifactId>validation-api</artifactId>
-				<version>2.0.1.Final</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.hibernate.validator</groupId>
-				<artifactId>hibernate-validator</artifactId>
-				<version>6.2.3.Final</version>
 			</dependency>
 
 			<!-- JAVAX EL -->
@@ -184,42 +90,15 @@
 				<version>3.0.1-b12</version>
 			</dependency>
 
-			<!-- DATASTAX -->
-
-			<dependency>
-				<groupId>com.datastax.oss</groupId>
-				<artifactId>java-driver-core</artifactId>
-				<version>${datastax-version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.datastax.oss</groupId>
-				<artifactId>java-driver-query-builder</artifactId>
-				<version>${datastax-version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.datastax.oss</groupId>
-				<artifactId>java-driver-mapper-runtime</artifactId>
-				<version>${datastax-version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.datastax.oss</groupId>
-				<artifactId>native-protocol</artifactId>
-				<version>1.5.1</version>
-			</dependency>
-
 			<!-- HAZELCAST -->
 
 			<dependency>
 				<groupId>com.hazelcast</groupId>
 				<artifactId>hazelcast-all</artifactId>
-				<version>4.2.4</version>
+				<version>${hazelcast.version}</version>
 			</dependency>
 
 			<!-- CURATOR -->
-
 			<!-- https://curator.apache.org -->
 
 			<dependency>
@@ -236,8 +115,8 @@
 			</dependency>
 
 			<!-- JSON PATCH -->
-
 			<!-- https://github.com/flipkart-incubator/zjsonpatch -->
+
 			<dependency>
 				<groupId>com.flipkart.zjsonpatch</groupId>
 				<artifactId>zjsonpatch</artifactId>
@@ -253,8 +132,8 @@
 			</dependency>
 
 			<!-- JSON FILTER -->
-
 			<!-- https://github.com/bohnman/squiggly-java -->
+
 			<dependency>
 				<groupId>com.github.bohnman</groupId>
 				<artifactId>squiggly-filter-jackson</artifactId>
@@ -262,12 +141,6 @@
 			</dependency>
 
 			<!-- COMMONS APACHE -->
-
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-lang3</artifactId>
-				<version>3.12.0</version>
-			</dependency>
 
 			<dependency>
 				<groupId>org.apache.commons</groupId>
@@ -281,66 +154,13 @@
 				<version>2.11.0</version>
 			</dependency>
 
-			<dependency>
-				<groupId>commons-codec</groupId>
-				<artifactId>commons-codec</artifactId>
-				<version>1.15</version>
-			</dependency>
-
 			<!-- GOOGLE GUAVA -->
-
 			<!-- https://github.com/google/guava -->
+
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
 				<version>31.1-jre</version>
-			</dependency>
-
-			<!-- JSOUP -->
-
-			<!-- https://jsoup.org/ -->
-			<dependency>
-				<groupId>org.jsoup</groupId>
-				<artifactId>jsoup</artifactId>
-				<version>1.14.3</version>
-			</dependency>
-
-			<!-- FASTER JACKSON -->
-
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-databind</artifactId>
-				<version>${com.fasterxml.jackson-version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.fasterxml.jackson.jaxrs</groupId>
-				<artifactId>jackson-jaxrs-json-provider</artifactId>
-				<version>${com.fasterxml.jackson-version}</version>
-			</dependency>
-
-			<!-- ASPECTJ -->
-
-			<dependency>
-				<groupId>org.aspectj</groupId>
-				<artifactId>aspectjrt</artifactId>
-				<version>1.9.9.1</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.aspectj</groupId>
-				<artifactId>aspectjweaver</artifactId>
-				<version>1.9.9.1</version>
-				<scope>runtime</scope>
-			</dependency>
-
-			<!-- YAML -->
-
-			<!-- http://www.snakeyaml.org -->
-			<dependency>
-				<groupId>org.yaml</groupId>
-				<artifactId>snakeyaml</artifactId>
-				<version>1.30</version>
 			</dependency>
 
 			<!-- SWAGGER -->
@@ -358,31 +178,6 @@
 				<version>2.2.0</version>
 			</dependency>
 
-			<!-- LOMBOK -->
-
-			<dependency>
-				<groupId>org.projectlombok</groupId>
-				<artifactId>lombok</artifactId>
-				<version>${lombok.version}</version>
-				<scope>provided</scope>
-			</dependency>
-
-			<!-- MOCKITO -->
-
-			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-core</artifactId>
-				<version>3.10.0</version>
-				<scope>test</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-junit-jupiter</artifactId>
-				<version>3.10.0</version>
-				<scope>test</scope>
-			</dependency>
-
 			<!-- CASSANDRA EMBEDDED -->
 			<!-- https://nosan.github.io/embedded-cassandra -->
 
@@ -397,98 +192,6 @@
 				<groupId>com.github.nosan</groupId>
 				<artifactId>embedded-cassandra-spring-boot-starter</artifactId>
 				<version>4.0.8</version>
-			</dependency>
-
-			<!-- LOGGING -->
-
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-				<version>${org.slf4j-version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>jcl-over-slf4j</artifactId>
-				<version>${org.slf4j-version}</version>
-				<scope>runtime</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>jul-to-slf4j</artifactId>
-				<version>${org.slf4j-version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-classic</artifactId>
-				<version>1.2.3</version>
-				<scope>runtime</scope>
-			</dependency>
-
-			<!-- JUNIT -->
-
-			<dependency>
-				<groupId>org.junit.jupiter</groupId>
-				<artifactId>junit-jupiter-engine</artifactId>
-				<version>5.7.2</version>
-				<scope>test</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>org.junit.jupiter</groupId>
-				<artifactId>junit-jupiter-params</artifactId>
-				<version>5.7.2</version>
-				<scope>test</scope>
-			</dependency>
-
-			<!-- REST ASSURED -->
-
-			<!-- http://rest-assured.io/ -->
-			<dependency>
-				<groupId>io.rest-assured</groupId>
-				<artifactId>rest-assured</artifactId>
-				<version>5.0.1</version>
-				<scope>test</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>io.rest-assured</groupId>
-				<artifactId>rest-assured-all</artifactId>
-				<version>5.0.1</version>
-				<scope>test</scope>
-			</dependency>
-
-			<!-- JSON PATH -->
-
-			<dependency>
-				<groupId>com.jayway.jsonpath</groupId>
-				<artifactId>json-path</artifactId>
-				<version>2.7.0</version>
-			</dependency>
-
-			<!-- GROOVY -->
-
-			<dependency>
-				<groupId>org.codehaus.groovy</groupId>
-				<artifactId>groovy</artifactId>
-				<version>${groovy-version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.codehaus.groovy</groupId>
-				<artifactId>groovy-json</artifactId>
-				<version>${groovy-version}</version>
-			</dependency>
-
-			<!-- ASSERTJ -->
-
-			<dependency>
-				<groupId>org.assertj</groupId>
-				<artifactId>assertj-core</artifactId>
-				<version>3.22.0</version>
-				<scope>test</scope>
 			</dependency>
 
 			<!-- JNDI SIMPLE -->
@@ -543,6 +246,7 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
+			<version>1.2.8</version>
 		</dependency>
 
 		<!-- YAML -->
@@ -595,7 +299,6 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.8.1</version>
 					<configuration>
 						<annotationProcessorPaths>
 							<path>
@@ -607,20 +310,11 @@
 					</configuration>
 				</plugin>
 
-				<!-- RESSOURCES -->
-				<!-- http://maven.apache.org/plugins/maven-resources-plugin/ -->
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-resources-plugin</artifactId>
-					<version>3.2.0</version>
-				</plugin>
-
 				<!-- WAR -->
 				<!-- http://maven.apache.org/plugins/maven-war-plugin/ -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
-					<version>3.3.1</version>
 					<configuration>
 						<archive>
 							<manifest>
@@ -640,7 +334,6 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.2.0</version>
 					<configuration>
 						<archive>
 							<manifest>
@@ -655,20 +348,11 @@
 					</configuration>
 				</plugin>
 
-				<!-- DEPLOY -->
-				<!-- https://maven.apache.org/plugins/maven-deploy-plugin/index.html -->
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-deploy-plugin</artifactId>
-					<version>3.0.0-M1</version>
-				</plugin>
-
 				<!-- TEST UNITAIRE -->
 				<!-- http://maven.apache.org/plugins/maven-surefire-plugin/ -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.0.0-M5</version>
 					<configuration>
 						<argLine>${jacoco.test.agent.argLine}</argLine>
 					</configuration>
@@ -679,8 +363,8 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>versions-maven-plugin</artifactId>
-					<version>2.8.1</version>
 					<configuration>
+						<processDependencyManagement>false</processDependencyManagement>
 						<outputFile>${project.build.directory}/outdated-dependencies.txt</outputFile>
 						<outputEncoding>${project.build.sourceEncoding}</outputEncoding>
 					</configuration>
@@ -748,41 +432,9 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-clean-plugin</artifactId>
-					<version>3.1.0</version>
 					<configuration>
 						<failOnError>false</failOnError>
 					</configuration>
-				</plugin>
-
-				<!-- GROOVY -->
-				<!-- http://groovy.github.io/GMavenPlus/index.html -->
-				<plugin>
-					<groupId>org.codehaus.gmavenplus</groupId>
-					<artifactId>gmavenplus-plugin</artifactId>
-					<version>1.10.0</version>
-					<dependencies>
-						<dependency>
-							<groupId>org.codehaus.groovy</groupId>
-							<artifactId>groovy</artifactId>
-							<version>${groovy-version}</version>
-						</dependency>
-					</dependencies>
-				</plugin>
-
-				<!-- HELPER -->
-				<!-- https://www.mojohaus.org/build-helper-maven-plugin/index.html -->
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>build-helper-maven-plugin</artifactId>
-					<version>3.2.0</version>
-				</plugin>
-
-				<!-- ENFORCER -->
-				<!-- https://maven.apache.org/enforcer/maven-enforcer-plugin/ -->
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-enforcer-plugin</artifactId>
-					<version>3.0.0-M3</version>
 				</plugin>
 
 			</plugins>
