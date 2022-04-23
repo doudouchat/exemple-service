@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>exemple</groupId>
@@ -11,7 +13,6 @@
 
 		<!-- TOMCAT -->
 		<tomcat.container.id>tomcat9x</tomcat.container.id>
-		<tomcat.version>9.0.59</tomcat.version>
 
 		<application.log.file>${project.build.testOutputDirectory}/logback.groovy</application.log.file>
 		<application.contextpath>ExempleService</application.contextpath>
@@ -64,6 +65,24 @@
 				<artifactId>cucumber-junit</artifactId>
 				<version>6.10.4</version>
 				<scope>test</scope>
+			</dependency>
+
+			<!-- BCRYPT -->
+			<!-- https://www.mindrot.org/projects/jBCrypt/ -->
+
+			<dependency>
+				<groupId>org.mindrot</groupId>
+				<artifactId>jbcrypt</artifactId>
+				<version>0.4</version>
+			</dependency>
+
+			<!-- JSOUP -->
+			<!-- https://jsoup.org/ -->
+
+			<dependency>
+				<groupId>org.jsoup</groupId>
+				<artifactId>jsoup</artifactId>
+				<version>1.14.3</version>
 			</dependency>
 
 		</dependencies>
@@ -155,12 +174,6 @@
 		</dependency>
 
 		<!-- REST ASSURED -->
-
-		<dependency>
-			<groupId>io.rest-assured</groupId>
-			<artifactId>rest-assured-all</artifactId>
-			<scope>compile</scope>
-		</dependency>
 
 		<dependency>
 			<groupId>io.rest-assured</groupId>
@@ -277,12 +290,11 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>3.0.0-M5</version>
 					<dependencies>
 						<dependency>
 							<groupId>org.apache.maven.surefire</groupId>
 							<artifactId>surefire-junit47</artifactId>
-							<version>3.0.0-M5</version>
+							<version>${maven-surefire-plugin.version}</version>
 						</dependency>
 					</dependencies>
 					<executions>
