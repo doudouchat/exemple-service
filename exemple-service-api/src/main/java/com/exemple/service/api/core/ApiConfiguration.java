@@ -6,7 +6,6 @@ import java.util.Properties;
 import javax.validation.Validator;
 
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -22,7 +21,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 @Configuration
-@ComponentScan(basePackages = "com.exemple.service.api", excludeFilters = @ComponentScan.Filter(SpringBootApplication.class))
+@ComponentScan(basePackages = "com.exemple.service.api")
 @ImportResource("classpath:exemple-service-api-security.xml")
 public class ApiConfiguration {
 
