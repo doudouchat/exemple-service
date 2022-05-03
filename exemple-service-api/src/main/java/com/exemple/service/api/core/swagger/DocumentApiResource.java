@@ -72,7 +72,8 @@ public class DocumentApiResource extends BaseOpenApiResource {
         info.description("Api documentation");
         openAPI.setInfo(info);
 
-        this.openApiConfiguration = new SwaggerConfiguration().filterClass(DocumentApiCustom.class.getName()).openAPI(openAPI);
+        this.openApiConfiguration = new SwaggerConfiguration().filterClass(DocumentApiCustom.class.getName())
+                .resourcePackages(Collections.singleton("com.exemple.service.api")).openAPI(openAPI);
         this.schemaResource = schemaResource;
         this.apiContext = apiContext;
 
