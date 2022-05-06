@@ -286,29 +286,6 @@
 			<artifactId>mockserver-client-java</artifactId>
 		</dependency>
 
-		<!-- CURATOR -->
-
-		<dependency>
-			<groupId>org.apache.curator</groupId>
-			<artifactId>curator-test</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- SPRING KAFKA -->
-
-		<dependency>
-			<groupId>org.springframework.kafka</groupId>
-			<artifactId>spring-kafka-test</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- CASSANDRA EMBEDDED -->
-
-		<dependency>
-			<groupId>com.github.nosan</groupId>
-			<artifactId>embedded-cassandra-spring-boot-starter</artifactId>
-		</dependency>
-
 	</dependencies>
 
 	<build>
