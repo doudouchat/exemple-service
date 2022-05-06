@@ -1,4 +1,4 @@
-package com.exemple.service.api.core.embedded;
+package com.exemple.service.api.launcher.embedded;
 
 import java.util.UUID;
 
