@@ -43,7 +43,7 @@ public class StockResourceImpl implements StockResource {
 
         Row row = session.execute(select.build().setConsistencyLevel(ConsistencyLevel.QUORUM)).one();
 
-        return Optional.ofNullable(row != null ? row.getLong(0) :null);
+        return Optional.ofNullable(row != null ? row.getLong(0) : null);
     }
 
 }
