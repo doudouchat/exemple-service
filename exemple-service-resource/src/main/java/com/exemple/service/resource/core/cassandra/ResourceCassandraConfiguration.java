@@ -3,8 +3,6 @@ package com.exemple.service.resource.core.cassandra;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +11,6 @@ import org.springframework.util.ResourceUtils;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
 import com.datastax.oss.driver.api.core.type.codec.ExtraTypeCodecs;
-import com.datastax.oss.driver.api.core.type.codec.registry.MutableCodecRegistry;
 import com.exemple.service.resource.common.model.EventType;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -32,17 +29,11 @@ public class ResourceCassandraConfiguration {
 
         DriverConfigLoader loader = DriverConfigLoader.fromFile(cassandraResource);
 
-        return CqlSession.builder().withConfigLoader(loader).build();
-    }
-
-    @PostConstruct
-    public void init() {
-
-        MutableCodecRegistry registry = (MutableCodecRegistry) session().getContext().getCodecRegistry();
-        registry.register(ExtraTypeCodecs.json(JsonNode.class));
-        registry.register(ExtraTypeCodecs.BLOB_TO_ARRAY);
-        registry.register(ExtraTypeCodecs.enumNamesOf(EventType.class));
-
+        return CqlSession.builder().withConfigLoader(loader)
+                .addTypeCodecs(ExtraTypeCodecs.json(JsonNode.class))
+                .addTypeCodecs(ExtraTypeCodecs.BLOB_TO_ARRAY)
+                .addTypeCodecs(ExtraTypeCodecs.enumNamesOf(EventType.class))
+                .build();
     }
 
 }

@@ -62,7 +62,7 @@ public class ActuatorStepDefinitions {
     @And("actuator contains {string}")
     public void checkProperty(String property) {
 
-        assertThat(context.lastGet().jsonPath().getString(property)).isNotNull();
+        assertThat(context.lastGet().jsonPath().getString(property)).as("property %s is expected", property).isNotNull();
 
     }
 

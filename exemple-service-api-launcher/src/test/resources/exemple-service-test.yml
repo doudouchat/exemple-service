@@ -13,6 +13,9 @@ management:
          enabled: true
       health:
          enabled: true
+   info:
+      env: 
+         enabled: true
 resource:
    cassandra:
       resource_configuration: file:${project.build.testOutputDirectory}/cassandra.conf
