@@ -15,7 +15,7 @@
 		<!-- TOMCAT -->
 		<tomcat.container.id>tomcat9x</tomcat.container.id>
 
-		<application.log.file>${project.build.testOutputDirectory}/logback.groovy</application.log.file>
+		<application.log.file>${project.build.testOutputDirectory}/logback.xml</application.log.file>
 		<application.contextpath>ExempleService</application.contextpath>
 		<application.host>http://localhost</application.host>
 
