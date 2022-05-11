@@ -3,8 +3,6 @@ package com.exemple.service.schema.validation.impl;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -127,15 +125,10 @@ public class SchemaValidationImpl implements SchemaValidation {
         try {
 
             if (form.isArray()) {
-                @SuppressWarnings("unchecked")
-                List<Object> formMap = MAPPER.convertValue(form, List.class);
-                validator.performValidation(schema, new JSONArray(formMap));
+                validator.performValidation(schema, new JSONArray(form.toString()));
             } else {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> formMap = MAPPER.convertValue(form, Map.class);
-                validator.performValidation(schema, new JSONObject(formMap));
+                validator.performValidation(schema, new JSONObject(form.toString()));
             }
-
         } catch (org.everit.json.schema.ValidationException e) {
 
             throw new ValidationException(ValidationExceptionBuilder.buildException(e, form));
