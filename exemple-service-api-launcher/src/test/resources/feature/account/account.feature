@@ -11,8 +11,6 @@ Feature: api account
           "birthday": "1967-06-15",
           "firstname": "Jean",
           "addresses": {
-             "holiday2": null,
-             "holiday1": null,
              "job": {
                  "city": "Paris",
                  "street": "rue de la paix"

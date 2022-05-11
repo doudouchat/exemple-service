@@ -402,20 +402,11 @@ public class SchemaValidationTest {
             patch1.put("path", "/external_id");
             patch1.put("value", UUID.randomUUID().toString());
 
-            ObjectNode patch2 = MAPPER.createObjectNode();
-            patch2.put("op", "add");
-            patch2.put("path", "/external_id");
-            patch2.set("value", NullNode.instance);
-
             return Stream.concat(
                     failures(),
                     Stream.of(
                             // external_id create only
-                            Arguments.of("readOnly", "/external_id", new JsonNode[] { patch1 })
-                    // external_id create only
-                    // FIXME patch readOnly with null
-                    // Arguments.of("readOnly", "/external_id", new JsonNode[] { patch2 })
-                    ));
+                            Arguments.of("readOnly", "/external_id", new JsonNode[] { patch1 })));
         }
 
         @ParameterizedTest
@@ -446,6 +437,49 @@ public class SchemaValidationTest {
                     exception -> assertAll(
                             () -> assertThat(exception.getCauses()).hasSize(1),
                             () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode).contains(expectedCode),
+                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains(expectedPath)));
+        }
+
+        private Stream<Arguments> patchFailures() {
+
+            ObjectNode patch1 = MAPPER.createObjectNode();
+            patch1.put("op", "add");
+            patch1.put("path", "/external_id");
+            patch1.set("value", NullNode.instance);
+
+            return Stream.of(
+                    // external_id create only
+                    Arguments.of(new String[] { "readOnly", "type" }, "/external_id", 2, new JsonNode[] { patch1 }));
+        }
+
+        @ParameterizedTest
+        @MethodSource("patchFailures")
+        @DisplayName("source patch fails")
+        public void patchFailure(String[] expectedCode, String expectedPath, int expectedExceptions, JsonNode... patchs) {
+
+            // Given origin
+            Map<String, Object> origin = new HashMap<>();
+            origin.put("opt_in_email", false);
+            origin.put("lastname", "doe");
+            origin.put("firstname", "john");
+            origin.put("cgus", MAPPER.createArrayNode());
+            origin.put("addresses", MAPPER.createObjectNode());
+            origin.put("hide", BooleanNode.TRUE);
+
+            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+
+            // And form
+            ArrayNode patch = MAPPER.createArrayNode();
+            patch.addAll(Arrays.asList(patchs));
+
+            // When perform
+            Throwable throwable = catchThrowable(() -> validation.validate("default", "default", "default", "schema_test", patch, old));
+
+            // Then check throwable
+            assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
+                    exception -> assertAll(
+                            () -> assertThat(exception.getCauses()).hasSize(expectedExceptions),
+                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode).containsOnly(expectedCode),
                             () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains(expectedPath)));
         }
 
@@ -797,6 +831,11 @@ public class SchemaValidationTest {
             patch1.put("path", "/external_id");
             patch1.put("value", UUID.randomUUID().toString());
 
+            ObjectNode patch2 = MAPPER.createObjectNode();
+            patch2.put("op", "add");
+            patch2.put("path", "/external_id");
+            patch2.set("value", NullNode.instance);
+
             return Stream.concat(
                     failures(),
                     Stream.of(
@@ -836,6 +875,55 @@ public class SchemaValidationTest {
                     exception -> assertAll(
                             () -> assertThat(exception.getCauses()).hasSize(1),
                             () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode).contains(expectedCode),
+                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains(expectedPath)));
+        }
+
+        private Stream<Arguments> updateFailures() {
+
+            new ValidateToCreation().creationFailure();
+
+            ObjectNode patch1 = MAPPER.createObjectNode();
+            patch1.put("op", "add");
+            patch1.put("path", "/external_id");
+            patch1.set("value", NullNode.instance);
+
+            return Stream.of(
+                    // external_id create only
+                    Arguments.of(new String[] { "readOnly", "type" }, "/external_id", 2, new JsonNode[] { patch1 }));
+
+        }
+
+        @ParameterizedTest
+        @MethodSource("updateFailures")
+        @DisplayName("source update fails")
+        public void updateFailure(String[] expectedCode, String expectedPath, int expectedExceptions, JsonNode... patchs) {
+
+            // Given origin
+            Map<String, Object> origin = new HashMap<>();
+            origin.put("id", UUID.randomUUID().toString());
+            origin.put("opt_in_email", false);
+            origin.put("firstname", "john");
+            origin.put("lastname", "doe");
+            origin.put("cgus", MAPPER.createArrayNode());
+            origin.put("addresses", MAPPER.createObjectNode());
+            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+
+            // And form
+            ArrayNode patch = MAPPER.createArrayNode();
+            patch.addAll(Arrays.asList(patchs));
+            JsonNode model = JsonPatch.apply(patch, old);
+
+            // And add hide
+            ((ObjectNode) old).set("hide", BooleanNode.TRUE);
+
+            // When perform
+            Throwable throwable = catchThrowable(() -> validation.validate("default", "default", "default", "schema_test", model, old));
+
+            // Then check throwable
+            assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
+                    exception -> assertAll(
+                            () -> assertThat(exception.getCauses()).hasSize(expectedExceptions),
+                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode).containsOnly(expectedCode),
                             () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains(expectedPath)));
         }
 
