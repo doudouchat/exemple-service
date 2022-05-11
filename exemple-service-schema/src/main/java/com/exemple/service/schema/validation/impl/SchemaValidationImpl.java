@@ -2,6 +2,7 @@ package com.exemple.service.schema.validation.impl;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -29,6 +30,7 @@ import com.exemple.service.schema.validation.custom.CustomDateTimeFormatValidato
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.flipkart.zjsonpatch.CompatibilityFlags;
 import com.flipkart.zjsonpatch.JsonPatch;
 
 @Component
@@ -94,7 +96,7 @@ public class SchemaValidationImpl implements SchemaValidation {
                 .map((SchemaEntity entity) -> FilterBuilder.filter(old, entity.getFields().toArray(new String[0])))
                 .orElse(old);
 
-        JsonNode form = JsonPatch.apply(patch, oldFilterBySchema);
+        JsonNode form = JsonPatch.apply(patch, oldFilterBySchema, EnumSet.of(CompatibilityFlags.FORBID_REMOVE_MISSING_OBJECT));
 
         try {
             performValidation(schema, form);

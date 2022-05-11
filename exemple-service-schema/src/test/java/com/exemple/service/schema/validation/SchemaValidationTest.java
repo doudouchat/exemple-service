@@ -36,6 +36,7 @@ import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.flipkart.zjsonpatch.JsonPatch;
+import com.flipkart.zjsonpatch.JsonPatchApplicationException;
 
 @SpringJUnitConfig(SchemaTestConfiguration.class)
 public class SchemaValidationTest {
@@ -749,6 +750,32 @@ public class SchemaValidationTest {
                             () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode)
                                     .contains("additionalProperties"),
                             () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains("/email")));
+        }
+
+        @Test
+        @DisplayName("source patch fails because remove field missing")
+        public void patchFailureWhenFieldIsMissing() {
+
+            // Given origin
+            Map<String, Object> origin = new HashMap<>();
+            origin.put("hide", BooleanNode.TRUE);
+
+            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+
+            // And form
+            ArrayNode patchs = MAPPER.createArrayNode();
+
+            ObjectNode patch = MAPPER.createObjectNode();
+            patch.put("op", "remove");
+            patch.put("path", "/hide");
+
+            patchs.add(patch);
+
+            // When perform
+            Throwable throwable = catchThrowable(() -> validation.validate("default", "default", "default", "schema_test", patchs, old));
+
+            // Then check throwable
+            assertThat(throwable).isInstanceOf(JsonPatchApplicationException.class);
         }
 
     }
