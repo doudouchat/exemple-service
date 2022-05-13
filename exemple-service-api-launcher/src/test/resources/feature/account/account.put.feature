@@ -97,6 +97,44 @@ Feature: api put account
     And account property 'creation_date' exists
     And account property 'update_date' exists
     
+  Scenario: put account remove addresses
+    When put account
+      """
+      {
+          "optin_mobile": true,
+          "birthday": "1967-06-15",
+          "firstname": "Jean",
+          "civility": "Mr",
+          "mobile": "0610203040",
+          "cgus": [
+             {
+               "code": "code_1",
+               "version": "v0"
+             }
+          ],
+          "email": "jean.dupond@gmail.com",
+          "lastname": "Dupont"
+      }
+      """
+    Then account is
+      """
+           {
+          "optin_mobile": true,
+          "birthday": "1967-06-15",
+          "firstname": "Jean",
+          "civility": "Mr",
+          "mobile": "0610203040",
+          "cgus": [
+             {
+               "code": "code_1",
+               "version": "v0"
+             }
+          ],
+          "email": "jean.dupond@gmail.com",
+          "lastname": "Dupont"
+      }
+      """
+
   Scenario: change email
     Given delete username 'jean.dupont@gmail.com'
     When put account

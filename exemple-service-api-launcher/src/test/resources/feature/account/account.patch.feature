@@ -95,6 +95,35 @@ Feature: api patch account
     And account property 'creation_date' exists
     And account property 'update_date' exists
     
+  Scenario: patch account remove addresses
+    When patch account
+      """
+      [
+         {
+           "op": "remove",
+           "path": "/addresses"
+         }
+      ]
+      """
+    Then account is
+      """
+      {
+          "optin_mobile": true,
+          "birthday": "1967-06-15",
+          "firstname": "Jean",
+          "civility": "Mr",
+          "mobile": "0610203040",
+          "cgus": [
+             {
+               "code": "code_1",
+               "version": "v0"
+             }
+          ],
+          "email": "jean.dupond@gmail.com",
+          "lastname": "Dupont"
+      }
+      """
+
   Scenario: change email
     When patch account
       """
