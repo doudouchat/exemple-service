@@ -11,7 +11,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -22,8 +21,8 @@ import javax.ws.rs.core.UriInfo;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.model.SchemaBeanParam;
-import com.exemple.service.api.common.schema.FilterHelper;
-import com.exemple.service.api.common.schema.ValidationHelper;
+import com.exemple.service.api.common.schema.SchemaFilter;
+import com.exemple.service.api.common.schema.SchemaValidation;
 import com.exemple.service.api.common.script.CustomerScriptFactory;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.subscription.SubscriptionService;
@@ -58,12 +57,11 @@ public class SubscriptionApi {
 
     private final CustomerScriptFactory scriptFactory;
 
-    private final ValidationHelper schemaValidation;
-
-    private final FilterHelper schemaFilter;
+    @Context
+    private SchemaValidation schemaValidation;
 
     @Context
-    private ContainerRequestContext servletContext;
+    private SchemaFilter schemaFilter;
 
     @GET
     @Path("/{email}")
@@ -82,7 +80,7 @@ public class SubscriptionApi {
 
         JsonNode subscription = scriptFactory.getBean(SUBSCRIPTION_BEAN, SubscriptionService.class).get(email).orElseThrow(NotFoundException::new);
 
-        return schemaFilter.filter(subscription, SUBSCRIPTION_RESOURCE, servletContext);
+        return schemaFilter.filter(subscription, SUBSCRIPTION_RESOURCE);
 
     }
 
@@ -106,7 +104,7 @@ public class SubscriptionApi {
 
         JsonNode subscriptionClone = subscription.deepCopy();
         ((ObjectNode) subscriptionClone).put(SubscriptionField.EMAIL.field, email);
-        schemaValidation.validate(subscriptionClone, SUBSCRIPTION_RESOURCE, servletContext);
+        schemaValidation.validate(subscriptionClone, SUBSCRIPTION_RESOURCE);
 
         boolean created = scriptFactory.getBean(SUBSCRIPTION_BEAN, SubscriptionService.class).save(email, subscription);
 
