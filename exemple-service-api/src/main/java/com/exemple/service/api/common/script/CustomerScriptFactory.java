@@ -23,7 +23,6 @@ import org.springframework.stereotype.Component;
 
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
-import com.exemple.service.context.ServiceContextExecution;
 
 import lombok.SneakyThrows;
 
@@ -63,15 +62,15 @@ public class CustomerScriptFactory {
         completeScriptApplicationContexts();
     }
 
-    public <T> T getBean(String beanName, Class<T> beanClass) {
+    public <T> T getBean(String beanName, Class<T> beanClass, String application) {
 
-        String application = ServiceContextExecution.context().getApp();
         ApplicationContext applicationScriptContext = applicationDetailService.get(application)
                 .filter((ApplicationDetail applicationDetail) -> checkIfBeanIsPresent(applicationDetail.getCompany(), beanName))
                 .map((ApplicationDetail applicationDetail) -> scriptApplicationContexts.get(applicationDetail.getCompany()))
                 .orElse(defaultApplicationContext);
 
         return applicationScriptContext.getBean(beanName, beanClass);
+
     }
 
     private boolean checkIfBeanIsPresent(String company, String beanName) {

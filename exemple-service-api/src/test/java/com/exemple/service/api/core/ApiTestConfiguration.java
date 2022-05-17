@@ -93,9 +93,9 @@ public class ApiTestConfiguration extends ApiConfiguration {
     @Bean
     public CustomerScriptFactory customerScriptFactory(ApplicationContext context) {
         CustomerScriptFactory customerScriptFactory = Mockito.mock(CustomerScriptFactory.class);
-        Mockito.when(customerScriptFactory.getBean(Mockito.anyString(), Mockito.eq(SubscriptionService.class)))
+        Mockito.when(customerScriptFactory.getBean(Mockito.anyString(), Mockito.eq(SubscriptionService.class), Mockito.anyString()))
                 .thenReturn(context.getBean(SubscriptionService.class));
-        Mockito.when(customerScriptFactory.getBean(Mockito.anyString(), Mockito.eq(AccountService.class)))
+        Mockito.when(customerScriptFactory.getBean(Mockito.anyString(), Mockito.eq(AccountService.class), Mockito.anyString()))
                 .thenReturn(context.getBean(AccountService.class));
         return customerScriptFactory;
     }

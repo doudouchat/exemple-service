@@ -23,7 +23,6 @@ import org.springframework.stereotype.Component;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.schema.SchemaFilter;
 import com.exemple.service.api.common.schema.SchemaValidation;
-import com.exemple.service.api.common.script.CustomerScriptFactory;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.subscription.SubscriptionService;
 import com.exemple.service.resource.subscription.SubscriptionField;
@@ -53,9 +52,8 @@ public class SubscriptionApi {
 
     private static final String SUBSCRIPTION_RESOURCE = "subscription";
 
-    private static final String SUBSCRIPTION_BEAN = "subscriptionService";
-
-    private final CustomerScriptFactory scriptFactory;
+    @Context
+    private SubscriptionService subscriptionService;
 
     @Context
     private SchemaValidation schemaValidation;
@@ -78,7 +76,7 @@ public class SubscriptionApi {
     public JsonNode get(@NotNull @PathParam("email") String email,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) {
 
-        JsonNode subscription = scriptFactory.getBean(SUBSCRIPTION_BEAN, SubscriptionService.class).get(email).orElseThrow(NotFoundException::new);
+        JsonNode subscription = subscriptionService.get(email).orElseThrow(NotFoundException::new);
 
         return schemaFilter.filter(subscription, SUBSCRIPTION_RESOURCE);
 
@@ -106,7 +104,7 @@ public class SubscriptionApi {
         ((ObjectNode) subscriptionClone).put(SubscriptionField.EMAIL.field, email);
         schemaValidation.validate(subscriptionClone, SUBSCRIPTION_RESOURCE);
 
-        boolean created = scriptFactory.getBean(SUBSCRIPTION_BEAN, SubscriptionService.class).save(email, subscription);
+        boolean created = subscriptionService.save(email, subscription);
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
         builder.path(email);
