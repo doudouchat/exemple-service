@@ -12,7 +12,6 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -21,7 +20,6 @@ import javax.ws.rs.core.Response.Status;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.model.ApplicationBeanParam;
-import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.login.LoginResource;
@@ -48,10 +46,8 @@ public class LoginApi {
 
     private final LoginResource loginResource;
 
-    private final AuthorizationCheckService authorizationCheckService;
-
     @Context
-    private ContainerRequestContext servletContext;
+    private AuthorizationCheckService authorizationCheckService;
 
     @HEAD
     @Path("/{username}")
@@ -86,7 +82,7 @@ public class LoginApi {
     public UUID get(@NotNull @PathParam("username") String username,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) ApplicationBeanParam applicationBeanParam) {
 
-        authorizationCheckService.verifyLogin(username, (ApiSecurityContext) servletContext.getSecurityContext());
+        authorizationCheckService.verifyLogin(username);
 
         return loginResource.get(username).orElseThrow(NotFoundException::new);
 

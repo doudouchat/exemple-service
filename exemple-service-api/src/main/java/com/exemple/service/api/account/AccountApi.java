@@ -15,7 +15,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -29,7 +28,6 @@ import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.schema.SchemaFilter;
 import com.exemple.service.api.common.schema.SchemaValidation;
 import com.exemple.service.api.common.script.CustomerScriptFactory;
-import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.account.AccountService;
@@ -68,16 +66,14 @@ public class AccountApi {
 
     private final CustomerScriptFactory scriptFactory;
 
-    private final AuthorizationCheckService authorizationCheckService;
+    @Context
+    private AuthorizationCheckService authorizationCheckService;
 
     @Context
     private SchemaValidation schemaValidation;
 
     @Context
     private SchemaFilter schemaFilter;
-
-    @Context
-    private ContainerRequestContext servletContext;
 
     @GET
     @Path("/{id}")
@@ -94,7 +90,7 @@ public class AccountApi {
     @RolesAllowed("account:read")
     public JsonNode get(@NotNull @PathParam("id") UUID id, @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) {
 
-        authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
+        authorizationCheckService.verifyAccountId(id);
 
         JsonNode account = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).get(id).orElseThrow(NotFoundException::new);
 
@@ -142,7 +138,7 @@ public class AccountApi {
     public Response update(@NotNull @PathParam("id") UUID id, @NotEmpty @Patch @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) {
 
-        authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
+        authorizationCheckService.verifyAccountId(id);
 
         JsonNode previousSource = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).get(id).orElseThrow(NotFoundException::new);
 
@@ -172,7 +168,7 @@ public class AccountApi {
     public Response update(@NotNull @PathParam("id") UUID id, @NotNull @Parameter(schema = @Schema(ref = ACCOUNT_SCHEMA)) JsonNode account,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) {
 
-        authorizationCheckService.verifyAccountId(id, (ApiSecurityContext) servletContext.getSecurityContext());
+        authorizationCheckService.verifyAccountId(id);
 
         JsonNode previousSource = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).get(id).orElseThrow(NotFoundException::new);
 

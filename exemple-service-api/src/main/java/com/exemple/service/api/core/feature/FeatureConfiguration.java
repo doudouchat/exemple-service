@@ -19,7 +19,9 @@ import com.exemple.service.api.common.schema.SchemaFilter;
 import com.exemple.service.api.common.schema.SchemaFilterSupplier;
 import com.exemple.service.api.common.schema.SchemaValidation;
 import com.exemple.service.api.common.schema.SchemaValidationSupplier;
+import com.exemple.service.api.core.authorization.AuthorizationCheckService;
 import com.exemple.service.api.core.authorization.AuthorizationFilter;
+import com.exemple.service.api.core.authorization.impl.AuthorizationCheckServiceSupplier;
 import com.exemple.service.api.core.filter.ExecutionContextResponseFilter;
 import com.exemple.service.api.core.listener.ApiEventListener;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
@@ -91,6 +93,10 @@ public class FeatureConfiguration extends ResourceConfig {
 
                                 bindFactory(SchemaFilterSupplier.class)
                                         .to(SchemaFilter.class)
+                                        .in(RequestScoped.class);
+
+                                bindFactory(AuthorizationCheckServiceSupplier.class)
+                                        .to(AuthorizationCheckService.class)
                                         .in(RequestScoped.class);
                             }
                         });
