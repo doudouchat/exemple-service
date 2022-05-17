@@ -5,7 +5,9 @@ import java.util.logging.Level;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.ext.ContextResolver;
 
+import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.logging.LoggingFeature;
+import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.glassfish.jersey.server.validation.ValidationConfig;
@@ -13,6 +15,10 @@ import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpo
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.validation.beanvalidation.MessageSourceResourceBundleLocator;
 
+import com.exemple.service.api.common.schema.SchemaFilter;
+import com.exemple.service.api.common.schema.SchemaFilterSupplier;
+import com.exemple.service.api.common.schema.SchemaValidation;
+import com.exemple.service.api.common.schema.SchemaValidationSupplier;
 import com.exemple.service.api.core.authorization.AuthorizationFilter;
 import com.exemple.service.api.core.filter.ExecutionContextResponseFilter;
 import com.exemple.service.api.core.listener.ApiEventListener;
@@ -74,7 +80,20 @@ public class FeatureConfiguration extends ResourceConfig {
                         .property(LoggingFeature.LOGGING_FEATURE_LOGGER_LEVEL, Level.FINE.getName())
 
                         // JSON
-                        .register(JacksonJsonProvider.class);
+                        .register(JacksonJsonProvider.class)
+
+                        .register(new AbstractBinder() {
+                            @Override
+                            protected void configure() {
+                                bindFactory(SchemaValidationSupplier.class)
+                                        .to(SchemaValidation.class)
+                                        .in(RequestScoped.class);
+
+                                bindFactory(SchemaFilterSupplier.class)
+                                        .to(SchemaFilter.class)
+                                        .in(RequestScoped.class);
+                            }
+                        });
 
     }
 

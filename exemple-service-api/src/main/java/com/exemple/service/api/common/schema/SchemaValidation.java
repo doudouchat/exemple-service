@@ -2,48 +2,46 @@ package com.exemple.service.api.common.schema;
 
 import javax.ws.rs.container.ContainerRequestContext;
 
-import org.springframework.stereotype.Component;
-
 import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.security.ApiSecurityContext;
-import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
 @RequiredArgsConstructor
-public class ValidationHelper {
+public class SchemaValidation {
 
-    private final SchemaValidation schemaValidation;
+    private final com.exemple.service.schema.validation.SchemaValidation schema;
 
-    public void validate(JsonNode source, String resourceName, ContainerRequestContext requestContext) {
+    private final ContainerRequestContext requestContext;
+
+    public void validate(JsonNode source, String resourceName) {
 
         String app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
         String version = requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER);
         String profile = ((ApiSecurityContext) requestContext.getSecurityContext()).getProfile();
 
-        schemaValidation.validate(app, version, profile, resourceName, source);
+        schema.validate(app, version, profile, resourceName, source);
     }
 
-    public void validate(JsonNode source, JsonNode previousSource, String resourceName, ContainerRequestContext requestContext) {
+    public void validate(JsonNode source, JsonNode previousSource, String resourceName) {
 
         String app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
         String version = requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER);
         String profile = ((ApiSecurityContext) requestContext.getSecurityContext()).getProfile();
 
-        schemaValidation.validate(app, version, profile, resourceName, source, previousSource);
+        schema.validate(app, version, profile, resourceName, source, previousSource);
     }
 
-    public void validate(ArrayNode patch, JsonNode previousSource, String resourceName, ContainerRequestContext requestContext) {
+    public void validate(ArrayNode patch, JsonNode previousSource, String resourceName) {
 
         String app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
         String version = requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER);
         String profile = ((ApiSecurityContext) requestContext.getSecurityContext()).getProfile();
 
-        schemaValidation.validate(app, version, profile, resourceName, patch, previousSource);
+        schema.validate(app, version, profile, resourceName, patch, previousSource);
     }
 
 }
