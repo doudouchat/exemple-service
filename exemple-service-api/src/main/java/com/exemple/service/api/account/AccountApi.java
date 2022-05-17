@@ -27,7 +27,6 @@ import org.springframework.stereotype.Component;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.schema.SchemaFilter;
 import com.exemple.service.api.common.schema.SchemaValidation;
-import com.exemple.service.api.common.script.CustomerScriptFactory;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.account.AccountService;
@@ -62,9 +61,8 @@ public class AccountApi {
 
     private static final String ACCOUNT_RESOURCE = "account";
 
-    private static final String ACCOUNT_BEAN = "accountService";
-
-    private final CustomerScriptFactory scriptFactory;
+    @Context
+    private AccountService accountService;
 
     @Context
     private AuthorizationCheckService authorizationCheckService;
@@ -92,7 +90,7 @@ public class AccountApi {
 
         authorizationCheckService.verifyAccountId(id);
 
-        JsonNode account = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).get(id).orElseThrow(NotFoundException::new);
+        JsonNode account = accountService.get(id).orElseThrow(NotFoundException::new);
 
         return schemaFilter.filter(account, ACCOUNT_RESOURCE);
 
@@ -114,7 +112,7 @@ public class AccountApi {
 
         schemaValidation.validate(account, ACCOUNT_RESOURCE);
 
-        JsonNode source = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).save(account);
+        JsonNode source = accountService.save(account);
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
         builder.path(source.get(AccountField.ID.field).textValue());
@@ -140,13 +138,13 @@ public class AccountApi {
 
         authorizationCheckService.verifyAccountId(id);
 
-        JsonNode previousSource = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).get(id).orElseThrow(NotFoundException::new);
+        JsonNode previousSource = accountService.get(id).orElseThrow(NotFoundException::new);
 
         schemaValidation.validate(patch, previousSource, ACCOUNT_RESOURCE);
 
         JsonNode source = JsonPatch.apply(patch, previousSource);
 
-        scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).save(source, previousSource);
+        accountService.save(source, previousSource);
 
         return Response.status(Status.NO_CONTENT).build();
 
@@ -170,12 +168,12 @@ public class AccountApi {
 
         authorizationCheckService.verifyAccountId(id);
 
-        JsonNode previousSource = scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).get(id).orElseThrow(NotFoundException::new);
+        JsonNode previousSource = accountService.get(id).orElseThrow(NotFoundException::new);
 
         ((ObjectNode) account).put(AccountField.ID.field, id.toString());
         schemaValidation.validate(account, previousSource, ACCOUNT_RESOURCE);
 
-        scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class).save(account, previousSource);
+        accountService.save(account, previousSource);
 
         return Response.status(Status.NO_CONTENT).build();
 

@@ -18,7 +18,6 @@ import org.springframework.util.ResourceUtils;
 
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
-import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.account.AccountService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,14 +45,11 @@ public class CustomerScriptFactoryTest {
     @Test
     public void getDefaultBean() throws IOException {
 
-        // Setup context
-        ServiceContextExecution.context().setApp("test");
-
-        // And init ApplicationDetail
+        // Given init ApplicationDetail
         Mockito.when(applicationDetailService.get("test")).thenReturn(Optional.of(ApplicationDetail.builder().company("default").build()));
 
         // when perform
-        AccountService service = factory.getBean("accountService", AccountService.class);
+        AccountService service = factory.getBean("accountService", AccountService.class, "test");
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.createObjectNode().put("note", "default value");
@@ -67,14 +63,11 @@ public class CustomerScriptFactoryTest {
     @Test
     public void getOverrideBean() throws IOException {
 
-        // Setup context
-        ServiceContextExecution.context().setApp("test");
-
-        // And init ApplicationDetail
+        // Given init ApplicationDetail
         Mockito.when(applicationDetailService.get("test")).thenReturn(Optional.of(ApplicationDetail.builder().company("company_test").build()));
 
         // when perform
-        AccountService service = factory.getBean("accountService", AccountService.class);
+        AccountService service = factory.getBean("accountService", AccountService.class, "test");
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.createObjectNode().put("note", "default value");
