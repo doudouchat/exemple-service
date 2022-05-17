@@ -4,27 +4,24 @@ import java.util.Objects;
 import java.util.UUID;
 
 import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.container.ContainerRequestContext;
 
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Service;
-
-import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
 import com.exemple.service.customer.login.LoginResource;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
-@Profile("!noSecurity")
 @RequiredArgsConstructor
 public class AuthorizationCheckServiceImpl implements AuthorizationCheckService {
 
     private final LoginResource loginResource;
 
-    @Override
-    public void verifyAccountId(UUID id, ApiSecurityContext securityContext) {
+    private final ContainerRequestContext requestContext;
 
-        UUID loginId = loginResource.get(securityContext.getUserPrincipal().getName()).orElseThrow(ForbiddenException::new);
+    @Override
+    public void verifyAccountId(UUID id) {
+
+        UUID loginId = loginResource.get(requestContext.getSecurityContext().getUserPrincipal().getName()).orElseThrow(ForbiddenException::new);
 
         if (!Objects.equals(id, loginId)) {
 
@@ -34,9 +31,9 @@ public class AuthorizationCheckServiceImpl implements AuthorizationCheckService 
     }
 
     @Override
-    public void verifyLogin(String username, ApiSecurityContext securityContext) {
+    public void verifyLogin(String username) {
 
-        if (!Objects.equals(username, securityContext.getUserPrincipal().getName())) {
+        if (!Objects.equals(username, requestContext.getSecurityContext().getUserPrincipal().getName())) {
 
             throw new ForbiddenException();
         }
