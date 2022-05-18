@@ -3,6 +3,7 @@ package com.exemple.service.resource.core.keystore;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import com.exemple.service.application.common.exception.NotFoundApplicationException;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.resource.core.ResourceExecutionContext;
@@ -21,7 +22,7 @@ public class ResourceKeystore {
 
             Assert.notNull(app, "App is required");
 
-            ApplicationDetail applicationDetail = applicationDetailService.get(app);
+            ApplicationDetail applicationDetail = applicationDetailService.get(app).orElseThrow(() -> new NotFoundApplicationException(app));
             ResourceExecutionContext.get().setKeyspace(applicationDetail.getKeyspace());
 
         }

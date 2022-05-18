@@ -42,7 +42,9 @@ public class AuthorizationTokenValidation {
 
     public void checkClientId(DecodedJWT jwt, MultivaluedMap<String, String> headers) throws AuthorizationException {
 
-        ApplicationDetail applicationDetail = applicationDetailService.get(headers.getFirst(ApplicationBeanParam.APP_HEADER));
+        String application = headers.getFirst(ApplicationBeanParam.APP_HEADER);
+        ApplicationDetail applicationDetail = applicationDetailService.get(application)
+                .orElseThrow(() -> new AuthorizationException(Response.Status.FORBIDDEN, application + " is forbidden"));
         String clientId = getClientId(jwt);
         if (!applicationDetail.getClientIds().contains(clientId)) {
             throw new AuthorizationException(Response.Status.FORBIDDEN, clientId + " is forbidden");

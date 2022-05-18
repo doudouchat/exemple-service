@@ -65,14 +65,11 @@ public class CustomerScriptFactory {
 
     public <T> T getBean(String beanName, Class<T> beanClass) {
 
-        String app = ServiceContextExecution.context().getApp();
-        ApplicationDetail applicationDetail = applicationDetailService.get(app);
-
-        ApplicationContext applicationScriptContext = defaultApplicationContext;
-        if (checkIfBeanIsPresent(applicationDetail.getCompany(), beanName)) {
-
-            applicationScriptContext = scriptApplicationContexts.get(applicationDetail.getCompany());
-        }
+        String application = ServiceContextExecution.context().getApp();
+        ApplicationContext applicationScriptContext = applicationDetailService.get(application)
+                .filter((ApplicationDetail applicationDetail) -> checkIfBeanIsPresent(applicationDetail.getCompany(), beanName))
+                .map((ApplicationDetail applicationDetail) -> scriptApplicationContexts.get(applicationDetail.getCompany()))
+                .orElse(defaultApplicationContext);
 
         return applicationScriptContext.getBean(beanName, beanClass);
     }

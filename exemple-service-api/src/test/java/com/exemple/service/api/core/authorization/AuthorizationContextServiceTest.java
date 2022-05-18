@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -116,7 +117,7 @@ public class AuthorizationContextServiceTest {
         hazelcastInstance.getMap(AuthorizationTokenManager.TOKEN_BLACK_LIST).put(DEPRECATED_TOKEN_ID.toString(), Date.from(Instant.now()));
         authorizationClient.reset();
 
-        Mockito.when(applicationDetailService.get("test")).thenReturn(ApplicationDetail.builder().clientId("clientId1").build());
+        Mockito.when(applicationDetailService.get("test")).thenReturn(Optional.of(ApplicationDetail.builder().clientId("clientId1").build()));
 
     }
 
@@ -136,14 +137,15 @@ public class AuthorizationContextServiceTest {
                 + new String(Base64.encodeBase64(AuthorizationTestConfiguration.OTHER_PUBLIC_KEY.getEncoded())) + "\n-----END PUBLIC KEY-----");
 
         return Stream.of(
-                Arguments.of(TOKEN, JsonBody.json(TOKEN_KEY_OTHER_RESPONSE)),
-                Arguments.of(badClientIdToken, JsonBody.json(TOKEN_KEY_CORRECT_RESPONSE)),
-                Arguments.of(deprecatedToken, JsonBody.json(TOKEN_KEY_CORRECT_RESPONSE)));
+                Arguments.of(TOKEN, "test", JsonBody.json(TOKEN_KEY_OTHER_RESPONSE)),
+                Arguments.of(TOKEN, "application_notfound", JsonBody.json(TOKEN_KEY_CORRECT_RESPONSE)),
+                Arguments.of(badClientIdToken, "test", JsonBody.json(TOKEN_KEY_CORRECT_RESPONSE)),
+                Arguments.of(deprecatedToken, "test", JsonBody.json(TOKEN_KEY_CORRECT_RESPONSE)));
     }
 
     @ParameterizedTest
     @MethodSource
-    public void authorizedFailure(String token, BodyWithContentType<?> body) {
+    public void authorizedFailure(String token, String app, BodyWithContentType<?> body) {
 
         // Given mock client
         authorizationClient.when(HttpRequest.request()
@@ -157,7 +159,7 @@ public class AuthorizationContextServiceTest {
         // When perform
         MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
         headers.putSingle("Authorization", "Bearer " + token);
-        headers.putSingle(ApplicationBeanParam.APP_HEADER, "test");
+        headers.putSingle(ApplicationBeanParam.APP_HEADER, app);
         Throwable throwable = catchThrowable(() -> service.buildContext(headers));
 
         // Then check throwable

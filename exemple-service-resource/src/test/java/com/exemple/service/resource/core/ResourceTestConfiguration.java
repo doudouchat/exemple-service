@@ -2,6 +2,7 @@ package com.exemple.service.resource.core;
 
 import java.io.FileNotFoundException;
 import java.time.Duration;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 import javax.validation.Validator;
@@ -90,7 +91,7 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
 
         ApplicationDetailService service = Mockito.mock(ApplicationDetailService.class);
 
-        Mockito.when(service.get(Mockito.anyString())).thenReturn(ApplicationDetail.builder().keyspace("test").build());
+        Mockito.when(service.get(Mockito.anyString())).thenReturn(Optional.of(ApplicationDetail.builder().keyspace("test").build()));
 
         return service;
     }

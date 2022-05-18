@@ -1,6 +1,7 @@
 package com.exemple.service.application.detail.impl;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.nodes.PersistentNode;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import com.exemple.service.application.common.exception.NotFoundApplicationException;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -40,15 +40,17 @@ public class ApplicationDetailServiceImpl implements ApplicationDetailService {
 
     @Override
     @SneakyThrows
-    public ApplicationDetail get(String application) {
+    public Optional<ApplicationDetail> get(String application) {
 
         try {
 
-            return MAPPER.readValue(client.getData().forPath("/" + application), ApplicationDetail.class);
+            return Optional.of(MAPPER.readValue(client.getData().forPath("/" + application), ApplicationDetail.class));
 
         } catch (KeeperException.NoNodeException e) {
 
-            throw new NotFoundApplicationException(application, e);
+            LOG.warn("Application '" + application + "' not exists", e);
+
+            return Optional.empty();
         }
 
     }
