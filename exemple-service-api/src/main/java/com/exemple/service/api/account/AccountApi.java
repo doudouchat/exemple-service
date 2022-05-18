@@ -1,5 +1,6 @@
 package com.exemple.service.api.account;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import javax.annotation.security.RolesAllowed;
@@ -18,12 +19,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.springframework.stereotype.Component;
 
+import com.exemple.service.api.common.json.JsonUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.schema.SchemaFilter;
 import com.exemple.service.api.common.schema.SchemaValidation;
@@ -164,7 +166,7 @@ public class AccountApi {
     })
     @RolesAllowed("account:update")
     public Response update(@NotNull @PathParam("id") UUID id, @NotNull @Parameter(schema = @Schema(ref = ACCOUNT_SCHEMA)) JsonNode account,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) {
+            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws IOException {
 
         authorizationCheckService.verifyAccountId(id);
 
@@ -173,7 +175,8 @@ public class AccountApi {
         ((ObjectNode) account).put(AccountField.ID.field, id.toString());
         schemaValidation.validate(account, previousSource, ACCOUNT_RESOURCE);
 
-        accountService.save(account, previousSource);
+        JsonNode accountFinal = JsonUtils.merge(account, schemaFilter.filterAllAdditionalProperties(previousSource, ACCOUNT_RESOURCE));
+        accountService.save(accountFinal, previousSource);
 
         return Response.status(Status.NO_CONTENT).build();
 
