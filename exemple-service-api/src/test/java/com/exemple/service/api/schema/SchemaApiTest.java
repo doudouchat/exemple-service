@@ -98,7 +98,7 @@ public class SchemaApiTest extends JerseySpringSupport {
         String profile = "user";
 
         Mockito.when(service.get(Mockito.eq(app), Mockito.eq(version), Mockito.eq(resource), Mockito.eq(profile)))
-                .thenThrow(new NotFoundApplicationException(app, null));
+                .thenThrow(new NotFoundApplicationException(app));
 
         // When perform get
 

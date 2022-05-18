@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.api.stock.model.Stock;
+import com.exemple.service.application.common.exception.NotFoundApplicationException;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.store.common.InsufficientStockException;
@@ -58,7 +59,9 @@ public class StockApi {
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) ApplicationBeanParam applicationBeanParam,
             @NotNull @Valid @Parameter(schema = @Schema(implementation = Stock.class)) Stock stock) throws InsufficientStockException {
 
-        ApplicationDetail applicationDetail = applicationDetailService.get(applicationBeanParam.app);
+        String application = applicationBeanParam.app;
+        ApplicationDetail applicationDetail = applicationDetailService.get(application)
+                .orElseThrow(() -> new NotFoundApplicationException(application));
 
         return service.update("/" + applicationDetail.getCompany(), "/" + store, "/" + product, stock.getIncrement());
 
@@ -74,7 +77,9 @@ public class StockApi {
     public Stock get(@PathParam("store") String store, @PathParam("product") String product,
             @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) ApplicationBeanParam applicationBeanParam) {
 
-        ApplicationDetail applicationDetail = applicationDetailService.get(applicationBeanParam.app);
+        String application = applicationBeanParam.app;
+        ApplicationDetail applicationDetail = applicationDetailService.get(application)
+                .orElseThrow(() -> new NotFoundApplicationException(application));
 
         Long amount = service.get("/" + applicationDetail.getCompany(), "/" + store, "/" + product).orElseThrow(NotFoundException::new);
 

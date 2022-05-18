@@ -1,5 +1,7 @@
 package com.exemple.service.application.detail;
 
+import java.util.Optional;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -10,6 +12,6 @@ public interface ApplicationDetailService {
 
     void put(@NotBlank String application, @NotNull JsonNode detail);
 
-    ApplicationDetail get(String application);
+    Optional<ApplicationDetail> get(String application);
 
 }
