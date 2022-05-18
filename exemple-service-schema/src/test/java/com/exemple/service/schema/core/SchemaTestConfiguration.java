@@ -60,6 +60,20 @@ public class SchemaTestConfiguration {
         schemaTestField.add("cgus[code,version]");
         schemaTestField.add("cgvs[code,version]");
         schemaTest.setFields(schemaTestField);
+        Set<String> schemaTestFilter = new HashSet<>();
+        schemaTestFilter.add("id");
+        schemaTestFilter.add("email");
+        schemaTestFilter.add("external_id");
+        schemaTestFilter.add("civility");
+        schemaTestFilter.add("lastname");
+        schemaTestFilter.add("firstname");
+        schemaTestFilter.add("birthday");
+        schemaTestFilter.add("creation_date");
+        schemaTestFilter.add("opt_in_email");
+        schemaTestFilter.add("addresses[*[city,street]]");
+        schemaTestFilter.add("cgus[code,version]");
+        schemaTestFilter.add("cgvs[code,version]");
+        schemaTest.setFilters(schemaTestFilter);
         Mockito.when(resource.get(Mockito.eq("default"), Mockito.eq("default"), Mockito.eq("schema_test"), Mockito.eq("default")))
                 .thenReturn(Optional.of(schemaTest));
 
