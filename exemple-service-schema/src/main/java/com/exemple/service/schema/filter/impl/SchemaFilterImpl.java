@@ -7,12 +7,15 @@ import com.exemple.service.resource.schema.model.SchemaEntity;
 import com.exemple.service.schema.common.FilterBuilder;
 import com.exemple.service.schema.filter.SchemaFilter;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class SchemaFilterImpl implements SchemaFilter {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final SchemaResource schemaResource;
 
@@ -21,7 +24,15 @@ public class SchemaFilterImpl implements SchemaFilter {
 
         return schemaResource.get(app, version, resource, profile)
                 .map((SchemaEntity schema) -> FilterBuilder.filter(source, schema.getFilters().toArray(new String[0])))
-                .orElse(source);
+                .orElse(MAPPER.createObjectNode());
+    }
+
+    @Override
+    public JsonNode filterAllProperties(String app, String version, String resource, String profile, JsonNode source) {
+
+        return schemaResource.get(app, version, resource, profile)
+                .map((SchemaEntity schema) -> FilterBuilder.filter(source, schema.getFields().toArray(new String[0])))
+                .orElse(MAPPER.createObjectNode());
     }
 
 }

@@ -21,10 +21,10 @@ import org.springframework.stereotype.Component;
 
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaEntity;
-import com.exemple.service.schema.common.FilterBuilder;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionBuilder;
 import com.exemple.service.schema.common.exception.ValidationExceptionCause;
+import com.exemple.service.schema.filter.SchemaFilter;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.exemple.service.schema.validation.custom.CustomDateTimeFormatValidator;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -42,8 +42,11 @@ public class SchemaValidationImpl implements SchemaValidation {
 
     private final Schema defaultSchema;
 
-    public SchemaValidationImpl(SchemaResource schemaResource) throws IOException {
+    private final SchemaFilter schemaFilter;
+
+    public SchemaValidationImpl(SchemaResource schemaResource, SchemaFilter schemaFilter) throws IOException {
         this.schemaResource = schemaResource;
+        this.schemaFilter = schemaFilter;
 
         JSONObject schemaJson = new JSONObject(new JSONTokener(new ClassPathResource("default-schema.json").getInputStream()));
         defaultSchema = buildSchema(schemaJson);
@@ -91,12 +94,10 @@ public class SchemaValidationImpl implements SchemaValidation {
                 .map((SchemaEntity entity) -> buildSchema(entity.getContent(), entity.getPatchs()))
                 .orElse(defaultSchema);
 
-        JsonNode oldFilterBySchema = schemaEntity
-                .filter((SchemaEntity entity) -> entity.getContent() != null)
-                .map((SchemaEntity entity) -> FilterBuilder.filter(old, entity.getFields().toArray(new String[0])))
-                .orElse(old);
+        JsonNode oldFilterBySchema = this.schemaFilter.filterAllProperties(app, version, resource, profile, old);
 
-        JsonNode form = JsonPatch.apply(patch, oldFilterBySchema, EnumSet.of(CompatibilityFlags.FORBID_REMOVE_MISSING_OBJECT));
+        JsonNode form = JsonPatch.apply(patch, oldFilterBySchema,
+                EnumSet.of(CompatibilityFlags.FORBID_REMOVE_MISSING_OBJECT, CompatibilityFlags.ALLOW_MISSING_TARGET_OBJECT_ON_REPLACE));
 
         try {
             performValidation(schema, form);
