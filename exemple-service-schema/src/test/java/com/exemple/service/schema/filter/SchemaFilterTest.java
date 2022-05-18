@@ -58,6 +58,36 @@ public class SchemaFilterTest {
     }
 
     @Test
+    public void filterAllProperties() throws IOException {
+
+        // Given create source
+        JsonNode source = MAPPER
+                .readTree(
+                        "{\"lastname\": \"jean\", \"hide\": \"value2\",  \"addresses\": {\"holiday\": {\"street\": \"Paris\", \"country\": \"French\"}}}");
+
+        // When perform filter
+        JsonNode newSource = schemaFilter.filterAllProperties("default", "default", "schema_test", "default", source);
+
+        // Then check source after filter
+        assertThat(newSource).isEqualTo(MAPPER.readTree("{\"lastname\": \"jean\", \"addresses\": {\"holiday\": {\"street\": \"Paris\"}}}"));
+    }
+
+    @Test
+    public void filterAllPropertiesWhenSchemaNotExists() throws IOException {
+
+        // Given create source
+        JsonNode source = MAPPER
+                .readTree(
+                        "{\"lastname\": \"jean\", \"hide\": \"value2\",  \"addresses\": {\"holiday\": {\"street\": \"Paris\", \"country\": \"French\"}}}");
+
+        // When perform filter
+        JsonNode newSource = schemaFilter.filterAllProperties("other", "default", "schema_test", "default", source);
+
+        // Then check source after filter
+        assertThat(newSource).isEqualTo(MAPPER.readTree("{}"));
+    }
+
+    @Test
     public void filterFailure() throws IOException {
 
         // Given filter configuration

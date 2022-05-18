@@ -61,6 +61,11 @@ public class ApiTestConfiguration extends ApiConfiguration {
                 return source;
             }
 
+            @Override
+            public JsonNode filterAllProperties(String app, String version, String resource, String profile, JsonNode source) {
+                return source;
+            }
+
         };
 
     }
