@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import org.everit.json.schema.ReadWriteContext;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.Validator;
-import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -21,22 +20,19 @@ import org.springframework.stereotype.Component;
 
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaEntity;
+import com.exemple.service.schema.common.SchemaBuilder;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionBuilder;
 import com.exemple.service.schema.common.exception.ValidationExceptionCause;
 import com.exemple.service.schema.filter.SchemaFilter;
 import com.exemple.service.schema.validation.SchemaValidation;
-import com.exemple.service.schema.validation.custom.CustomDateTimeFormatValidator;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.flipkart.zjsonpatch.CompatibilityFlags;
 import com.flipkart.zjsonpatch.JsonPatch;
 
 @Component
 public class SchemaValidationImpl implements SchemaValidation {
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final SchemaResource schemaResource;
 
@@ -49,7 +45,7 @@ public class SchemaValidationImpl implements SchemaValidation {
         this.schemaFilter = schemaFilter;
 
         JSONObject schemaJson = new JSONObject(new JSONTokener(new ClassPathResource("default-schema.json").getInputStream()));
-        defaultSchema = buildSchema(schemaJson);
+        defaultSchema = SchemaBuilder.buildSchema(schemaJson);
 
     }
 
@@ -58,7 +54,7 @@ public class SchemaValidationImpl implements SchemaValidation {
 
         Schema schema = schemaResource.get(app, version, resource, profile)
                 .map(SchemaEntity::getContent)
-                .map((JsonNode schemaContent) -> buildSchema(schemaContent, Collections.emptySet()))
+                .map((JsonNode schemaContent) -> SchemaBuilder.buildSchema(schemaContent, Collections.emptySet()))
                 .orElse(defaultSchema);
         performValidation(schema, form);
 
@@ -69,7 +65,7 @@ public class SchemaValidationImpl implements SchemaValidation {
 
         Schema schema = schemaResource.get(app, version, resource, profile)
                 .filter((SchemaEntity schemaEntity) -> schemaEntity.getContent() != null)
-                .map((SchemaEntity schemaEntity) -> buildSchema(schemaEntity.getContent(), schemaEntity.getPatchs()))
+                .map((SchemaEntity schemaEntity) -> SchemaBuilder.buildSchema(schemaEntity.getContent(), schemaEntity.getPatchs()))
                 .orElse(defaultSchema);
 
         try {
@@ -91,7 +87,7 @@ public class SchemaValidationImpl implements SchemaValidation {
 
         Schema schema = schemaEntity
                 .filter((SchemaEntity entity) -> entity.getContent() != null)
-                .map((SchemaEntity entity) -> buildSchema(entity.getContent(), entity.getPatchs()))
+                .map((SchemaEntity entity) -> SchemaBuilder.buildSchema(entity.getContent(), entity.getPatchs()))
                 .orElse(defaultSchema);
 
         JsonNode oldFilterBySchema = this.schemaFilter.filterAllProperties(app, version, resource, profile, old);
@@ -162,22 +158,6 @@ public class SchemaValidationImpl implements SchemaValidation {
             throw validationException;
 
         }
-
-    }
-
-    private static Schema buildSchema(JsonNode schema, Set<JsonNode> patchs) {
-
-        ArrayNode patch = MAPPER.createArrayNode().addAll(patchs);
-        JSONObject rawSchema = new JSONObject(new JSONTokener(JsonPatch.apply(patch, schema).toString()));
-        return buildSchema(rawSchema);
-
-    }
-
-    private static Schema buildSchema(JSONObject rawSchema) {
-
-        SchemaLoader schemaLoader = SchemaLoader.builder().draftV7Support().schemaJson(rawSchema)
-                .addFormatValidator(new CustomDateTimeFormatValidator()).enableOverrideOfBuiltInFormatValidators().build();
-        return schemaLoader.load().build();
 
     }
 
