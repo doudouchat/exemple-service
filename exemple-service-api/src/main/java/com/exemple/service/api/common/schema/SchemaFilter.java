@@ -25,4 +25,14 @@ public class SchemaFilter {
         return schema.filter(app, version, resourceName, profile, source);
     }
 
+    public JsonNode filterAllAdditionalProperties(JsonNode source, String resourceName) {
+
+        String app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
+        String version = requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER);
+        String profile = ((ApiSecurityContext) requestContext.getSecurityContext()).getProfile();
+
+        return schema.filterAllAdditionalProperties(app, version, resourceName, profile, source);
+
+    }
+
 }
