@@ -89,6 +89,7 @@
 	"definitions": {
 		"Address": {
 			"type": "object",
+			"additionalProperties": false,
 			"properties": {
 				"street": {
 					"type": "string"
@@ -104,6 +105,7 @@
 		},
 		"Cgu": {
 			"type": "object",
+			"additionalProperties": false,
 			"properties": {
 				"code": {
 					"type": "string"
@@ -119,6 +121,7 @@
 		},
 		"Cgv": {
 			"type": "object",
+			"additionalProperties": false,
 			"properties": {
 				"code": {
 					"type": "string"
