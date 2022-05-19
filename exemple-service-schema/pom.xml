@@ -38,13 +38,6 @@
 			<artifactId>org.everit.json.schema</artifactId>
 		</dependency>
 
-		<!-- JSON FILTER -->
-
-		<dependency>
-			<groupId>com.github.bohnman</groupId>
-			<artifactId>squiggly-filter-jackson</artifactId>
-		</dependency>
-
 		<!-- JSON PATCH -->
 
 		<dependency>

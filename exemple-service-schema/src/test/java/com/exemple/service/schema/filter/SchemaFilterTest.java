@@ -30,13 +30,14 @@ public class SchemaFilterTest {
         // Given create source
         JsonNode source = MAPPER
                 .readTree(
-                        "{\"lastname\": \"jean\", \"password\": \"value\",  \"addresses\": {\"holiday\": {\"street\": \"Paris\", \"country\": \"French\"}}}");
+                        "{\"lastname\": \"jean\", \"password\": \"value\", \"update_date\": \"2022-05-23\",  \"addresses\": {\"holiday\": {\"street\": \"Paris\", \"country\": \"French\"}}}");
 
         // When perform filter
         JsonNode newSource = schemaFilter.filter("default", "default", "schema_test", "default", source);
 
         // Then check source after filter
-        assertThat(newSource).isEqualTo(MAPPER.readTree("{\"lastname\": \"jean\", \"addresses\": {\"holiday\": {\"street\": \"Paris\"}}}"));
+        assertThat(newSource).isEqualTo(
+                MAPPER.readTree("{\"lastname\": \"jean\", \"update_date\": \"2022-05-23\", \"addresses\": {\"holiday\": {\"street\": \"Paris\"}}}"));
     }
 
     @Test
@@ -45,7 +46,7 @@ public class SchemaFilterTest {
         // Given create source
         JsonNode source = MAPPER
                 .readTree(
-                        "{\"lastname\": \"jean\", \"password\": \"value\",  \"addresses\": {\"holiday\": {\"street\": \"Paris\", \"country\": \"French\"}}}");
+                        "{\"lastname\": \"jean\", \"password\": \"value\", \"update_date\": \"2022-05-23\", \"addresses\": {\"holiday\": {\"street\": \"Paris\", \"country\": \"French\"}}}");
 
         // When perform filter
         JsonNode newSource = schemaFilter.filter("other", "default", "schema_test", "default", source);
@@ -60,13 +61,14 @@ public class SchemaFilterTest {
         // Given create source
         JsonNode source = MAPPER
                 .readTree(
-                        "{\"lastname\": \"jean\", \"hide\": \"value2\",  \"addresses\": {\"holiday\": {\"street\": \"Paris\", \"country\": \"French\"}}}");
+                        "{\"lastname\": \"jean\", \"hide\": \"value2\", \"update_date\": \"2022-05-23\", \"addresses\": {\"holiday\": {\"street\": \"Paris\", \"country\": \"French\"}}}");
 
         // When perform filter
         JsonNode newSource = schemaFilter.filterAllProperties("default", "default", "schema_test", "default", source);
 
         // Then check source after filter
-        assertThat(newSource).isEqualTo(MAPPER.readTree("{\"lastname\": \"jean\", \"addresses\": {\"holiday\": {\"street\": \"Paris\"}}}"));
+        assertThat(newSource).isEqualTo(
+                MAPPER.readTree("{\"lastname\": \"jean\", \"update_date\": \"2022-05-23\", \"addresses\": {\"holiday\": {\"street\": \"Paris\"}}}"));
     }
 
     @Test
@@ -75,7 +77,7 @@ public class SchemaFilterTest {
         // Given create source
         JsonNode source = MAPPER
                 .readTree(
-                        "{\"lastname\": \"jean\", \"hide\": \"value2\",  \"addresses\": {\"holiday\": {\"street\": \"Paris\", \"country\": \"French\"}}}");
+                        "{\"lastname\": \"jean\", \"hide\": \"value2\",  \"update_date\": \"2022-05-23\", \"addresses\": {\"holiday\": {\"street\": \"Paris\", \"country\": \"French\"}}}");
 
         // When perform filter
         JsonNode newSource = schemaFilter.filterAllProperties("other", "default", "schema_test", "default", source);

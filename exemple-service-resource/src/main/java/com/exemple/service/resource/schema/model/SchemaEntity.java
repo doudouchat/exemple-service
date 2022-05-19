@@ -36,12 +36,6 @@ public class SchemaEntity implements Serializable {
 
     private JsonNode content;
 
-    @CqlName("filter")
-    private Set<String> filters = Collections.emptySet();
-
-    @CqlName("field")
-    private Set<String> fields = Collections.emptySet();
-
     @CqlName("patch")
     private Set<JsonNode> patchs = Collections.emptySet();
 

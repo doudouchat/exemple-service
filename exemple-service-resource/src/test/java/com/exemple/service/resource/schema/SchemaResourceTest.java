@@ -65,8 +65,6 @@ public class SchemaResourceTest {
             resourceSchema.setResource("account");
             resourceSchema.setProfile("example");
             resourceSchema.setContent(schemaResource);
-            resourceSchema.setFilters(Collections.singleton("filter"));
-            resourceSchema.setFields((Collections.singleton("field")));
             resourceSchema.setPatchs(Collections.singleton(MAPPER.convertValue(Collections.singletonMap("op", "add"), JsonNode.class)));
 
             // When perform save
@@ -77,8 +75,6 @@ public class SchemaResourceTest {
             Optional<SchemaEntity> schema = resource.get("app1", "v1", "account", "example");
             assertAll(
                     () -> assertThat(schema.get().getContent()).isEqualTo(this.schemaResource),
-                    () -> assertThat(schema.get().getFilters()).containsOnly("filter"),
-                    () -> assertThat(schema.get().getFields()).containsOnly("field"),
                     () -> assertThat(schema.get().getPatchs()).extracting(patch -> patch.get("op").textValue()).containsOnly("add"));
 
         }
@@ -103,8 +99,6 @@ public class SchemaResourceTest {
             Optional<SchemaEntity> schema = resource.get("app1", "v1", "account", "example");
             assertAll(
                     () -> assertThat(schema.get().getContent()).isNull(),
-                    () -> assertThat(schema.get().getFilters()).isEmpty(),
-                    () -> assertThat(schema.get().getFields()).isEmpty(),
                     () -> assertThat(schema.get().getPatchs()).isEmpty());
         }
 
