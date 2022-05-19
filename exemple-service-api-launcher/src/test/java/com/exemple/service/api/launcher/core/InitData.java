@@ -1,10 +1,7 @@
 package com.exemple.service.api.launcher.core;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -22,6 +19,7 @@ import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Component
 @DependsOn("initCassandra")
@@ -56,33 +54,6 @@ public class InitData {
 
                 .keyspace("test_keyspace").company("test_company").clientId("test").clientId("test_user").build();
 
-        Set<String> accountFilter = new HashSet<>();
-        accountFilter.add("lastname");
-        accountFilter.add("firstname");
-        accountFilter.add("email");
-        accountFilter.add("optin_mobile");
-        accountFilter.add("civility");
-        accountFilter.add("mobile");
-        accountFilter.add("creation_date");
-        accountFilter.add("update_date");
-        accountFilter.add("birthday");
-        accountFilter.add("addresses[*[city,street]]");
-        accountFilter.add("cgus[code,version]");
-
-        Set<String> accountField = new HashSet<>();
-        accountField.add("id");
-        accountField.add("lastname");
-        accountField.add("firstname");
-        accountField.add("email");
-        accountField.add("optin_mobile");
-        accountField.add("civility");
-        accountField.add("mobile");
-        accountField.add("creation_date");
-        accountField.add("update_date");
-        accountField.add("birthday");
-        accountField.add("addresses[*[city,street]]");
-        accountField.add("cgus[code,version]");
-
         ResourceExecutionContext.get().setKeyspace(detail.getKeyspace());
 
         SchemaEntity accountSchema = new SchemaEntity();
@@ -91,16 +62,18 @@ public class InitData {
         accountSchema.setResource("account");
         accountSchema.setProfile("user");
         accountSchema.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("account.json").getInputStream())));
-        accountSchema.setFilters(accountFilter);
-        accountSchema.setFields(accountField);
+
+        ObjectNode patchUpdateDate = MAPPER.createObjectNode();
+        patchUpdateDate.put("op", "add");
+        patchUpdateDate.put("path", "/properties/update_date");
+        patchUpdateDate.set("value", MAPPER.readTree("{\"type\": \"string\",\"format\": \"date-time\",\"readOnly\": true}"));
+
+        Set<JsonNode> accountPatchs = new HashSet<>();
+        accountPatchs.add(patchUpdateDate);
+
+        accountSchema.setPatchs(accountPatchs);
 
         schemaResource.save(accountSchema);
-
-        Set<String> subscriptionFilter = new HashSet<>();
-        subscriptionFilter.add("subscription_date");
-
-        Map<String, Set<String>> subscriptionRules = new HashMap<>();
-        subscriptionRules.put("login", Collections.singleton("/email"));
 
         SchemaEntity subscriptionSchema = new SchemaEntity();
         subscriptionSchema.setApplication(TEST_APP);
@@ -108,7 +81,6 @@ public class InitData {
         subscriptionSchema.setResource("subscription");
         subscriptionSchema.setProfile("user");
         subscriptionSchema.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("subscription.json").getInputStream())));
-        subscriptionSchema.setFilters(subscriptionFilter);
 
         schemaResource.save(subscriptionSchema);
 

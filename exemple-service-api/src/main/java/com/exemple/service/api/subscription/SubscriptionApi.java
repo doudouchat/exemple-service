@@ -78,7 +78,9 @@ public class SubscriptionApi {
 
         JsonNode subscription = subscriptionService.get(email).orElseThrow(NotFoundException::new);
 
-        return schemaFilter.filter(subscription, SUBSCRIPTION_RESOURCE);
+        ObjectNode response = (ObjectNode) schemaFilter.filter(subscription, SUBSCRIPTION_RESOURCE);
+        response.remove(SubscriptionField.EMAIL.field);
+        return response;
 
     }
 

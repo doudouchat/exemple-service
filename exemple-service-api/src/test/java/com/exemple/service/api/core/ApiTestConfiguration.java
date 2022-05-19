@@ -4,9 +4,11 @@ import java.io.IOException;
 
 import org.everit.json.schema.Schema;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.util.ResourceUtils;
 
 import com.exemple.service.api.common.script.CustomerScriptFactory;
@@ -102,12 +104,14 @@ public class ApiTestConfiguration extends ApiConfiguration {
     }
 
     @Bean(name = "account")
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public JsonNode account() throws IOException {
 
         return MAPPER.readTree(ResourceUtils.getFile("classpath:model/account.json"));
     }
 
     @Bean(name = "subscription")
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public JsonNode subscription() throws IOException {
 
         return MAPPER.readTree(ResourceUtils.getFile("classpath:model/subscription.json"));

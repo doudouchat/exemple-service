@@ -89,8 +89,6 @@ CREATE TABLE IF NOT EXISTS resource_schema (
 	resource text,
 	profile text,
 	content text,
-	filter set<text>,
-	field set<text>,
 	patch set<text>,
 	PRIMARY KEY ((app), resource, version, profile)
 );

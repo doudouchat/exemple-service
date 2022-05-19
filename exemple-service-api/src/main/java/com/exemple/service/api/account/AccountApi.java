@@ -94,8 +94,9 @@ public class AccountApi {
 
         JsonNode account = accountService.get(id).orElseThrow(NotFoundException::new);
 
-        return schemaFilter.filter(account, ACCOUNT_RESOURCE);
-
+        ObjectNode response = (ObjectNode) schemaFilter.filter(account, ACCOUNT_RESOURCE);
+        response.remove(AccountField.ID.field);
+        return response;
     }
 
     @POST

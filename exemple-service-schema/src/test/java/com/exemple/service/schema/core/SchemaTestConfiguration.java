@@ -1,7 +1,6 @@
 package com.exemple.service.schema.core;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -19,6 +18,7 @@ import org.springframework.validation.beanvalidation.MethodValidationPostProcess
 
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaEntity;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -39,48 +39,25 @@ public class SchemaTestConfiguration {
         SchemaEntity schemaTest = new SchemaEntity();
         schemaTest.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("schema_test.json").getInputStream())));
 
-        ObjectNode patch = MAPPER.createObjectNode();
-        patch.put("op", "add");
-        patch.put("path", "/properties/external_id/readOnly");
-        patch.put("value", true);
+        ObjectNode patchExternalId = MAPPER.createObjectNode();
+        patchExternalId.put("op", "add");
+        patchExternalId.put("path", "/properties/external_id/readOnly");
+        patchExternalId.put("value", true);
 
-        schemaTest.setPatchs(Collections.singleton(patch));
-        Set<String> schemaTestField = new HashSet<>();
-        schemaTestField.add("id");
-        schemaTestField.add("email");
-        schemaTestField.add("external_id");
-        schemaTestField.add("civility");
-        schemaTestField.add("lastname");
-        schemaTestField.add("firstname");
-        schemaTestField.add("password");
-        schemaTestField.add("birthday");
-        schemaTestField.add("creation_date");
-        schemaTestField.add("opt_in_email");
-        schemaTestField.add("addresses[*[city,street]]");
-        schemaTestField.add("cgus[code,version]");
-        schemaTestField.add("cgvs[code,version]");
-        schemaTest.setFields(schemaTestField);
-        Set<String> schemaTestFilter = new HashSet<>();
-        schemaTestFilter.add("id");
-        schemaTestFilter.add("email");
-        schemaTestFilter.add("external_id");
-        schemaTestFilter.add("civility");
-        schemaTestFilter.add("lastname");
-        schemaTestFilter.add("firstname");
-        schemaTestFilter.add("birthday");
-        schemaTestFilter.add("creation_date");
-        schemaTestFilter.add("opt_in_email");
-        schemaTestFilter.add("addresses[*[city,street]]");
-        schemaTestFilter.add("cgus[code,version]");
-        schemaTestFilter.add("cgvs[code,version]");
-        schemaTest.setFilters(schemaTestFilter);
+        ObjectNode patchUpdateDate = MAPPER.createObjectNode();
+        patchUpdateDate.put("op", "add");
+        patchUpdateDate.put("path", "/properties/update_date");
+        patchUpdateDate.set("value", MAPPER.readTree("{\"type\": \"string\",\"format\": \"date-time\",\"readOnly\": true}"));
+
+        Set<JsonNode> schemaPatchs = new HashSet<>();
+        schemaPatchs.add(patchExternalId);
+        schemaPatchs.add(patchUpdateDate);
+
+        schemaTest.setPatchs(schemaPatchs);
         Mockito.when(resource.get(Mockito.eq("default"), Mockito.eq("default"), Mockito.eq("schema_test"), Mockito.eq("default")))
                 .thenReturn(Optional.of(schemaTest));
 
         SchemaEntity schemaArray = new SchemaEntity();
-        Set<String> schemaArrayField = new HashSet<>();
-        schemaArrayField.add("items[city,street]");
-        schemaArray.setFields(schemaArrayField);
         schemaArray.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("schema_array.json").getInputStream())));
 
         Mockito.when(resource.get(Mockito.eq("default"), Mockito.eq("default"), Mockito.eq("array_test"), Mockito.eq("default")))
