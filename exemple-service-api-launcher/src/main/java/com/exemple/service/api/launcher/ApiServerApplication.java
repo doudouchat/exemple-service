@@ -11,6 +11,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
 
 import com.exemple.service.api.core.ApiConfiguration;
 import com.exemple.service.application.core.ApplicationConfiguration;
@@ -25,6 +26,7 @@ import com.exemple.service.store.core.StoreConfiguration;
 @EnableCaching
 @Import({ SchemaConfiguration.class, ApplicationConfiguration.class, StoreConfiguration.class, ResourceConfiguration.class,
         EventPublisherConfiguration.class, ApiConfiguration.class })
+@PropertySource("classpath:default.properties")
 public class ApiServerApplication extends SpringBootServletInitializer {
 
     @Override
