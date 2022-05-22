@@ -179,6 +179,13 @@
 
 	<build>
 
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
 		<testResources>
 			<testResource>
 				<directory>src/test/resources</directory>
@@ -485,9 +492,9 @@
 							<configuration>
 								<properties>
 									<cargo.resource.resource.spring>
-										cargo.resource.name=spring.config.location|
+										cargo.resource.name=spring.config.additional-location|
 										cargo.resource.type=java.lang.String|
-										cargo.resource.parameters=factory=org.glassfish.resources.custom.factory.PrimitivesAndStringFactory;value=classpath:default.yml,${configuration.path}
+										cargo.resource.parameters=factory=org.glassfish.resources.custom.factory.PrimitivesAndStringFactory;value=${configuration.path}
 									</cargo.resource.resource.spring>
 									<cargo.resource.resource.api>
 										cargo.resource.name=${configuration.name}|

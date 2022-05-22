@@ -9,6 +9,6 @@
     <Environment 
     	name="spring.config.location" 
     	type="java.lang.String"
-		value="classpath:default.yml,file:/usr/local/tomcat/etc/exemple-service.yml" />
+		value="file:/usr/local/tomcat/etc/exemple-service.yml" />
     
 </Context>

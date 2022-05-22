@@ -1,3 +1,0 @@
-info:
-   version: ${project.version}
-   buildTime: ${maven.build.timestamp}
