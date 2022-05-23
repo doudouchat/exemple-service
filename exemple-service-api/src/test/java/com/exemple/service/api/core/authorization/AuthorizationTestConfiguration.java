@@ -14,10 +14,13 @@ import javax.ws.rs.core.SecurityContext;
 
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.io.ClassPathResource;
 
 import com.auth0.jwt.algorithms.Algorithm;
 import com.exemple.service.api.core.authorization.impl.AuthorizationTokenManager;
@@ -124,6 +127,18 @@ public class AuthorizationTestConfiguration {
 
         }
 
+    }
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
+
+        PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = new PropertySourcesPlaceholderConfigurer();
+
+        YamlPropertiesFactoryBean properties = new YamlPropertiesFactoryBean();
+        properties.setResources(new ClassPathResource("exemple-service-api-test.yml"));
+
+        propertySourcesPlaceholderConfigurer.setProperties(properties.getObject());
+        return propertySourcesPlaceholderConfigurer;
     }
 
 }

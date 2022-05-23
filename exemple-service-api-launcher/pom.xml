@@ -496,11 +496,6 @@
 										cargo.resource.type=java.lang.String|
 										cargo.resource.parameters=factory=org.glassfish.resources.custom.factory.PrimitivesAndStringFactory;value=${configuration.path}
 									</cargo.resource.resource.spring>
-									<cargo.resource.resource.api>
-										cargo.resource.name=${configuration.name}|
-										cargo.resource.type=java.lang.String|
-										cargo.resource.parameters=factory=org.glassfish.resources.custom.factory.PrimitivesAndStringFactory;value=${configuration.path}
-									</cargo.resource.resource.api>
 								</properties>
 							</configuration>
 						</configuration>

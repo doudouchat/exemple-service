@@ -2,20 +2,11 @@ package com.exemple.service.api.core;
 
 import java.io.IOException;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
 import org.everit.json.schema.Schema;
 import org.mockito.Mockito;
-import org.osjava.sj.SimpleJndi;
-import org.osjava.sj.loader.JndiLoader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jndi.JndiObjectFactoryBean;
 import org.springframework.util.ResourceUtils;
 
 import com.exemple.service.api.common.script.CustomerScriptFactory;
@@ -108,28 +99,6 @@ public class ApiTestConfiguration extends ApiConfiguration {
         Mockito.when(customerScriptFactory.getBean(Mockito.anyString(), Mockito.eq(AccountService.class), Mockito.anyString()))
                 .thenReturn(context.getBean(AccountService.class));
         return customerScriptFactory;
-    }
-
-    @Bean
-    public InitialContext initialContext() throws NamingException, IOException {
-
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.osjava.sj.SimpleContextFactory");
-        System.setProperty(SimpleJndi.ENC, "java:comp");
-        System.setProperty(JndiLoader.COLON_REPLACE, "--");
-        System.setProperty(JndiLoader.DELIMITER, "/");
-        System.setProperty(SimpleJndi.SHARED, "true");
-        System.setProperty(SimpleJndi.ROOT, new ClassPathResource("java--comp").getURL().getFile());
-
-        return new InitialContext();
-
-    }
-
-    @Bean
-    @DependsOn("initialContext")
-    @Override
-    public JndiObjectFactoryBean jndiObjectFactoryBean() {
-
-        return super.jndiObjectFactoryBean();
     }
 
     @Bean(name = "account")
