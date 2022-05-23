@@ -267,13 +267,6 @@
 			<artifactId>mockito-core</artifactId>
 		</dependency>
 
-		<!-- JNDI SIMPLE -->
-
-		<dependency>
-			<groupId>com.github.h-thurow</groupId>
-			<artifactId>simple-jndi</artifactId>
-		</dependency>
-
 		<!-- MOCK SERVER -->
 
 		<dependency>
