@@ -3,9 +3,7 @@ package com.exemple.service.api.login;
 import java.util.UUID;
 
 import javax.annotation.security.RolesAllowed;
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.BeanParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.NotFoundException;
@@ -21,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
+import com.exemple.service.api.core.check.AppAndVersionCheck;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.login.LoginResource;
 
@@ -53,9 +52,10 @@ public class LoginApi {
     @Path("/{username}")
     @Operation(tags = "login", security = { @SecurityRequirement(name = DocumentApiResource.BEARER_AUTH),
             @SecurityRequirement(name = DocumentApiResource.OAUTH2_CLIENT_CREDENTIALS) })
+    @Parameter(in = ParameterIn.HEADER, schema = @Schema(implementation = ApplicationBeanParam.class))
     @RolesAllowed("login:head")
-    public Response check(@PathParam("username") String username,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) ApplicationBeanParam applicationBeanParam) {
+    @AppAndVersionCheck(optionalVersion = true)
+    public Response check(@PathParam("username") String username) {
 
         if (loginResource.get(username).isPresent()) {
 
@@ -78,9 +78,10 @@ public class LoginApi {
             @ApiResponse(description = "Login is not accessible", responseCode = "403")
 
     })
+    @Parameter(in = ParameterIn.HEADER, schema = @Schema(implementation = ApplicationBeanParam.class))
     @RolesAllowed("login:read")
-    public UUID get(@NotNull @PathParam("username") String username,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) ApplicationBeanParam applicationBeanParam) {
+    @AppAndVersionCheck(optionalVersion = true)
+    public UUID get(@NotNull @PathParam("username") String username) {
 
         authorizationCheckService.verifyLogin(username);
 

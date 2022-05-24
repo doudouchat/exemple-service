@@ -24,6 +24,7 @@ import com.exemple.service.api.common.script.SubscriptionServiceSupplier;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
 import com.exemple.service.api.core.authorization.AuthorizationFilter;
 import com.exemple.service.api.core.authorization.impl.AuthorizationCheckServiceSupplier;
+import com.exemple.service.api.core.check.AppAndVersionCheckFeature;
 import com.exemple.service.api.core.filter.ExecutionContextResponseFilter;
 import com.exemple.service.api.core.listener.ApiEventListener;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
@@ -76,6 +77,9 @@ public class FeatureConfiguration extends ResourceConfig {
                         .register(RolesAllowedDynamicFeature.class)
 
                         .register(AuthorizationFilter.class)
+
+                        // check
+                        .register(AppAndVersionCheckFeature.class)
 
                         // logging
 

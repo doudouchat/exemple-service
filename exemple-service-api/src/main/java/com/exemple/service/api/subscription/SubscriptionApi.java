@@ -3,9 +3,7 @@ package com.exemple.service.api.subscription;
 import java.io.IOException;
 
 import javax.annotation.security.RolesAllowed;
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -25,6 +23,7 @@ import com.exemple.service.api.common.json.JsonUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.schema.SchemaFilter;
 import com.exemple.service.api.common.schema.SchemaValidation;
+import com.exemple.service.api.core.check.AppAndVersionCheck;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.subscription.SubscriptionService;
 import com.exemple.service.resource.subscription.SubscriptionField;
@@ -78,9 +77,10 @@ public class SubscriptionApi {
             @ApiResponse(description = "Subscription is not accessible", responseCode = "403")
 
     })
+    @Parameter(in = ParameterIn.HEADER, schema = @Schema(implementation = SchemaBeanParam.class))
     @RolesAllowed("subscription:read")
-    public JsonNode get(@NotNull @PathParam("email") String email,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) {
+    @AppAndVersionCheck
+    public JsonNode get(@NotNull @PathParam("email") String email) {
 
         JsonNode subscription = subscriptionService.get(email).orElseThrow(NotFoundException::new);
 
@@ -103,10 +103,11 @@ public class SubscriptionApi {
                     @Header(name = "Location", description = "Links to Subscription Data", schema = @Schema(type = "string")) })
 
     })
+    @Parameter(in = ParameterIn.HEADER, schema = @Schema(implementation = SchemaBeanParam.class))
     @RolesAllowed("subscription:update")
+    @AppAndVersionCheck
     public Response update(@NotNull @PathParam("email") String email,
-            @NotNull @Parameter(schema = @Schema(ref = SUBSCRIPTION_SCHEMA)) JsonNode subscription,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam, @Context UriInfo uriInfo) throws IOException {
+            @NotNull @Parameter(schema = @Schema(ref = SUBSCRIPTION_SCHEMA)) JsonNode subscription, @Context UriInfo uriInfo) throws IOException {
 
         JsonNode subscriptionClone = subscription.deepCopy();
         ((ObjectNode) subscriptionClone).put(SubscriptionField.EMAIL.field, email);

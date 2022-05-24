@@ -33,19 +33,9 @@
 				"operationId": "create",
 				"parameters": [
 					{
-						"name": "app",
 						"in": "header",
-						"required": true,
 						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "version",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
+							"$ref": "#/components/schemas/SchemaBeanParam"
 						}
 					}
 				],
@@ -98,28 +88,18 @@
 				"operationId": "get",
 				"parameters": [
 					{
+						"in": "header",
+						"schema": {
+							"$ref": "#/components/schemas/SchemaBeanParam"
+						}
+					},
+					{
 						"name": "id",
 						"in": "path",
 						"required": true,
 						"schema": {
 							"type": "string",
 							"format": "uuid"
-						}
-					},
-					{
-						"name": "app",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "version",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
 						}
 					}
 				],
@@ -164,28 +144,18 @@
 				"operationId": "update",
 				"parameters": [
 					{
+						"in": "header",
+						"schema": {
+							"$ref": "#/components/schemas/SchemaBeanParam"
+						}
+					},
+					{
 						"name": "id",
 						"in": "path",
 						"required": true,
 						"schema": {
 							"type": "string",
 							"format": "uuid"
-						}
-					},
-					{
-						"name": "app",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "version",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
 						}
 					}
 				],
@@ -233,28 +203,18 @@
 				"operationId": "update_1",
 				"parameters": [
 					{
+						"in": "header",
+						"schema": {
+							"$ref": "#/components/schemas/SchemaBeanParam"
+						}
+					},
+					{
 						"name": "id",
 						"in": "path",
 						"required": true,
 						"schema": {
 							"type": "string",
 							"format": "uuid"
-						}
-					},
-					{
-						"name": "app",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "version",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
 						}
 					}
 				],
@@ -319,16 +279,14 @@
 				"operationId": "get_1",
 				"parameters": [
 					{
-						"name": "username",
-						"in": "path",
-						"required": true,
+						"in": "header",
 						"schema": {
-							"type": "string"
+							"$ref": "#/components/schemas/ApplicationBeanParam"
 						}
 					},
 					{
-						"name": "app",
-						"in": "header",
+						"name": "username",
+						"in": "path",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -369,16 +327,14 @@
 				"operationId": "check",
 				"parameters": [
 					{
-						"name": "username",
-						"in": "path",
-						"required": true,
+						"in": "header",
 						"schema": {
-							"type": "string"
+							"$ref": "#/components/schemas/ApplicationBeanParam"
 						}
 					},
 					{
-						"name": "app",
-						"in": "header",
+						"name": "username",
+						"in": "path",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -413,6 +369,12 @@
 				"operationId": "get_2",
 				"parameters": [
 					{
+						"in": "header",
+						"schema": {
+							"$ref": "#/components/schemas/ApplicationBeanParam"
+						}
+					},
+					{
 						"name": "store",
 						"in": "path",
 						"required": true,
@@ -423,14 +385,6 @@
 					{
 						"name": "product",
 						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "app",
-						"in": "header",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -465,6 +419,12 @@
 				"operationId": "post",
 				"parameters": [
 					{
+						"in": "header",
+						"schema": {
+							"$ref": "#/components/schemas/ApplicationBeanParam"
+						}
+					},
+					{
 						"name": "store",
 						"in": "path",
 						"required": true,
@@ -475,14 +435,6 @@
 					{
 						"name": "product",
 						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "app",
-						"in": "header",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -530,24 +482,14 @@
 				"operationId": "get_3",
 				"parameters": [
 					{
+						"in": "header",
+						"schema": {
+							"$ref": "#/components/schemas/SchemaBeanParam"
+						}
+					},
+					{
 						"name": "email",
 						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "app",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "version",
-						"in": "header",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -585,24 +527,14 @@
 				"operationId": "update_2",
 				"parameters": [
 					{
+						"in": "header",
+						"schema": {
+							"$ref": "#/components/schemas/SchemaBeanParam"
+						}
+					},
+					{
 						"name": "email",
 						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "app",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "version",
-						"in": "header",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -658,6 +590,21 @@
 	},
 	"components": {
 		"schemas": {
+			"SchemaBeanParam": {
+				"required": [
+					"app",
+					"version"
+				],
+				"type": "object",
+				"properties": {
+					"app": {
+						"type": "string"
+					},
+					"version": {
+						"type": "string"
+					}
+				}
+			},
 			"Patch": {
 				"$ref": "/ws/v1/schemas/patch"
 			},
@@ -668,6 +615,17 @@
 						"type": "string"
 					},
 					"buildTime": {
+						"type": "string"
+					}
+				}
+			},
+			"ApplicationBeanParam": {
+				"required": [
+					"app"
+				],
+				"type": "object",
+				"properties": {
+					"app": {
 						"type": "string"
 					}
 				}

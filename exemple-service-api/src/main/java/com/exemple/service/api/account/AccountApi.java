@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import javax.annotation.security.RolesAllowed;
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -19,9 +17,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Response.Status;
 
 import org.springframework.stereotype.Component;
 
@@ -30,6 +28,7 @@ import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.schema.SchemaFilter;
 import com.exemple.service.api.common.schema.SchemaValidation;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
+import com.exemple.service.api.core.check.AppAndVersionCheck;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.common.validator.NotEmpty;
@@ -87,8 +86,10 @@ public class AccountApi {
             @ApiResponse(description = "Account is not accessible", responseCode = "403")
 
     })
+    @Parameter(in = ParameterIn.HEADER, schema = @Schema(implementation = SchemaBeanParam.class))
     @RolesAllowed("account:read")
-    public JsonNode get(@NotNull @PathParam("id") UUID id, @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) {
+    @AppAndVersionCheck
+    public JsonNode get(@NotNull @PathParam("id") UUID id) {
 
         authorizationCheckService.verifyAccountId(id);
 
@@ -109,9 +110,10 @@ public class AccountApi {
                     @Header(name = "Location", description = "Links to Account Data", schema = @Schema(type = "string")) })
 
     })
+    @Parameter(in = ParameterIn.HEADER, schema = @Schema(implementation = SchemaBeanParam.class))
     @RolesAllowed("account:create")
-    public Response create(@NotNull @Parameter(schema = @Schema(ref = ACCOUNT_SCHEMA)) JsonNode account,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam, @Context UriInfo uriInfo) {
+    @AppAndVersionCheck
+    public Response create(@NotNull @Parameter(schema = @Schema(ref = ACCOUNT_SCHEMA)) JsonNode account, @Context UriInfo uriInfo) {
 
         schemaValidation.validate(account, ACCOUNT_RESOURCE);
 
@@ -135,9 +137,10 @@ public class AccountApi {
             @ApiResponse(description = "Account is not accessible", responseCode = "403")
 
     })
+    @Parameter(in = ParameterIn.HEADER, schema = @Schema(implementation = SchemaBeanParam.class))
     @RolesAllowed("account:update")
-    public Response update(@NotNull @PathParam("id") UUID id, @NotEmpty @Patch @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) {
+    @AppAndVersionCheck
+    public Response update(@NotNull @PathParam("id") UUID id, @NotEmpty @Patch @Parameter(schema = @Schema(name = "Patch")) ArrayNode patch) {
 
         authorizationCheckService.verifyAccountId(id);
 
@@ -165,9 +168,11 @@ public class AccountApi {
             @ApiResponse(description = "Account is not accessible", responseCode = "403")
 
     })
+    @Parameter(in = ParameterIn.HEADER, schema = @Schema(implementation = SchemaBeanParam.class))
     @RolesAllowed("account:update")
-    public Response update(@NotNull @PathParam("id") UUID id, @NotNull @Parameter(schema = @Schema(ref = ACCOUNT_SCHEMA)) JsonNode account,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam) throws IOException {
+    @AppAndVersionCheck
+    public Response update(@NotNull @PathParam("id") UUID id, @NotNull @Parameter(schema = @Schema(ref = ACCOUNT_SCHEMA)) JsonNode account)
+            throws IOException {
 
         authorizationCheckService.verifyAccountId(id);
 
