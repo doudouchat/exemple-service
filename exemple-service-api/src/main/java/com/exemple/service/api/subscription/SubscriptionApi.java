@@ -27,7 +27,9 @@ import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.subscription.SubscriptionService;
 import com.exemple.service.resource.subscription.SubscriptionField;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,6 +49,8 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class SubscriptionApi {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private static final String SUBSCRIPTION_SCHEMA = "Subscription";
 
@@ -104,7 +108,9 @@ public class SubscriptionApi {
 
         JsonNode subscriptionClone = subscription.deepCopy();
         ((ObjectNode) subscriptionClone).put(SubscriptionField.EMAIL.field, email);
-        schemaValidation.validate(subscriptionClone, SUBSCRIPTION_RESOURCE);
+        ObjectNode previousSubscription = MAPPER.createObjectNode();
+        previousSubscription.set("email", TextNode.valueOf(email));
+        schemaValidation.validate(subscriptionClone, previousSubscription, SUBSCRIPTION_RESOURCE);
 
         boolean created = subscriptionService.save(email, subscription);
 

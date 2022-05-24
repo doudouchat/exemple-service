@@ -5,7 +5,7 @@
 		"email": {
 			"type": "string",
 			"format": "email",
-			"writeOnly": true
+			"readOnly": true
 		},
 		"subscription_date": {
 			"type": "string",

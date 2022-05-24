@@ -100,9 +100,10 @@ public class SubscriptionApiTest extends JerseySpringSupport {
         // And check validation
 
         JsonNode sourceToValidate = MAPPER.readTree("{\"email\": \"" + email + "\", \"lastname\": \"dupond\", \"firstname\":\"jean\"}");
+        JsonNode previousSourceToValidate = MAPPER.readTree("{\"email\": \"" + email + "\"}");
 
         Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("subscription"),
-                subscription.capture());
+                subscription.capture(), Mockito.eq(previousSourceToValidate));
         assertThat(subscription.getValue()).isEqualTo(sourceToValidate);
 
     }
