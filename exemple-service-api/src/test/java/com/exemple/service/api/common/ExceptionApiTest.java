@@ -170,4 +170,27 @@ public class ExceptionApiTest extends JerseySpringSupport {
 
     }
 
+    @Test
+    public void getFailureBecauseAppAndVersionAreMissing() throws IOException {
+
+        // Given account id
+        UUID id = UUID.randomUUID();
+
+        // When perform get
+
+        Response response = target(AccountApiTest.URL + "/" + id).request(MediaType.APPLICATION_JSON)
+
+                .get();
+
+        // Then check status
+
+        assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
+
+        // And check body
+
+        assertThat(response.readEntity(JsonNode.class))
+                .isEqualTo(MAPPER.readTree("{\"app\":\"La valeur doit être renseignée.\",\"version\":\"La valeur doit être renseignée.\"}"));
+
+    }
+
 }
