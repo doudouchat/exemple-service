@@ -68,8 +68,14 @@ public class InitData {
         patchUpdateDate.put("path", "/properties/update_date");
         patchUpdateDate.set("value", MAPPER.readTree("{\"type\": \"string\",\"format\": \"date-time\",\"readOnly\": true}"));
 
+        ObjectNode patchCreationDate = MAPPER.createObjectNode();
+        patchCreationDate.put("op", "add");
+        patchCreationDate.put("path", "/required/0");
+        patchCreationDate.put("value", "creation_date");
+
         Set<JsonNode> accountPatchs = new HashSet<>();
         accountPatchs.add(patchUpdateDate);
+        accountPatchs.add(patchCreationDate);
 
         accountSchema.setPatchs(accountPatchs);
 
