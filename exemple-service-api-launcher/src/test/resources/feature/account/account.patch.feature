@@ -224,6 +224,24 @@ Feature: api patch account
       }
       """
 
+  Scenario: patch account fails because creation_date is required
+    When patch account
+      """
+      [
+         {
+           "op": "remove",
+           "path": "/creation_date"
+         }
+      ]
+      """
+    Then account error only contains
+      """
+      {
+          "path": "/creation_date",
+          "code": "required"
+      }
+      """
+
   Scenario: patch account fails because a property is unknown
     When patch account
       """
