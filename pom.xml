@@ -89,14 +89,6 @@
 				<version>3.0.1-b12</version>
 			</dependency>
 
-			<!-- HAZELCAST -->
-
-			<dependency>
-				<groupId>com.hazelcast</groupId>
-				<artifactId>hazelcast-all</artifactId>
-				<version>${hazelcast.version}</version>
-			</dependency>
-
 			<!-- CURATOR -->
 			<!-- https://curator.apache.org -->
 
