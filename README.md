@@ -12,6 +12,6 @@
 
 ## Docker
 
-<ol>
-<li>docker build -t exemple-service .</li>
-</ol>
+<p>build image <code>docker build -t exemple-service --build-arg VERSION_TOMCAT=@Tag .</code></p>
+
+<p>exemple build image <code>docker build -t exemple-service --build-arg VERSION_TOMCAT=9.0.60-jdk8-openjdk .</code>
