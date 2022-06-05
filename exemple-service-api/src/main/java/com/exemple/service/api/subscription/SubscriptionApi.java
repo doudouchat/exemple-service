@@ -1,5 +1,7 @@
 package com.exemple.service.api.subscription;
 
+import java.io.IOException;
+
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -15,11 +17,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.springframework.stereotype.Component;
 
+import com.exemple.service.api.common.json.JsonUtils;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.schema.SchemaFilter;
 import com.exemple.service.api.common.schema.SchemaValidation;
@@ -104,19 +106,27 @@ public class SubscriptionApi {
     @RolesAllowed("subscription:update")
     public Response update(@NotNull @PathParam("email") String email,
             @NotNull @Parameter(schema = @Schema(ref = SUBSCRIPTION_SCHEMA)) JsonNode subscription,
-            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam, @Context UriInfo uriInfo) {
+            @Valid @BeanParam @Parameter(in = ParameterIn.HEADER) SchemaBeanParam schemaBeanParam, @Context UriInfo uriInfo) throws IOException {
 
         JsonNode subscriptionClone = subscription.deepCopy();
         ((ObjectNode) subscriptionClone).put(SubscriptionField.EMAIL.field, email);
-        ObjectNode previousSubscription = MAPPER.createObjectNode();
-        previousSubscription.set("email", TextNode.valueOf(email));
-        schemaValidation.validate(subscriptionClone, previousSubscription, SUBSCRIPTION_RESOURCE);
 
-        boolean created = subscriptionService.save(email, subscription);
+        ObjectNode previousSubscription = (ObjectNode) subscriptionService.get(email).orElse(null);
 
-        UriBuilder builder = uriInfo.getAbsolutePathBuilder();
-        builder.path(email);
-        return Response.status(created ? Status.CREATED : Status.NO_CONTENT).location(builder.build()).build();
+        if (previousSubscription == null) {
+            previousSubscription = MAPPER.createObjectNode();
+            previousSubscription.set("email", TextNode.valueOf(email));
+            schemaValidation.validate(subscriptionClone, previousSubscription, SUBSCRIPTION_RESOURCE);
+            subscriptionService.save(email, subscription);
+            return Response.status(Status.CREATED).build();
+        } else {
+            schemaValidation.validate(subscriptionClone, previousSubscription, SUBSCRIPTION_RESOURCE);
+            JsonNode subscriptionFinal = JsonUtils.merge(subscription,
+                    schemaFilter.filterAllAdditionalProperties(previousSubscription, SUBSCRIPTION_RESOURCE));
+            subscriptionService.save(email, subscriptionFinal, previousSubscription);
+            return Response.status(Status.NO_CONTENT).build();
+
+        }
 
     }
 

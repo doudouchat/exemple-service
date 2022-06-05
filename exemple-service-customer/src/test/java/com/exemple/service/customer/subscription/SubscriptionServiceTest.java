@@ -4,15 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,39 +51,20 @@ public class SubscriptionServiceTest {
         context.setApp("default");
     }
 
-    private static Stream<Arguments> save() throws IOException {
-
-        JsonNode source = MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\"}");
-
-        return Stream.of(
-                Arguments.of(Optional.empty(), true),
-                Arguments.of(Optional.of(source), false));
-    }
-
-    @DisplayName("save subscription")
-    @ParameterizedTest
-    @MethodSource
-    public void save(Optional<JsonNode> subscription, boolean expectedCreated) {
+    @Test
+    public void save() {
 
         // Given email
 
         String email = "jean@gmail.com";
 
-        // And mock resource
-
-        Mockito.when(resource.get(email)).thenReturn(subscription);
-
         // When perform save
 
         JsonNode source = MAPPER.createObjectNode();
 
-        boolean created = service.save(email, source);
+        service.save(email, source);
 
-        // Then check subscription
-
-        assertThat(created).isEqualTo(expectedCreated);
-
-        // And check save resource
+        // Then check save resource
 
         JsonNode expectedSubscription = ((ObjectNode) source).put("subscription_date", ServiceContextExecution.context().getDate().toString());
 
@@ -100,6 +77,37 @@ public class SubscriptionServiceTest {
 
         ArgumentCaptor<JsonNode> eventCaptor = ArgumentCaptor.forClass(JsonNode.class);
         Mockito.verify(publisher).publish(eventCaptor.capture(), Mockito.eq("subscription"), Mockito.eq(EventType.CREATE));
+        assertThat(eventCaptor.getValue()).isEqualTo(expectedSubscription);
+
+    }
+
+    @Test
+    public void update() throws IOException {
+
+        // Given email
+
+        String email = "jean@gmail.com";
+
+        // When perform save
+
+        JsonNode source = MAPPER.createObjectNode();
+        JsonNode previousSource = MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\"}");
+
+        service.save(email, source, previousSource);
+
+        // Then check save resource
+
+        JsonNode expectedSubscription = ((ObjectNode) source).put("subscription_date", ServiceContextExecution.context().getDate().toString());
+
+        ArgumentCaptor<JsonNode> subscriptionCaptor = ArgumentCaptor.forClass(JsonNode.class);
+
+        Mockito.verify(resource).save(subscriptionCaptor.capture());
+        assertThat(subscriptionCaptor.getValue()).isEqualTo(expectedSubscription);
+
+        // And check publish resource
+
+        ArgumentCaptor<JsonNode> eventCaptor = ArgumentCaptor.forClass(JsonNode.class);
+        Mockito.verify(publisher).publish(eventCaptor.capture(), Mockito.eq("subscription"), Mockito.eq(EventType.UPDATE));
         assertThat(eventCaptor.getValue()).isEqualTo(expectedSubscription);
 
     }

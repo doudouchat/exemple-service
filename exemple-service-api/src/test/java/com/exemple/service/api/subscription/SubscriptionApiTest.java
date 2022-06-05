@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
@@ -14,9 +13,6 @@ import javax.ws.rs.core.Response.Status;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,26 +52,15 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
     public static final String URL = "/v1/subscriptions";
 
-    private static Stream<Arguments> update() {
-
-        return Stream.of(
-                // created
-                Arguments.of(true, Status.CREATED),
-                // updated
-                Arguments.of(false, Status.NO_CONTENT));
-    }
-
-    @ParameterizedTest
-    @MethodSource
-    public void update(boolean created, Status expectedStatus) throws IOException {
+    @Test
+    public void save() throws IOException {
 
         // Given email
 
         String email = "jean.dupond@gmail.com";
 
         // And mock service
-
-        Mockito.when(service.save(Mockito.eq(email), Mockito.any(JsonNode.class))).thenReturn(created);
+        Mockito.when(service.get(Mockito.eq(email))).thenReturn(Optional.empty());
 
         // When perform put
 
@@ -89,11 +74,12 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
         // Then check status
 
-        assertThat(response.getStatus()).isEqualTo(expectedStatus.getStatusCode());
+        assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
 
         // And check service
 
         ArgumentCaptor<JsonNode> subscription = ArgumentCaptor.forClass(JsonNode.class);
+
         Mockito.verify(service).save(Mockito.eq(email), subscription.capture());
         assertThat(subscription.getValue()).isEqualTo(source);
 
@@ -104,6 +90,48 @@ public class SubscriptionApiTest extends JerseySpringSupport {
 
         Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("subscription"),
                 subscription.capture(), Mockito.eq(previousSourceToValidate));
+        assertThat(subscription.getValue()).isEqualTo(sourceToValidate);
+
+    }
+
+    @Test
+    public void update() throws IOException {
+
+        // Given email
+
+        String email = "jean.dupond@gmail.com";
+
+        // And mock service
+        JsonNode previousSource = MAPPER.readTree("{\"email\": \"" + email + "\"}");
+        Mockito.when(service.get(Mockito.eq(email))).thenReturn(Optional.of(previousSource));
+
+        // When perform put
+
+        JsonNode source = MAPPER.readTree("{\"lastname\": \"dupond\", \"firstname\":\"jean\"}");
+
+        Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
+
+                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
+
+                .put(Entity.json(source));
+
+        // Then check status
+
+        assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
+
+        // And check service
+
+        ArgumentCaptor<JsonNode> subscription = ArgumentCaptor.forClass(JsonNode.class);
+
+        Mockito.verify(service).save(Mockito.eq(email), subscription.capture(), Mockito.eq(previousSource));
+        assertThat(subscription.getValue()).isEqualTo(source);
+
+        // And check validation
+
+        JsonNode sourceToValidate = MAPPER.readTree("{\"email\": \"" + email + "\", \"lastname\": \"dupond\", \"firstname\":\"jean\"}");
+
+        Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("subscription"),
+                subscription.capture(), Mockito.eq(previousSource));
         assertThat(subscription.getValue()).isEqualTo(sourceToValidate);
 
     }
