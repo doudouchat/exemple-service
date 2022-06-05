@@ -73,6 +73,22 @@ public class SubscriptionResourceImpl implements SubscriptionResource {
     }
 
     @Override
+    public void save(JsonNode subscription, JsonNode previousSubscription) {
+
+        Assert.isTrue(subscription.path(SubscriptionField.EMAIL.field).isTextual(), SubscriptionField.EMAIL.field + " is required");
+
+        Insert createSubscription = jsonQueryBuilder.insert(subscription);
+
+        BatchStatementBuilder batch = new BatchStatementBuilder(BatchType.LOGGED);
+        batch.addStatement(createSubscription.build());
+        subscriptionHistoryResource.saveHistories(subscription, previousSubscription).forEach(batch::addStatements);
+        batch.addStatement(subscriptionEventResource.saveEvent(subscription, EventType.UPDATE));
+
+        session.execute(batch.build());
+
+    }
+
+    @Override
     public void delete(String email) {
 
         Delete deleteSubscription = QueryBuilder.deleteFrom(ResourceExecutionContext.get().keyspace(), SUBSCRIPTION_TABLE)
