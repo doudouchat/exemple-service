@@ -41,7 +41,8 @@ CREATE TABLE test.login (
 );
 
 CREATE TABLE test.subscription (
-	email text PRIMARY KEY
+	email text PRIMARY KEY,
+    update_date timestamp
 );
 
 CREATE TABLE test.account_history ( 

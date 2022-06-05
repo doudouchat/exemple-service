@@ -35,7 +35,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         ((ObjectNode) subscription).set('email', new TextNode(email))
         ((ObjectNode) subscription).set('subscription_date', new TextNode(ServiceContextExecution.context().date.toString()))
 
-        subscriptionResource.save(subscription)
+        subscriptionResource.save(subscription, previousSubscription)
 
         resourceEventPublisher.publish(subscription, SUBSCRIPTION, EventType.UPDATE)
     }

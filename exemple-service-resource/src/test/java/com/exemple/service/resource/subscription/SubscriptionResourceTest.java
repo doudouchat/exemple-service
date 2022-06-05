@@ -69,15 +69,15 @@ public class SubscriptionResourceTest {
     @Order(0)
     public void save() throws IOException {
 
-        // Given build account
-        JsonNode subscription = MAPPER.readTree("{\"email\": \"" + email + "\"}");
+        // Given build subscription
+        JsonNode subscription = MAPPER.readTree("{\"email\": \"" + email + "\", \"update_date\": \"2019-01-01T09:00:00Z\"}");
 
         // When perform save
         resource.save(subscription);
 
         // Then check subscription
         Optional<JsonNode> result = resource.get(email);
-        assertThat(result).hasValue(MAPPER.readTree("{\"email\": \"" + email + "\"}"));
+        assertThat(result).hasValue(MAPPER.readTree("{\"email\": \"" + email + "\", \"update_date\": \"2019-01-01 09:00:00.000Z\"}"));
 
         // And check event
         OffsetDateTime createDate = ServiceContextExecution.context().getDate();
@@ -85,7 +85,8 @@ public class SubscriptionResourceTest {
         assertAll(
                 () -> assertThat(event.getEventType()).isEqualTo(EventType.CREATE),
                 () -> assertThat(event.getLocalDate()).isEqualTo(createDate.toLocalDate()),
-                () -> assertThat(event.getData().get("email").textValue()).isEqualTo(email));
+                () -> assertThat(event.getData().get("email").textValue()).isEqualTo(email),
+                () -> assertThat(event.getData().get("update_date").textValue()).isEqualTo("2019-01-01T09:00:00Z"));
 
         ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("local_date")
                 .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
@@ -94,13 +95,53 @@ public class SubscriptionResourceTest {
         // and check history
         List<SubscriptionHistory> histories = subscriptionHistoryResource.findById(email);
         assertAll(
-                () -> assertThat(histories).hasSize(1),
-                () -> assertHistory(subscriptionHistoryResource.findByIdAndField(email, "/email"), email, createDate.toInstant()));
+                () -> assertThat(histories).hasSize(2),
+                () -> assertHistory(subscriptionHistoryResource.findByIdAndField(email, "/email"), email, createDate.toInstant()),
+                () -> assertHistory(subscriptionHistoryResource.findByIdAndField(email, "/update_date"), "2019-01-01T09:00:00Z",
+                        createDate.toInstant()));
 
     }
 
     @Test
     @Order(1)
+    public void update() throws IOException {
+
+        // Given build subscription
+        JsonNode subscription = MAPPER.readTree("{\"email\": \"" + email + "\", \"update_date\": \"2019-01-01T10:00:00Z\"}");
+        JsonNode previouSubscription = resource.get(email).get();
+
+        // When perform save
+        resource.save(subscription, previouSubscription);
+
+        // Then check subscription
+        Optional<JsonNode> result = resource.get(email);
+        assertThat(result).hasValue(MAPPER.readTree("{\"email\": \"" + email + "\", \"update_date\": \"2019-01-01 10:00:00.000Z\"}"));
+
+        // And check event
+        OffsetDateTime createDate = ServiceContextExecution.context().getDate();
+        SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
+        assertAll(
+                () -> assertThat(event.getEventType()).isEqualTo(EventType.UPDATE),
+                () -> assertThat(event.getLocalDate()).isEqualTo(createDate.toLocalDate()),
+                () -> assertThat(event.getData().get("email").textValue()).isEqualTo(email),
+                () -> assertThat(event.getData().get("update_date").textValue()).isEqualTo("2019-01-01T10:00:00Z"));
+
+        ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("local_date")
+                .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
+        assertThat(countAccountEvents.all()).hasSize(2);
+
+        // and check history
+        List<SubscriptionHistory> histories = subscriptionHistoryResource.findById(email);
+        assertAll(
+                () -> assertThat(histories).hasSize(2),
+                () -> assertHistory(subscriptionHistoryResource.findByIdAndField(email, "/email"), email),
+                () -> assertHistory(subscriptionHistoryResource.findByIdAndField(email, "/update_date"), "2019-01-01T10:00:00Z",
+                        createDate.toInstant()));
+
+    }
+
+    @Test
+    @Order(2)
     public void delete() {
 
         // When perform delete
@@ -117,7 +158,7 @@ public class SubscriptionResourceTest {
 
         ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("local_date")
                 .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-        assertThat(countAccountEvents.all()).hasSize(2);
+        assertThat(countAccountEvents.all()).hasSize(3);
 
     }
 
@@ -126,6 +167,14 @@ public class SubscriptionResourceTest {
         assertAll(
                 () -> assertThat(subscriptionHistory.getValue().asText()).isEqualTo(expectedValue.toString()),
                 () -> assertThat(subscriptionHistory.getDate()).isEqualTo(expectedDate),
+                () -> assertHistory(subscriptionHistory));
+
+    }
+
+    private static void assertHistory(SubscriptionHistory subscriptionHistory, Object expectedValue) {
+
+        assertAll(
+                () -> assertThat(subscriptionHistory.getValue().asText()).isEqualTo(expectedValue.toString()),
                 () -> assertHistory(subscriptionHistory));
 
     }
