@@ -78,6 +78,18 @@ CREATE TABLE test.subscription_event (
 	PRIMARY KEY ((email), date)
 );
 
+CREATE TABLE test.subscription_history ( 
+	email text,
+	field text,
+	date timestamp,
+	value text,
+	application text,
+	version text,
+	user text,
+	previous_value text,
+	PRIMARY KEY ((email), field)
+);
+
 CREATE TABLE test.resource_schema ( 
 	app text,
 	version text,

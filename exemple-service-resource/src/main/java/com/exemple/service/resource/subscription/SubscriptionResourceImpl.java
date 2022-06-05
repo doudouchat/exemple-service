@@ -19,6 +19,7 @@ import com.exemple.service.resource.common.JsonQueryBuilder;
 import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.subscription.event.SubscriptionEventResource;
+import com.exemple.service.resource.subscription.history.SubscriptionHistoryResource;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Service("subscriptionResource")
@@ -31,11 +32,15 @@ public class SubscriptionResourceImpl implements SubscriptionResource {
 
     private final JsonQueryBuilder jsonQueryBuilder;
 
+    private final SubscriptionHistoryResource subscriptionHistoryResource;
+
     private final SubscriptionEventResource subscriptionEventResource;
 
-    public SubscriptionResourceImpl(CqlSession session, SubscriptionEventResource subscriptionEventResource) {
+    public SubscriptionResourceImpl(CqlSession session, SubscriptionHistoryResource subscriptionHistoryResource,
+            SubscriptionEventResource subscriptionEventResource) {
 
         this.session = session;
+        this.subscriptionHistoryResource = subscriptionHistoryResource;
         this.subscriptionEventResource = subscriptionEventResource;
         this.jsonQueryBuilder = new JsonQueryBuilder(session, SUBSCRIPTION_TABLE);
     }
@@ -60,6 +65,7 @@ public class SubscriptionResourceImpl implements SubscriptionResource {
 
         BatchStatementBuilder batch = new BatchStatementBuilder(BatchType.LOGGED);
         batch.addStatement(createSubscription.build());
+        subscriptionHistoryResource.saveHistories(subscription).forEach(batch::addStatements);
         batch.addStatement(subscriptionEventResource.saveEvent(subscription, EventType.CREATE));
 
         session.execute(batch.build());
