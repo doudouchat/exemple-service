@@ -101,7 +101,7 @@ public class SubscriptionServiceTest {
 
         ArgumentCaptor<JsonNode> subscriptionCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
-        Mockito.verify(resource).save(subscriptionCaptor.capture());
+        Mockito.verify(resource).save(subscriptionCaptor.capture(), Mockito.eq(previousSource));
         assertThat(subscriptionCaptor.getValue()).isEqualTo(expectedSubscription);
 
         // And check publish resource
