@@ -19,9 +19,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     ResourceEventPublisher resourceEventPublisher
 
     @Override
-    boolean save(String email, JsonNode subscription) {
-
-        boolean created = !subscriptionResource.get(email).isPresent()
+    void save(String email, JsonNode subscription) {
 
         ((ObjectNode) subscription).set('email', new TextNode(email))
         ((ObjectNode) subscription).set('subscription_date', new TextNode(ServiceContextExecution.context().date.toString()))
@@ -29,8 +27,17 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         subscriptionResource.save(subscription)
 
         resourceEventPublisher.publish(subscription, SUBSCRIPTION, EventType.CREATE)
+    }
 
-        created
+    @Override
+    void save(String email, JsonNode subscription, JsonNode previousSubscription) {
+
+        ((ObjectNode) subscription).set('email', new TextNode(email))
+        ((ObjectNode) subscription).set('subscription_date', new TextNode(ServiceContextExecution.context().date.toString()))
+
+        subscriptionResource.save(subscription)
+
+        resourceEventPublisher.publish(subscription, SUBSCRIPTION, EventType.UPDATE)
     }
 
     @Override
