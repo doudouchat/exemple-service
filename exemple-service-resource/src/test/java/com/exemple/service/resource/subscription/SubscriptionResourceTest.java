@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,7 +27,9 @@ import com.exemple.service.customer.subscription.SubscriptionResource;
 import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.exemple.service.resource.subscription.event.SubscriptionEventResource;
+import com.exemple.service.resource.subscription.history.SubscriptionHistoryResource;
 import com.exemple.service.resource.subscription.model.SubscriptionEvent;
+import com.exemple.service.resource.subscription.model.SubscriptionHistory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -41,6 +45,9 @@ public class SubscriptionResourceTest {
 
     @Autowired
     private SubscriptionEventResource subscriptionEventResource;
+
+    @Autowired
+    private SubscriptionHistoryResource subscriptionHistoryResource;
 
     @Autowired
     private CqlSession session;
@@ -73,15 +80,22 @@ public class SubscriptionResourceTest {
         assertThat(result).hasValue(MAPPER.readTree("{\"email\": \"" + email + "\"}"));
 
         // And check event
+        OffsetDateTime createDate = ServiceContextExecution.context().getDate();
         SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
         assertAll(
                 () -> assertThat(event.getEventType()).isEqualTo(EventType.CREATE),
-                () -> assertThat(event.getLocalDate()).isEqualTo(ServiceContextExecution.context().getDate().toLocalDate()),
+                () -> assertThat(event.getLocalDate()).isEqualTo(createDate.toLocalDate()),
                 () -> assertThat(event.getData().get("email").textValue()).isEqualTo(email));
 
         ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("local_date")
                 .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
         assertThat(countAccountEvents.all()).hasSize(1);
+
+        // and check history
+        List<SubscriptionHistory> histories = subscriptionHistoryResource.findById(email);
+        assertAll(
+                () -> assertThat(histories).hasSize(1),
+                () -> assertHistory(subscriptionHistoryResource.findByIdAndField(email, "/email"), email, createDate.toInstant()));
 
     }
 
@@ -104,6 +118,24 @@ public class SubscriptionResourceTest {
         ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("local_date")
                 .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
         assertThat(countAccountEvents.all()).hasSize(2);
+
+    }
+
+    private static void assertHistory(SubscriptionHistory subscriptionHistory, Object expectedValue, Instant expectedDate) {
+
+        assertAll(
+                () -> assertThat(subscriptionHistory.getValue().asText()).isEqualTo(expectedValue.toString()),
+                () -> assertThat(subscriptionHistory.getDate()).isEqualTo(expectedDate),
+                () -> assertHistory(subscriptionHistory));
+
+    }
+
+    private static void assertHistory(SubscriptionHistory subscriptionHistory) {
+
+        assertAll(
+                () -> assertThat(subscriptionHistory.getApplication()).isEqualTo("test"),
+                () -> assertThat(subscriptionHistory.getVersion()).isEqualTo("v1"),
+                () -> assertThat(subscriptionHistory.getUser()).isEqualTo("user"));
 
     }
 
