@@ -117,8 +117,8 @@
 			<!-- JSON SCHEMA -->
 
 			<dependency>
-				<groupId>com.github.everit-org.json-schema</groupId>
-				<artifactId>org.everit.json.schema</artifactId>
+				<groupId>com.github.erosb</groupId>
+				<artifactId>everit-json-schema</artifactId>
 				<version>1.14.1</version>
 			</dependency>
 
@@ -258,13 +258,6 @@
 		</dependency>
 
 	</dependencies>
-
-	<repositories>
-		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
-		</repository>
-	</repositories>
 
 	<build>
 		<pluginManagement>
