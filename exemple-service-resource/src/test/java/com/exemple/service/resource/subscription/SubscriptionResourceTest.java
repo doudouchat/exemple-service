@@ -6,10 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -166,7 +168,7 @@ public class SubscriptionResourceTest {
 
         assertAll(
                 () -> assertThat(subscriptionHistory.getValue().asText()).isEqualTo(expectedValue.toString()),
-                () -> assertThat(subscriptionHistory.getDate()).isEqualTo(expectedDate),
+                () -> assertThat(subscriptionHistory.getDate()).isCloseTo(expectedDate, Assertions.within(1, ChronoUnit.MILLIS)),
                 () -> assertHistory(subscriptionHistory));
 
     }

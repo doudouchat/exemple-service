@@ -6,12 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -458,7 +460,7 @@ public class AccountResourceTest {
 
         assertAll(
                 () -> assertThat(accountHistory.getValue().getNodeType()).isEqualTo(expectedJsonNodeType),
-                () -> assertThat(accountHistory.getDate()).isEqualTo(expectedDate),
+                () -> assertThat(accountHistory.getDate()).isCloseTo(expectedDate, Assertions.within(1, ChronoUnit.MILLIS)),
                 () -> assertHistory(accountHistory));
 
     }
@@ -467,7 +469,7 @@ public class AccountResourceTest {
 
         assertAll(
                 () -> assertThat(accountHistory.getValue().asText()).isEqualTo(expectedValue.toString()),
-                () -> assertThat(accountHistory.getDate()).isEqualTo(expectedDate),
+                () -> assertThat(accountHistory.getDate()).isCloseTo(expectedDate, Assertions.within(1, ChronoUnit.MILLIS)),
                 () -> assertHistory(accountHistory));
 
     }
