@@ -139,6 +139,14 @@
 			<artifactId>zjsonpatch</artifactId>
 		</dependency>
 
+		<!-- JAVAX ANNOTATION -->
+
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- TEST -->
 
 		<dependency>

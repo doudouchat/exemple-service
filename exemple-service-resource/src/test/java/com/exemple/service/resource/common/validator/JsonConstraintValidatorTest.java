@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
@@ -39,6 +41,7 @@ public class JsonConstraintValidatorTest {
 
         // Given build account
         UUID id = UUID.randomUUID();
+        Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
         JsonNode account = MAPPER.readTree("{"
                 + "  \"id\" : \"" + id + "\","
                 + "  \"email\" : \"jean.dupont@gmail.com\","
@@ -54,7 +57,8 @@ public class JsonConstraintValidatorTest {
                 + "    }"
                 + "  },"
                 + "  \"profils\" : [ \"profil 1\" ],"
-                + "  \"preferences\" : [ [ \"pref1\", \"value1\", 10, \"2001-01-01 00:00:00.000Z\" ] ]"
+                + "  \"preferences\" : [ [ \"pref1\", \"value1\", 10, \"2001-01-01 00:00:00.000Z\" ] ],"
+                + "  \"creation_date\": \"" + now.toString() + "\""
                 + "}");
 
         // When perform save
@@ -67,7 +71,8 @@ public class JsonConstraintValidatorTest {
                 () -> assertThat(result.get("address")).isNotNull(),
                 () -> assertThat(result.get("addresses")).isNotNull(),
                 () -> assertThat(result.get("profils")).isNotNull(),
-                () -> assertThat(result.get("preferences")).isNotNull());
+                () -> assertThat(result.get("preferences")).isNotNull(),
+                () -> assertThat(result.get("creation_date")).isNotNull());
 
     }
 

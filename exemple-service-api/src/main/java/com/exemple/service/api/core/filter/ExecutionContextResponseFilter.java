@@ -1,6 +1,7 @@
 package com.exemple.service.api.core.filter;
 
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -20,7 +21,7 @@ public class ExecutionContextResponseFilter implements ContainerRequestFilter, C
     @Override
     public void filter(ContainerRequestContext requestContext) {
 
-        ServiceContextExecution.context().setDate(OffsetDateTime.now());
+        ServiceContextExecution.context().setDate(OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS));
         ServiceContextExecution.context().setApp(requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER));
         ServiceContextExecution.context().setVersion(requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER));
 
