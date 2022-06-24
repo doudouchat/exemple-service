@@ -9,8 +9,6 @@ import org.apache.curator.framework.recipes.nodes.PersistentNode;
 import org.apache.curator.framework.recipes.nodes.PersistentTtlNode;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -19,12 +17,12 @@ import com.google.common.primitives.Longs;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class StockDistribution {
-
-    private static final Logger LOG = LoggerFactory.getLogger(StockDistribution.class);
 
     @Value("${store.zookeeper.ttlMs.product:30000}")
     private final long productTtlMs;

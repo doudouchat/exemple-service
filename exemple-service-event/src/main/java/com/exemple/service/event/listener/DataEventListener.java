@@ -3,8 +3,6 @@ package com.exemple.service.event.listener;
 import java.time.OffsetDateTime;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -18,9 +16,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class DataEventListener {
 
     public static final String X_ORIGIN = "X_Origin";
@@ -30,8 +30,6 @@ public class DataEventListener {
     public static final String X_RESOURCE = "X_Resource";
 
     public static final String X_EVENT_TYPE = "X_Event_Type";
-
-    private static final Logger LOG = LoggerFactory.getLogger(DataEventListener.class);
 
     @Value("${event.timeout:3000}")
     private final Long timeout;

@@ -12,8 +12,6 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
@@ -27,10 +25,11 @@ import org.springframework.kafka.test.utils.KafkaTestUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class KafkaTestEvent {
+import lombok.extern.slf4j.Slf4j;
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataEventListener.class);
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Slf4j
+public class KafkaTestEvent {
 
     @Autowired
     private EmbeddedKafkaBroker embeddedKafka;

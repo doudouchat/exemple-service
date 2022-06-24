@@ -5,8 +5,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
@@ -27,11 +25,12 @@ import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service("accountResource")
 @Validated
+@Slf4j
 public class AccountResourceImpl implements AccountResource {
-
-    private static final Logger LOG = LoggerFactory.getLogger(AccountResourceImpl.class);
 
     public static final String ACCOUNT_TABLE = "account";
 

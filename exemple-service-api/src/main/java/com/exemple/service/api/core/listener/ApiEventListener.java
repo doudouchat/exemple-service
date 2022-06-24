@@ -9,16 +9,15 @@ import org.glassfish.jersey.server.monitoring.ApplicationEvent;
 import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
 import org.glassfish.jersey.server.monitoring.RequestEventListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
-@Provider
-public class ApiEventListener implements ApplicationEventListener {
+import lombok.extern.slf4j.Slf4j;
 
-    private static final Logger LOG = LoggerFactory.getLogger(ApiEventListener.class);
+@Provider
+@Slf4j
+public class ApiEventListener implements ApplicationEventListener {
 
     @Autowired
     private ApplicationContext context;

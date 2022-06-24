@@ -2,8 +2,6 @@ package com.exemple.service.api.launcher.embedded;
 
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -13,14 +11,14 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker;
 
 import kafka.server.KafkaConfig;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @ConditionalOnProperty(value = { "port", "dir", "defaultTopic" }, prefix = "kafka.embedded")
 @ConditionalOnClass(EmbeddedKafkaBroker.class)
 @RequiredArgsConstructor
+@Slf4j
 public class EmbeddedKafkaAutoConfiguration {
-
-    private static final Logger LOG = LoggerFactory.getLogger(EmbeddedKafkaAutoConfiguration.class);
 
     @Value("${kafka.embedded.port:0}")
     private final int kafkaPort;

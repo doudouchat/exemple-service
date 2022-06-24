@@ -8,9 +8,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
@@ -21,9 +18,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.common.collect.Streams;
 
-public class HistoryResource<T, E extends HistoryModel<T>> {
+import lombok.extern.slf4j.Slf4j;
 
-    private static final Logger LOG = LoggerFactory.getLogger(HistoryResource.class);
+@Slf4j
+public class HistoryResource<T, E extends HistoryModel<T>> {
 
     private static final JsonNode DEFAULT_HISTORY_VALUE = new ObjectMapper().nullNode();
 

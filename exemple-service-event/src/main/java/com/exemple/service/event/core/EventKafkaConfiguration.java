@@ -7,8 +7,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -20,13 +18,13 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @ComponentScan(basePackages = "com.exemple.service.event.listener")
 @RequiredArgsConstructor
+@Slf4j
 public class EventKafkaConfiguration {
-
-    private static final Logger LOG = LoggerFactory.getLogger(EventKafkaConfiguration.class);
 
     @Value("${event.kafka.bootstrap-servers}")
     private final String bootstrapServers;

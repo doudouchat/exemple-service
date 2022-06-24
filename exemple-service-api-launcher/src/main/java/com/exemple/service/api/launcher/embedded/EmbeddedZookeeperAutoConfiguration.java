@@ -1,8 +1,6 @@
 package com.exemple.service.api.launcher.embedded;
 
 import org.apache.curator.test.TestingServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -10,14 +8,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @ConditionalOnProperty(value = "port", prefix = "zookeeper.embedded")
 @ConditionalOnClass(TestingServer.class)
 @RequiredArgsConstructor
+@Slf4j
 public class EmbeddedZookeeperAutoConfiguration {
-
-    private static final Logger LOG = LoggerFactory.getLogger(EmbeddedZookeeperAutoConfiguration.class);
 
     @Value("${zookeeper.embedded.port:-1}")
     private final int port;

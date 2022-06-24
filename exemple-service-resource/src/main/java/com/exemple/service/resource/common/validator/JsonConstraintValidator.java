@@ -3,20 +3,17 @@ package com.exemple.service.resource.common.validator;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.exemple.service.customer.common.validator.Json;
 import com.exemple.service.resource.common.JsonValidatorException;
 import com.exemple.service.resource.common.validator.json.JsonValidator;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
+@Slf4j
 public class JsonConstraintValidator implements ConstraintValidator<Json, JsonNode> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(JsonConstraintValidator.class);
 
     private String table;
 

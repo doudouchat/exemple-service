@@ -11,8 +11,6 @@ import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
@@ -25,12 +23,12 @@ import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @EnableScheduling
+@Slf4j
 public class CustomerScriptFactory {
-
-    private static final Logger LOG = LoggerFactory.getLogger(CustomerScriptFactory.class);
 
     private final ApplicationDetailService applicationDetailService;
 

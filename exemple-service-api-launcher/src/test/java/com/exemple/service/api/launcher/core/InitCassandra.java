@@ -5,8 +5,6 @@ import java.util.Arrays;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -16,10 +14,11 @@ import com.github.nosan.embedded.cassandra.commons.Resource;
 import com.github.nosan.embedded.cassandra.cql.CqlScript;
 import com.github.nosan.embedded.cassandra.cql.ResourceCqlScript;
 
-@Component
-public class InitCassandra {
+import lombok.extern.slf4j.Slf4j;
 
-    private static final Logger LOG = LoggerFactory.getLogger(InitCassandra.class);
+@Component
+@Slf4j
+public class InitCassandra {
 
     private final Resource[] scripts;
 

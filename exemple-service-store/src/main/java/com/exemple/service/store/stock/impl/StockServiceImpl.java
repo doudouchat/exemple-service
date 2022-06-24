@@ -2,8 +2,6 @@ package com.exemple.service.store.stock.impl;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -13,13 +11,13 @@ import com.exemple.service.store.stock.StockService;
 import com.exemple.service.store.stock.distribution.StockDistribution;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Validated
 @RequiredArgsConstructor
+@Slf4j
 public class StockServiceImpl implements StockService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(StockServiceImpl.class);
 
     private final StockDistribution distribution;
 

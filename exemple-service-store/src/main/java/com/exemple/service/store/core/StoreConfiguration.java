@@ -3,8 +3,6 @@ package com.exemple.service.store.core;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -12,14 +10,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableAspectJAutoProxy
 @ComponentScan(basePackages = "com.exemple.service.store")
 @RequiredArgsConstructor
+@Slf4j
 public class StoreConfiguration {
-
-    private static final Logger LOG = LoggerFactory.getLogger(StoreConfiguration.class);
 
     @Value("${store.zookeeper.host}")
     private final String address;
