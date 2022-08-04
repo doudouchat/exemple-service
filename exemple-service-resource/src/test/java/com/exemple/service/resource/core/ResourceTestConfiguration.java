@@ -1,14 +1,20 @@
 package com.exemple.service.resource.core;
 
 import java.io.FileNotFoundException;
-import java.time.Duration;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.validation.Validator;
 
+import org.apache.commons.io.FileUtils;
 import org.mockito.Mockito;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
@@ -17,52 +23,43 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.ResourceUtils;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
+import org.testcontainers.containers.CassandraContainer;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.containers.wait.strategy.Wait;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.core.cassandra.ResourceCassandraConfiguration;
-import com.github.nosan.embedded.cassandra.Cassandra;
-import com.github.nosan.embedded.cassandra.CassandraBuilder;
-import com.github.nosan.embedded.cassandra.commons.logging.Slf4jLogger;
-import com.github.nosan.embedded.cassandra.cql.CqlDataSet;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @Import(ResourceConfiguration.class)
+@Slf4j
 public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
-
-    @Value("${resource.cassandra.port}")
-    private int port;
 
     @Value("${resource.cassandra.version}")
     private String version;
 
-    @Value("${resource.cassandra.startup_timeout:120}")
-    private int startupTimeout;
+    private final Path cassandraResourcePath;
 
     public ResourceTestConfiguration(@Value("${resource.cassandra.resource_configuration}") String cassandraResource) throws FileNotFoundException {
         super(cassandraResource);
+        this.cassandraResourcePath = Paths.get(ResourceUtils.getFile(cassandraResource).getPath());
     }
 
     @Bean(initMethod = "start", destroyMethod = "stop")
-    public Cassandra embeddedServer() {
+    public CassandraContainer embeddedServer() {
 
-        return new CassandraBuilder()
-
-                .version(version)
-
-                .addEnvironmentVariable("MAX_HEAP_SIZE", "64M").addEnvironmentVariable("HEAP_NEWSIZE", "12M")
-
-                .addConfigProperty("native_transport_port", port).addConfigProperty("disk_failure_policy", "stop_paranoid")
-
-                .logger(new Slf4jLogger(LoggerFactory.getLogger("Cassandra")))
-
-                .startupTimeout(Duration.ofSeconds(startupTimeout))
-
-                .build();
+        return (CassandraContainer) new CassandraContainer("cassandra:" + version)
+                .withExposedPorts(9042)
+                .waitingFor(Wait.forLogMessage(".*Startup complete.*\\n", 1))
+                .withLogConsumer(new Slf4jLogConsumer(LOG));
     }
 
     @Bean
@@ -81,6 +78,14 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
     @DependsOn("embeddedServer")
     public CqlSession session() {
 
+        try {
+            String content = new String(Files.readAllBytes(cassandraResourcePath), StandardCharsets.UTF_8);
+            content = content.replaceAll("localhost:9042", "localhost:" + this.embeddedServer().getMappedPort(9042));
+            Files.write(cassandraResourcePath, content.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+
         CqlSession session = super.session();
         session.setSchemaMetadataEnabled(true);
         return session;
@@ -97,11 +102,13 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
     }
 
     @PostConstruct
-    public void initKeyspace() {
+    public void initKeyspace() throws IOException {
 
         CqlSession session = this.session();
 
-        CqlDataSet.ofClassPaths("cassandra/keyspace.cql", "cassandra/test.cql", "cassandra/exec.cql").forEachStatement(session::execute);
+        executeScript("classpath:cassandra/keyspace.cql", session::execute);
+        executeScript("classpath:cassandra/test.cql", session::execute);
+        executeScript("classpath:cassandra/exec.cql", session::execute);
 
         ServiceContextExecution.context().setApp("test");
     }
@@ -119,6 +126,11 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
         methodValidationPostProcessor.setValidator(validator());
 
         return methodValidationPostProcessor;
+    }
+
+    private static void executeScript(String resourceLocation, Consumer<String> execute) throws IOException {
+        Stream.of(FileUtils.readFileToString(ResourceUtils.getFile(resourceLocation), StandardCharsets.UTF_8).trim().split(";"))
+                .forEach(execute);
     }
 
 }

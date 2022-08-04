@@ -1,19 +1,20 @@
 package com.exemple.service.api.launcher.core;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.github.nosan.embedded.cassandra.commons.FileSystemResource;
-import com.github.nosan.embedded.cassandra.commons.Resource;
-import com.github.nosan.embedded.cassandra.cql.CqlScript;
-import com.github.nosan.embedded.cassandra.cql.ResourceCqlScript;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
@@ -35,8 +36,13 @@ public class InitCassandra {
 
         LOG.info("INIT EMBEDDED CASSANDRA");
 
-        Arrays.stream(scripts).map(ResourceCqlScript::new).forEach((CqlScript script) -> script.forEachStatement(session::execute));
+        Arrays.stream(scripts).flatMap((Resource script) -> Arrays.stream(splitScript(script))).forEach(session::execute);
 
+    }
+
+    @SneakyThrows
+    private static String[] splitScript(Resource script) {
+        return FileUtils.readFileToString(script.getFile(), StandardCharsets.UTF_8).trim().split(";");
     }
 
 }
