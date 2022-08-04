@@ -1,6 +1,4 @@
 resource: 
    cassandra:
-      port: ${cassandra.port}
       version: ${cassandra-version}
-      startup_timeout: 600
       resource_configuration: classpath:cassandra.conf

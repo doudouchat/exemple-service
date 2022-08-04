@@ -29,7 +29,6 @@
 
 		<!-- API -->
 		<cassandra.host>127.0.0.1</cassandra.host>
-		<cassandra.port>9042</cassandra.port>
 		<hazelcast.port>5706</hazelcast.port>
 		<zookeeper.port>10024</zookeeper.port>
 
@@ -131,14 +130,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- CASSANDRA EMBEDDED -->
-
-		<dependency>
-			<groupId>com.github.nosan</groupId>
-			<artifactId>embedded-cassandra</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		
 		<!-- CURATOR -->
 
 		<dependency>
@@ -253,6 +244,14 @@
 					</executions>
 				</plugin>
 
+				<!-- DOCKER -->
+				<!-- http://dmp.fabric8.io/ -->
+				<plugin>
+					<groupId>io.fabric8</groupId>
+					<artifactId>docker-maven-plugin</artifactId>
+					<version>0.40.2</version>
+				</plugin>
+
 				<!-- TEST INTEGRATION -->
 				<!-- http://maven.apache.org/surefire/maven-failsafe-plugin/ -->
 				<plugin>
@@ -306,14 +305,6 @@
 			</properties>
 
 			<dependencies>
-
-				<!-- CASSANDRA EMBEDDED -->
-
-				<dependency>
-					<groupId>com.github.nosan</groupId>
-					<artifactId>embedded-cassandra-spring-boot-starter</artifactId>
-					<scope>provided</scope>
-				</dependency>
 
 				<!-- CURATOR -->
 
@@ -459,6 +450,46 @@
 								</configuration>
 								<goals>
 									<goal>war</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- DOCKER -->
+					<plugin>
+						<groupId>io.fabric8</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>start_cassandra</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>cassandra:${cassandra-version}</name>
+											<alias>cassandra</alias>
+											<run>
+												<ports>
+													<port>${cassandra.port}:9042</port>
+												</ports>
+												<wait>
+													<log>(?s)Startup complete</log>
+													<time>60000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>stop_cassandra</id>
+								<goals>
+									<goal>stop</goal>
 								</goals>
 							</execution>
 						</executions>
