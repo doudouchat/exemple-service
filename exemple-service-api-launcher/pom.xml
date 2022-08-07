@@ -30,7 +30,6 @@
 		<!-- API -->
 		<cassandra.host>127.0.0.1</cassandra.host>
 		<hazelcast.port>5706</hazelcast.port>
-		<zookeeper.port>10024</zookeeper.port>
 
 	</properties>
 
@@ -128,14 +127,6 @@
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
 			<scope>test</scope>
-		</dependency>
-
-		<!-- CURATOR -->
-
-		<dependency>
-			<groupId>org.apache.curator</groupId>
-			<artifactId>curator-test</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
 		<!-- SPRING KAFKA -->
@@ -306,14 +297,6 @@
 
 			<dependencies>
 
-				<!-- CURATOR -->
-
-				<dependency>
-					<groupId>org.apache.curator</groupId>
-					<artifactId>curator-test</artifactId>
-					<scope>provided</scope>
-				</dependency>
-
 				<!-- SPRING KAFKA -->
 
 				<dependency>
@@ -477,6 +460,31 @@
 												<wait>
 													<log>(?s)Startup complete</log>
 													<time>60000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>start_zookeeper</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>zookeeper:3.8.0</name>
+											<alias>zookeeper</alias>
+											<run>
+												<ports>
+													<port>${zookeeper.port}:2181</port>
+												</ports>
+												<wait>
+													<time>5000</time>
 												</wait>
 												<log>
 													<date>default</date>
