@@ -41,9 +41,6 @@ api:
       client:
          clientId: resource
          clientSecret: secret
-zookeeper:
-   embedded:
-      port: ${zookeeper.port}
 hazelcast:
    port: ${hazelcast.port}
 kafka:
