@@ -43,10 +43,5 @@ api:
          clientSecret: secret
 hazelcast:
    port: ${hazelcast.port}
-kafka:
-   embedded:
-      port: ${kafka.port}
-      defaultTopic: test
-      dir: ${project.build.directory}/kafka
 cassandra:
    scripts: ${project.build.testOutputDirectory}/cassandra/schema.cql, ${project.build.testOutputDirectory}/cassandra/exec.cql, ${project.build.testOutputDirectory}/cassandra/other.cql
