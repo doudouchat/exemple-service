@@ -1,2 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.exemple.service.api.launcher.embedded.EmbeddedKafkaAutoConfiguration

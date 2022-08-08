@@ -129,14 +129,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- SPRING KAFKA -->
-
-		<dependency>
-			<groupId>org.springframework.kafka</groupId>
-			<artifactId>spring-kafka-test</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
 		<!-- CUCUMBER -->
 
 		<dependency>
@@ -297,20 +289,6 @@
 
 			<dependencies>
 
-				<!-- SPRING KAFKA -->
-
-				<dependency>
-					<groupId>org.springframework.kafka</groupId>
-					<artifactId>spring-kafka-test</artifactId>
-					<scope>provided</scope>
-					<exclusions>
-						<exclusion>
-							<groupId>com.fasterxml.jackson.module</groupId>
-							<artifactId>*</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency>
-
 				<!-- RESOURCE CONNECTOR -->
 				<dependency>
 					<groupId>org.glassfish.main.resources</groupId>
@@ -388,56 +366,6 @@
 						</executions>
 					</plugin>
 
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>copy-dependencies</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>copy-dependencies</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${project.build.directory}/dependencies-provided/WEB-INF/lib</outputDirectory>
-									<includeScope>provided</includeScope>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-
-					<!-- WAR -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-war-plugin</artifactId>
-						<configuration>
-							<failOnMissingWebXml>false</failOnMissingWebXml>
-							<primaryArtifact>false</primaryArtifact>
-						</configuration>
-						<executions>
-							<execution>
-								<id>embedded</id>
-								<phase>pre-integration-test</phase>
-								<configuration>
-									<classifier>embedded</classifier>
-									<webResources>
-										<resource>
-											<!-- this is relative to the pom.xml directory -->
-											<directory>${project.build.directory}/dependencies-provided</directory>
-											<!-- the list has a default value of ** -->
-											<includes>
-												<include>**/*.jar</include>
-											</includes>
-										</resource>
-									</webResources>
-								</configuration>
-								<goals>
-									<goal>war</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
 					<!-- DOCKER -->
 					<plugin>
 						<groupId>io.fabric8</groupId>
@@ -495,7 +423,41 @@
 								</configuration>
 							</execution>
 							<execution>
-								<id>stop_cassandra</id>
+								<id>start_kafka</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>bitnami/kafka:3.2.0</name>
+											<alias>kafka</alias>
+											<run>
+												<ports>
+													<port>9092:9092</port>
+													<port>${kafka.port}:9093</port>
+												</ports>
+												<env>
+													<ALLOW_PLAINTEXT_LISTENER>yes</ALLOW_PLAINTEXT_LISTENER>
+													<KAFKA_CFG_ZOOKEEPER_CONNECT>172.17.0.1:${zookeeper.port}</KAFKA_CFG_ZOOKEEPER_CONNECT>
+													<KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP>CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT</KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP>
+													<KAFKA_CFG_LISTENERS>CLIENT://:9092,EXTERNAL://:9093</KAFKA_CFG_LISTENERS>
+													<KAFKA_CFG_ADVERTISED_LISTENERS>CLIENT://localhost:9092,EXTERNAL://localhost:${kafka.port}</KAFKA_CFG_ADVERTISED_LISTENERS>
+													<KAFKA_CFG_INTER_BROKER_LISTENER_NAME>CLIENT</KAFKA_CFG_INTER_BROKER_LISTENER_NAME>
+												</env>
+												<wait>
+													<time>10000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>stop_all</id>
 								<goals>
 									<goal>stop</goal>
 								</goals>
@@ -521,7 +483,6 @@
 								<deployable>
 									<groupId>${project.groupId}</groupId>
 									<artifactId>${artifactId.groupId}</artifactId>
-									<classifier>embedded</classifier>
 									<type>war</type>
 									<properties>
 										<context>/${application.contextpath}</context>
