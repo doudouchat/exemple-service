@@ -32,7 +32,9 @@ public class InitCassandra {
     @PostConstruct
     public void initKeyspace() {
 
+        this.session.setSchemaMetadataEnabled(false);
         Arrays.stream(scripts).flatMap((Resource script) -> Arrays.stream(splitScript(script))).forEach(session::execute);
+        this.session.setSchemaMetadataEnabled(true);
 
     }
 
