@@ -84,9 +84,7 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
         content = content.replaceAll("localhost:9042", "localhost:" + this.embeddedServer().getMappedPort(9042));
         Files.write(cassandraResourcePath, content.getBytes(StandardCharsets.UTF_8));
 
-        CqlSession session = super.session();
-        session.setSchemaMetadataEnabled(true);
-        return session;
+        return super.session();
     }
 
     @Bean
@@ -104,9 +102,13 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
 
         CqlSession session = this.session();
 
+        session.setSchemaMetadataEnabled(false);
+
         executeScript("classpath:cassandra/keyspace.cql", session::execute);
         executeScript("classpath:cassandra/test.cql", session::execute);
         executeScript("classpath:cassandra/exec.cql", session::execute);
+
+        session.setSchemaMetadataEnabled(true);
 
         ServiceContextExecution.context().setApp("test");
     }
