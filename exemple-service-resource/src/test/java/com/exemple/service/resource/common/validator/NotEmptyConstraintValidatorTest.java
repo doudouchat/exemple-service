@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringJUnitConfig(ResourceTestConfiguration.class)
-public class NotEmptyConstraintValidatorTest {
+class NotEmptyConstraintValidatorTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -32,7 +32,7 @@ public class NotEmptyConstraintValidatorTest {
     private AccountResource resource;
 
     @Test
-    public void updateSuccess() throws IOException {
+    void updateSuccess() throws IOException {
 
         // Given build account
         UUID id = UUID.randomUUID();
@@ -57,7 +57,7 @@ public class NotEmptyConstraintValidatorTest {
     @ParameterizedTest
     @MethodSource
     @NullSource
-    public void updateFailure(JsonNode account) {
+    void updateFailure(JsonNode account) {
 
         // When perform save
         Throwable throwable = catchThrowable(() -> resource.save(account));

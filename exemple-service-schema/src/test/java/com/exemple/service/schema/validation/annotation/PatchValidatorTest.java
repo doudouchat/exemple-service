@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.Iterables;
 
 @SpringJUnitConfig(SchemaTestConfiguration.class)
-public class PatchValidatorTest {
+class PatchValidatorTest {
 
     @Autowired
     private IExemple exemple;
@@ -53,7 +53,7 @@ public class PatchValidatorTest {
 
     @ParameterizedTest
     @MethodSource
-    public void patchSuccess(ArrayNode argument) {
+    void patchSuccess(ArrayNode argument) {
 
         exemple.exemple(argument);
 
@@ -80,7 +80,7 @@ public class PatchValidatorTest {
 
     @ParameterizedTest
     @MethodSource
-    public void patchFailure(Map<String, Object> patch, int expectedExceptionSize, String... expectedPropertyPath) {
+    void patchFailure(Map<String, Object> patch, int expectedExceptionSize, String... expectedPropertyPath) {
 
         // setup source
         ObjectMapper mapper = new ObjectMapper();
@@ -100,7 +100,7 @@ public class PatchValidatorTest {
     }
 
     @Test
-    public void patchNullFailure() {
+    void patchNullFailure() {
 
         // When perform
         Throwable throwable = catchThrowable(() -> exemple.exemple(null));

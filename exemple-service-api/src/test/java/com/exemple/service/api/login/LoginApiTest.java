@@ -20,7 +20,7 @@ import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.login.LoginResource;
 
-public class LoginApiTest extends JerseySpringSupport {
+class LoginApiTest extends JerseySpringSupport {
 
     @Override
     protected ResourceConfig configure() {
@@ -31,7 +31,7 @@ public class LoginApiTest extends JerseySpringSupport {
     private LoginResource resource;
 
     @BeforeEach
-    public void before() {
+    void before() {
 
         Mockito.reset(resource);
 
@@ -40,7 +40,7 @@ public class LoginApiTest extends JerseySpringSupport {
     public static final String URL = "/v1/logins";
 
     @Test
-    public void check() {
+    void check() {
 
         // Given login
 
@@ -61,7 +61,7 @@ public class LoginApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void checkNotFound() throws Exception {
+    void checkNotFound() throws Exception {
 
         // Given username
 
@@ -82,7 +82,7 @@ public class LoginApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void get() {
+    void get() {
 
         // Given user_name
 

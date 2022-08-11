@@ -25,7 +25,7 @@ import com.exemple.service.store.common.InsufficientStockException;
 import com.exemple.service.store.stock.StockService;
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class StockApiTest extends JerseySpringSupport {
+class StockApiTest extends JerseySpringSupport {
 
     @Override
     protected ResourceConfig configure() {
@@ -48,7 +48,7 @@ public class StockApiTest extends JerseySpringSupport {
     public static final String URL = "/v1/stocks";
 
     @Test
-    public void update() throws InsufficientStockException {
+    void update() throws InsufficientStockException {
 
         // Given stock
 
@@ -79,7 +79,7 @@ public class StockApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void updateValidationFailure() {
+    void updateValidationFailure() {
 
         // Given stock
 
@@ -107,7 +107,7 @@ public class StockApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void updateInsufficientStockFailure() throws InsufficientStockException {
+    void updateInsufficientStockFailure() throws InsufficientStockException {
 
         // Given stock
 
@@ -140,7 +140,7 @@ public class StockApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void get() {
+    void get() {
 
         // Given stock
 
@@ -173,7 +173,7 @@ public class StockApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void getNotFoundStockFailure() {
+    void getNotFoundStockFailure() {
 
         // Given stock
 

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @SpringJUnitConfig(CustomerTestConfiguration.class)
-public class SubscriptionServiceTest {
+class SubscriptionServiceTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -52,7 +52,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void save() {
+    void save() {
 
         // Given email
 
@@ -82,7 +82,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void update() throws IOException {
+    void update() throws IOException {
 
         // Given email
 
@@ -114,7 +114,7 @@ public class SubscriptionServiceTest {
 
     @DisplayName("get subscription")
     @Test
-    public void get() throws IOException {
+    void get() throws IOException {
 
         // Given email
 

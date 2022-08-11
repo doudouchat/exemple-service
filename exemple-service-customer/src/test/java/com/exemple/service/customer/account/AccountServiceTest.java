@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringJUnitConfig(CustomerTestConfiguration.class)
-public class AccountServiceTest {
+class AccountServiceTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -58,7 +58,7 @@ public class AccountServiceTest {
 
     @Test
     @DisplayName("save account")
-    public void save() throws IOException {
+    void save() throws IOException {
 
         // Given account
 
@@ -98,7 +98,7 @@ public class AccountServiceTest {
 
     @Test
     @DisplayName("update account")
-    public void update() throws IOException {
+    void update() throws IOException {
 
         // Given account
 
@@ -142,7 +142,7 @@ public class AccountServiceTest {
 
     @Test
     @DisplayName("update email")
-    public void updateEmail() throws IOException {
+    void updateEmail() throws IOException {
 
         // Given account
 
@@ -189,7 +189,7 @@ public class AccountServiceTest {
 
     @Test
     @DisplayName("get account")
-    public void get() throws IOException {
+    void get() throws IOException {
 
         // Given account id
 

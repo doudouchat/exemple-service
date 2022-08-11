@@ -98,7 +98,7 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
     }
 
     @PostConstruct
-    public void initKeyspace() throws IOException {
+    void initKeyspace() throws IOException {
 
         CqlSession session = this.session();
 

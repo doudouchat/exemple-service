@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @SpringJUnitConfig(ResourceTestConfiguration.class)
-public class JsonConstraintValidatorTest {
+class JsonConstraintValidatorTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -37,7 +37,7 @@ public class JsonConstraintValidatorTest {
     private AccountResource resource;
 
     @Test
-    public void success() throws IOException {
+    void success() throws IOException {
 
         // Given build account
         UUID id = UUID.randomUUID();
@@ -125,7 +125,7 @@ public class JsonConstraintValidatorTest {
     @DisplayName("save fails because json is incorrect")
     @ParameterizedTest
     @MethodSource
-    public void saveFailure(String property, Object value) {
+    void saveFailure(String property, Object value) {
 
         // setup source
         ObjectNode node = MAPPER.createObjectNode();

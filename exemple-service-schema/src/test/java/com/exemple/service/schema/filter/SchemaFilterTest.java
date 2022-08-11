@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringJUnitConfig(SchemaTestConfiguration.class)
-public class SchemaFilterTest {
+class SchemaFilterTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -25,7 +25,7 @@ public class SchemaFilterTest {
     private SchemaFilter schemaFilter;
 
     @Test
-    public void filter() throws IOException {
+    void filter() throws IOException {
 
         // Given create source
         JsonNode source = MAPPER
@@ -41,7 +41,7 @@ public class SchemaFilterTest {
     }
 
     @Test
-    public void filterWhenSchemaNotExists() throws IOException {
+    void filterWhenSchemaNotExists() throws IOException {
 
         // Given create source
         JsonNode source = MAPPER
@@ -56,7 +56,7 @@ public class SchemaFilterTest {
     }
 
     @Test
-    public void filterAllProperties() throws IOException {
+    void filterAllProperties() throws IOException {
 
         // Given create source
         JsonNode source = MAPPER
@@ -72,7 +72,7 @@ public class SchemaFilterTest {
     }
 
     @Test
-    public void filterAllPropertiesWhenSchemaNotExists() throws IOException {
+    void filterAllPropertiesWhenSchemaNotExists() throws IOException {
 
         // Given create source
         JsonNode source = MAPPER
@@ -109,7 +109,7 @@ public class SchemaFilterTest {
 
     @ParameterizedTest
     @MethodSource
-    public void filterAllAdditionalProperties(JsonNode source, JsonNode expectedSource) {
+    void filterAllAdditionalProperties(JsonNode source, JsonNode expectedSource) {
 
         // When perform filter
         JsonNode newSource = schemaFilter.filterAllAdditionalProperties("default", "default", "schema_test", "default", source);
@@ -119,7 +119,7 @@ public class SchemaFilterTest {
     }
 
     @Test
-    public void filterAllAdditionalPropertiesWhenSchemaNotExists() throws IOException {
+    void filterAllAdditionalPropertiesWhenSchemaNotExists() throws IOException {
 
         // Given create source
         JsonNode source = MAPPER.readTree("{\"lastname\": \"jean\", \"addresses\": {\"holiday\": {\"city\": \"Paris\"}}}");

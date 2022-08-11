@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 
 @SpringJUnitConfig(ApplicationTestConfiguration.class)
-public class ApplicationDetailServiceTest {
+class ApplicationDetailServiceTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -31,7 +31,7 @@ public class ApplicationDetailServiceTest {
 
     @Test
     @DisplayName("create application in zookeeper")
-    public void createApplication() {
+    void createApplication() {
 
         // setup application
         Map<String, Object> application = new HashMap<>();
@@ -55,7 +55,7 @@ public class ApplicationDetailServiceTest {
 
     @Test
     @DisplayName("check exception if application is not found")
-    public void getFailureNotFoundApplication() {
+    void getFailureNotFoundApplication() {
 
         // setup random application
         String application = UUID.randomUUID().toString();
@@ -70,7 +70,7 @@ public class ApplicationDetailServiceTest {
 
     @Test
     @DisplayName("check exception if application is incorrect")
-    public void getFailureBecauseApplicationIsIncorrect() {
+    void getFailureBecauseApplicationIsIncorrect() {
 
         // setup save application
         service.put("fails", MAPPER.createArrayNode());

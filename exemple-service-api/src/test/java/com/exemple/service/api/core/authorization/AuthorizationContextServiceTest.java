@@ -55,7 +55,7 @@ import com.hazelcast.core.HazelcastInstance;
 
 @SpringJUnitConfig({ ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class AuthorizationContextServiceTest {
+class AuthorizationContextServiceTest {
 
     @Autowired
     private AuthorizationContextService service;
@@ -145,7 +145,7 @@ public class AuthorizationContextServiceTest {
 
     @ParameterizedTest
     @MethodSource
-    public void authorizedFailure(String token, String app, BodyWithContentType<?> body) {
+    void authorizedFailure(String token, String app, BodyWithContentType<?> body) {
 
         // Given mock client
         authorizationClient.when(HttpRequest.request()
@@ -183,7 +183,7 @@ public class AuthorizationContextServiceTest {
 
     @ParameterizedTest
     @MethodSource
-    public void authorizedFailureAlgorithm(BodyWithContentType<?> body, Status status, Class<? extends Throwable> expectedCause) {
+    void authorizedFailureAlgorithm(BodyWithContentType<?> body, Status status, Class<? extends Throwable> expectedCause) {
 
         // Given mock client
         authorizationClient.when(HttpRequest.request()
@@ -206,7 +206,7 @@ public class AuthorizationContextServiceTest {
     }
 
     @Test
-    public void authorized() throws AuthorizationException {
+    void authorized() throws AuthorizationException {
 
         // Given build response
         JsonBody body = JsonBody.json(TOKEN_KEY_CORRECT_RESPONSE);

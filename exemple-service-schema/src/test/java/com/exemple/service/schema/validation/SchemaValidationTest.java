@@ -39,7 +39,7 @@ import com.flipkart.zjsonpatch.JsonPatch;
 import com.flipkart.zjsonpatch.JsonPatchApplicationException;
 
 @SpringJUnitConfig(SchemaTestConfiguration.class)
-public class SchemaValidationTest {
+class SchemaValidationTest {
 
     @Autowired
     private SchemaValidation validation;
@@ -194,7 +194,7 @@ public class SchemaValidationTest {
 
         @Test
         @DisplayName("source creation success")
-        public void creationSuccess() {
+        void creationSuccess() {
 
             Map<String, Object> model = new HashMap<>();
             model.put("email", "jean.dupont@gmail.com");
@@ -220,7 +220,7 @@ public class SchemaValidationTest {
         @ParameterizedTest
         @MethodSource
         @DisplayName("source creation fails")
-        public void creationFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
+        void creationFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
 
             // Given model
             Map<String, Object> origin = new HashMap<>();
@@ -252,7 +252,7 @@ public class SchemaValidationTest {
 
         @Test
         @DisplayName("source creation fails because schema not exists")
-        public void creationFailureWhenSchemaNotExists() {
+        void creationFailureWhenSchemaNotExists() {
 
             // Given source
             Map<String, Object> model = new HashMap<>();
@@ -280,7 +280,7 @@ public class SchemaValidationTest {
 
         @Test
         @DisplayName("source creation validation")
-        public void creationSuccess() {
+        void creationSuccess() {
 
             // Given build model
             Map<String, Object> addresse1 = new HashMap<>();
@@ -305,7 +305,7 @@ public class SchemaValidationTest {
 
         @Test
         @DisplayName("source creation fails")
-        public void creationFailure() {
+        void creationFailure() {
 
             // Given build model
             Map<String, Object> addresse = new HashMap<>();
@@ -373,7 +373,7 @@ public class SchemaValidationTest {
         @ParameterizedTest
         @MethodSource
         @DisplayName("source patch success")
-        public void patchSuccess(JsonNode patch) {
+        void patchSuccess(JsonNode patch) {
 
             // build source
             Map<String, Object> origin = new HashMap<>();
@@ -413,7 +413,7 @@ public class SchemaValidationTest {
         @ParameterizedTest
         @MethodSource
         @DisplayName("source patch fails")
-        public void patchFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
+        void patchFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
 
             // Given origin
             Map<String, Object> origin = new HashMap<>();
@@ -456,7 +456,7 @@ public class SchemaValidationTest {
         @ParameterizedTest
         @MethodSource("patchFailures")
         @DisplayName("source patch fails")
-        public void patchFailure(String[] expectedCode, String expectedPath, int expectedExceptions, JsonNode... patchs) {
+        void patchFailure(String[] expectedCode, String expectedPath, int expectedExceptions, JsonNode... patchs) {
 
             // Given origin
             Map<String, Object> origin = new HashMap<>();
@@ -519,7 +519,7 @@ public class SchemaValidationTest {
         @ParameterizedTest
         @MethodSource
         @DisplayName("source patch success when fixing error")
-        public void fixIncorrectSource(JsonNode patch) {
+        void fixIncorrectSource(JsonNode patch) {
 
             // Given origin
             Map<String, Object> origin = new HashMap<>();
@@ -646,7 +646,7 @@ public class SchemaValidationTest {
         @ParameterizedTest
         @MethodSource
         @DisplayName("source patch fails when fixing error")
-        public void fixIncorrectSourceFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
+        void fixIncorrectSourceFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
 
             // Given origin
             Map<String, Object> origin = new HashMap<>();
@@ -722,7 +722,7 @@ public class SchemaValidationTest {
 
         @Test
         @DisplayName("source patch fails because schema not exists")
-        public void patchFailureWhenSchemaNotExists() {
+        void patchFailureWhenSchemaNotExists() {
 
             // Given origin
 
@@ -754,7 +754,7 @@ public class SchemaValidationTest {
 
         @Test
         @DisplayName("source patch fails because remove field missing")
-        public void patchFailureWhenFieldIsMissing() {
+        void patchFailureWhenFieldIsMissing() {
 
             // Given origin
             Map<String, Object> origin = new HashMap<>();
@@ -822,7 +822,7 @@ public class SchemaValidationTest {
         @ParameterizedTest
         @MethodSource
         @DisplayName("source update success")
-        public void updateSuccess(JsonNode patch) {
+        void updateSuccess(JsonNode patch) {
 
             // build source
             Map<String, Object> origin = new HashMap<>();
@@ -874,7 +874,7 @@ public class SchemaValidationTest {
         @ParameterizedTest
         @MethodSource
         @DisplayName("source update fails")
-        public void updateFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
+        void updateFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
 
             // Given origin
             Map<String, Object> origin = new HashMap<>();
@@ -923,7 +923,7 @@ public class SchemaValidationTest {
         @ParameterizedTest
         @MethodSource("updateFailures")
         @DisplayName("source update fails")
-        public void updateFailure(String[] expectedCode, String expectedPath, int expectedExceptions, JsonNode... patchs) {
+        void updateFailure(String[] expectedCode, String expectedPath, int expectedExceptions, JsonNode... patchs) {
 
             // Given origin
             Map<String, Object> origin = new HashMap<>();
@@ -956,7 +956,7 @@ public class SchemaValidationTest {
 
         @Test
         @DisplayName("source update success when fixing error")
-        public void fixIncorrectSource() {
+        void fixIncorrectSource() {
 
             // Given origin
             Map<String, Object> origin = new HashMap<>();
@@ -985,7 +985,7 @@ public class SchemaValidationTest {
 
         @Test
         @DisplayName("source udpate fails because schema not exists")
-        public void updateFailureWhenSchemaNotExists() {
+        void updateFailureWhenSchemaNotExists() {
 
             // Given origin
             Map<String, Object> origin = new HashMap<>();
@@ -1023,7 +1023,7 @@ public class SchemaValidationTest {
     class ValidateArrayToUpdate {
 
         @Test
-        public void validationNotUniqueItemsFailure() {
+        void validationNotUniqueItemsFailure() {
 
             // Given build model
             Map<String, Object> addresse = new HashMap<>();
@@ -1055,7 +1055,7 @@ public class SchemaValidationTest {
     class ValidateSchema {
 
         @Test
-        public void validationSchema() throws IOException {
+        void validationSchema() throws IOException {
 
             Map<String, Object> model = new HashMap<>();
             model.put("email", "jean.dupont@gmail.com");
@@ -1071,7 +1071,7 @@ public class SchemaValidationTest {
         }
 
         @Test
-        public void validationSchemaFailure() throws IOException {
+        void validationSchemaFailure() throws IOException {
 
             Map<String, Object> model = new HashMap<>();
             model.put("email", "jean.dupont");

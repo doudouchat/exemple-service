@@ -12,13 +12,13 @@ import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.exemple.service.store.stock.StockResource;
 
 @SpringJUnitConfig(ResourceTestConfiguration.class)
-public class StockResourceTest {
+class StockResourceTest {
 
     @Autowired
     private StockResource resource;
 
     @Test
-    public void update() {
+    void update() {
 
         // when update stock
         resource.update("store1", "product1", 5L);
@@ -32,7 +32,7 @@ public class StockResourceTest {
     }
 
     @Test
-    public void getNotExist() {
+    void getNotExist() {
 
         assertThat(resource.get(UUID.randomUUID().toString(), UUID.randomUUID().toString())).isEmpty();
 

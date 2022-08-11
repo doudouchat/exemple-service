@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringJUnitConfig(SchemaTestConfiguration.class)
-public class SchemaDescriptionTest {
+class SchemaDescriptionTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -22,7 +22,7 @@ public class SchemaDescriptionTest {
     private SchemaDescription service;
 
     @Test
-    public void get() {
+    void get() {
 
         // when perform get schema
         JsonNode schema = service.get("default", "default", "schema_test", "default");
@@ -33,7 +33,7 @@ public class SchemaDescriptionTest {
     }
 
     @Test
-    public void getNotExistSchema() throws IOException {
+    void getNotExistSchema() throws IOException {
 
         // when perform get schema
         JsonNode schema = service.get("unknown", "unknown", "schema_test", "unknown");
@@ -44,7 +44,7 @@ public class SchemaDescriptionTest {
     }
 
     @Test
-    public void getPatch() {
+    void getPatch() {
 
         // when perform get schema
         JsonNode schema = service.getPatch();

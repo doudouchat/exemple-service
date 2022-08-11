@@ -25,7 +25,7 @@ import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.login.LoginResource;
 
-public class LoginApiSecureTest extends JerseySpringSupportSecure {
+class LoginApiSecureTest extends JerseySpringSupportSecure {
 
     private TestFilter testFilter = new TestFilter();
 
@@ -44,7 +44,7 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
     }
 
     @Test
-    public void authorizedGetLoginSuccess() {
+    void authorizedGetLoginSuccess() {
 
         // Given user_name
 
@@ -79,7 +79,7 @@ public class LoginApiSecureTest extends JerseySpringSupportSecure {
     }
 
     @Test
-    public void authorizedGetLoginFailure() {
+    void authorizedGetLoginFailure() {
 
         // Given user_name
 

@@ -18,7 +18,7 @@ import com.exemple.service.application.common.exception.NotFoundApplicationExcep
 import com.exemple.service.schema.description.SchemaDescription;
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class SchemaApiTest extends JerseySpringSupport {
+class SchemaApiTest extends JerseySpringSupport {
 
     @Override
     protected ResourceConfig configure() {
@@ -32,7 +32,7 @@ public class SchemaApiTest extends JerseySpringSupport {
     private JsonNode schema;
 
     @BeforeEach
-    public void before() {
+    void before() {
 
         Mockito.reset(service);
 
@@ -41,7 +41,7 @@ public class SchemaApiTest extends JerseySpringSupport {
     public static final String URL = "/v1/schemas";
 
     @Test
-    public void get() {
+    void get() {
 
         // Given mock service
 
@@ -67,7 +67,7 @@ public class SchemaApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void getPatch() {
+    void getPatch() {
 
         // Given mock service
 
@@ -88,7 +88,7 @@ public class SchemaApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void getFailureNotFoundApplicationException() {
+    void getFailureNotFoundApplicationException() {
 
         // Given mock service
 
