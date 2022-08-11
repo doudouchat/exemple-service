@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-public class CustomDateTimeFormatValidatorTest {
+class CustomDateTimeFormatValidatorTest {
 
     private static Schema schema;
 
@@ -38,7 +38,7 @@ public class CustomDateTimeFormatValidatorTest {
     @ValueSource(strings = {
             "2018-02-28T12:00:00Z",
             "2018-02-28 12:00:00Z" })
-    public void dateTimeSuccess(String value) {
+    void dateTimeSuccess(String value) {
 
         // When perform
         Throwable throwable = catchThrowable(() -> schema.validate(new JSONObject("{\"creation_date\" : \"" + value + "\"}")));
@@ -55,7 +55,7 @@ public class CustomDateTimeFormatValidatorTest {
             "2018-02-30T12:00:00Z",
             "2018-02-30 12:00:00Z",
             "2018-02-2812:00:00Z" })
-    public void dateTimeFailure(String value) {
+    void dateTimeFailure(String value) {
 
         // When perform
         Throwable throwable = catchThrowable(() -> schema.validate(new JSONObject("{\"creation_date\" : \"" + value + "\"}")));

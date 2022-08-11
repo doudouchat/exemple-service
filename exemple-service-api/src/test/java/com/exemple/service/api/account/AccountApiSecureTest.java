@@ -36,7 +36,7 @@ import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.login.LoginResource;
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class AccountApiSecureTest extends JerseySpringSupportSecure {
+class AccountApiSecureTest extends JerseySpringSupportSecure {
 
     private TestFilter testFilter = new TestFilter();
 
@@ -88,7 +88,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
 
     @ParameterizedTest
     @MethodSource
-    public void authorizedGetUserFailure(String token, Optional<UUID> loginResponse) {
+    void authorizedGetUserFailure(String token, Optional<UUID> loginResponse) {
 
         // Given mock service
         Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(loginResponse);
@@ -106,7 +106,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     }
 
     @Test
-    public void authorizedGetUserFailures() throws AuthorizationException {
+    void authorizedGetUserFailures() throws AuthorizationException {
 
         // Given token
 
@@ -131,7 +131,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     }
 
     @Test
-    public void authorizedGetAccount() {
+    void authorizedGetAccount() {
 
         // Given token
 
@@ -163,7 +163,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     }
 
     @Test
-    public void authorizedPostAccount() {
+    void authorizedPostAccount() {
 
         // Given token
 
@@ -198,7 +198,7 @@ public class AccountApiSecureTest extends JerseySpringSupportSecure {
     }
 
     @Test
-    public void authorizedGetUser() {
+    void authorizedGetUser() {
 
         // Given token
 

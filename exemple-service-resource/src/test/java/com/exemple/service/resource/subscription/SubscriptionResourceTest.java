@@ -38,7 +38,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @TestMethodOrder(OrderAnnotation.class)
 @SpringJUnitConfig(ResourceTestConfiguration.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class SubscriptionResourceTest {
+class SubscriptionResourceTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -57,7 +57,7 @@ public class SubscriptionResourceTest {
     private final String email = UUID.randomUUID() + "@gmail.com";
 
     @BeforeEach
-    public void initExecutionContextDate() {
+    void initExecutionContextDate() {
 
         OffsetDateTime now = OffsetDateTime.now();
         ServiceContextExecution.context().setDate(now);
@@ -69,7 +69,7 @@ public class SubscriptionResourceTest {
 
     @Test
     @Order(0)
-    public void save() throws IOException {
+    void save() throws IOException {
 
         // Given build subscription
         JsonNode subscription = MAPPER.readTree("{\"email\": \"" + email + "\", \"update_date\": \"2019-01-01T09:00:00Z\"}");
@@ -106,7 +106,7 @@ public class SubscriptionResourceTest {
 
     @Test
     @Order(1)
-    public void update() throws IOException {
+    void update() throws IOException {
 
         // Given build subscription
         JsonNode subscription = MAPPER.readTree("{\"email\": \"" + email + "\", \"update_date\": \"2019-01-01T10:00:00Z\"}");
@@ -144,7 +144,7 @@ public class SubscriptionResourceTest {
 
     @Test
     @Order(2)
-    public void delete() {
+    void delete() {
 
         // When perform delete
         resource.delete(email);

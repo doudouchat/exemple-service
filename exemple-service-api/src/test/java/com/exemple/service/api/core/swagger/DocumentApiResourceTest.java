@@ -34,7 +34,7 @@ import com.exemple.service.schema.description.SchemaDescription;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @TestMethodOrder(OrderAnnotation.class)
-public class DocumentApiResourceTest extends JerseySpringSupport {
+class DocumentApiResourceTest extends JerseySpringSupport {
 
     public static final String URL = "/test/openapi.json";
 
@@ -70,7 +70,7 @@ public class DocumentApiResourceTest extends JerseySpringSupport {
 
     @Test
     @Order(1)
-    public void swagger() {
+    void swagger() {
 
         // Given service mock
 
@@ -102,7 +102,7 @@ public class DocumentApiResourceTest extends JerseySpringSupport {
     @ParameterizedTest
     @MethodSource
     @Order(2)
-    public void schemas(String url) throws Exception {
+    void schemas(String url) throws Exception {
 
         // Given mock service
 
@@ -125,7 +125,7 @@ public class DocumentApiResourceTest extends JerseySpringSupport {
 
     @Test
     @Order(2)
-    public void patch() {
+    void patch() {
 
         // Given mock service
 
@@ -159,7 +159,7 @@ public class DocumentApiResourceTest extends JerseySpringSupport {
         private JsonNode swaggerSecurity;
 
         @Test
-        public void swagger() {
+        void swagger() {
 
             // When perform get
 

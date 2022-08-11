@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class AccountApiTest extends JerseySpringSupport {
+class AccountApiTest extends JerseySpringSupport {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -59,7 +59,7 @@ public class AccountApiTest extends JerseySpringSupport {
     public static final String URL = "/v1/accounts";
 
     @Test
-    public void get() {
+    void get() {
 
         // Given account id
 
@@ -88,7 +88,7 @@ public class AccountApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void patch() throws IOException {
+    void patch() throws IOException {
 
         // Given account id
 
@@ -138,7 +138,7 @@ public class AccountApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void put() throws IOException {
+    void put() throws IOException {
 
         // Given account id
 
@@ -184,7 +184,7 @@ public class AccountApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void create() throws IOException {
+    void create() throws IOException {
 
         // Given mock service
 

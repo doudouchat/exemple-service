@@ -9,12 +9,12 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class JsonNodeFilterUtilsTest {
+class JsonNodeFilterUtilsTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Test
-    public void clean() throws IOException {
+    void clean() throws IOException {
 
         // Given build account
         JsonNode account = MAPPER.readTree("{"

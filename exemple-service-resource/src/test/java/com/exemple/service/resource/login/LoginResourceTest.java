@@ -15,13 +15,13 @@ import com.exemple.service.customer.login.UsernameAlreadyExistsException;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 
 @SpringJUnitConfig(ResourceTestConfiguration.class)
-public class LoginResourceTest {
+class LoginResourceTest {
 
     @Autowired
     private LoginResource resource;
 
     @Test
-    public void create() {
+    void create() {
 
         // Given login
 
@@ -39,7 +39,7 @@ public class LoginResourceTest {
     }
 
     @Test
-    public void createFailureIfUsernameAlreadyExists() {
+    void createFailureIfUsernameAlreadyExists() {
 
         // When perform
         Throwable throwable = catchThrowable(() -> resource.save(UUID.randomUUID(), "jean.dupond@gmail.com"));
@@ -50,7 +50,7 @@ public class LoginResourceTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
 
         // Given login
 

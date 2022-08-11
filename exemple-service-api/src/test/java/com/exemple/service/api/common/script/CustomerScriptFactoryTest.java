@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CustomerScriptFactoryTest {
+class CustomerScriptFactoryTest {
 
     private CustomerScriptFactory factory;
 
@@ -43,7 +43,7 @@ public class CustomerScriptFactoryTest {
     }
 
     @Test
-    public void getDefaultBean() throws IOException {
+    void getDefaultBean() throws IOException {
 
         // Given init ApplicationDetail
         Mockito.when(applicationDetailService.get("test")).thenReturn(Optional.of(ApplicationDetail.builder().company("default").build()));
@@ -61,7 +61,7 @@ public class CustomerScriptFactoryTest {
     }
 
     @Test
-    public void getOverrideBean() throws IOException {
+    void getOverrideBean() throws IOException {
 
         // Given init ApplicationDetail
         Mockito.when(applicationDetailService.get("test")).thenReturn(Optional.of(ApplicationDetail.builder().company("company_test").build()));

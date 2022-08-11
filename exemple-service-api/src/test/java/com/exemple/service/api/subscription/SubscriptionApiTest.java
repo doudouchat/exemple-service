@@ -25,7 +25,7 @@ import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class SubscriptionApiTest extends JerseySpringSupport {
+class SubscriptionApiTest extends JerseySpringSupport {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -44,7 +44,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
     private JsonNode subscription;
 
     @BeforeEach
-    public void before() {
+    void before() {
 
         Mockito.reset(service, schemaValidation);
 
@@ -53,7 +53,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
     public static final String URL = "/v1/subscriptions";
 
     @Test
-    public void save() throws IOException {
+    void save() throws IOException {
 
         // Given email
 
@@ -95,7 +95,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void update() throws IOException {
+    void update() throws IOException {
 
         // Given email
 
@@ -137,7 +137,7 @@ public class SubscriptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void get() {
+    void get() {
 
         // Given email
 

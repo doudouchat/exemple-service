@@ -19,18 +19,20 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.exemple.service.api.account.AccountApiTest;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
-import com.exemple.service.api.stock.StockApiTest;
 import com.exemple.service.customer.account.AccountService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class ExceptionApiTest extends JerseySpringSupport {
+class ExceptionApiTest extends JerseySpringSupport {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    public static final String ACCOUNT_URL = "/v1/accounts";
+
+    private static final String STOCK_URL = "/v1/stocks";
 
     @Override
     protected ResourceConfig configure() {
@@ -48,7 +50,7 @@ public class ExceptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void notFound() {
+    void notFound() {
 
         // When perform get
 
@@ -61,11 +63,11 @@ public class ExceptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void notAcceptable() {
+    void notAcceptable() {
 
         // When perform get
 
-        Response response = target(AccountApiTest.URL + "/" + UUID.randomUUID()).request(MediaType.TEXT_HTML).get();
+        Response response = target(ACCOUNT_URL + "/" + UUID.randomUUID()).request(MediaType.TEXT_HTML).get();
 
         // Then check status
 
@@ -74,11 +76,11 @@ public class ExceptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void JsonException() {
+    void JsonException() {
 
         // When perform post
 
-        Response response = target(AccountApiTest.URL).request(MediaType.APPLICATION_JSON).post(Entity.json("toto"));
+        Response response = target(ACCOUNT_URL).request(MediaType.APPLICATION_JSON).post(Entity.json("toto"));
 
         // Then check status
 
@@ -86,11 +88,11 @@ public class ExceptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void JsonEmptyException() {
+    void JsonEmptyException() {
 
         // When perform past
 
-        Response response = target(AccountApiTest.URL + "/" + UUID.randomUUID()).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
+        Response response = target(ACCOUNT_URL + "/" + UUID.randomUUID()).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
                 .request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
@@ -103,7 +105,7 @@ public class ExceptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void JsonPatchException() throws IOException {
+    void JsonPatchException() throws IOException {
 
         // Given account id
 
@@ -117,7 +119,7 @@ public class ExceptionApiTest extends JerseySpringSupport {
 
         JsonNode patch = MAPPER.readTree("{\"op\": \"replace\", \"path\": \"/lastname\", \"value\":\"Dupond\"}");
 
-        Response response = target(AccountApiTest.URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
+        Response response = target(ACCOUNT_URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
                 .request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
@@ -131,11 +133,11 @@ public class ExceptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void unrecognizedPropertyException() {
+    void unrecognizedPropertyException() {
 
         // When perform post
 
-        Response response = target(StockApiTest.URL + "/store/product").request(MediaType.APPLICATION_JSON)
+        Response response = target(STOCK_URL + "/store/product").request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
 
@@ -152,7 +154,7 @@ public class ExceptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void internalServerError() {
+    void internalServerError() {
 
         // Given mock service
 
@@ -160,7 +162,7 @@ public class ExceptionApiTest extends JerseySpringSupport {
 
         // When perform post
 
-        Response response = target(AccountApiTest.URL + "/" + UUID.randomUUID()).request(MediaType.APPLICATION_JSON)
+        Response response = target(ACCOUNT_URL + "/" + UUID.randomUUID()).request(MediaType.APPLICATION_JSON)
 
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").get();
 
@@ -171,14 +173,14 @@ public class ExceptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    public void getFailureBecauseAppAndVersionAreMissing() throws IOException {
+    void getFailureBecauseAppAndVersionAreMissing() throws IOException {
 
         // Given account id
         UUID id = UUID.randomUUID();
 
         // When perform get
 
-        Response response = target(AccountApiTest.URL + "/" + id).request(MediaType.APPLICATION_JSON)
+        Response response = target(ACCOUNT_URL + "/" + id).request(MediaType.APPLICATION_JSON)
 
                 .get();
 

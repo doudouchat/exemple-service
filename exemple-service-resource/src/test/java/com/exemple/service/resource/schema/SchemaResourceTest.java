@@ -30,7 +30,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringJUnitConfig(ResourceTestConfiguration.class)
-public class SchemaResourceTest {
+class SchemaResourceTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -38,7 +38,7 @@ public class SchemaResourceTest {
     private SchemaResource resource;
 
     @BeforeEach
-    public void resetResourceContext() {
+    void resetResourceContext() {
 
         ResourceExecutionContext.destroy();
 
@@ -53,7 +53,7 @@ public class SchemaResourceTest {
 
         @Test
         @Order(1)
-        public void save() throws IOException {
+        void save() throws IOException {
 
             // Given build schema
 
@@ -81,7 +81,7 @@ public class SchemaResourceTest {
 
         @Test
         @Order(2)
-        public void cleanAll() throws IOException {
+        void cleanAll() throws IOException {
 
             // Given build schema
 
@@ -105,7 +105,7 @@ public class SchemaResourceTest {
     }
 
     @Test
-    public void allVersions() {
+    void allVersions() {
 
         // Given create schema
 
@@ -139,7 +139,7 @@ public class SchemaResourceTest {
     }
 
     @Test
-    public void getEmptySchema() throws IOException {
+    void getEmptySchema() throws IOException {
 
         // When perform get
         Optional<SchemaEntity> schemaResource = resource.get("app3", UUID.randomUUID().toString(), "account", "example");

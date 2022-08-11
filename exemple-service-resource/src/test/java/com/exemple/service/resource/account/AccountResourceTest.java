@@ -42,7 +42,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 @TestMethodOrder(OrderAnnotation.class)
 @SpringJUnitConfig(ResourceTestConfiguration.class)
-public class AccountResourceTest {
+class AccountResourceTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -59,7 +59,7 @@ public class AccountResourceTest {
     private CqlSession session;
 
     @BeforeEach
-    public void initExecutionContextDate() {
+    void initExecutionContextDate() {
 
         OffsetDateTime now = OffsetDateTime.now();
         ServiceContextExecution.context().setDate(now);
@@ -81,7 +81,7 @@ public class AccountResourceTest {
         @Test
         @DisplayName("save email")
         @Order(1)
-        public void save() throws IOException {
+        void save() throws IOException {
 
             // Given build account
             JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupond@gmail\"}");
@@ -116,7 +116,7 @@ public class AccountResourceTest {
         @Test
         @DisplayName("update email and add age")
         @Order(2)
-        public void update() throws IOException {
+        void update() throws IOException {
 
             // Given build account
             JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupont@gmail\", \"age\": 19}");
@@ -146,7 +146,7 @@ public class AccountResourceTest {
         @Test
         @DisplayName("remove email and age")
         @Order(3)
-        public void remove() throws IOException {
+        void remove() throws IOException {
 
             // Given build account
             JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": null, \"age\": null}");
@@ -182,7 +182,7 @@ public class AccountResourceTest {
         @Test
         @DisplayName("save addresses")
         @Order(1)
-        public void save() throws IOException {
+        void save() throws IOException {
 
             // Given build account
             JsonNode account = MAPPER
@@ -210,7 +210,7 @@ public class AccountResourceTest {
         @Test
         @DisplayName("add 1 addresse")
         @Order(2)
-        public void addAdresse() throws IOException {
+        void addAdresse() throws IOException {
 
             // Given build account
             JsonNode account = MAPPER
@@ -242,7 +242,7 @@ public class AccountResourceTest {
         @Test
         @DisplayName("update addresse")
         @Order(3)
-        public void updateAddresse() throws IOException {
+        void updateAddresse() throws IOException {
 
             // Given build account
             JsonNode account = MAPPER
@@ -276,7 +276,7 @@ public class AccountResourceTest {
         @Test
         @DisplayName("delete addresse")
         @Order(4)
-        public void deleteAddresse() throws IOException {
+        void deleteAddresse() throws IOException {
 
             // Given build account
             JsonNode account = MAPPER
@@ -307,7 +307,7 @@ public class AccountResourceTest {
         @Test
         @DisplayName("remove all addresses")
         @Order(5)
-        public void remove() throws IOException {
+        void remove() throws IOException {
 
             // Given build account
             JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"addresses\": null}");
@@ -341,7 +341,7 @@ public class AccountResourceTest {
         @Test
         @DisplayName("save cgus")
         @Order(1)
-        public void save() throws IOException {
+        void save() throws IOException {
 
             // Given build account
             JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"cgus\": [{\"code\": \"code_1\", \"version\": \"v1\"}]}");
@@ -366,7 +366,7 @@ public class AccountResourceTest {
         @Test
         @DisplayName("add 1 cgu")
         @Order(2)
-        public void addCgu() throws IOException {
+        void addCgu() throws IOException {
 
             // Given build account
             JsonNode account = MAPPER.readTree(
@@ -396,7 +396,7 @@ public class AccountResourceTest {
         @Test
         @DisplayName("remove all cgus")
         @Order(3)
-        public void remove() throws IOException {
+        void remove() throws IOException {
 
             // Given build account
             JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"cgus\": null}");
@@ -419,7 +419,7 @@ public class AccountResourceTest {
     }
 
     @Test
-    public void getNotExist() {
+    void getNotExist() {
 
         // When perform get
         Optional<JsonNode> account = resource.get(UUID.randomUUID());
@@ -429,7 +429,7 @@ public class AccountResourceTest {
     }
 
     @Test
-    public void findByIndex() throws IOException {
+    void findByIndex() throws IOException {
 
         // Given build accounts
         UUID id1 = UUID.randomUUID();

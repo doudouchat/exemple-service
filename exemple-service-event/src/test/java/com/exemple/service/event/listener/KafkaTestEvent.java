@@ -42,7 +42,7 @@ public class KafkaTestEvent {
     protected BlockingQueue<ConsumerRecord<String, JsonNode>> records;
 
     @BeforeAll
-    public void createConsumer() throws Exception {
+    void createConsumer() throws Exception {
 
         records = new LinkedBlockingQueue<>();
 
@@ -68,7 +68,7 @@ public class KafkaTestEvent {
     }
 
     @AfterAll
-    public void stop() {
+    void stop() {
 
         container.stop();
 

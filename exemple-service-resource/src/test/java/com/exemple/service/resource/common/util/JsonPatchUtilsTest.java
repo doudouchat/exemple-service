@@ -14,12 +14,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.Streams;
 
-public class JsonPatchUtilsTest {
+class JsonPatchUtilsTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Test
-    public void patchProperty() throws IOException {
+    void patchProperty() throws IOException {
 
         // Given build model
         JsonNode model = MAPPER.readTree("{\"email\": \"jean.dupont@gmail\"}");
@@ -40,7 +40,7 @@ public class JsonPatchUtilsTest {
     }
 
     @Test
-    public void patchObject() throws IOException {
+    void patchObject() throws IOException {
 
         // Given build model
         JsonNode model = MAPPER.readTree("{\"address\": {\"street\": \"1 rue de la paix\"}}");
@@ -65,7 +65,7 @@ public class JsonPatchUtilsTest {
     }
 
     @Test
-    public void patchMultiObject() throws IOException {
+    void patchMultiObject() throws IOException {
 
         // Given build model
         JsonNode model = MAPPER
@@ -101,7 +101,7 @@ public class JsonPatchUtilsTest {
     }
 
     @Test
-    public void patchArrayProperty() throws IOException {
+    void patchArrayProperty() throws IOException {
 
         // Given build model
         JsonNode model = MAPPER.readTree("{\"preferences\":[]}");
@@ -123,7 +123,7 @@ public class JsonPatchUtilsTest {
     }
 
     @Test
-    public void patchArrayObject() throws IOException {
+    void patchArrayObject() throws IOException {
 
         // Given build model
         JsonNode model = MAPPER.readTree("{\"cgus\": []}");

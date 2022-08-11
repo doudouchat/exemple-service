@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringJUnitConfig(EventTestConfiguration.class)
-public class DataEventListenerTest extends KafkaTestEvent {
+class DataEventListenerTest extends KafkaTestEvent {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -31,7 +31,7 @@ public class DataEventListenerTest extends KafkaTestEvent {
     private DataEventPublisher dataEventPublisher;
 
     @Test
-    public void publishEvent() throws InterruptedException, IOException {
+    void publishEvent() throws InterruptedException, IOException {
 
         // Given build message
 

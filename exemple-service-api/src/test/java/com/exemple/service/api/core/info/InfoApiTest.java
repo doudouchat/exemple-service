@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class InfoApiTest extends JerseySpringSupport {
+class InfoApiTest extends JerseySpringSupport {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -31,7 +31,7 @@ public class InfoApiTest extends JerseySpringSupport {
     private static final String URL = "/";
 
     @Test
-    public void template() {
+    void template() {
 
         // When perform get
 

@@ -27,7 +27,7 @@ import com.exemple.service.store.common.InsufficientStockException;
 import com.exemple.service.store.core.StoreTestConfiguration;
 
 @SpringJUnitConfig(StoreTestConfiguration.class)
-public class StockServiceTest {
+class StockServiceTest {
 
     @Autowired
     private StockService service;
@@ -50,7 +50,7 @@ public class StockServiceTest {
 
         @DisplayName("multiple update stock")
         @Test
-        public void update() throws InterruptedException {
+        void update() throws InterruptedException {
 
             // setup mock resource
 
@@ -97,7 +97,7 @@ public class StockServiceTest {
 
     @DisplayName("get stock if not exists")
     @Test
-    public void getFailureNoFoundStock() {
+    void getFailureNoFoundStock() {
 
         // when perform get
 
@@ -113,7 +113,7 @@ public class StockServiceTest {
 
     @DisplayName("update stock if stock is insufficient")
     @Test
-    public void updateFailureInsufficientStock() throws InsufficientStockException {
+    void updateFailureInsufficientStock() throws InsufficientStockException {
 
         // setup mock resource
 
@@ -137,7 +137,7 @@ public class StockServiceTest {
 
     @DisplayName("update stock if stock is insufficient because resource is missing")
     @Test
-    public void updateFailureInsufficientStockBecauseNonStock() throws InsufficientStockException {
+    void updateFailureInsufficientStockBecauseNonStock() throws InsufficientStockException {
 
         // setup mock resource
 
@@ -164,7 +164,7 @@ public class StockServiceTest {
         }
 
         @Test
-        public void updateFailure() {
+        void updateFailure() {
 
             // when update stock
             String product = "/product#" + UUID.randomUUID();
@@ -177,7 +177,7 @@ public class StockServiceTest {
         }
 
         @Test
-        public void getFailure() {
+        void getFailure() {
 
             // when get stock
             String product = "/product#" + UUID.randomUUID();
