@@ -57,8 +57,6 @@
 
 		<!-- force sonar to use jacoco -->
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-		<!-- property checked by sonar to locate jacoco UT/IT reports -->
-		<sonar.jacoco.itReportPath>${project.build.directory}/../../target/jacoco-it.exec</sonar.jacoco.itReportPath>
 
 	</properties>
 
@@ -359,7 +357,6 @@
 							<phase>pre-integration-test</phase>
 							<configuration>
 								<propertyName>jacoco.it.agent.argLine</propertyName>
-								<destFile>${sonar.jacoco.itReportPath}</destFile>
 								<includes>
 									<include>com.exemple.service.*</include>
 								</includes>
