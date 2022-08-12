@@ -54,7 +54,7 @@ class StockServiceTest {
 
             // setup mock resource
 
-            Mockito.when(resource.get(Mockito.eq(store), Mockito.eq(product))).thenReturn(Optional.of(100L));
+            Mockito.when(resource.get(store, product)).thenReturn(Optional.of(100L));
 
             // when perform multiple update
 
@@ -76,7 +76,7 @@ class StockServiceTest {
 
             // Then check mock
 
-            Mockito.verify(resource).get(Mockito.eq(store), Mockito.eq(product));
+            Mockito.verify(resource).get(store, product);
 
             // And check stock
 
@@ -120,7 +120,7 @@ class StockServiceTest {
         String product = "/product#" + UUID.randomUUID();
         String store = "/store#" + UUID.randomUUID();
 
-        Mockito.when(resource.get(Mockito.eq(store), Mockito.eq(product))).thenReturn(Optional.of(5L));
+        Mockito.when(resource.get(store, product)).thenReturn(Optional.of(5L));
 
         // when update stock
         service.update(company, store, product, -3);

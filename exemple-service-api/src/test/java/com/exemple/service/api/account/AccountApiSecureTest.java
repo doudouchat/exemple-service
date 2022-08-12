@@ -91,7 +91,7 @@ class AccountApiSecureTest extends JerseySpringSupportSecure {
     void authorizedGetUserFailure(String token, Optional<UUID> loginResponse) {
 
         // Given mock service
-        Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(loginResponse);
+        Mockito.when(loginResource.get("john_doe")).thenReturn(loginResponse);
 
         // When perform get
 
@@ -140,8 +140,8 @@ class AccountApiSecureTest extends JerseySpringSupportSecure {
 
         // And mock service & resource
 
-        Mockito.when(accountService.get(Mockito.eq(ID))).thenReturn(Optional.of(account));
-        Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(ID_RESPONSE_LOGIN);
+        Mockito.when(accountService.get(ID)).thenReturn(Optional.of(account));
+        Mockito.when(loginResource.get("john_doe")).thenReturn(ID_RESPONSE_LOGIN);
 
         // When perform get
 
@@ -207,8 +207,8 @@ class AccountApiSecureTest extends JerseySpringSupportSecure {
 
         // And mock service & resource
 
-        Mockito.when(accountService.get(Mockito.eq(ID))).thenReturn(Optional.of(account));
-        Mockito.when(loginResource.get(Mockito.eq("john_doe"))).thenReturn(ID_RESPONSE_LOGIN);
+        Mockito.when(accountService.get(ID)).thenReturn(Optional.of(account));
+        Mockito.when(loginResource.get("john_doe")).thenReturn(ID_RESPONSE_LOGIN);
 
         // When perform get
 

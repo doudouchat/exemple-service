@@ -60,7 +60,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
         String email = "jean.dupond@gmail.com";
 
         // And mock service
-        Mockito.when(service.get(Mockito.eq(email))).thenReturn(Optional.empty());
+        Mockito.when(service.get(email)).thenReturn(Optional.empty());
 
         // When perform put
 
@@ -103,7 +103,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
         // And mock service
         JsonNode previousSource = MAPPER.readTree("{\"email\": \"" + email + "\"}");
-        Mockito.when(service.get(Mockito.eq(email))).thenReturn(Optional.of(previousSource));
+        Mockito.when(service.get(email)).thenReturn(Optional.of(previousSource));
 
         // When perform put
 
@@ -145,7 +145,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
         // And mock service
 
-        Mockito.when(service.get(Mockito.eq(email))).thenReturn(Optional.of(subscription));
+        Mockito.when(service.get(email)).thenReturn(Optional.of(subscription));
 
         // When perform get
 

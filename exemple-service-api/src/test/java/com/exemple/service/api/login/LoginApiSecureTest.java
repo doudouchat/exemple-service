@@ -57,7 +57,7 @@ class LoginApiSecureTest extends JerseySpringSupportSecure {
 
         // And mock service
 
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(UUID.randomUUID()));
+        Mockito.when(loginResource.get(username)).thenReturn(Optional.of(UUID.randomUUID()));
 
         // When perform get
 

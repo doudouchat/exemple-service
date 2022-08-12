@@ -61,7 +61,7 @@ class StockApiTest extends JerseySpringSupport {
 
         Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
 
-        Mockito.when(service.update(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product), Mockito.eq(5))).thenReturn(18L);
+        Mockito.when(service.update("/" + company, "/" + store, "/" + product, 5)).thenReturn(18L);
 
         // When perform post
 
@@ -121,7 +121,7 @@ class StockApiTest extends JerseySpringSupport {
         Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
 
         Mockito.doThrow(new InsufficientStockException("/" + company, "/" + store, "/" + product, 100, 5)).when(service)
-                .update(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product), Mockito.eq(5));
+                .update("/" + company, "/" + store, "/" + product, 5);
 
         // When perform put
 
@@ -153,7 +153,7 @@ class StockApiTest extends JerseySpringSupport {
 
         Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
 
-        Mockito.when(service.get(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product))).thenReturn(Optional.of(5L));
+        Mockito.when(service.get("/" + company, "/" + store, "/" + product)).thenReturn(Optional.of(5L));
 
         // When perform service
 
@@ -186,7 +186,7 @@ class StockApiTest extends JerseySpringSupport {
 
         Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
 
-        Mockito.when(service.get(Mockito.eq("/" + company), Mockito.eq("/" + store), Mockito.eq("/" + product))).thenReturn(Optional.empty());
+        Mockito.when(service.get("/" + company, "/" + store, "/" + product)).thenReturn(Optional.empty());
 
         // When perform service
 

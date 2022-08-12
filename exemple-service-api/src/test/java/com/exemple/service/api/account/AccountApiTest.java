@@ -67,7 +67,7 @@ class AccountApiTest extends JerseySpringSupport {
 
         // And mock service
 
-        Mockito.when(service.get(Mockito.eq(id))).thenReturn(Optional.of(account));
+        Mockito.when(service.get(id)).thenReturn(Optional.of(account));
 
         // When perform get
 
@@ -96,7 +96,7 @@ class AccountApiTest extends JerseySpringSupport {
 
         // And mock service
 
-        Mockito.when(service.get(Mockito.eq(id))).thenReturn(Optional.of(account));
+        Mockito.when(service.get(id)).thenReturn(Optional.of(account));
 
         // When perform patch
 
@@ -145,7 +145,7 @@ class AccountApiTest extends JerseySpringSupport {
         UUID id = UUID.randomUUID();
 
         // And mock service
-        Mockito.when(service.get(Mockito.eq(id))).thenReturn(Optional.of(this.account));
+        Mockito.when(service.get(id)).thenReturn(Optional.of(this.account));
 
         // When perform put
 
