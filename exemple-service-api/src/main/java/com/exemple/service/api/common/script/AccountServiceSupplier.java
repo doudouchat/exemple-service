@@ -24,7 +24,7 @@ public class AccountServiceSupplier implements Supplier<AccountService> {
 
     @Override
     public AccountService get() {
-        String app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
+        var app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
         return scriptFactory.getBean(ACCOUNT_BEAN, AccountService.class, app);
 
     }

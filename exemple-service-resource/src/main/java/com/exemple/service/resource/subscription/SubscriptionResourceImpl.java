@@ -9,11 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BatchStatementBuilder;
 import com.datastax.oss.driver.api.core.cql.BatchType;
-import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
-import com.datastax.oss.driver.api.querybuilder.delete.Delete;
-import com.datastax.oss.driver.api.querybuilder.insert.Insert;
-import com.datastax.oss.driver.api.querybuilder.select.Select;
 import com.exemple.service.customer.subscription.SubscriptionResource;
 import com.exemple.service.resource.common.JsonQueryBuilder;
 import com.exemple.service.resource.common.model.EventType;
@@ -48,10 +44,10 @@ public class SubscriptionResourceImpl implements SubscriptionResource {
     @Override
     public Optional<JsonNode> get(String email) {
 
-        Select select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), SUBSCRIPTION_TABLE).json().all()
+        var select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), SUBSCRIPTION_TABLE).json().all()
                 .whereColumn(SubscriptionField.EMAIL.field).isEqualTo(QueryBuilder.literal(email));
 
-        Row row = session.execute(select.build()).one();
+        var row = session.execute(select.build()).one();
 
         return Optional.ofNullable(row != null ? row.get(0, JsonNode.class) : null);
     }
@@ -61,9 +57,9 @@ public class SubscriptionResourceImpl implements SubscriptionResource {
 
         Assert.isTrue(subscription.path(SubscriptionField.EMAIL.field).isTextual(), SubscriptionField.EMAIL.field + " is required");
 
-        Insert createSubscription = jsonQueryBuilder.insert(subscription);
+        var createSubscription = jsonQueryBuilder.insert(subscription);
 
-        BatchStatementBuilder batch = new BatchStatementBuilder(BatchType.LOGGED);
+        var batch = new BatchStatementBuilder(BatchType.LOGGED);
         batch.addStatement(createSubscription.build());
         subscriptionHistoryResource.saveHistories(subscription).forEach(batch::addStatements);
         batch.addStatement(subscriptionEventResource.saveEvent(subscription, EventType.CREATE));
@@ -77,9 +73,9 @@ public class SubscriptionResourceImpl implements SubscriptionResource {
 
         Assert.isTrue(subscription.path(SubscriptionField.EMAIL.field).isTextual(), SubscriptionField.EMAIL.field + " is required");
 
-        Insert createSubscription = jsonQueryBuilder.insert(subscription);
+        var createSubscription = jsonQueryBuilder.insert(subscription);
 
-        BatchStatementBuilder batch = new BatchStatementBuilder(BatchType.LOGGED);
+        var batch = new BatchStatementBuilder(BatchType.LOGGED);
         batch.addStatement(createSubscription.build());
         subscriptionHistoryResource.saveHistories(subscription, previousSubscription).forEach(batch::addStatements);
         batch.addStatement(subscriptionEventResource.saveEvent(subscription, EventType.UPDATE));
@@ -91,10 +87,10 @@ public class SubscriptionResourceImpl implements SubscriptionResource {
     @Override
     public void delete(String email) {
 
-        Delete deleteSubscription = QueryBuilder.deleteFrom(ResourceExecutionContext.get().keyspace(), SUBSCRIPTION_TABLE)
+        var deleteSubscription = QueryBuilder.deleteFrom(ResourceExecutionContext.get().keyspace(), SUBSCRIPTION_TABLE)
                 .whereColumn(SubscriptionField.EMAIL.field).isEqualTo(QueryBuilder.literal(email));
 
-        BatchStatementBuilder batch = new BatchStatementBuilder(BatchType.LOGGED);
+        var batch = new BatchStatementBuilder(BatchType.LOGGED);
         batch.addStatement(deleteSubscription.build());
         batch.addStatement(subscriptionEventResource.saveEvent(email, EventType.DELETE));
 

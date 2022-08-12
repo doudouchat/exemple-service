@@ -25,7 +25,6 @@ import com.exemple.service.api.core.check.AppAndVersionCheck;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.api.stock.model.Stock;
 import com.exemple.service.application.common.exception.NotFoundApplicationException;
-import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.store.common.InsufficientStockException;
 import com.exemple.service.store.stock.StockService;
@@ -65,9 +64,8 @@ public class StockApi {
     public Long post(@PathParam("store") String store, @PathParam("product") String product,
             @NotNull @Valid @Parameter(schema = @Schema(implementation = Stock.class)) Stock stock) throws InsufficientStockException {
 
-        String application = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
-        ApplicationDetail applicationDetail = applicationDetailService.get(application)
-                .orElseThrow(() -> new NotFoundApplicationException(application));
+        var application = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
+        var applicationDetail = applicationDetailService.get(application).orElseThrow(() -> new NotFoundApplicationException(application));
 
         return service.update("/" + applicationDetail.getCompany(), "/" + store, "/" + product, stock.getIncrement());
 
@@ -84,9 +82,8 @@ public class StockApi {
     @AppAndVersionCheck(optionalVersion = true)
     public Stock get(@PathParam("store") String store, @PathParam("product") String product) {
 
-        String application = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
-        ApplicationDetail applicationDetail = applicationDetailService.get(application)
-                .orElseThrow(() -> new NotFoundApplicationException(application));
+        var application = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
+        var applicationDetail = applicationDetailService.get(application).orElseThrow(() -> new NotFoundApplicationException(application));
 
         Long amount = service.get("/" + applicationDetail.getCompany(), "/" + store, "/" + product).orElseThrow(NotFoundException::new);
 

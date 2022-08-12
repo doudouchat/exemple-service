@@ -13,10 +13,7 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.DefaultConsistencyLevel;
 import com.datastax.oss.driver.api.core.cql.BatchStatementBuilder;
 import com.datastax.oss.driver.api.core.cql.BatchType;
-import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
-import com.datastax.oss.driver.api.querybuilder.insert.Insert;
-import com.datastax.oss.driver.api.querybuilder.select.Select;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.account.event.AccountEventResource;
 import com.exemple.service.resource.account.history.AccountHistoryResource;
@@ -55,9 +52,9 @@ public class AccountResourceImpl implements AccountResource {
 
         Assert.isTrue(account.path(AccountField.ID.field).isTextual(), AccountField.ID.field + " is required");
 
-        Insert insertAccount = jsonQueryBuilder.insert(account);
+        var insertAccount = jsonQueryBuilder.insert(account);
 
-        BatchStatementBuilder batch = new BatchStatementBuilder(BatchType.LOGGED);
+        var batch = new BatchStatementBuilder(BatchType.LOGGED);
         batch.addStatement(insertAccount.build());
         accountHistoryResource.saveHistories(account).forEach(batch::addStatements);
         batch.addStatement(accountEventResource.saveEvent(account, EventType.CREATE));
@@ -73,9 +70,9 @@ public class AccountResourceImpl implements AccountResource {
 
         LOG.debug("save account {}", account);
 
-        Insert insertAccount = jsonQueryBuilder.insert(account);
+        var insertAccount = jsonQueryBuilder.insert(account);
 
-        BatchStatementBuilder batch = new BatchStatementBuilder(BatchType.LOGGED);
+        var batch = new BatchStatementBuilder(BatchType.LOGGED);
         batch.addStatement(insertAccount.build());
         accountHistoryResource.saveHistories(account, previousAccount).forEach(batch::addStatements);
         batch.addStatement(accountEventResource.saveEvent(account, EventType.UPDATE));
@@ -96,10 +93,10 @@ public class AccountResourceImpl implements AccountResource {
 
     private Optional<JsonNode> getById(UUID id) {
 
-        Select select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), ACCOUNT_TABLE).json().all()
+        var select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), ACCOUNT_TABLE).json().all()
                 .whereColumn(AccountField.ID.field).isEqualTo(QueryBuilder.literal(id));
 
-        Row row = session.execute(select.build().setConsistencyLevel(DefaultConsistencyLevel.QUORUM)).one();
+        var row = session.execute(select.build().setConsistencyLevel(DefaultConsistencyLevel.QUORUM)).one();
 
         return Optional.ofNullable(row != null ? row.get(0, JsonNode.class) : null);
     }
@@ -107,7 +104,7 @@ public class AccountResourceImpl implements AccountResource {
     @Override
     public Set<JsonNode> findByIndex(String index, Object value) {
 
-        Select select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), ACCOUNT_TABLE).json().all().whereColumn(index)
+        var select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), ACCOUNT_TABLE).json().all().whereColumn(index)
                 .isEqualTo(QueryBuilder.literal(value));
 
         return session.execute(select.build()).all().stream().map(row -> row.get(0, JsonNode.class)).collect(Collectors.toSet());

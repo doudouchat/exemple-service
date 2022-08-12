@@ -13,7 +13,6 @@ import org.springframework.context.MessageSource;
 
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,12 +29,12 @@ public class AppAndVersionCheckRequestFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) {
 
-        ObjectNode entity = MAPPER.createObjectNode();
+        var entity = MAPPER.createObjectNode();
 
         if (StringUtils.isBlank(requestContext.getHeaderString(SchemaBeanParam.APP_HEADER))) {
 
             entity.put(SchemaBeanParam.APP_HEADER, getMessage(requestContext));
-            Response response = Response.status(Response.Status.BAD_REQUEST)
+            var response = Response.status(Response.Status.BAD_REQUEST)
                     .entity(entity)
                     .build();
             requestContext.abortWith(response);
@@ -45,7 +44,7 @@ public class AppAndVersionCheckRequestFilter implements ContainerRequestFilter {
         if (!optionalVersion && StringUtils.isBlank(requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER))) {
 
             entity.put(SchemaBeanParam.VERSION_HEADER, getMessage(requestContext));
-            Response response = Response.status(Response.Status.BAD_REQUEST)
+            var response = Response.status(Response.Status.BAD_REQUEST)
                     .entity(entity)
                     .build();
             requestContext.abortWith(response);

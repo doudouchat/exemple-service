@@ -24,7 +24,7 @@ public class SubscriptionServiceSupplier implements Supplier<SubscriptionService
 
     @Override
     public SubscriptionService get() {
-        String app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
+        var app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
         return scriptFactory.getBean(SUBSCRIPTION_BEAN, SubscriptionService.class, app);
 
     }

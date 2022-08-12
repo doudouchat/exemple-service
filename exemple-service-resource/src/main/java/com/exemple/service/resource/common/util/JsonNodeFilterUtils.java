@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
@@ -42,7 +41,7 @@ public final class JsonNodeFilterUtils {
 
         if (source.getValue().isArray()) {
 
-            ArrayNode arrayNode = JsonNodeFactory.instance.arrayNode();
+            var arrayNode = JsonNodeFactory.instance.arrayNode();
             List<JsonNode> nodes = Streams.stream(source.getValue().elements())
                     .filter(node -> predicate.test(source.getValue(), Maps.immutableEntry(null, node)))
                     .map(node -> filter(Maps.immutableEntry(null, node), new ObjectMapper().createObjectNode(), predicate))

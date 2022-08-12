@@ -1,7 +1,6 @@
 package com.exemple.service.schema.filter.impl;
 
 import org.everit.json.schema.ReadWriteContext;
-import org.everit.json.schema.Schema;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.schema.common.SchemaBuilder;
@@ -12,8 +11,6 @@ import com.exemple.service.schema.filter.SchemaFilter;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.flipkart.zjsonpatch.JsonPatch;
 
 import lombok.RequiredArgsConstructor;
@@ -31,20 +28,20 @@ public class SchemaFilterImpl implements SchemaFilter {
 
         JsonNode filterProperties = source.deepCopy();
 
-        Schema schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
+        var schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
 
         SchemaValidator.performValidation(schema, ReadWriteContext.READ, source, (ValidationException e) ->
 
         e.getCauses().stream()
                 .filter((ValidationExceptionCause cause) -> isAdditionalProperties(cause) || isWriteOnly(cause))
                 .map((ValidationExceptionCause cause) -> {
-                    ObjectNode patch = MAPPER.createObjectNode();
+                    var patch = MAPPER.createObjectNode();
                     patch.put("op", "remove");
                     patch.put("path", cause.getPath());
                     return patch;
                 })
                 .map((JsonNode patch) -> {
-                    ArrayNode patchs = MAPPER.createArrayNode();
+                    var patchs = MAPPER.createArrayNode();
                     patchs.add(patch);
                     return patchs;
                 })
@@ -56,20 +53,20 @@ public class SchemaFilterImpl implements SchemaFilter {
     public JsonNode filterAllProperties(String app, String version, String resource, String profile, JsonNode source) {
 
         JsonNode allProperties = source.deepCopy();
-        Schema schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
+        var schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
 
         SchemaValidator.performValidation(schema, ReadWriteContext.READ, source, (ValidationException e) ->
 
         e.getCauses().stream()
                 .filter(SchemaFilterImpl::isAdditionalProperties)
                 .map((ValidationExceptionCause cause) -> {
-                    ObjectNode patch = MAPPER.createObjectNode();
+                    var patch = MAPPER.createObjectNode();
                     patch.put("op", "remove");
                     patch.put("path", cause.getPath());
                     return patch;
                 })
                 .map((JsonNode patch) -> {
-                    ArrayNode patchs = MAPPER.createArrayNode();
+                    var patchs = MAPPER.createArrayNode();
                     patchs.add(patch);
                     return patchs;
                 })
@@ -81,7 +78,7 @@ public class SchemaFilterImpl implements SchemaFilter {
     public JsonNode filterAllAdditionalProperties(String app, String version, String resource, String profile, JsonNode source) {
 
         JsonNode onlyAdditionalProperties = MAPPER.createObjectNode();
-        Schema schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
+        var schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
 
         SchemaValidator.performValidation(schema, ReadWriteContext.READ, source, (ValidationException e) ->
 
@@ -89,14 +86,14 @@ public class SchemaFilterImpl implements SchemaFilter {
                 .filter(SchemaFilterImpl::isAdditionalProperties)
                 .filter((ValidationExceptionCause cause) -> JsonPointer.empty().equals(cause.getPointer().head()))
                 .map((ValidationExceptionCause cause) -> {
-                    ObjectNode patch = MAPPER.createObjectNode();
+                    var patch = MAPPER.createObjectNode();
                     patch.put("op", "add");
                     patch.put("path", cause.getPath());
                     patch.set("value", cause.getValue());
                     return patch;
                 })
                 .map((JsonNode patch) -> {
-                    ArrayNode patchs = MAPPER.createArrayNode();
+                    var patchs = MAPPER.createArrayNode();
                     patchs.add(patch);
                     return patchs;
                 })

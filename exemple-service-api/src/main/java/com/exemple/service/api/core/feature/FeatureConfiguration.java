@@ -124,9 +124,9 @@ public class FeatureConfiguration extends ResourceConfig {
         @Override
         public ValidationConfig getContext(Class<?> type) {
 
-            ValidationConfig config = new ValidationConfig();
+            var config = new ValidationConfig();
 
-            ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+            var messageSource = new ReloadableResourceBundleMessageSource();
 
             messageSource.setCacheSeconds(0);
             messageSource.setBasename("classpath:messages/erreur_messages");

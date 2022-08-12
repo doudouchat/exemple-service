@@ -19,27 +19,27 @@ public class SchemaValidation {
 
     public void validate(JsonNode source, String resourceName) {
 
-        String app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
-        String version = requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER);
-        String profile = ((ApiSecurityContext) requestContext.getSecurityContext()).getProfile();
+        var app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
+        var version = requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER);
+        var profile = ((ApiSecurityContext) requestContext.getSecurityContext()).getProfile();
 
         schema.validate(app, version, profile, resourceName, source);
     }
 
     public void validate(JsonNode source, JsonNode previousSource, String resourceName) {
 
-        String app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
-        String version = requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER);
-        String profile = ((ApiSecurityContext) requestContext.getSecurityContext()).getProfile();
+        var app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
+        var version = requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER);
+        var profile = ((ApiSecurityContext) requestContext.getSecurityContext()).getProfile();
 
         schema.validate(app, version, profile, resourceName, source, previousSource);
     }
 
     public void validate(ArrayNode patch, JsonNode previousSource, String resourceName) {
 
-        String app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
-        String version = requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER);
-        String profile = ((ApiSecurityContext) requestContext.getSecurityContext()).getProfile();
+        var app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
+        var version = requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER);
+        var profile = ((ApiSecurityContext) requestContext.getSecurityContext()).getProfile();
 
         schema.validate(app, version, profile, resourceName, patch, previousSource);
     }

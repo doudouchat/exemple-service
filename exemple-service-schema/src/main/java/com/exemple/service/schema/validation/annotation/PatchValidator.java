@@ -22,7 +22,7 @@ public class PatchValidator implements ConstraintValidator<Patch, ArrayNode> {
     @Override
     public boolean isValid(ArrayNode source, ConstraintValidatorContext context) {
 
-        boolean valid = true;
+        var valid = true;
 
         try {
 

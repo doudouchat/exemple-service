@@ -80,7 +80,7 @@ public class HistoryResource<T, E extends HistoryModel<T>> {
         String path = patch.get(JsonPatchUtils.PATH).asText();
         JsonNode value = patch.path(JsonPatchUtils.VALUE);
 
-        E history = this.defaultHistoryBuilder.get();
+        var history = this.defaultHistoryBuilder.get();
         history.setId(id);
         history.setField(path);
         history.setDate(now.toInstant());

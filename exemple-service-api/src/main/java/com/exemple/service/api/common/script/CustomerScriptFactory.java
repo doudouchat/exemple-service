@@ -92,7 +92,7 @@ public class CustomerScriptFactory {
         try (Stream<Path> paths = Files.list(path)) {
 
             paths.filter((Path p) -> Paths.get(contextName).equals(p.getFileName())).findFirst().ifPresent(((Path p) -> {
-                String contextKey = path.getFileName().toString();
+                var contextKey = path.getFileName().toString();
                 saveContextIfUpdated(contextKey, p);
             }));
         }
@@ -105,7 +105,7 @@ public class CustomerScriptFactory {
         long checksum = FileUtils.checksumCRC32(contextPath.toFile());
         if (checksum != checksumApplicationContexts.getOrDefault(contextKey, 0L)) {
 
-            String configLocation = contextPath.toString();
+            var configLocation = contextPath.toString();
             LOG.debug("loading context {}", configLocation);
 
             scriptApplicationContexts.put(contextKey,

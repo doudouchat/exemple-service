@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.metadata.schema.TableMetadata;
 import com.datastax.oss.driver.api.core.type.DataType;
 import com.datastax.oss.driver.api.core.type.ListType;
 import com.datastax.oss.driver.api.core.type.MapType;
@@ -57,7 +56,7 @@ public class JsonValidator {
 
         forEach(source::fields, (Map.Entry<String, JsonNode> node) -> {
 
-            DataType type = toDataType(node.getKey(), table);
+            var type = toDataType(node.getKey(), table);
 
             this.valid(type, node);
         });
@@ -100,10 +99,10 @@ public class JsonValidator {
             checkIfCondition(json.getValue().isObject(), "OBJECT", json.getKey());
 
             forEach(json.getValue()::fields, (Entry<String, JsonNode> node) -> {
-                DataType keyType = dataType.getKeyType();
+                var keyType = dataType.getKeyType();
                 valid(keyType, Maps.immutableEntry(json.getKey(), new TextNode(node.getKey())));
 
-                DataType valueType = dataType.getValueType();
+                var valueType = dataType.getValueType();
                 valid(valueType, node);
 
             });
@@ -204,7 +203,7 @@ public class JsonValidator {
 
             checkIfCondition(json.getValue().isTextual(), "VARCHAR", json.getKey());
 
-            String value = new StringBuilder().append("'").append(json.getValue().asText()).append("'").toString();
+            var value = new StringBuilder().append("'").append(json.getValue().asText()).append("'").toString();
             checkPrimitive(value, dataType, json);
 
         }
@@ -266,7 +265,7 @@ public class JsonValidator {
 
     private DataType toDataType(String key, String table) throws JsonValidatorException {
 
-        TableMetadata tableMetadata = MetadataSchemaUtils.getTableMetadata(session, table);
+        var tableMetadata = MetadataSchemaUtils.getTableMetadata(session, table);
         return tableMetadata.getColumn(key).orElseThrow(() -> new JsonValidatorException(UNKNOWN_EXCEPTION, key)).getType();
     }
 
