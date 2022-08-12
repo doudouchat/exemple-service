@@ -24,9 +24,6 @@
 		<configuration.name>exemple-service-configuration</configuration.name>
 		<configuration.path>file:${project.build.testOutputDirectory}/exemple-service-test.yml</configuration.path>
 
-		<!-- SONAR -->
-		<sonar.coverage.exclusions>**/core/**/*.java</sonar.coverage.exclusions>
-
 		<!-- API -->
 		<cassandra.host>127.0.0.1</cassandra.host>
 		<hazelcast.port>5706</hazelcast.port>
@@ -324,24 +321,6 @@
 									</portNames>
 								</configuration>
 							</execution>
-							<execution>
-								<id>add-source</id>
-								<goals>
-									<goal>add-source</goal>
-								</goals>
-								<phase>pre-integration-test</phase>
-								<configuration>
-									<sources>
-										<source>${project.parent.basedir}/exemple-service-api/src/main/java</source>
-										<source>${project.parent.basedir}/exemple-service-resource/src/main/java</source>
-										<source>${project.parent.basedir}/exemple-service-customer/src/main/java</source>
-										<source>${project.parent.basedir}/exemple-service-schema/src/main/java</source>
-										<source>${project.parent.basedir}/exemple-service-application/src/main/java</source>
-										<source>${project.parent.basedir}/exemple-service-event/src/main/java</source>
-										<source>${project.parent.basedir}/exemple-service-store/src/main/java</source>
-									</sources>
-								</configuration>
-							</execution>
 						</executions>
 					</plugin>
 
@@ -349,19 +328,23 @@
 					<plugin>
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
+						<configuration>
+							<excludes>
+								<exclude>com/exemple/service/api/launcher/account/**</exclude>
+								<exclude>com/exemple/service/api/launcher/actuate/**</exclude>
+								<exclude>com/exemple/service/api/launcher/core/**</exclude>
+								<exclude>com/exemple/service/api/launcher/login/**</exclude>
+								<exclude>com/exemple/service/api/launcher/stock/**</exclude>
+								<exclude>com/exemple/service/api/launcher/subscription/**</exclude>
+								<exclude>com/exemple/service/api/launcher/swagger/**</exclude>
+							</excludes>
+						</configuration>
 						<executions>
 							<execution>
 								<id>report-integration</id>
 								<goals>
 									<goal>report-integration</goal>
 								</goals>
-								<configuration>
-									<dataFile>${sonar.jacoco.itReportPath}</dataFile>
-									<outputDirectory>${project.parent.reporting.outputDirectory}/jacoco-it</outputDirectory>
-									<excludes>
-										<exclude>com/exemple/service/api/launcher/**</exclude>
-									</excludes>
-								</configuration>
 							</execution>
 						</executions>
 					</plugin>
