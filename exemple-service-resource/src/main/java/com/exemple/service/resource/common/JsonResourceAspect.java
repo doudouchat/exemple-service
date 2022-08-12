@@ -18,7 +18,6 @@ public class JsonResourceAspect {
             + "com.exemple.service.resource..*.*(..))")
     public Optional<JsonNode> returnOptionalJsonNode(ProceedingJoinPoint joinPoint) throws Throwable {
 
-        @SuppressWarnings("unchecked")
         Optional<JsonNode> source = (Optional<JsonNode>) joinPoint.proceed();
         if (source.isPresent()) {
             return Optional.of(JsonNodeFilterUtils.clean(source.get()));

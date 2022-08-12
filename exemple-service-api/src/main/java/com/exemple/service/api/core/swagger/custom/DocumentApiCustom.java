@@ -79,7 +79,6 @@ public class DocumentApiCustom extends AbstractSpecFilter {
 
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public Optional<Schema> filterSchema(Schema schema, Map<String, List<String>> params, Map<String, String> cookies,
             Map<String, List<String>> headers) {
@@ -87,7 +86,6 @@ public class DocumentApiCustom extends AbstractSpecFilter {
         String host = headers.get(DocumentApiResource.APP_HOST).stream().findFirst().orElseThrow(IllegalArgumentException::new);
         String app = headers.get(DocumentApiResource.APP).stream().findFirst().orElseThrow(IllegalArgumentException::new);
 
-        @SuppressWarnings("unchecked")
         Map<String, Object> extensions = MapUtils.emptyIfNull(schema.getExtensions());
 
         String version = (String) extensions.get(X_VERSION);
