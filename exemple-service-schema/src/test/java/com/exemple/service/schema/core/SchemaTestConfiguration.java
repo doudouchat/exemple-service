@@ -33,8 +33,7 @@ public class SchemaTestConfiguration {
         SchemaResource resource = Mockito.mock(SchemaResource.class);
 
         SchemaEntity unknownResourceSchema = new SchemaEntity();
-        Mockito.when(resource.get(Mockito.eq("unknown"), Mockito.eq("unknown"), Mockito.eq("schema_test"), Mockito.eq("unknown")))
-                .thenReturn(Optional.of(unknownResourceSchema));
+        Mockito.when(resource.get("unknown", "unknown", "schema_test", "unknown")).thenReturn(Optional.of(unknownResourceSchema));
 
         SchemaEntity schemaTest = new SchemaEntity();
         schemaTest.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("schema_test.json").getInputStream())));
@@ -54,14 +53,12 @@ public class SchemaTestConfiguration {
         schemaPatchs.add(patchUpdateDate);
 
         schemaTest.setPatchs(schemaPatchs);
-        Mockito.when(resource.get(Mockito.eq("default"), Mockito.eq("default"), Mockito.eq("schema_test"), Mockito.eq("default")))
-                .thenReturn(Optional.of(schemaTest));
+        Mockito.when(resource.get("default", "default", "schema_test", "default")).thenReturn(Optional.of(schemaTest));
 
         SchemaEntity schemaArray = new SchemaEntity();
         schemaArray.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("schema_array.json").getInputStream())));
 
-        Mockito.when(resource.get(Mockito.eq("default"), Mockito.eq("default"), Mockito.eq("array_test"), Mockito.eq("default")))
-                .thenReturn(Optional.of(schemaArray));
+        Mockito.when(resource.get("default", "default", "array_test", "default")).thenReturn(Optional.of(schemaArray));
 
         return resource;
     }

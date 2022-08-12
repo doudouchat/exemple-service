@@ -85,8 +85,7 @@ class AccountServiceTest {
 
         // And check save login resource
 
-        Mockito.verify(loginResource).save(Mockito.eq(UUID.fromString(accountCaptor.getValue().get("id").textValue())),
-                Mockito.eq("jean.dupont@gmail.com"));
+        Mockito.verify(loginResource).save(UUID.fromString(accountCaptor.getValue().get("id").textValue()), "jean.dupont@gmail.com");
 
         // And check publish resource
 
@@ -176,8 +175,8 @@ class AccountServiceTest {
 
         // And check save login resource
 
-        Mockito.verify(loginResource).save(Mockito.eq(id), Mockito.eq("jean.dupond@gmail.com"));
-        Mockito.verify(loginResource).delete(Mockito.eq("jean.dupont@gmail.com"));
+        Mockito.verify(loginResource).save(id, "jean.dupond@gmail.com");
+        Mockito.verify(loginResource).delete("jean.dupont@gmail.com");
 
         // And check publish resource
 
@@ -198,7 +197,7 @@ class AccountServiceTest {
         // And mock resource
 
         JsonNode source = MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\", \"lastname\": \"Dupont\", \"firstname\":\"Jean\"}");
-        Mockito.when(accountResource.get(Mockito.eq(id))).thenReturn(Optional.of(source));
+        Mockito.when(accountResource.get(id)).thenReturn(Optional.of(source));
 
         // When perform get
 

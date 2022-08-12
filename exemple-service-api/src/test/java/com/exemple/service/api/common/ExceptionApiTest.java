@@ -113,7 +113,7 @@ class ExceptionApiTest extends JerseySpringSupport {
 
         // And mock service
 
-        Mockito.when(service.get(Mockito.eq(id))).thenReturn(Optional.of(MAPPER.createObjectNode()));
+        Mockito.when(service.get(id)).thenReturn(Optional.of(MAPPER.createObjectNode()));
 
         // When perform patch
 

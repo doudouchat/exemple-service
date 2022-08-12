@@ -48,7 +48,7 @@ class LoginApiTest extends JerseySpringSupport {
 
         // And mock service
 
-        Mockito.when(resource.get(Mockito.eq(username))).thenReturn(Optional.of(UUID.randomUUID()));
+        Mockito.when(resource.get(username)).thenReturn(Optional.of(UUID.randomUUID()));
 
         // When perform head
 
@@ -69,7 +69,7 @@ class LoginApiTest extends JerseySpringSupport {
 
         // And mock service
 
-        Mockito.when(resource.get(Mockito.eq(username))).thenReturn(Optional.empty());
+        Mockito.when(resource.get(username)).thenReturn(Optional.empty());
 
         // When perform head
 
@@ -92,7 +92,7 @@ class LoginApiTest extends JerseySpringSupport {
 
         UUID id = UUID.randomUUID();
 
-        Mockito.when(resource.get(Mockito.eq(username))).thenReturn(Optional.of(id));
+        Mockito.when(resource.get(username)).thenReturn(Optional.of(id));
 
         // When perform get
 
