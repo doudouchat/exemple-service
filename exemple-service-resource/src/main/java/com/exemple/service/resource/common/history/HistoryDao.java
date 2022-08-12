@@ -24,7 +24,6 @@ public interface HistoryDao<I, T extends HistoryModel<I>> extends Supplier<Objec
         return invoke(get(), "deleteByIdAndField", id, field);
     }
 
-    @SuppressWarnings("unchecked")
     @SneakyThrows
     static <T> T invoke(Object object, String methodeName, Object... args) {
         return (T) MethodUtils.invokeExactMethod(object, methodeName, args);
