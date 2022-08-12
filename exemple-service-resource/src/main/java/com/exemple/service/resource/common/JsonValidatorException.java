@@ -5,8 +5,6 @@ import lombok.Getter;
 @Getter
 public class JsonValidatorException extends Exception {
 
-    private static final long serialVersionUID = 1L;
-
     private final String key;
 
     private final String node;

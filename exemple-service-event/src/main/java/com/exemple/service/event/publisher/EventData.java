@@ -10,8 +10,6 @@ import lombok.Getter;
 @Getter
 public class EventData extends ApplicationEvent {
 
-    private static final long serialVersionUID = 1L;
-
     private final String resource;
     private final EventType eventType;
     private final String origin;

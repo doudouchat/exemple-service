@@ -9,8 +9,6 @@ public class InsufficientStockException extends Exception {
 
     protected static final String EXCEPTION_MESSAGE = "Stock {0}:{1} is insufficient for quantity {2}";
 
-    private static final long serialVersionUID = 1L;
-
     private final String company;
 
     private final String store;

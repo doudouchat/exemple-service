@@ -9,8 +9,6 @@ import lombok.Getter;
 @Getter
 public class ValidationException extends RuntimeException {
 
-    private static final long serialVersionUID = 1L;
-
     private final Set<ValidationExceptionCause> causes;
 
     public ValidationException(Set<ValidationExceptionCause> causes) {

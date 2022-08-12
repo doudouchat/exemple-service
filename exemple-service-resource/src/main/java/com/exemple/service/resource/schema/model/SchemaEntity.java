@@ -19,8 +19,6 @@ import lombok.Setter;
 @Setter
 public class SchemaEntity implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     @PartitionKey
     @CqlName("app")
     private String application;

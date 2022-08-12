@@ -1,7 +1,5 @@
 package com.exemple.service.schema.common.exception;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,9 +11,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @EqualsAndHashCode
-public class ValidationExceptionCause implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class ValidationExceptionCause {
 
     private final String path;
 
