@@ -55,7 +55,11 @@ class PatchValidatorTest {
     @MethodSource
     void patchSuccess(ArrayNode argument) {
 
-        exemple.exemple(argument);
+        // When perform validate
+        Throwable throwable = catchThrowable(() -> exemple.exemple(argument));
+
+        // Then check none exception
+        assertThat(throwable).as("None exception is expected").isNull();
 
     }
 
