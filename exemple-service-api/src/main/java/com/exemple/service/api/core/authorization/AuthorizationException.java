@@ -7,8 +7,6 @@ import lombok.Getter;
 @Getter
 public class AuthorizationException extends Exception {
 
-    private static final long serialVersionUID = 1L;
-
     private final Response.Status status;
 
     public AuthorizationException(Response.Status status, Throwable cause) {
