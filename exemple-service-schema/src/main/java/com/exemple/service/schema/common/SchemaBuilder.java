@@ -33,7 +33,7 @@ public class SchemaBuilder {
 
         this.schemaResource = schemaResource;
 
-        JSONObject schemaJson = new JSONObject(new JSONTokener(new ClassPathResource("default-schema.json").getInputStream()));
+        var schemaJson = new JSONObject(new JSONTokener(new ClassPathResource("default-schema.json").getInputStream()));
         defaultSchema = SchemaBuilder.buildSchema(schemaJson);
     }
 
@@ -61,14 +61,14 @@ public class SchemaBuilder {
     private static Schema buildSchema(JsonNode schema, Set<JsonNode> patchs) {
 
         ArrayNode patch = MAPPER.createArrayNode().addAll(patchs);
-        JSONObject rawSchema = new JSONObject(new JSONTokener(JsonPatch.apply(patch, schema).toString()));
+        var rawSchema = new JSONObject(new JSONTokener(JsonPatch.apply(patch, schema).toString()));
         return buildSchema(rawSchema);
 
     }
 
     private static Schema buildSchema(JSONObject rawSchema) {
 
-        SchemaLoader schemaLoader = SchemaLoader.builder().draftV7Support().schemaJson(rawSchema)
+        var schemaLoader = SchemaLoader.builder().draftV7Support().schemaJson(rawSchema)
                 .addFormatValidator(new CustomDateTimeFormatValidator()).enableOverrideOfBuiltInFormatValidators().build();
         return schemaLoader.load().build();
 

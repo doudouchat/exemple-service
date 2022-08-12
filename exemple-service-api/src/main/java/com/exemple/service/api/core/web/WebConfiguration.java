@@ -15,7 +15,7 @@ public class WebConfiguration implements WebMvcConfigurer {
     @Bean
     public FilterRegistrationBean<CharacterEncodingFilter> filterRegistrationBean() {
         FilterRegistrationBean<CharacterEncodingFilter> registrationBean = new FilterRegistrationBean<>();
-        CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+        var characterEncodingFilter = new CharacterEncodingFilter();
         characterEncodingFilter.setForceEncoding(true);
         characterEncodingFilter.setEncoding(StandardCharsets.UTF_8.name());
         registrationBean.setFilter(characterEncodingFilter);

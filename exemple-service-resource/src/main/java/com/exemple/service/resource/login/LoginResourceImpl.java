@@ -36,7 +36,7 @@ public class LoginResourceImpl implements LoginResource {
     @Override
     public void save(UUID id, String username) {
 
-        LoginEntity source = new LoginEntity();
+        var source = new LoginEntity();
         source.setId(id);
         source.setUsername(username);
 

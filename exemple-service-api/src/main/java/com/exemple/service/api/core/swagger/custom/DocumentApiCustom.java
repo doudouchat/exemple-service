@@ -49,18 +49,18 @@ public class DocumentApiCustom extends AbstractSpecFilter {
 
     private static void buildVersioningSchema(Map<String, MediaType> content, Map<String, List<String>> headers) {
 
-        MediaType mediaType = MapUtils.emptyIfNull(content).get(javax.ws.rs.core.MediaType.APPLICATION_JSON);
+        var mediaType = MapUtils.emptyIfNull(content).get(javax.ws.rs.core.MediaType.APPLICATION_JSON);
 
         if (mediaType != null) {
 
-            String name = StringUtils.substring(mediaType.getSchema().get$ref(), "#/components/schemas/".length());
+            var name = StringUtils.substring(mediaType.getSchema().get$ref(), "#/components/schemas/".length());
             headers.entrySet().stream()
 
                     .filter((Map.Entry<String, List<String>> header) -> StringUtils.equalsAnyIgnoreCase(header.getKey(),
                             DocumentApiResource.RESOURCE + name))
                     .forEach((Map.Entry<String, List<String>> header) -> {
 
-                        ComposedSchema composedSchema = new ComposedSchema();
+                        var composedSchema = new ComposedSchema();
 
                         header.getValue().stream().map((String version) -> {
                             String[] values = version.split("\\|");
@@ -94,7 +94,7 @@ public class DocumentApiCustom extends AbstractSpecFilter {
         if (version != null) {
 
             String profile = (String) extensions.get(X_PROFILE);
-            StringBuilder ref = new StringBuilder();
+            var ref = new StringBuilder();
             ref.append(host)
 
                     .append("ws/v1/schemas/")
@@ -136,7 +136,7 @@ public class DocumentApiCustom extends AbstractSpecFilter {
                 .filter((Map.Entry<String, List<String>> header) -> StringUtils.startsWith(header.getKey(), DocumentApiResource.RESOURCE))
                 .forEach((Map.Entry<String, List<String>> header) -> {
 
-                    String name = header.getKey().substring(DocumentApiResource.RESOURCE.length());
+                    var name = header.getKey().substring(DocumentApiResource.RESOURCE.length());
 
                     header.getValue().stream().map((String version) -> {
                         String[] values = version.split("\\|");

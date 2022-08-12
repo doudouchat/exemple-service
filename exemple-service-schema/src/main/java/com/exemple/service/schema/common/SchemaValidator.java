@@ -29,7 +29,7 @@ public interface SchemaValidator extends Consumer<ValidationException> {
 
     static void performValidation(Schema schema, ReadWriteContext context, JsonNode form) {
 
-        Validator validator = Validator.builder().readWriteContext(context).build();
+        var validator = Validator.builder().readWriteContext(context).build();
 
         try {
 

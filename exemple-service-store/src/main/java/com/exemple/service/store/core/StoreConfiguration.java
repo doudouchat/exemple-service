@@ -37,8 +37,7 @@ public class StoreConfiguration {
     @Bean(initMethod = "start", destroyMethod = "close")
     public CuratorFramework storeCuratorFramework() {
 
-        CuratorFramework client = CuratorFrameworkFactory.newClient(address, sessionTimeout, connectionTimeout,
-                new RetryNTimes(retry, sleepMsBetweenRetries));
+        var client = CuratorFrameworkFactory.newClient(address, sessionTimeout, connectionTimeout, new RetryNTimes(retry, sleepMsBetweenRetries));
 
         client.getConnectionStateListenable().addListener((c, state) -> LOG.debug("State changed to: {}", state));
 

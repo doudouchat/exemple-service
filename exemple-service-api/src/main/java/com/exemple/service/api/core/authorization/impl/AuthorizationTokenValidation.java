@@ -12,7 +12,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.api.core.authorization.AuthorizationException;
-import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 
 import lombok.RequiredArgsConstructor;
@@ -43,7 +42,7 @@ public class AuthorizationTokenValidation {
     public void checkClientId(DecodedJWT jwt, MultivaluedMap<String, String> headers) throws AuthorizationException {
 
         String application = headers.getFirst(ApplicationBeanParam.APP_HEADER);
-        ApplicationDetail applicationDetail = applicationDetailService.get(application)
+        var applicationDetail = applicationDetailService.get(application)
                 .orElseThrow(() -> new AuthorizationException(Response.Status.FORBIDDEN, application + " is forbidden"));
         String clientId = getClientId(jwt);
         if (!applicationDetail.getClientIds().contains(clientId)) {

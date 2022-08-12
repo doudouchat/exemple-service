@@ -19,7 +19,7 @@ public class ApiConfiguration {
     @Bean
     public MessageSource messageSource() {
 
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        var messageSource = new ReloadableResourceBundleMessageSource();
 
         messageSource.setCacheSeconds(0);
         messageSource.setBasename("classpath:messages/erreur_messages");
@@ -36,7 +36,7 @@ public class ApiConfiguration {
     @Bean
     public MethodValidationPostProcessor methodValidationPostProcessor() {
 
-        MethodValidationPostProcessor methodValidationPostProcessor = new MethodValidationPostProcessor();
+        var methodValidationPostProcessor = new MethodValidationPostProcessor();
         methodValidationPostProcessor.setValidator(validator());
 
         return methodValidationPostProcessor;

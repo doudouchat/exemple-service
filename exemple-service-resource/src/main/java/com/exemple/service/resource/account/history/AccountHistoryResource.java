@@ -53,7 +53,7 @@ public class AccountHistoryResource {
 
     public Collection<BoundStatement> saveHistories(JsonNode source, JsonNode previousSource) {
 
-        UUID id = UUID.fromString(source.get(AccountField.ID.field).textValue());
+        var id = UUID.fromString(source.get(AccountField.ID.field).textValue());
 
         return this.historyResource.saveHistories(id, source, previousSource);
     }

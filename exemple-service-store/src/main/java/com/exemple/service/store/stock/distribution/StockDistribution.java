@@ -78,7 +78,7 @@ public class StockDistribution {
         }
 
         if (client.checkExists().forPath(company + store + product) == null) {
-            PersistentTtlNode node = new PersistentTtlNode(client, company + store + product, productTtlMs, new byte[0]);
+            var node = new PersistentTtlNode(client, company + store + product, productTtlMs, new byte[0]);
             node.start();
             return node;
         }

@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.flipkart.zjsonpatch.DiffFlags;
 import com.flipkart.zjsonpatch.JsonDiff;
 import com.google.common.collect.Streams;
@@ -32,7 +31,7 @@ public final class JsonPatchUtils {
 
         ArrayNode patchs = (ArrayNode) JsonDiff.asJson(source, target, EnumSet.of(DiffFlags.OMIT_COPY_OPERATION, DiffFlags.OMIT_MOVE_OPERATION));
 
-        ArrayNode result = MAPPER.createArrayNode();
+        var result = MAPPER.createArrayNode();
 
         Streams.stream(patchs.elements()).filter((JsonNode patch) -> !isRemoveOperation(patch)).flatMap(JsonPatchUtils::completePatch)
                 .forEach(result::add);
@@ -54,7 +53,7 @@ public final class JsonPatchUtils {
         if (value.isObject()) {
 
             return Streams.stream(value.fields()).flatMap((Map.Entry<String, JsonNode> node) -> {
-                ObjectNode patch = MAPPER.createObjectNode();
+                var patch = MAPPER.createObjectNode();
                 patch.set(OP, element.get(OP));
                 patch.set(PATH, MAPPER.convertValue(element.get(PATH).textValue() + JsonPointer.SEPARATOR + node.getKey(), JsonNode.class));
                 patch.set(VALUE, node.getValue());
@@ -66,7 +65,7 @@ public final class JsonPatchUtils {
         if (value.isArray()) {
 
             return IntStream.range(0, ((ArrayNode) value).size()).mapToObj((int index) -> {
-                ObjectNode patch = MAPPER.createObjectNode();
+                var patch = MAPPER.createObjectNode();
                 patch.set(OP, element.get(OP));
                 patch.set(PATH, MAPPER.convertValue(element.get(PATH).textValue() + JsonPointer.SEPARATOR + index, JsonNode.class));
                 patch.set(VALUE, ((ArrayNode) value).get(index));

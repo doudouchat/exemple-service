@@ -7,10 +7,7 @@ import org.springframework.validation.annotation.Validated;
 
 import com.datastax.oss.driver.api.core.ConsistencyLevel;
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
-import com.datastax.oss.driver.api.querybuilder.select.Select;
-import com.datastax.oss.driver.api.querybuilder.update.Update;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.store.stock.StockResource;
 
@@ -28,7 +25,7 @@ public class StockResourceImpl implements StockResource {
     @Override
     public void update(String store, String product, long quantity) {
 
-        Update update = QueryBuilder.update(ResourceExecutionContext.get().keyspace(), STOCK_TABLE)
+        var update = QueryBuilder.update(ResourceExecutionContext.get().keyspace(), STOCK_TABLE)
                 .increment("quantity", QueryBuilder.literal(quantity)).whereColumn("store").isEqualTo(QueryBuilder.literal(store))
                 .whereColumn("product").isEqualTo(QueryBuilder.literal(product));
 
@@ -38,10 +35,10 @@ public class StockResourceImpl implements StockResource {
     @Override
     public Optional<Long> get(String store, String product) {
 
-        Select select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), STOCK_TABLE).column("quantity").whereColumn("store")
+        var select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), STOCK_TABLE).column("quantity").whereColumn("store")
                 .isEqualTo(QueryBuilder.literal(store)).whereColumn("product").isEqualTo(QueryBuilder.literal(product));
 
-        Row row = session.execute(select.build().setConsistencyLevel(ConsistencyLevel.QUORUM)).one();
+        var row = session.execute(select.build().setConsistencyLevel(ConsistencyLevel.QUORUM)).one();
 
         return Optional.ofNullable(row != null ? row.getLong(0) : null);
     }

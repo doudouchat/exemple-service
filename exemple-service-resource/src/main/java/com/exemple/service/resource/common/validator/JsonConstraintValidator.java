@@ -24,7 +24,7 @@ public class JsonConstraintValidator implements ConstraintValidator<Json, JsonNo
     @Override
     public boolean isValid(JsonNode source, ConstraintValidatorContext context) {
 
-        boolean valid = true;
+        var valid = true;
 
         try {
 
@@ -34,7 +34,7 @@ public class JsonConstraintValidator implements ConstraintValidator<Json, JsonNo
 
             valid = false;
 
-            StringBuilder message = new StringBuilder();
+            var message = new StringBuilder();
             message.append(messageTemplate.replace("{", "").replace("}", "")).append('.').append(e.getKey());
 
             LOG.trace(message.toString(), e);

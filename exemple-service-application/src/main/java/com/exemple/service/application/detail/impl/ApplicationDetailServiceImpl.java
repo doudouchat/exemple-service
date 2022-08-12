@@ -64,7 +64,7 @@ public class ApplicationDetailServiceImpl implements ApplicationDetailService {
 
     private PersistentNode createDetail(String application, JsonNode detail) {
 
-        PersistentNode node = new PersistentNode(client, CreateMode.PERSISTENT, false, "/" + application,
+        var node = new PersistentNode(client, CreateMode.PERSISTENT, false, "/" + application,
                 detail.toString().getBytes(StandardCharsets.UTF_8));
         node.start();
 

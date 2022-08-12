@@ -34,7 +34,7 @@ public class SchemaValidationImpl implements SchemaValidation {
     @Override
     public void validate(String app, String version, String profile, String resource, JsonNode form) {
 
-        Schema schema = schemaBuilder.buildCreationSchema(app, version, resource, profile);
+        var schema = schemaBuilder.buildCreationSchema(app, version, resource, profile);
         SchemaValidator.performValidation(schema, ReadWriteContext.WRITE, form);
 
     }
@@ -42,7 +42,7 @@ public class SchemaValidationImpl implements SchemaValidation {
     @Override
     public void validate(String app, String version, String profile, String resource, JsonNode form, JsonNode old) {
 
-        Schema schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
+        var schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
 
         SchemaValidator.performValidation(schema, ReadWriteContext.WRITE, form, (ValidationException e) -> {
 
@@ -57,7 +57,7 @@ public class SchemaValidationImpl implements SchemaValidation {
     @Override
     public void validate(String app, String version, String profile, String resource, ArrayNode patch, JsonNode old) {
 
-        Schema schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
+        var schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
 
         JsonNode oldFilterBySchema = this.schemaFilter.filterAllProperties(app, version, resource, profile, old);
 
@@ -94,8 +94,7 @@ public class SchemaValidationImpl implements SchemaValidation {
 
     private static void throwExceptionIfCausesNotEmpty(ValidationException e, Predicate<ValidationExceptionCause> filter) {
 
-        ValidationException validationException = new ValidationException(
-                e.getCauses().stream().filter(filter).collect(Collectors.toSet()));
+        var validationException = new ValidationException(e.getCauses().stream().filter(filter).collect(Collectors.toSet()));
 
         if (!validationException.getCauses().isEmpty()) {
             throw validationException;

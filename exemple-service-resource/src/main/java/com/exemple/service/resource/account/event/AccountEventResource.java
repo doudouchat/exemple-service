@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
-import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.account.AccountField;
 import com.exemple.service.resource.account.event.dao.AccountEventDao;
@@ -31,11 +30,11 @@ public class AccountEventResource {
 
     public BoundStatement saveEvent(JsonNode source, EventType eventType) {
 
-        UUID id = UUID.fromString(source.get(AccountField.ID.field).textValue());
+        var id = UUID.fromString(source.get(AccountField.ID.field).textValue());
 
-        ServiceContext context = ServiceContextExecution.context();
+        var context = ServiceContextExecution.context();
 
-        AccountEvent accountEvent = new AccountEvent();
+        var accountEvent = new AccountEvent();
         accountEvent.setId(id);
         accountEvent.setData(source);
         accountEvent.setVersion(context.getVersion());

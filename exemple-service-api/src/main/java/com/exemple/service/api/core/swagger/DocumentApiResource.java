@@ -65,9 +65,9 @@ public class DocumentApiResource extends BaseOpenApiResource {
 
     public DocumentApiResource(SchemaResource schemaResource, ApiContext apiContext) {
 
-        OpenAPI openAPI = new OpenAPI();
+        var openAPI = new OpenAPI();
 
-        Info info = new Info();
+        var info = new Info();
         info.title("Api documentation");
         info.description("Api documentation");
         openAPI.setInfo(info);
@@ -97,7 +97,7 @@ public class DocumentApiResource extends BaseOpenApiResource {
 
         this.openApiConfiguration.getOpenAPI().getInfo().setVersion(apiContext.getVersion());
 
-        Server server = new Server();
+        var server = new Server();
         server.setUrl(host);
 
         this.openApiConfiguration.getOpenAPI().addServersItem(server);

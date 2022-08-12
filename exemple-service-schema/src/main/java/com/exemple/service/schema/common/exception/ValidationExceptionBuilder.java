@@ -2,7 +2,6 @@ package com.exemple.service.schema.common.exception;
 
 import java.util.Collections;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -63,7 +62,7 @@ public final class ValidationExceptionBuilder {
 
     private static String getValue(String message) {
 
-        Matcher matcher = PATTERN.matcher(message);
+        var matcher = PATTERN.matcher(message);
 
         Assert.isTrue(matcher.lookingAt(), "Pattern is invalid");
 

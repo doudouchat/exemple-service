@@ -3,13 +3,11 @@ package com.exemple.service.api.core.authorization.impl;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.KeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Base64;
@@ -79,14 +77,14 @@ public class AuthorizationAlgorithmFactory {
         Assert.notNull(body, "Body is missing");
         Assert.isTrue(body.get("value").isTextual(), "Value is missing");
 
-        Matcher publicKeyMatcher = RSA_PUBLIC_KEY.matcher(body.get("value").textValue());
+        var publicKeyMatcher = RSA_PUBLIC_KEY.matcher(body.get("value").textValue());
 
         Assert.isTrue(publicKeyMatcher.lookingAt(), "Pattern is invalid");
 
         final byte[] content = Base64.decodeBase64(publicKeyMatcher.group(1).getBytes(StandardCharsets.UTF_8));
 
         KeySpec keySpec = new X509EncodedKeySpec(content);
-        PublicKey publicKey = this.keyFactory.generatePublic(keySpec);
+        var publicKey = this.keyFactory.generatePublic(keySpec);
 
         return Algorithm.RSA256((RSAPublicKey) publicKey, null);
     }

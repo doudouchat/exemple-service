@@ -17,7 +17,7 @@ public class AppAndVersionCheckFeature implements DynamicFeature {
 
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
-        AnnotatedMethod am = new AnnotatedMethod(resourceInfo.getResourceMethod());
+        var am = new AnnotatedMethod(resourceInfo.getResourceMethod());
 
         AppAndVersionCheck appAndVersion = am.getAnnotation(AppAndVersionCheck.class);
         if (appAndVersion != null) {

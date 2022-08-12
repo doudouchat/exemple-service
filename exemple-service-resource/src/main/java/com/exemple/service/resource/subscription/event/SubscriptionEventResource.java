@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
-import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.core.ResourceExecutionContext;
@@ -32,9 +31,9 @@ public class SubscriptionEventResource {
 
         String email = source.get(SubscriptionField.EMAIL.field).textValue();
 
-        ServiceContext context = ServiceContextExecution.context();
+        var context = ServiceContextExecution.context();
 
-        SubscriptionEvent subscriptionEvent = new SubscriptionEvent();
+        var subscriptionEvent = new SubscriptionEvent();
         subscriptionEvent.setEmail(email);
         subscriptionEvent.setData(source);
         subscriptionEvent.setVersion(context.getVersion());
@@ -48,9 +47,9 @@ public class SubscriptionEventResource {
 
     public BoundStatement saveEvent(String email, EventType eventType) {
 
-        ServiceContext context = ServiceContextExecution.context();
+        var context = ServiceContextExecution.context();
 
-        SubscriptionEvent subscriptionEvent = new SubscriptionEvent();
+        var subscriptionEvent = new SubscriptionEvent();
         subscriptionEvent.setEmail(email);
         subscriptionEvent.setVersion(context.getVersion());
         subscriptionEvent.setApplication(context.getApp());
