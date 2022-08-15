@@ -1,0 +1,131 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>exemple</groupId>
+		<artifactId>exemple-service</artifactId>
+		<version>3.0.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>jacoco-report</artifactId>
+
+	<properties>
+
+		<!-- SONAR -->
+		<sonar.coverage.jacoco.xmlReportPaths>${sonar.coverage.report.path}</sonar.coverage.jacoco.xmlReportPaths>
+
+	</properties>
+
+	<dependencies>
+
+		<!-- CONTEXT -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-context</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- APPLICATION -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-application</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- RESOURCE -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-resource</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- EVENT -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-event</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- CUSTOMER -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-customer</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- STORE -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-store</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- SCHEMA -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-schema</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- API -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- LAUNCHER -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-api-launcher</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+
+		<plugins>
+
+			<!-- JACOCO -->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>com/exemple/service/api/launcher/account/**</exclude>
+						<exclude>com/exemple/service/api/launcher/actuate/**</exclude>
+						<exclude>com/exemple/service/api/launcher/core/**</exclude>
+						<exclude>com/exemple/service/api/launcher/login/**</exclude>
+						<exclude>com/exemple/service/api/launcher/stock/**</exclude>
+						<exclude>com/exemple/service/api/launcher/subscription/**</exclude>
+						<exclude>com/exemple/service/api/launcher/swagger/**</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>report-sonar</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report-aggregate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+
+		</plugins>
+
+	</build>
+
+</project>
