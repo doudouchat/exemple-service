@@ -24,6 +24,9 @@
 		<configuration.name>exemple-service-configuration</configuration.name>
 		<configuration.path>file:${project.build.testOutputDirectory}/exemple-service-test.yml</configuration.path>
 
+		<!-- SONAR -->
+		<sonar.coverage.jacoco.xmlReportPaths>${sonar.coverage.report.path}</sonar.coverage.jacoco.xmlReportPaths>
+
 		<!-- API -->
 		<cassandra.host>127.0.0.1</cassandra.host>
 		<hazelcast.port>5706</hazelcast.port>

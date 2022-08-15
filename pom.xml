@@ -25,6 +25,7 @@
 		<module>exemple-service-store</module>
 		<module>exemple-service-api</module>
 		<module>exemple-service-api-launcher</module>
+		<module>jacoco-report</module>
 	</modules>
 
 	<scm>
@@ -54,6 +55,8 @@
 		<cassandra-version>3.11.13</cassandra-version>
 
 		<!-- SONAR -->
+		<sonar.coverage.exclusions>**/test/**/*.java</sonar.coverage.exclusions>
+		<sonar.coverage.report.path>${basedir}/../jacoco-report/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.report.path>
 
 		<!-- force sonar to use jacoco -->
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>

@@ -9,6 +9,13 @@
 	</parent>
 	<artifactId>exemple-service-schema</artifactId>
 
+	<properties>
+
+		<!-- SONAR -->
+		<sonar.coverage.jacoco.xmlReportPaths>${sonar.coverage.report.path}</sonar.coverage.jacoco.xmlReportPaths>
+
+	</properties>
+
 	<dependencies>
 
 		<!-- RESOURCE -->
