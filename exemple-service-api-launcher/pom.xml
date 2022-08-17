@@ -60,8 +60,24 @@
 
 			<dependency>
 				<groupId>io.cucumber</groupId>
-				<artifactId>cucumber-junit</artifactId>
+				<artifactId>cucumber-junit-platform-engine</artifactId>
 				<version>7.4.1</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- JUNIT PLATEFORM -->
+
+			<dependency>
+				<groupId>org.junit.platform</groupId>
+				<artifactId>junit-platform-suite-api</artifactId>
+				<version>1.8.2</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.junit.platform</groupId>
+				<artifactId>junit-platform-suite-engine</artifactId>
+				<version>1.8.2</version>
 				<scope>test</scope>
 			</dependency>
 
@@ -145,8 +161,20 @@
 
 		<dependency>
 			<groupId>io.cucumber</groupId>
-			<artifactId>cucumber-junit</artifactId>
+			<artifactId>cucumber-junit-platform-engine</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<!-- JUNIT PLATEFORM -->
+
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-suite-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-suite-engine</artifactId>
 		</dependency>
 
 	</dependencies>
@@ -240,13 +268,6 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<dependencies>
-						<dependency>
-							<groupId>org.apache.maven.surefire</groupId>
-							<artifactId>surefire-junit47</artifactId>
-							<version>${maven-surefire-plugin.version}</version>
-						</dependency>
-					</dependencies>
 					<executions>
 						<execution>
 							<goals>
