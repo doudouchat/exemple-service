@@ -30,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CustomerScriptFactory {
 
+    private static final ApplicationContext EMPTY_CONTEXT = new GenericApplicationContext();
+
     private final ApplicationDetailService applicationDetailService;
 
     private final ApplicationContext defaultApplicationContext;
@@ -41,8 +43,6 @@ public class CustomerScriptFactory {
     private final ApplicationContext applicationContext;
 
     private final String contextsPath;
-
-    private static final ApplicationContext EMPTY_CONTEXT = new GenericApplicationContext();
 
     public CustomerScriptFactory(ApplicationDetailService applicationDetailService, @Value("${customer.contexts.path}") String contextsPath,
             ApplicationContext applicationContext) {
