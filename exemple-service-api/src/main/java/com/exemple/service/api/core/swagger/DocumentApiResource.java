@@ -109,7 +109,7 @@ public class DocumentApiResource extends BaseOpenApiResource {
         if (documentApiSecurity != null) {
 
             String ctxId = ServletConfigContextUtils.getContextIdFromServletConfig(config);
-            OpenApiContext ctx = new JaxrsOpenApiContextBuilder().servletConfig(config).application(application).resourcePackages(resourcePackages)
+            OpenApiContext ctx = new JaxrsOpenApiContextBuilder<>().servletConfig(config).application(application).resourcePackages(resourcePackages)
                     .configLocation(configLocation).openApiConfiguration(openApiConfiguration).ctxId(ctxId).buildContext(true);
             OpenAPI oas = ctx.read();
 

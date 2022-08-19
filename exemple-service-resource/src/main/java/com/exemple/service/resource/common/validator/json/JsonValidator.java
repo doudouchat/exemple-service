@@ -65,9 +65,9 @@ public class JsonValidator {
 
     private void valid(DataType dataType, Map.Entry<String, JsonNode> json) throws JsonValidatorException {
 
-        Stream<AbstractJsonValidate> validates = jsonValidates.stream()
+        Stream<AbstractJsonValidate<DataType>> validates = jsonValidates.stream()
                 .filter(validate -> validate.hasChecked(dataType))
-                .map(AbstractJsonValidate.class::cast)
+                .map(validate -> (AbstractJsonValidate<DataType>) validate)
                 .filter(validate -> !json.getValue().isNull());
 
         forEach(validates::iterator, jsonValidate -> jsonValidate.check(dataType, json));
@@ -242,7 +242,7 @@ public class JsonValidator {
 
     }
 
-    private void checkPrimitive(String value, PrimitiveType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
+    private void checkPrimitive(String value, DataType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
 
         TypeCodec<Object> typeCodec = toTypeCodec(dataType);
         try {
@@ -252,7 +252,7 @@ public class JsonValidator {
         }
     }
 
-    private boolean isStringOrInstant(PrimitiveType dataType) {
+    private boolean isStringOrInstant(DataType dataType) {
         TypeCodec<Object> typeCodec = toTypeCodec(dataType);
         Class<Object> javaType = typeCodec.getJavaType().getRawType();
         return javaType.equals(String.class) || javaType.equals(java.time.Instant.class);
