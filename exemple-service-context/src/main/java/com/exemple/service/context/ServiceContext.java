@@ -3,19 +3,19 @@ package com.exemple.service.context;
 import java.security.Principal;
 import java.time.OffsetDateTime;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
+@Builder(toBuilder = true)
 @Getter
-@Setter
 public class ServiceContext {
 
-    private OffsetDateTime date = OffsetDateTime.now();
+    private final OffsetDateTime date;
 
-    private Principal principal = () -> "anonymous";
+    private final Principal principal;
 
-    private String app;
+    private final String app;
 
-    private String version;
+    private final String version;
 
 }

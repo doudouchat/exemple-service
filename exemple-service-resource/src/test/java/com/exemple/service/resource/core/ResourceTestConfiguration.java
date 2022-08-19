@@ -110,7 +110,7 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
 
         session.setSchemaMetadataEnabled(true);
 
-        ServiceContextExecution.context().setApp("test");
+        ServiceContextExecution.setApp("test");
     }
 
     @Bean

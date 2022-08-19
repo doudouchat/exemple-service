@@ -24,7 +24,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
             ApiSecurityContext context = service.buildContext(requestContext.getHeaders());
 
-            ServiceContextExecution.context().setPrincipal(context.getUserPrincipal());
+            ServiceContextExecution.setPrincipal(context.getUserPrincipal());
 
             requestContext.setSecurityContext(context);
 

@@ -40,9 +40,9 @@ class DataEventListenerTest extends KafkaTestEvent {
         // and build context
         String origin = "app1";
         String originVersion = "v1";
-        ServiceContextExecution.context().setDate(date);
-        ServiceContextExecution.context().setApp(origin);
-        ServiceContextExecution.context().setVersion(originVersion);
+        ServiceContextExecution.setDate(date);
+        ServiceContextExecution.setApp(origin);
+        ServiceContextExecution.setVersion(originVersion);
 
         // when publish event
         dataEventPublisher.publish(resource, "account", EventType.CREATE);

@@ -21,9 +21,9 @@ public class ExecutionContextResponseFilter implements ContainerRequestFilter, C
     @Override
     public void filter(ContainerRequestContext requestContext) {
 
-        ServiceContextExecution.context().setDate(OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS));
-        ServiceContextExecution.context().setApp(requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER));
-        ServiceContextExecution.context().setVersion(requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER));
+        ServiceContextExecution.setDate(OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS));
+        ServiceContextExecution.setApp(requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER));
+        ServiceContextExecution.setVersion(requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER));
 
     }
 
