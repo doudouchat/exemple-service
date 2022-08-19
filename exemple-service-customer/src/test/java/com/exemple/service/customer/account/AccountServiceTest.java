@@ -16,7 +16,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.common.event.EventType;
 import com.exemple.service.customer.common.event.ResourceEventPublisher;
@@ -52,8 +51,7 @@ class AccountServiceTest {
     @BeforeAll
     public static void initServiceContextExecution() {
 
-        ServiceContext context = ServiceContextExecution.context();
-        context.setApp("default");
+        ServiceContextExecution.setApp("default");
     }
 
     @Test

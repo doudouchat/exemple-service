@@ -60,10 +60,10 @@ class SubscriptionResourceTest {
     void initExecutionContextDate() {
 
         OffsetDateTime now = OffsetDateTime.now();
-        ServiceContextExecution.context().setDate(now);
-        ServiceContextExecution.context().setPrincipal(() -> "user");
-        ServiceContextExecution.context().setApp("test");
-        ServiceContextExecution.context().setVersion("v1");
+        ServiceContextExecution.setDate(now);
+        ServiceContextExecution.setPrincipal(() -> "user");
+        ServiceContextExecution.setApp("test");
+        ServiceContextExecution.setVersion("v1");
 
     }
 
