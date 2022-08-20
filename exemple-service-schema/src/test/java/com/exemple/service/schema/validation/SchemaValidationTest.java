@@ -5,9 +5,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -57,16 +55,9 @@ class SchemaValidationTest {
         patch2.put("op", "remove");
         patch2.put("path", "/firstname");
 
-        Map<String, Object> cgu1 = new HashMap<>();
-        cgu1.put("code", "code_1");
-        cgu1.put("version", "v1");
-
-        Map<String, Object> cgu2 = new HashMap<>();
-        cgu2.put("code", "code_1");
-        cgu2.put("version", "v2");
-        Map<String, Object> cgu3 = new HashMap<>();
-        cgu3.put("code", "code_2");
-        cgu3.put("version", "v1");
+        Map<String, Object> cgu1 = Map.of("code", "code_1", "version", "v1");
+        Map<String, Object> cgu2 = Map.of("code", "code_1", "version", "v2");
+        Map<String, Object> cgu3 = Map.of("code", "code_2", "version", "v1");
 
         ObjectNode patch31 = MAPPER.createObjectNode();
         patch31.put("op", "add");
@@ -123,28 +114,18 @@ class SchemaValidationTest {
         patch10.put("path", "/firstname");
         patch10.put("value", " ");
 
-        Map<String, Object> holidays = new HashMap<>();
-
-        Map<String, Object> holiday = new HashMap<>();
-        holiday.put("city", "Paris");
-        holiday.put("street", "rue de la paix");
-
-        Map<String, Object> home = new HashMap<>();
-        home.put("city", "Paris");
-
-        holidays.put("holiday1", holiday);
-        holidays.put("holiday2", holiday);
-        holidays.put("holiday3", holiday);
-
         ObjectNode patch11 = MAPPER.createObjectNode();
         patch11.put("op", "add");
         patch11.put("path", "/addresses/home");
-        patch11.set("value", MAPPER.convertValue(home, JsonNode.class));
+        patch11.set("value", MAPPER.convertValue(Map.of("city", "Paris"), JsonNode.class));
 
         ObjectNode patch12 = MAPPER.createObjectNode();
         patch12.put("op", "add");
         patch12.put("path", "/addresses");
-        patch12.set("value", MAPPER.convertValue(holidays, JsonNode.class));
+        patch12.set("value", MAPPER.convertValue(Map.of(
+                "holiday1", Map.of("city", "Paris", "street", "rue de la paix"),
+                "holiday2", Map.of("city", "Paris", "street", "rue de la paix"),
+                "holiday3", Map.of("city", "Paris", "street", "rue de la paix")), JsonNode.class));
 
         ObjectNode patch13 = MAPPER.createObjectNode();
         patch13.put("op", "add");
@@ -196,13 +177,13 @@ class SchemaValidationTest {
         @DisplayName("source creation success")
         void creationSuccess() {
 
-            Map<String, Object> model = new HashMap<>();
-            model.put("email", "jean.dupont@gmail.com");
-            model.put("lastname", "Dupont");
-            model.put("firstname", "Jean");
-            model.put("opt_in_email", true);
-            model.put("civility", "Mr");
-            model.put("creation_date", "2019-06-17T19:16:40Z");
+            Map<String, Object> model = Map.of(
+                    "email", "jean.dupont@gmail.com",
+                    "lastname", "Dupont",
+                    "firstname", "Jean",
+                    "opt_in_email", true,
+                    "civility", "Mr",
+                    "creation_date", "2019-06-17T19:16:40Z");
 
             // When perform validate
             Throwable throwable = catchThrowable(
@@ -223,13 +204,13 @@ class SchemaValidationTest {
         void creationFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
 
             // Given model
-            Map<String, Object> origin = new HashMap<>();
-            origin.put("lastname", "Dupont");
-            origin.put("firstname", "Jean");
-            origin.put("opt_in_email", false);
-            origin.put("civility", "Mr");
-            origin.put("cgus", MAPPER.createArrayNode());
-            origin.put("addresses", MAPPER.createObjectNode());
+            Map<String, Object> origin = Map.of(
+                    "lastname", "Dupont",
+                    "firstname", "Jean",
+                    "opt_in_email", false,
+                    "civility", "Mr",
+                    "cgus", MAPPER.createArrayNode(),
+                    "addresses", MAPPER.createObjectNode());
 
             JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
 
@@ -255,9 +236,7 @@ class SchemaValidationTest {
         void creationFailureWhenSchemaNotExists() {
 
             // Given source
-            Map<String, Object> model = new HashMap<>();
-            model.put("email", "jean.dupont@gmail.com");
-
+            Map<String, Object> model = Map.of("email", "jean.dupont@gmail.com");
             JsonNode source = MAPPER.convertValue(model, JsonNode.class);
 
             // When perform
@@ -283,17 +262,10 @@ class SchemaValidationTest {
         void creationSuccess() {
 
             // Given build model
-            Map<String, Object> addresse1 = new HashMap<>();
-            addresse1.put("street", "1 rue de la paix");
-            addresse1.put("city", "Paris");
+            Map<String, Object> addresse1 = Map.of("street", "1 rue de la paix", "city", "Paris");
+            Map<String, Object> addresse2 = Map.of("street", "2 rue de la paix", "city", "Paris");
 
-            Map<String, Object> addresse2 = new HashMap<>();
-            addresse2.put("street", "2 rue de la paix");
-            addresse2.put("city", "Paris");
-
-            List<Object> addresses = new ArrayList<>();
-            addresses.add(addresse1);
-            addresses.add(addresse2);
+            List<Object> addresses = List.of(addresse1, addresse2);
 
             JsonNode model = MAPPER.convertValue(addresses, JsonNode.class);
 
@@ -308,11 +280,9 @@ class SchemaValidationTest {
         void creationFailure() {
 
             // Given build model
-            Map<String, Object> addresse = new HashMap<>();
-            addresse.put("street", "1 rue de la paix");
+            Map<String, Object> addresse = Map.of("street", "1 rue de la paix");
 
-            List<Object> addresses = new ArrayList<>();
-            addresses.add(addresse);
+            List<Object> addresses = List.of(addresse);
 
             JsonNode model = MAPPER.convertValue(addresses, JsonNode.class);
 
@@ -341,18 +311,12 @@ class SchemaValidationTest {
             patch1.put("path", "/email");
             patch1.put("value", "jack.dupond@gmail.com");
 
-            Map<String, Object> addresse = new HashMap<>();
-            addresse.put("city", "New York");
-            addresse.put("street", "5th avenue");
-
             ObjectNode patch2 = MAPPER.createObjectNode();
             patch2.put("op", "add");
             patch2.put("path", "/addresses/holidays");
-            patch2.set("value", MAPPER.convertValue(addresse, JsonNode.class));
+            patch2.set("value", MAPPER.convertValue(Map.of("city", "New York", "street", "5th avenue"), JsonNode.class));
 
-            Map<String, Object> cgu = new HashMap<>();
-            cgu.put("code", "code_1");
-            cgu.put("version", "v1");
+            Map<String, Object> cgu = Map.of("code", "code_1", "version", "v1");
 
             ObjectNode patch3 = MAPPER.createObjectNode();
             patch3.put("op", "add");
@@ -376,14 +340,14 @@ class SchemaValidationTest {
         void patchSuccess(JsonNode patch) {
 
             // build source
-            Map<String, Object> origin = new HashMap<>();
-            origin.put("email", "jean.dupont@gmail.com");
-            origin.put("lastname", "Dupont");
-            origin.put("firstname", "Jean");
-            origin.put("opt_in_email", true);
-            origin.put("civility", "Mr");
-            origin.put("addresses", MAPPER.createObjectNode());
-            origin.put("cgus", MAPPER.createArrayNode());
+            Map<String, Object> origin = Map.of(
+                    "email", "jean.dupont@gmail.com",
+                    "lastname", "Dupont",
+                    "firstname", "Jean",
+                    "opt_in_email", true,
+                    "civility", "Mr",
+                    "addresses", MAPPER.createObjectNode(),
+                    "cgus", MAPPER.createArrayNode());
             JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
 
             ArrayNode patchs = MAPPER.createArrayNode();
@@ -416,13 +380,13 @@ class SchemaValidationTest {
         void patchFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
 
             // Given origin
-            Map<String, Object> origin = new HashMap<>();
-            origin.put("opt_in_email", false);
-            origin.put("lastname", "doe");
-            origin.put("firstname", "john");
-            origin.put("cgus", MAPPER.createArrayNode());
-            origin.put("addresses", MAPPER.createObjectNode());
-            origin.put("hide", BooleanNode.TRUE);
+            Map<String, Object> origin = Map.of(
+                    "opt_in_email", false,
+                    "lastname", "doe",
+                    "firstname", "john",
+                    "cgus", MAPPER.createArrayNode(),
+                    "addresses", MAPPER.createObjectNode(),
+                    "hide", BooleanNode.TRUE);
 
             JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
 
@@ -459,13 +423,13 @@ class SchemaValidationTest {
         void patchFailure(String[] expectedCode, String expectedPath, int expectedExceptions, JsonNode... patchs) {
 
             // Given origin
-            Map<String, Object> origin = new HashMap<>();
-            origin.put("opt_in_email", false);
-            origin.put("lastname", "doe");
-            origin.put("firstname", "john");
-            origin.put("cgus", MAPPER.createArrayNode());
-            origin.put("addresses", MAPPER.createObjectNode());
-            origin.put("hide", BooleanNode.TRUE);
+            Map<String, Object> origin = Map.of(
+                    "opt_in_email", false,
+                    "lastname", "doe",
+                    "firstname", "john",
+                    "cgus", MAPPER.createArrayNode(),
+                    "addresses", MAPPER.createObjectNode(),
+                    "hide", BooleanNode.TRUE);
 
             JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
 
@@ -522,50 +486,16 @@ class SchemaValidationTest {
         void fixIncorrectSource(JsonNode patch) {
 
             // Given origin
-            Map<String, Object> origin = new HashMap<>();
-
-            // And email incorrect
-            origin.put("email", "toto");
-
-            // And cgu incorrect
-            Map<String, Object> cgu = new HashMap<>();
-            cgu.put("code", "code_1");
-            cgu.put("version", "v1");
-
-            List<Map<String, Object>> cgus = new ArrayList<>();
-            cgus.add(cgu);
-            cgus.add(cgu);
-
-            origin.put("cgus", cgus);
-
-            // And max cgv
-            Map<String, Object> cgv1 = new HashMap<>();
-            cgv1.put("code", "code_1");
-            cgv1.put("version", "v1");
-
-            Map<String, Object> cgv2 = new HashMap<>();
-            cgv2.put("code", "code_2");
-            cgv2.put("version", "v1");
-
-            Map<String, Object> cgv3 = new HashMap<>();
-            cgv3.put("code", "code_3");
-            cgv3.put("version", "v1");
-
-            List<Map<String, Object>> cgvs = new ArrayList<>();
-            cgvs.add(cgv1);
-            cgvs.add(cgv2);
-            cgvs.add(cgv3);
-
-            origin.put("cgvs", cgvs);
-
-            // And addresses incorrect
-            Map<String, Object> home = new HashMap<>();
-            home.put("city", "Paris");
-
-            Map<String, Object> addresses = new HashMap<>();
-            addresses.put("home", home);
-
-            origin.put("addresses", addresses);
+            Map<String, Object> origin = Map.of(
+                    // And email incorrect
+                    "email", "toto",
+                    // And cgu incorrect
+                    "cgus", List.of(Map.of("code", "code_1", "version", "v1"), Map.of("code", "code_1", "version", "v1")),
+                    // And max cgv
+                    "cgvs", List.of(Map.of("code", "code_1", "version", "v1"), Map.of("code", "code_2", "version", "v1"),
+                            Map.of("code", "code_3", "version", "v1")),
+                    // And addresses incorrect
+                    "addresses", Map.of("home", Map.of("city", "Paris")));
 
             // And form
             ArrayNode patchs = MAPPER.createArrayNode();
@@ -586,28 +516,20 @@ class SchemaValidationTest {
             patch1.put("path", "/email");
             patch1.put("value", "tata");
 
-            Map<String, Object> cgu = new HashMap<>();
-            cgu.put("code", "code_1");
-            cgu.put("version", "v2");
-
             ObjectNode patch21 = MAPPER.createObjectNode();
             patch21.put("op", "replace");
             patch21.put("path", "/cgus/0");
-            patch21.set("value", MAPPER.convertValue(cgu, JsonNode.class));
+            patch21.set("value", MAPPER.convertValue(Map.of("code", "code_1", "version", "v2"), JsonNode.class));
 
             ObjectNode patch22 = MAPPER.createObjectNode();
             patch22.put("op", "replace");
             patch22.put("path", "/cgus/1");
-            patch22.set("value", MAPPER.convertValue(cgu, JsonNode.class));
-
-            Map<String, Object> holiday = new HashMap<>();
-            holiday.put("city", "Paris");
-            holiday.put("street", "2 rue de la paix");
+            patch22.set("value", MAPPER.convertValue(Map.of("code", "code_1", "version", "v2"), JsonNode.class));
 
             ObjectNode patch3 = MAPPER.createObjectNode();
             patch3.put("op", "replace");
             patch3.put("path", "/addresses/holiday");
-            patch3.set("value", MAPPER.convertValue(holiday, JsonNode.class));
+            patch3.set("value", MAPPER.convertValue(Map.of("city", "Paris", "street", "2 rue de la paix"), JsonNode.class));
 
             ObjectNode patch41 = MAPPER.createObjectNode();
             patch41.put("op", "remove");
@@ -616,18 +538,13 @@ class SchemaValidationTest {
             ObjectNode patch42 = MAPPER.createObjectNode();
             patch42.put("op", "replace");
             patch42.put("path", "/addresses/home");
-            Map<String, Object> home = new HashMap<>();
-            home.put("city", "Londres");
+            Map<String, Object> home = Map.of("city", "Londres");
             patch42.set("value", MAPPER.convertValue(home, JsonNode.class));
-
-            Map<String, Object> cgv = new HashMap<>();
-            cgv.put("code", "code_4");
-            cgv.put("version", "v1");
 
             ObjectNode patch5 = MAPPER.createObjectNode();
             patch5.put("op", "add");
             patch5.put("path", "/cgvs/0");
-            patch5.set("value", MAPPER.convertValue(cgv, JsonNode.class));
+            patch5.set("value", MAPPER.convertValue(Map.of("code", "code_4", "version", "v1"), JsonNode.class));
 
             return Stream.of(
                     // email format
@@ -649,60 +566,19 @@ class SchemaValidationTest {
         void fixIncorrectSourceFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
 
             // Given origin
-            Map<String, Object> origin = new HashMap<>();
-
-            // And email incorrect
-            origin.put("email", "toto");
-
-            // And cgu incorrect
-            Map<String, Object> cgu = new HashMap<>();
-            cgu.put("code", "code_1");
-            cgu.put("version", "v1");
-
-            List<Map<String, Object>> cgus = new ArrayList<>();
-            cgus.add(cgu);
-            cgus.add(cgu);
-
-            origin.put("cgus", cgus);
-
-            // And max cgv
-            Map<String, Object> cgv1 = new HashMap<>();
-            cgv1.put("code", "code_1");
-            cgv1.put("version", "v1");
-
-            Map<String, Object> cgv2 = new HashMap<>();
-            cgv2.put("code", "code_2");
-            cgv2.put("version", "v1");
-
-            Map<String, Object> cgv3 = new HashMap<>();
-            cgv3.put("code", "code_3");
-            cgv3.put("version", "v1");
-
-            List<Map<String, Object>> cgvs = new ArrayList<>();
-            cgvs.add(cgv1);
-            cgvs.add(cgv2);
-            cgvs.add(cgv3);
-
-            origin.put("cgvs", cgvs);
-
-            // And addresses incorrect
-            Map<String, Object> holiday = new HashMap<>();
-            holiday.put("city", "Paris");
-            holiday.put("street", "rue de la paix");
-
-            Map<String, Object> job = new HashMap<>();
-            job.put("city", "Paris");
-            job.put("street", "rue de la paix");
-
-            Map<String, Object> home = new HashMap<>();
-            home.put("city", "Paris");
-
-            Map<String, Object> addresses = new HashMap<>();
-            addresses.put("holiday", holiday);
-            addresses.put("job", job);
-            addresses.put("home", home);
-
-            origin.put("addresses", addresses);
+            Map<String, Object> origin = Map.of(
+                    // And email incorrect
+                    "email", "toto",
+                    // And cgu incorrect
+                    "cgus", List.of(Map.of("code", "code_1", "version", "v1"), Map.of("code", "code_1", "version", "v1")),
+                    // And max cgv
+                    "cgvs", List.of(Map.of("code", "code_1", "version", "v1"), Map.of("code", "code_2", "version", "v1"),
+                            Map.of("code", "code_3", "version", "v1")),
+                    // And addresses incorrect
+                    "addresses", Map.of(
+                            "holiday", Map.of("city", "Paris", "street", "rue de la paix"),
+                            "job", Map.of("city", "Paris", "street", "rue de la paix"),
+                            "home", Map.of("city", "Paris")));
 
             // And form
             ArrayNode patch = MAPPER.createArrayNode();
@@ -726,8 +602,7 @@ class SchemaValidationTest {
 
             // Given origin
 
-            Map<String, Object> origin = new HashMap<>();
-            origin.put("email", "jean.dupond@gmail.com");
+            Map<String, Object> origin = Map.of("email", "jean.dupond@gmail.com");
             JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
 
             // And Patch
@@ -757,8 +632,7 @@ class SchemaValidationTest {
         void patchFailureWhenFieldIsMissing() {
 
             // Given origin
-            Map<String, Object> origin = new HashMap<>();
-            origin.put("hide", BooleanNode.TRUE);
+            Map<String, Object> origin = Map.of("hide", BooleanNode.TRUE);
 
             JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
 
@@ -792,23 +666,15 @@ class SchemaValidationTest {
             patch1.put("path", "/email");
             patch1.put("value", "jack.dupont@gmail.com");
 
-            Map<String, Object> addresse = new HashMap<>();
-            addresse.put("city", "New York");
-            addresse.put("street", "5th avenue");
-
             ObjectNode patch2 = MAPPER.createObjectNode();
             patch2.put("op", "add");
             patch2.put("path", "/addresses/holidays");
-            patch2.set("value", MAPPER.convertValue(addresse, JsonNode.class));
-
-            Map<String, Object> cgu = new HashMap<>();
-            cgu.put("code", "code_1");
-            cgu.put("version", "v1");
+            patch2.set("value", MAPPER.convertValue(Map.of("city", "New York", "street", "5th avenue"), JsonNode.class));
 
             ObjectNode patch3 = MAPPER.createObjectNode();
             patch3.put("op", "add");
             patch3.put("path", "/cgus/0");
-            patch3.set("value", MAPPER.convertValue(cgu, JsonNode.class));
+            patch3.set("value", MAPPER.convertValue(Map.of("code", "code_1", "version", "v1"), JsonNode.class));
 
             return Stream.of(
                     // replace email
@@ -825,14 +691,14 @@ class SchemaValidationTest {
         void updateSuccess(JsonNode patch) {
 
             // build source
-            Map<String, Object> origin = new HashMap<>();
-            origin.put("email", "jean.dupont@gmail.com");
-            origin.put("lastname", "Dupont");
-            origin.put("firstname", "Jean");
-            origin.put("opt_in_email", true);
-            origin.put("civility", "Mr");
-            origin.put("addresses", MAPPER.createObjectNode());
-            origin.put("cgus", MAPPER.createArrayNode());
+            Map<String, Object> origin = Map.of(
+                    "email", "jean.dupont@gmail.com",
+                    "lastname", "Dupont",
+                    "firstname", "Jean",
+                    "opt_in_email", true,
+                    "civility", "Mr",
+                    "addresses", MAPPER.createObjectNode(),
+                    "cgus", MAPPER.createArrayNode());
 
             JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
 
@@ -877,13 +743,13 @@ class SchemaValidationTest {
         void updateFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
 
             // Given origin
-            Map<String, Object> origin = new HashMap<>();
-            origin.put("id", UUID.randomUUID().toString());
-            origin.put("opt_in_email", false);
-            origin.put("firstname", "john");
-            origin.put("lastname", "doe");
-            origin.put("cgus", MAPPER.createArrayNode());
-            origin.put("addresses", MAPPER.createObjectNode());
+            Map<String, Object> origin = Map.of(
+                    "id", UUID.randomUUID().toString(),
+                    "opt_in_email", false,
+                    "firstname", "john",
+                    "lastname", "doe",
+                    "cgus", MAPPER.createArrayNode(),
+                    "addresses", MAPPER.createObjectNode());
             JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
 
             // And form
@@ -926,13 +792,13 @@ class SchemaValidationTest {
         void updateFailure(String[] expectedCode, String expectedPath, int expectedExceptions, JsonNode... patchs) {
 
             // Given origin
-            Map<String, Object> origin = new HashMap<>();
-            origin.put("id", UUID.randomUUID().toString());
-            origin.put("opt_in_email", false);
-            origin.put("firstname", "john");
-            origin.put("lastname", "doe");
-            origin.put("cgus", MAPPER.createArrayNode());
-            origin.put("addresses", MAPPER.createObjectNode());
+            Map<String, Object> origin = Map.of(
+                    "id", UUID.randomUUID().toString(),
+                    "opt_in_email", false,
+                    "firstname", "john",
+                    "lastname", "doe",
+                    "cgus", MAPPER.createArrayNode(),
+                    "addresses", MAPPER.createObjectNode());
             JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
 
             // And form
@@ -959,20 +825,20 @@ class SchemaValidationTest {
         void fixIncorrectSource() {
 
             // Given origin
-            Map<String, Object> origin = new HashMap<>();
-            origin.put("id", UUID.randomUUID().toString());
-            origin.put("email", "toto");
-            origin.put("opt_in_email", false);
-            origin.put("firstname", "john");
-            origin.put("lastname", "doe");
+            Map<String, Object> origin = Map.of(
+                    "id", UUID.randomUUID().toString(),
+                    "email", "toto",
+                    "opt_in_email", false,
+                    "firstname", "john",
+                    "lastname", "doe");
 
             // And email incorrect
-            Map<String, Object> model = new HashMap<>();
-            model.put("id", origin.get("id"));
-            model.put("email", "jean.dupond@gmail.com");
-            model.put("opt_in_email", false);
-            model.put("firstname", "john");
-            model.put("lastname", "doe");
+            Map<String, Object> model = Map.of(
+                    "id", origin.get("id"),
+                    "email", "jean.dupond@gmail.com",
+                    "opt_in_email", false,
+                    "firstname", "john",
+                    "lastname", "doe");
 
             // When perform
             JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
@@ -988,8 +854,7 @@ class SchemaValidationTest {
         void updateFailureWhenSchemaNotExists() {
 
             // Given origin
-            Map<String, Object> origin = new HashMap<>();
-            origin.put("email", "jean.dupont@gmail.com");
+            Map<String, Object> origin = Map.of("email", "jean.dupont@gmail.com");
             JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
 
             // And Patch
@@ -1026,13 +891,8 @@ class SchemaValidationTest {
         void validationNotUniqueItemsFailure() {
 
             // Given build model
-            Map<String, Object> addresse = new HashMap<>();
-            addresse.put("street", "1 rue de la paix");
-            addresse.put("city", "paris");
-
-            List<Object> addresses = new ArrayList<>();
-            addresses.add(addresse);
-            addresses.add(addresse);
+            Map<String, Object> addresse = Map.of("street", "1 rue de la paix", "city", "paris");
+            List<Object> addresses = List.of(addresse, addresse);
 
             JsonNode model = MAPPER.convertValue(addresses, JsonNode.class);
 
@@ -1057,12 +917,12 @@ class SchemaValidationTest {
         @Test
         void validationSchema() throws IOException {
 
-            Map<String, Object> model = new HashMap<>();
-            model.put("email", "jean.dupont@gmail.com");
-            model.put("lastname", "Dupont");
-            model.put("firstname", "Jean");
-            model.put("opt_in_email", true);
-            model.put("civility", "Mr");
+            Map<String, Object> model = Map.of(
+                    "email", "jean.dupont@gmail.com",
+                    "lastname", "Dupont",
+                    "firstname", "Jean",
+                    "opt_in_email", true,
+                    "civility", "Mr");
 
             Schema schema = SchemaBuilder.build(new ClassPathResource("schema_test.json").getInputStream());
 
@@ -1073,12 +933,12 @@ class SchemaValidationTest {
         @Test
         void validationSchemaFailure() throws IOException {
 
-            Map<String, Object> model = new HashMap<>();
-            model.put("email", "jean.dupont");
-            model.put("lastname", "Dupont");
-            model.put("firstname", "Jean");
-            model.put("opt_in_email", true);
-            model.put("civility", "Mr");
+            Map<String, Object> model = Map.of(
+                    "email", "jean.dupont",
+                    "lastname", "Dupont",
+                    "firstname", "Jean",
+                    "opt_in_email", true,
+                    "civility", "Mr");
 
             Schema schema = SchemaBuilder.build(new ClassPathResource("schema_test.json").getInputStream());
 

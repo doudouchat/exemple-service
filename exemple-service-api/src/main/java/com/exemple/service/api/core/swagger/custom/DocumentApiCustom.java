@@ -1,6 +1,5 @@
 package com.exemple.service.api.core.swagger.custom;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -141,9 +140,7 @@ public class DocumentApiCustom extends AbstractSpecFilter {
                         return SchemaVersionProfileEntity.builder().version(values[0]).profile(values[1]).build();
                     }).forEach((SchemaVersionProfileEntity v) -> {
 
-                        Map<String, Object> extensions = new HashMap<>();
-                        extensions.put(X_VERSION, v.getVersion());
-                        extensions.put(X_PROFILE, v.getProfile());
+                        Map<String, Object> extensions = Map.of(X_VERSION, v.getVersion(), X_PROFILE, v.getProfile());
 
                         Schema<?> schema = new Schema<>();
                         schema.setName(name);

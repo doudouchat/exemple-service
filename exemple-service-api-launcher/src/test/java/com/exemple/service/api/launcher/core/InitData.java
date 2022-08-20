@@ -1,7 +1,6 @@
 package com.exemple.service.api.launcher.core;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -73,11 +72,7 @@ public class InitData {
         patchCreationDate.put("path", "/required/0");
         patchCreationDate.put("value", "creation_date");
 
-        Set<JsonNode> accountPatchs = new HashSet<>();
-        accountPatchs.add(patchUpdateDate);
-        accountPatchs.add(patchCreationDate);
-
-        accountSchema.setPatchs(accountPatchs);
+        accountSchema.setPatchs(Set.of(patchUpdateDate, patchCreationDate));
 
         schemaResource.save(accountSchema);
 

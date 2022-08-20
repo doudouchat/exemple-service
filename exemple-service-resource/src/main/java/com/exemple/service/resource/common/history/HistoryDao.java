@@ -13,19 +13,19 @@ import lombok.SneakyThrows;
 public interface HistoryDao<I, T extends HistoryModel<I>> extends Supplier<Object> {
 
     default BoundStatement save(T historyModel) {
-        return invoke(get(), "save", historyModel);
+        return invoke("save", historyModel);
     }
 
     default PagingIterable<T> findById(I id) {
-        return invoke(get(), "findById", id);
+        return invoke("findById", id);
     }
 
     default BoundStatement deleteByIdAndField(I id, String field) {
-        return invoke(get(), "deleteByIdAndField", id, field);
+        return invoke("deleteByIdAndField", id, field);
     }
 
     @SneakyThrows
-    static <T> T invoke(Object object, String methodeName, Object... args) {
-        return (T) MethodUtils.invokeExactMethod(object, methodeName, args);
+    private <O> O invoke(String methodeName, Object... args) {
+        return (O) MethodUtils.invokeExactMethod(get(), methodeName, args);
     }
 }
