@@ -16,13 +16,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ValidationExceptionBuilder {
 
-    private static final Pattern PATTERN;
+    private static final Pattern ADDITIONAL_PROPERTIES_PATTERN;
+
+    private static final Pattern REQUIRED_PATTERN;
 
     private static final Pattern SEPARATOR;
 
     static {
 
-        PATTERN = Pattern.compile(".*\\[(.*)\\].*");
+        ADDITIONAL_PROPERTIES_PATTERN = Pattern.compile("extraneous key \\[(.*)\\] is not permitted");
+        REQUIRED_PATTERN = Pattern.compile("required key \\[(.*)\\] not found");
         SEPARATOR = Pattern.compile("#");
     }
 
@@ -45,8 +48,10 @@ public final class ValidationExceptionBuilder {
 
         switch (exception.getKeyword()) {
             case "required":
+                path = path.concat("/").concat(extractField(REQUIRED_PATTERN, exception));
+                break;
             case "additionalProperties":
-                path = path.concat("/").concat(getValue(exception.getErrorMessage()));
+                path = path.concat("/").concat(extractField(ADDITIONAL_PROPERTIES_PATTERN, exception));
                 break;
             default:
 
@@ -60,9 +65,9 @@ public final class ValidationExceptionBuilder {
         return new ValidationExceptionCause(JsonPointer.compile(path), exception.getKeyword(), exception.getErrorMessage(), value);
     }
 
-    private static String getValue(String message) {
+    private static String extractField(Pattern pattern, org.everit.json.schema.ValidationException exception) {
 
-        var matcher = PATTERN.matcher(message);
+        var matcher = pattern.matcher(exception.getErrorMessage());
 
         Assert.isTrue(matcher.lookingAt(), "Pattern is invalid");
 
