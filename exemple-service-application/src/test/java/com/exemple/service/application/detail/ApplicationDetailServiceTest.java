@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +19,6 @@ import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.core.ApplicationTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Sets;
 
 @SpringJUnitConfig(ApplicationTestConfiguration.class)
 class ApplicationDetailServiceTest {
@@ -34,11 +33,11 @@ class ApplicationDetailServiceTest {
     void createApplication() {
 
         // setup application
-        Map<String, Object> application = new HashMap<>();
-        application.put("keyspace", "keyspace1");
-        application.put("company", "company1");
-        application.put("clientIds", Sets.newHashSet("clientId1"));
-        application.put("other", "other");
+        Map<String, Object> application = Map.of(
+                "keyspace", "keyspace1",
+                "company", "company1",
+                "clientIds", Set.of("clientId1"),
+                "other", "other");
 
         // when save application
         service.put("app", MAPPER.convertValue(application, JsonNode.class));

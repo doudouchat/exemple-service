@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.security.spec.InvalidKeySpecException;
 import java.time.Instant;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -95,19 +94,14 @@ class AuthorizationContextServiceTest {
 
     private static final UUID DEPRECATED_TOKEN_ID = UUID.randomUUID();
 
-    private static Map<String, String> TOKEN_KEY_CORRECT_RESPONSE = new HashMap<>();
+    private static Map<String, String> TOKEN_KEY_CORRECT_RESPONSE = Map.of(
+            "alg", "SHA256withRSA",
+            "value", "-----BEGIN PUBLIC KEY-----\n"
+                    + new String(Base64.encodeBase64(AuthorizationTestConfiguration.PUBLIC_KEY.getEncoded())) + "\n-----END PUBLIC KEY-----");
 
     private static String TOKEN = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe")
             .withArrayClaim("scope", new String[] { "account:write" }).withJWTId(UUID.randomUUID().toString())
             .sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
-
-    static {
-
-        TOKEN_KEY_CORRECT_RESPONSE.put("alg", "SHA256withRSA");
-        TOKEN_KEY_CORRECT_RESPONSE.put("value", "-----BEGIN PUBLIC KEY-----\n"
-                + new String(Base64.encodeBase64(AuthorizationTestConfiguration.PUBLIC_KEY.getEncoded())) + "\n-----END PUBLIC KEY-----");
-
-    }
 
     @BeforeEach
     private void before() {
@@ -131,10 +125,11 @@ class AuthorizationContextServiceTest {
                 .withArrayClaim("scope", new String[] { "account:write" }).withJWTId(DEPRECATED_TOKEN_ID.toString())
                 .sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
 
-        Map<String, String> TOKEN_KEY_OTHER_RESPONSE = new HashMap<>();
-        TOKEN_KEY_OTHER_RESPONSE.put("alg", "SHA256withRSA");
-        TOKEN_KEY_OTHER_RESPONSE.put("value", "-----BEGIN PUBLIC KEY-----\n"
-                + new String(Base64.encodeBase64(AuthorizationTestConfiguration.OTHER_PUBLIC_KEY.getEncoded())) + "\n-----END PUBLIC KEY-----");
+        Map<String, String> TOKEN_KEY_OTHER_RESPONSE = Map.of(
+                "alg", "SHA256withRSA",
+                "value", "-----BEGIN PUBLIC KEY-----\n"
+                        + new String(Base64.encodeBase64(AuthorizationTestConfiguration.OTHER_PUBLIC_KEY.getEncoded()))
+                        + "\n-----END PUBLIC KEY-----");
 
         return Stream.of(
                 Arguments.of(TOKEN, "test", JsonBody.json(TOKEN_KEY_OTHER_RESPONSE)),
@@ -169,10 +164,9 @@ class AuthorizationContextServiceTest {
 
     private static Stream<Arguments> authorizedFailureAlgorithm() {
 
-        Map<String, String> TOKEN_KEY_INCORRECT_RESPONSE = new HashMap<>();
-        TOKEN_KEY_INCORRECT_RESPONSE.put("alg", "SHA256withRSA");
-        TOKEN_KEY_INCORRECT_RESPONSE.put("value",
-                "-----BEGIN PUBLIC KEY-----\n" + new String(Base64.encodeBase64("123".getBytes())) + "\n-----END PUBLIC KEY-----");
+        Map<String, String> TOKEN_KEY_INCORRECT_RESPONSE = Map.of(
+                "alg", "SHA256withRSA",
+                "value", "-----BEGIN PUBLIC KEY-----\n" + new String(Base64.encodeBase64("123".getBytes())) + "\n-----END PUBLIC KEY-----");
 
         return Stream.of(
                 Arguments.of(JsonBody.json(TOKEN_KEY_CORRECT_RESPONSE), Status.BAD_REQUEST, ClientErrorException.class),

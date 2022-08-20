@@ -3,7 +3,6 @@ package com.exemple.service.api.account;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -176,8 +175,7 @@ class AccountApiSecureTest extends JerseySpringSupportSecure {
 
         // When perform post
 
-        Map<String, Object> model = new HashMap<>();
-        model.put("email", "jean.dupond@gmail.com");
+        Map<String, Object> model = Map.of("email", "jean.dupond@gmail.com");
 
         Response response = target(AccountApiTest.URL).request(MediaType.APPLICATION_JSON)
 

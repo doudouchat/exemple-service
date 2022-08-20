@@ -54,7 +54,8 @@ class DataEventListenerTest extends KafkaTestEvent {
                 () -> assertThat(received).isNotNull(),
                 () -> assertThat(received.value()).isEqualTo(resource),
                 () -> assertThat(received.timestamp()).isEqualTo(date.toInstant().toEpochMilli()));
-        try (StringDeserializer deserializer = new StringDeserializer()) {
+        StringDeserializer deserializer = new StringDeserializer();
+        try (deserializer) {
             assertAll(
                     () -> assertThat(deserializer.deserialize(null, received.headers().lastHeader(DataEventListener.X_ORIGIN_VERSION).value()))
                             .isEqualTo(originVersion),

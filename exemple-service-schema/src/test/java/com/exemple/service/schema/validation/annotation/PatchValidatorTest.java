@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -34,10 +33,10 @@ class PatchValidatorTest {
 
     private static Stream<Arguments> patchSuccess() {
 
-        Map<String, Object> patch = new HashMap<>();
-        patch.put("op", "add");
-        patch.put("path", "/lastname");
-        patch.put("value", "Dupond");
+        Map<String, Object> patch = Map.of(
+                "op", "add",
+                "path", "/lastname",
+                "value", "Dupond");
 
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode argumentPatch = mapper.createArrayNode();
@@ -65,15 +64,15 @@ class PatchValidatorTest {
 
     private static Stream<Arguments> patchFailure() {
 
-        Map<String, Object> patch1 = new HashMap<>();
-        patch1.put("op", "bad");
-        patch1.put("path", "/lastname");
-        patch1.put("value", "Dupond");
+        Map<String, Object> patch1 = Map.of(
+                "op", "bad",
+                "path", "/lastname",
+                "value", "Dupond");
 
-        Map<String, Object> patch2 = new HashMap<>();
-        patch2.put("op", "add");
-        patch2.put("path", "lastname");
-        patch2.put("value", "Dupond");
+        Map<String, Object> patch2 = Map.of(
+                "op", "add",
+                "path", "lastname",
+                "value", "Dupond");
 
         return Stream.of(
                 // bad op

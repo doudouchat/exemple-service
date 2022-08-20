@@ -1,7 +1,6 @@
 package com.exemple.service.api.core.exception;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
@@ -24,9 +23,7 @@ public class UsernameAlreadyExistsExceptionProvider implements ExceptionMapper<U
     @Override
     public Response toResponse(UsernameAlreadyExistsException exception) {
 
-        Map<String, Object> cause = new HashMap<>();
-        cause.put("code", "username");
-        cause.put("message", exception.getMessage());
+        Map<String, Object> cause = Map.of("code", "username", "message", exception.getMessage());
 
         return Response.status(Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON).entity(Collections.singletonList(cause)).build();
 

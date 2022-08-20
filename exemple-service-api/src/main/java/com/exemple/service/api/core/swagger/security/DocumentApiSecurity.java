@@ -1,6 +1,5 @@
 package com.exemple.service.api.core.swagger.security;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -24,20 +23,12 @@ public class DocumentApiSecurity {
 
     public Map<String, SecurityScheme> buildSecurityScheme() {
 
-        Map<String, SecurityScheme> securitySchemes = new HashMap<>();
-
-        SecurityScheme oauth2ClientCredentials = new SecurityScheme().type(SecurityScheme.Type.OAUTH2)
-                .flows(new OAuthFlows().clientCredentials(new OAuthFlow().tokenUrl(path + "/oauth/token")));
-        securitySchemes.put(DocumentApiResource.OAUTH2_CLIENT_CREDENTIALS, oauth2ClientCredentials);
-
-        SecurityScheme oauth2Password = new SecurityScheme().type(SecurityScheme.Type.OAUTH2)
-                .flows(new OAuthFlows().password(new OAuthFlow().tokenUrl(path + "/oauth/token")));
-        securitySchemes.put(DocumentApiResource.OAUTH2_PASS, oauth2Password);
-
-        SecurityScheme bearerAuth = new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT");
-        securitySchemes.put(DocumentApiResource.BEARER_AUTH, bearerAuth);
-
-        return securitySchemes;
+        return Map.of(
+                DocumentApiResource.OAUTH2_CLIENT_CREDENTIALS, new SecurityScheme().type(SecurityScheme.Type.OAUTH2)
+                        .flows(new OAuthFlows().clientCredentials(new OAuthFlow().tokenUrl(path + "/oauth/token"))),
+                DocumentApiResource.OAUTH2_PASS, new SecurityScheme().type(SecurityScheme.Type.OAUTH2)
+                        .flows(new OAuthFlows().password(new OAuthFlow().tokenUrl(path + "/oauth/token"))),
+                DocumentApiResource.BEARER_AUTH, new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT"));
     }
 
 }
