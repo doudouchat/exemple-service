@@ -18,22 +18,22 @@ public class InfoConfiguration extends ResourceConfig {
                 // info
                 "com.exemple.service.api.core.info")
 
-                        // Nom de l'application
-                        .setApplicationName("JS Service")
+                // Nom de l'application
+                .setApplicationName("JS Service")
 
-                        // logging
+                // logging
 
-                        .register(LoggingFeature.class)
+                .register(LoggingFeature.class)
 
-                        .property(LoggingFeature.LOGGING_FEATURE_VERBOSITY, LoggingFeature.Verbosity.PAYLOAD_ANY)
+                .property(LoggingFeature.LOGGING_FEATURE_VERBOSITY, LoggingFeature.Verbosity.PAYLOAD_ANY)
 
-                        .property(LoggingFeature.LOGGING_FEATURE_LOGGER_LEVEL, Level.FINE.getName())
+                .property(LoggingFeature.LOGGING_FEATURE_LOGGER_LEVEL, Level.FINE.getName())
 
-                        // JSP
+                // JSP
 
-                        .register(JspMvcFeature.class)
+                .register(JspMvcFeature.class)
 
-                        .property(JspMvcFeature.TEMPLATE_BASE_PATH, "/WEB-INF/pages");
+                .property(JspMvcFeature.TEMPLATE_BASE_PATH, "/WEB-INF/pages");
 
     }
 

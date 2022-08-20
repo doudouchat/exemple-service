@@ -53,69 +53,68 @@ public class FeatureConfiguration extends ResourceConfig {
                 "com.exemple.service.api.subscription",
                 // stock
                 "com.exemple.service.api.stock")
+                // Nom de l'application
+                .setApplicationName("WS Service")
 
-                        // Nom de l'application
-                        .setApplicationName("WS Service")
+                // validation
+                .register(ValidationConfigurationContextResolver.class)
 
-                        // validation
-                        .register(ValidationConfigurationContextResolver.class)
+                // swagger
 
-                        // swagger
+                .register(DocumentApiResource.class)
 
-                        .register(DocumentApiResource.class)
+                // execution context
 
-                        // execution context
+                .register(ExecutionContextResponseFilter.class)
 
-                        .register(ExecutionContextResponseFilter.class)
+                // listener event
 
-                        // listener event
+                .register(ApiEventListener.class)
 
-                        .register(ApiEventListener.class)
+                // security
 
-                        // security
+                .register(RolesAllowedDynamicFeature.class)
 
-                        .register(RolesAllowedDynamicFeature.class)
+                .register(AuthorizationFilter.class)
 
-                        .register(AuthorizationFilter.class)
+                // check
+                .register(AppAndVersionCheckFeature.class)
 
-                        // check
-                        .register(AppAndVersionCheckFeature.class)
+                // logging
 
-                        // logging
+                .register(LoggingFeature.class)
 
-                        .register(LoggingFeature.class)
+                .property(LoggingFeature.LOGGING_FEATURE_VERBOSITY, LoggingFeature.Verbosity.PAYLOAD_ANY)
 
-                        .property(LoggingFeature.LOGGING_FEATURE_VERBOSITY, LoggingFeature.Verbosity.PAYLOAD_ANY)
+                .property(LoggingFeature.LOGGING_FEATURE_LOGGER_LEVEL, Level.FINE.getName())
 
-                        .property(LoggingFeature.LOGGING_FEATURE_LOGGER_LEVEL, Level.FINE.getName())
+                // JSON
+                .register(JacksonJsonProvider.class)
 
-                        // JSON
-                        .register(JacksonJsonProvider.class)
+                .register(new AbstractBinder() {
+                    @Override
+                    protected void configure() {
+                        bindFactory(SchemaValidationSupplier.class)
+                                .to(SchemaValidation.class)
+                                .in(RequestScoped.class);
 
-                        .register(new AbstractBinder() {
-                            @Override
-                            protected void configure() {
-                                bindFactory(SchemaValidationSupplier.class)
-                                        .to(SchemaValidation.class)
-                                        .in(RequestScoped.class);
+                        bindFactory(SchemaFilterSupplier.class)
+                                .to(SchemaFilter.class)
+                                .in(RequestScoped.class);
 
-                                bindFactory(SchemaFilterSupplier.class)
-                                        .to(SchemaFilter.class)
-                                        .in(RequestScoped.class);
+                        bindFactory(AuthorizationCheckServiceSupplier.class)
+                                .to(AuthorizationCheckService.class)
+                                .in(RequestScoped.class);
 
-                                bindFactory(AuthorizationCheckServiceSupplier.class)
-                                        .to(AuthorizationCheckService.class)
-                                        .in(RequestScoped.class);
+                        bindFactory(AccountServiceSupplier.class)
+                                .to(AccountService.class)
+                                .in(RequestScoped.class);
 
-                                bindFactory(AccountServiceSupplier.class)
-                                        .to(AccountService.class)
-                                        .in(RequestScoped.class);
-
-                                bindFactory(SubscriptionServiceSupplier.class)
-                                        .to(SubscriptionService.class)
-                                        .in(RequestScoped.class);
-                            }
-                        });
+                        bindFactory(SubscriptionServiceSupplier.class)
+                                .to(SubscriptionService.class)
+                                .in(RequestScoped.class);
+                    }
+                });
 
     }
 
