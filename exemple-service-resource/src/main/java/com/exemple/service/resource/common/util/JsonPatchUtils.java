@@ -2,6 +2,7 @@ package com.exemple.service.resource.common.util;
 
 import java.util.EnumSet;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -33,7 +34,7 @@ public final class JsonPatchUtils {
 
         var result = MAPPER.createArrayNode();
 
-        Streams.stream(patchs.elements()).filter((JsonNode patch) -> !isRemoveOperation(patch)).flatMap(JsonPatchUtils::completePatch)
+        Streams.stream(patchs.elements()).filter(Predicate.not(JsonPatchUtils::isRemoveOperation)).flatMap(JsonPatchUtils::completePatch)
                 .forEach(result::add);
 
         Streams.stream(patchs.elements()).filter(JsonPatchUtils::isRemoveOperation).forEach(result::add);
