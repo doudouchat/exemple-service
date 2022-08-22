@@ -3,11 +3,13 @@ package com.exemple.service.api.core;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
 
+import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
+import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -30,7 +32,7 @@ public abstract class JerseySpringSupport {
     @Autowired
     private ApplicationContext context;
 
-    @BeforeAll
+    @BeforeEach
     public void setup() throws Exception {
 
         jerseyTest = new JerseyTest() {
@@ -43,12 +45,17 @@ public abstract class JerseySpringSupport {
 
                 return application;
             }
+
+            @Override
+            protected void configureClient(ClientConfig config) {
+                config.connectorProvider(new ApacheConnectorProvider());
+            }
         };
 
         jerseyTest.setUp();
     }
 
-    @AfterAll
+    @AfterEach
     public void tearDown() throws Exception {
         jerseyTest.tearDown();
     }
