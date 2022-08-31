@@ -44,7 +44,10 @@ public class SchemaTestConfiguration {
         ObjectNode patchUpdateDate = MAPPER.createObjectNode();
         patchUpdateDate.put("op", "add");
         patchUpdateDate.put("path", "/properties/update_date");
-        patchUpdateDate.set("value", MAPPER.readTree("{\"type\": \"string\",\"format\": \"date-time\",\"readOnly\": true}"));
+        patchUpdateDate.set("value", MAPPER.readTree(
+                """
+                {"type": "string","format": "date-time","readOnly": true}
+                """));
 
         schemaTest.setPatchs(Set.of(patchExternalId, patchUpdateDate));
         Mockito.when(resource.get("default", "default", "schema_test", "default")).thenReturn(Optional.of(schemaTest));

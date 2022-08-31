@@ -65,7 +65,10 @@ public class InitData {
         ObjectNode patchUpdateDate = MAPPER.createObjectNode();
         patchUpdateDate.put("op", "add");
         patchUpdateDate.put("path", "/properties/update_date");
-        patchUpdateDate.set("value", MAPPER.readTree("{\"type\": \"string\",\"format\": \"date-time\",\"readOnly\": true}"));
+        patchUpdateDate.set("value", MAPPER.readTree(
+                """
+                {"type": "string","format": "date-time","readOnly": true}"
+                """));
 
         ObjectNode patchCreationDate = MAPPER.createObjectNode();
         patchCreationDate.put("op", "add");

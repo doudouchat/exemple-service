@@ -31,7 +31,7 @@ class InfoApiTest extends JerseySpringSupport {
     private static final String URL = "/";
 
     @Test
-    void template() {
+    void template() throws IOException {
 
         // When perform get
 
@@ -43,7 +43,10 @@ class InfoApiTest extends JerseySpringSupport {
 
         // And check body
 
-        assertThat(response.readEntity(String.class)).isEqualTo("{\"version\":\"nc\",\"buildTime\":\"nc\"}");
+        assertThat(response.readEntity(String.class)).isEqualTo(MAPPER.readTree(
+                """
+                {"version":"nc","buildTime":"nc"}
+                """).toString());
 
     }
 

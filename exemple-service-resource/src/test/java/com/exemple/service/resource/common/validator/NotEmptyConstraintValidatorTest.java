@@ -36,7 +36,10 @@ class NotEmptyConstraintValidatorTest {
 
         // Given build account
         UUID id = UUID.randomUUID();
-        JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupond@gmail\"}");
+        JsonNode account = MAPPER.readTree(
+                """
+                {"id": "%s", "email": "jean.dupond@gmail"}
+                """.formatted(id));
 
         // When perform save
         resource.save(account);

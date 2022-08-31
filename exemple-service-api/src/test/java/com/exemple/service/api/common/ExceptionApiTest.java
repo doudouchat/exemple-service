@@ -94,9 +94,7 @@ class ExceptionApiTest extends JerseySpringSupport {
 
         Response response = target(ACCOUNT_URL + "/" + UUID.randomUUID()).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
                 .request(MediaType.APPLICATION_JSON)
-
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
-
                 .method("PATCH", Entity.json(Collections.EMPTY_LIST));
 
         // Then check status
@@ -117,13 +115,14 @@ class ExceptionApiTest extends JerseySpringSupport {
 
         // When perform patch
 
-        JsonNode patch = MAPPER.readTree("{\"op\": \"replace\", \"path\": \"/lastname\", \"value\":\"Dupond\"}");
+        JsonNode patch = MAPPER.readTree(
+                """
+                {"op": "replace", "path": "/lastname", "value":"Dupond"}
+                """);
 
         Response response = target(ACCOUNT_URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
                 .request(MediaType.APPLICATION_JSON)
-
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
-
                 .method("PATCH", Entity.json(Collections.singletonList(patch)));
 
         // Then check status
@@ -138,10 +137,11 @@ class ExceptionApiTest extends JerseySpringSupport {
         // When perform post
 
         Response response = target(STOCK_URL + "/store/product").request(MediaType.APPLICATION_JSON)
-
                 .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
-
-                .post(Entity.json("{\"other\":10, \"increment\":5}"));
+                .post(Entity.json(
+                        """
+                        {"other":10, "increment":5}
+                        """));
 
         // Then check status
 
@@ -191,7 +191,10 @@ class ExceptionApiTest extends JerseySpringSupport {
         // And check body
 
         assertThat(response.readEntity(JsonNode.class))
-                .isEqualTo(MAPPER.readTree("{\"app\":\"La valeur doit être renseignée.\",\"version\":\"La valeur doit être renseignée.\"}"));
+                .isEqualTo(MAPPER.readTree(
+                        """
+                        {"app":"La valeur doit être renseignée.","version":"La valeur doit être renseignée."}
+                        """));
 
     }
 

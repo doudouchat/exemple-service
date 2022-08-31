@@ -56,8 +56,10 @@ class CustomerScriptFactoryTest {
 
         // then check get response
         Optional<JsonNode> account = service.get(UUID.randomUUID());
-        assertThat(account).hasValue(mapper.readTree("{\"note\": \"default value\"}"));
-
+        assertThat(account).hasValue(mapper.readTree(
+                """
+                {"note": "default value"}
+                """));
     }
 
     @Test
@@ -74,8 +76,10 @@ class CustomerScriptFactoryTest {
 
         // then check get response
         Optional<JsonNode> account = service.get(UUID.randomUUID());
-        assertThat(account).hasValue(mapper.readTree("{\"note\": \"override value\"}"));
-
+        assertThat(account).hasValue(mapper.readTree(
+                """
+                {"note": "override value"}
+                """));
     }
 
 }

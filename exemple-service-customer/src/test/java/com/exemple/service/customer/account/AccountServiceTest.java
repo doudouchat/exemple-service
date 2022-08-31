@@ -23,6 +23,7 @@ import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.exemple.service.customer.login.LoginResource;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @SpringJUnitConfig(CustomerTestConfiguration.class)
 class AccountServiceTest {
@@ -60,20 +61,24 @@ class AccountServiceTest {
 
         // Given account
 
-        JsonNode source = MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\", \"lastname\": \"Dupont\", \"firstname\":\"Jean\"}");
+        JsonNode source = MAPPER.readTree(
+                """
+                {"email": "jean.dupont@gmail.com", "lastname": "Dupont", "firstname":"Jean"}
+                """);
 
         // When perform save
 
-        JsonNode account = service.save(source);
+        ObjectNode account = service.save(source).deepCopy();
 
-        assertThat(account).isNotNull();
+        // Then check account
+
         assertAll(
-                () -> assertThat(account).hasSize(5),
-                () -> assertThat(account.get("email")).hasToString("\"jean.dupont@gmail.com\""),
-                () -> assertThat(account.get("lastname")).hasToString("\"Dupont\""),
-                () -> assertThat(account.get("firstname")).hasToString("\"Jean\""),
-                () -> assertThat(account.get("creation_date")).hasToString("\"" + ServiceContextExecution.context().getDate() + "\""),
-                () -> assertThat(account.get("id").isTextual()).isTrue());
+                () -> assertThat(account).isNotNull(),
+                () -> assertThat(account.get("id").isTextual()).isTrue(),
+                () -> assertThat(account.deepCopy().putNull("id")).isEqualTo(MAPPER.readTree(
+                        """
+                        {"email": "jean.dupont@gmail.com", "lastname": "Dupont", "firstname": "Jean", "creation_date": "%s", "id": null}
+                        """.formatted(ServiceContextExecution.context().getDate()))));
 
         // And check save account resource
 
@@ -99,11 +104,17 @@ class AccountServiceTest {
 
         // Given account
 
-        JsonNode source = MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\", \"lastname\": \"Dupond\"}");
+        JsonNode source = MAPPER.readTree(
+                """
+                {"email": "jean.dupont@gmail.com", "lastname": "Dupond"}
+                """);
 
         // And previousAccount
 
-        JsonNode previousSource = MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\", \"lastname\": \"Dupont\", \"firstname\":\"Jean\"}");
+        JsonNode previousSource = MAPPER.readTree(
+                """
+                {"email": "jean.dupont@gmail.com", "lastname": "Dupont", "firstname":"Jean"}
+                """);
 
         // When perform save
 
@@ -113,7 +124,10 @@ class AccountServiceTest {
 
         assertAll(
                 () -> assertThat(account).isNotNull(),
-                () -> assertThat(account).isEqualTo(MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\", \"lastname\": \"Dupond\"}")));
+                () -> assertThat(account).isEqualTo(MAPPER.readTree(
+                        """
+                        {"email": "jean.dupont@gmail.com", "lastname": "Dupond"}
+                        """)));
 
         // And check save resource
 
@@ -145,11 +159,17 @@ class AccountServiceTest {
 
         UUID id = UUID.randomUUID();
 
-        JsonNode source = MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupond@gmail.com\"}");
+        JsonNode source = MAPPER.readTree(
+                """
+                {"id": "%s", "email": "jean.dupond@gmail.com"}
+                """.formatted(id));
 
         // And previousAccount
 
-        JsonNode previousSource = MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupont@gmail.com\"}");
+        JsonNode previousSource = MAPPER.readTree(
+                """
+                {"id": "%s", "email": "jean.dupont@gmail.com"}
+                """.formatted(id));
 
         // When perform save
 
@@ -159,7 +179,10 @@ class AccountServiceTest {
 
         assertAll(
                 () -> assertThat(account).isNotNull(),
-                () -> assertThat(account).isEqualTo(MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupond@gmail.com\"}")));
+                () -> assertThat(account).isEqualTo(MAPPER.readTree(
+                        """
+                        {"id": "%s", "email": "jean.dupond@gmail.com"}
+                        """.formatted(id))));
 
         // And check save resource
 
@@ -194,7 +217,10 @@ class AccountServiceTest {
 
         // And mock resource
 
-        JsonNode source = MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\", \"lastname\": \"Dupont\", \"firstname\":\"Jean\"}");
+        JsonNode source = MAPPER.readTree(
+                """
+                {"email": "jean.dupont@gmail.com", "lastname": "Dupont", "firstname":"Jean"}
+                """);
         Mockito.when(accountResource.get(id)).thenReturn(Optional.of(source));
 
         // When perform get

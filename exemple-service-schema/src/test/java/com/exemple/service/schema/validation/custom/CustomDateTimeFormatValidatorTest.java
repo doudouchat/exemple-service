@@ -19,15 +19,18 @@ class CustomDateTimeFormatValidatorTest {
     @BeforeAll
     public static void buildSchema() {
 
-        JSONObject schemaJson = new JSONObject(new JSONTokener("{\n"
-                + "        \"$schema\": \"http://json-schema.org/draft-07/schema\",\n"
-                + "        \"properties\": {\n"
-                + "                \"creation_date\": {\n"
-                + "                        \"type\": \"string\",\n"
-                + "                        \"format\": \"date-time\"\n"
-                + "                },\n"
-                + "        },\n"
-                + "}"));
+        JSONObject schemaJson = new JSONObject(new JSONTokener(
+                """
+                 {
+                     "$schema": "http://json-schema.org/draft-07/schema",
+                     "properties": {
+                         "creation_date": {
+                             "type": "string",
+                             "format": "date-time"
+                         }
+                     }
+                 }
+                """));
 
         schema = SchemaLoader.builder().draftV7Support().schemaJson(schemaJson)
                 .addFormatValidator(new CustomDateTimeFormatValidator()).enableOverrideOfBuiltInFormatValidators().build().load().build();
@@ -41,7 +44,10 @@ class CustomDateTimeFormatValidatorTest {
     void dateTimeSuccess(String value) {
 
         // When perform
-        Throwable throwable = catchThrowable(() -> schema.validate(new JSONObject("{\"creation_date\" : \"" + value + "\"}")));
+        Throwable throwable = catchThrowable(() -> schema.validate(new JSONObject(
+                """
+                {"creation_date" : "%s"}
+                """.formatted(value))));
 
         // Then check none exception
         assertThat(throwable).as("None exception is expected").isNull();
@@ -58,7 +64,10 @@ class CustomDateTimeFormatValidatorTest {
     void dateTimeFailure(String value) {
 
         // When perform
-        Throwable throwable = catchThrowable(() -> schema.validate(new JSONObject("{\"creation_date\" : \"" + value + "\"}")));
+        Throwable throwable = catchThrowable(() -> schema.validate(new JSONObject(
+                """
+                {"creation_date" : "%s"}
+                """.formatted(value))));
 
         // Then check throwable
         assertThat(throwable).isInstanceOf(ValidationException.class);

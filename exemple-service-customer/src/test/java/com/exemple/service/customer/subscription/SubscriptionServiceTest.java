@@ -89,7 +89,10 @@ class SubscriptionServiceTest {
         // When perform save
 
         JsonNode source = MAPPER.createObjectNode();
-        JsonNode previousSource = MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\"}");
+        JsonNode previousSource = MAPPER.readTree(
+                """
+                {"email": "jean.dupont@gmail.com"}
+                """);
 
         service.save(email, source, previousSource);
 
@@ -120,7 +123,10 @@ class SubscriptionServiceTest {
 
         // And mock resource
 
-        JsonNode source = MAPPER.readTree("{\"email\": \"jean.dupont@gmail.com\"}");
+        JsonNode source = MAPPER.readTree(
+                """
+                {"email": "jean.dupont@gmail.com"}
+                """);
 
         Mockito.when(resource.get(email)).thenReturn(Optional.of(source));
 

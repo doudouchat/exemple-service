@@ -64,7 +64,10 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
         // When perform put
 
-        JsonNode source = MAPPER.readTree("{\"lastname\": \"dupond\", \"firstname\":\"jean\"}");
+        JsonNode source = MAPPER.readTree(
+                """
+                {"lastname": "dupond", "firstname":"jean"}
+                """);
 
         Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
 
@@ -85,8 +88,14 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
         // And check validation
 
-        JsonNode sourceToValidate = MAPPER.readTree("{\"email\": \"" + email + "\", \"lastname\": \"dupond\", \"firstname\":\"jean\"}");
-        JsonNode previousSourceToValidate = MAPPER.readTree("{\"email\": \"" + email + "\"}");
+        JsonNode sourceToValidate = MAPPER.readTree(
+                """
+                {"email": "%s", "lastname": "dupond", "firstname":"jean"}
+                """.formatted(email));
+        JsonNode previousSourceToValidate = MAPPER.readTree(
+                """
+                {"email": "%s"}
+                """.formatted(email));
 
         Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("subscription"),
                 subscription.capture(), Mockito.eq(previousSourceToValidate));
@@ -102,12 +111,18 @@ class SubscriptionApiTest extends JerseySpringSupport {
         String email = "jean.dupond@gmail.com";
 
         // And mock service
-        JsonNode previousSource = MAPPER.readTree("{\"email\": \"" + email + "\"}");
+        JsonNode previousSource = MAPPER.readTree(
+                """
+                {"email": "%s"}
+                """.formatted(email));
         Mockito.when(service.get(email)).thenReturn(Optional.of(previousSource));
 
         // When perform put
 
-        JsonNode source = MAPPER.readTree("{\"lastname\": \"dupond\", \"firstname\":\"jean\"}");
+        JsonNode source = MAPPER.readTree(
+                """
+                {"lastname": "dupond", "firstname":"jean"}
+                """);
 
         Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
 
@@ -128,7 +143,10 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
         // And check validation
 
-        JsonNode sourceToValidate = MAPPER.readTree("{\"email\": \"" + email + "\", \"lastname\": \"dupond\", \"firstname\":\"jean\"}");
+        JsonNode sourceToValidate = MAPPER.readTree(
+                """
+                {"email": "%s", "lastname": "dupond", "firstname":"jean"}
+                """.formatted(email));
 
         Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("subscription"),
                 subscription.capture(), Mockito.eq(previousSource));
