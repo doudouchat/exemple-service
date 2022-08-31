@@ -28,7 +28,7 @@ class SchemaDescriptionTest {
         JsonNode schema = service.get("default", "default", "schema_test", "default");
 
         // Then check response
-        assertThat(schema.get("$schema")).hasToString("\"http://json-schema.org/draft-07/schema\"");
+        assertThat(schema.get("$schema").textValue()).isEqualTo("http://json-schema.org/draft-07/schema");
 
     }
 
@@ -50,7 +50,7 @@ class SchemaDescriptionTest {
         JsonNode schema = service.getPatch();
 
         // Then check response
-        assertThat(schema.get("title")).hasToString("\"JSON schema for JSONPatch files\"");
+        assertThat(schema.get("title").textValue()).isEqualTo("JSON schema for JSONPatch files");
 
     }
 

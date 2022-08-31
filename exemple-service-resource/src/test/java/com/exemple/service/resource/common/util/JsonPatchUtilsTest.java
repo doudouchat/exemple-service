@@ -22,10 +22,16 @@ class JsonPatchUtilsTest {
     void patchProperty() throws IOException {
 
         // Given build model
-        JsonNode model = MAPPER.readTree("{\"email\": \"jean.dupont@gmail\"}");
+        JsonNode model = MAPPER.readTree(
+                """
+                {"email": "jean.dupont@gmail"}
+                """);
 
         // And build target
-        JsonNode target = MAPPER.readTree("{\"email\": \"jean.dupond@gmail\"}");
+        JsonNode target = MAPPER.readTree(
+                """
+                {"email": "jean.dupond@gmail"}
+                """);
 
         // when perform diff
         ArrayNode patch = JsonPatchUtils.diff(model, target);
@@ -43,10 +49,16 @@ class JsonPatchUtilsTest {
     void patchObject() throws IOException {
 
         // Given build model
-        JsonNode model = MAPPER.readTree("{\"address\": {\"street\": \"1 rue de la paix\"}}");
+        JsonNode model = MAPPER.readTree(
+                """
+                {"address": {"street": "1 rue de la paix"}}
+                """);
 
         // And build target
-        JsonNode target = MAPPER.readTree("{\"address\": {\"city\": \"Paris\"}}");
+        JsonNode target = MAPPER.readTree(
+                """
+                {"address": {"city": "Paris"}}
+                """);
 
         // when perform diff
         ArrayNode patch = JsonPatchUtils.diff(model, target);
@@ -68,14 +80,16 @@ class JsonPatchUtilsTest {
     void patchMultiObject() throws IOException {
 
         // Given build model
-        JsonNode model = MAPPER
-                .readTree(
-                        "{\"addresses\": {\"home\": {\"street\": \"1 rue de la paix\", \"city\": null},\"job\": {\"street\": \"1 rue de la paix\", \"city\": \"Paris\"}}}");
+        JsonNode model = MAPPER.readTree(
+                """
+                {"addresses": {"home": {"street": "1 rue de la paix", "city": null},"job": {"street": "1 rue de la paix", "city": "Paris"}}}
+                """);
 
         // And build target
-        JsonNode target = MAPPER
-                .readTree(
-                        "{\"addresses\": {\"home\": {\"street\": \"1 rue de la paix\", \"city\": \"Paris\"},\"holidays\": {\"street\": \"1 rue de la paix\", \"city\": \"Paris\"}}}");
+        JsonNode target = MAPPER.readTree(
+                """
+                {"addresses": {"home": {"street": "1 rue de la paix", "city": "Paris"},"holidays": {"street": "1 rue de la paix", "city": "Paris"}}}
+                """);
 
         // when perform diff
         ArrayNode patch = JsonPatchUtils.diff(model, target);
@@ -95,8 +109,10 @@ class JsonPatchUtilsTest {
                 () -> assertThat(result.get(2).get(JsonPatchUtils.VALUE).textValue()).isEqualTo("Paris"),
                 () -> assertThat(result.get(3).get(JsonPatchUtils.OP).textValue()).isEqualTo("remove"),
                 () -> assertThat(result.get(3).get(JsonPatchUtils.PATH).textValue()).isEqualTo("/addresses/job"),
-                () -> assertThat(result.get(3).path(JsonPatchUtils.VALUE))
-                        .isEqualTo(MAPPER.readTree("{\"street\": \"1 rue de la paix\", \"city\": \"Paris\"}")));
+                () -> assertThat(result.get(3).path(JsonPatchUtils.VALUE)).isEqualTo(MAPPER.readTree(
+                        """
+                        {"street": "1 rue de la paix", "city": "Paris"}
+                        """)));
 
     }
 
@@ -104,10 +120,16 @@ class JsonPatchUtilsTest {
     void patchArrayProperty() throws IOException {
 
         // Given build model
-        JsonNode model = MAPPER.readTree("{\"preferences\":[]}");
+        JsonNode model = MAPPER.readTree(
+                """
+                {"preferences":[]}
+                """);
 
         // And build target
-        JsonNode target = MAPPER.readTree("{\"preferences\":[\"pref 1\"]}");
+        JsonNode target = MAPPER.readTree(
+                """
+                {"preferences":["pref 1"]}
+                 """);
 
         // when perform diff
         ArrayNode patch = JsonPatchUtils.diff(model, target);
@@ -126,10 +148,16 @@ class JsonPatchUtilsTest {
     void patchArrayObject() throws IOException {
 
         // Given build model
-        JsonNode model = MAPPER.readTree("{\"cgus\": []}");
+        JsonNode model = MAPPER.readTree(
+                """
+                {"cgus": []}
+                """);
 
         // And build target
-        JsonNode target = MAPPER.readTree("{\"cgus\": [{\"code\": \"code 1\", \"version\": \"version 1\"}]}");
+        JsonNode target = MAPPER.readTree(
+                """
+                {"cgus": [{"code": "code 1", "version": "version 1"}]}
+                """);
 
         // when perform diff
         ArrayNode patch = JsonPatchUtils.diff(model, target);

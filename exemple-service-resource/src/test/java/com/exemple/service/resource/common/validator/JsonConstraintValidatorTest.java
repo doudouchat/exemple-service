@@ -42,24 +42,27 @@ class JsonConstraintValidatorTest {
         // Given build account
         UUID id = UUID.randomUUID();
         Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-        JsonNode account = MAPPER.readTree("{"
-                + "  \"id\" : \"" + id + "\","
-                + "  \"email\" : \"jean.dupont@gmail.com\","
-                + "  \"address\" : {"
-                + "    \"street\" : \"1 rue de la paix\","
-                + "    \"city\" : \"Paris\","
-                + "    \"zip\" : \"75002\","
-                + "    \"floor\" : 5"
-                + "  },"
-                + "  \"addresses\" : {"
-                + "    \"home\" : {"
-                + "      \"street\" : \"1 rue de de la poste\""
-                + "    }"
-                + "  },"
-                + "  \"profils\" : [ \"profil 1\" ],"
-                + "  \"preferences\" : [ [ \"pref1\", \"value1\", 10, \"2001-01-01 00:00:00.000Z\" ] ],"
-                + "  \"creation_date\": \"" + now.toString() + "\""
-                + "}");
+        JsonNode account = MAPPER.readTree(
+                """
+                {
+                  "id" : "%s",
+                  "email" : "jean.dupont@gmail.com",
+                  "address" : {
+                    "street" : "1 rue de la paix",
+                    "city" : "Paris",
+                    "zip" : "75002",
+                    "floor" : 5
+                  },
+                  "addresses" : {
+                    "home" : {
+                      "street" : "1 rue de de la poste"
+                    }
+                  },
+                  "profils" : [ "profil 1" ],
+                  "preferences" : [ [ "pref1", "value1", 10, "2001-01-01 00:00:00.000Z" ] ],
+                  "creation_date": "%s"
+                }
+                """.formatted(id, now.toString()));
 
         // When perform save
         resource.save(account);

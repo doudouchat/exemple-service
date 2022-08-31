@@ -72,14 +72,20 @@ class SubscriptionResourceTest {
     void save() throws IOException {
 
         // Given build subscription
-        JsonNode subscription = MAPPER.readTree("{\"email\": \"" + email + "\", \"update_date\": \"2019-01-01T09:00:00Z\"}");
+        JsonNode subscription = MAPPER.readTree(
+                """
+                {"email": "%s", "update_date": "2019-01-01T09:00:00Z"}
+                """.formatted(email));
 
         // When perform save
         resource.save(subscription);
 
         // Then check subscription
         Optional<JsonNode> result = resource.get(email);
-        assertThat(result).hasValue(MAPPER.readTree("{\"email\": \"" + email + "\", \"update_date\": \"2019-01-01 09:00:00.000Z\"}"));
+        assertThat(result).hasValue(MAPPER.readTree(
+                """
+                {"email": "%s", "update_date": "2019-01-01 09:00:00.000Z"}
+                """.formatted(email)));
 
         // And check event
         OffsetDateTime createDate = ServiceContextExecution.context().getDate();
@@ -109,7 +115,10 @@ class SubscriptionResourceTest {
     void update() throws IOException {
 
         // Given build subscription
-        JsonNode subscription = MAPPER.readTree("{\"email\": \"" + email + "\", \"update_date\": \"2019-01-01T10:00:00Z\"}");
+        JsonNode subscription = MAPPER.readTree(
+                """
+                {"email": "%s", "update_date": "2019-01-01T10:00:00Z"}
+                """.formatted(email));
         JsonNode previouSubscription = resource.get(email).get();
 
         // When perform save
@@ -117,7 +126,10 @@ class SubscriptionResourceTest {
 
         // Then check subscription
         Optional<JsonNode> result = resource.get(email);
-        assertThat(result).hasValue(MAPPER.readTree("{\"email\": \"" + email + "\", \"update_date\": \"2019-01-01 10:00:00.000Z\"}"));
+        assertThat(result).hasValue(MAPPER.readTree(
+                """
+                {"email": "%s", "update_date": "2019-01-01 10:00:00.000Z"}
+                """.formatted(email)));
 
         // And check event
         OffsetDateTime createDate = ServiceContextExecution.context().getDate();

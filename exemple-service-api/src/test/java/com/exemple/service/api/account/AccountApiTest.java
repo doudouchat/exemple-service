@@ -100,7 +100,10 @@ class AccountApiTest extends JerseySpringSupport {
 
         // When perform patch
 
-        JsonNode patch = MAPPER.readTree("[{\"op\": \"add\", \"path\": \"/birthday\", \"value\":\"1976-12-12\"}]");
+        JsonNode patch = MAPPER.readTree(
+                """
+                [{"op": "add", "path": "/birthday", "value":"1976-12-12"}]
+                """);
 
         Response response = target(URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true).request(MediaType.APPLICATION_JSON)
 
@@ -149,7 +152,10 @@ class AccountApiTest extends JerseySpringSupport {
 
         // When perform put
 
-        JsonNode source = MAPPER.readTree("{\"lastname\": \"Dupond\"}");
+        JsonNode source = MAPPER.readTree(
+                """
+                {"lastname": "Dupond"}
+                """);
 
         Response response = target(URL + "/" + id).request(MediaType.APPLICATION_JSON)
 
@@ -163,7 +169,10 @@ class AccountApiTest extends JerseySpringSupport {
 
         // And check service
 
-        JsonNode sourceToValidate = MAPPER.readTree("{\"id\": \"" + id + "\", \"lastname\": \"Dupond\"}");
+        JsonNode sourceToValidate = MAPPER.readTree(
+                """
+                {"id": "%s", "lastname": "Dupond"}
+                """.formatted(id));
 
         ArgumentCaptor<JsonNode> previousAccount = ArgumentCaptor.forClass(JsonNode.class);
         ArgumentCaptor<JsonNode> account = ArgumentCaptor.forClass(JsonNode.class);
@@ -192,7 +201,10 @@ class AccountApiTest extends JerseySpringSupport {
 
         // When perform post
 
-        JsonNode source = MAPPER.readTree("{\"email\": \"jean.dupond@gmail.com\", \"lastname\": \"dupond\", \"firstname\":\"jean\"}");
+        JsonNode source = MAPPER.readTree(
+                """
+                {"email": "jean.dupond@gmail.com", "lastname": "dupond", "firstname":"jean"}
+                """);
 
         Response response = target(URL).request(MediaType.APPLICATION_JSON)
 

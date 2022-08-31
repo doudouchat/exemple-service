@@ -35,7 +35,10 @@ class DataEventListenerTest extends KafkaTestEvent {
 
         // Given build message
 
-        JsonNode resource = MAPPER.readTree("{\"key1\": \"value1\", \"key2\": \"value2\"}");
+        JsonNode resource = MAPPER.readTree(
+                """
+                {"key1": "value1", "key2": "value2"}
+                """);
 
         // and build context
         String origin = "app1";

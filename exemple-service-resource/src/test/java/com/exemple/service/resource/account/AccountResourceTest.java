@@ -84,7 +84,11 @@ class AccountResourceTest {
         void save() throws IOException {
 
             // Given build account
-            JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupond@gmail\"}");
+            JsonNode account = MAPPER.readTree(
+                    """
+                    {"id": "%s", "email": "jean.dupond@gmail"}"
+
+                    """.formatted(id));
 
             // When perform save
             resource.save(account);
@@ -99,7 +103,11 @@ class AccountResourceTest {
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
-            assertThat(result).hasValue(MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupond@gmail\"}"));
+            assertThat(result).hasValue(MAPPER.readTree(
+                    """
+                    {"id": "%s", "email": "jean.dupond@gmail"}"
+
+                    """.formatted(id)));
 
             // And check event
             AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
@@ -119,7 +127,11 @@ class AccountResourceTest {
         void update() throws IOException {
 
             // Given build account
-            JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupont@gmail\", \"age\": 19}");
+            JsonNode account = MAPPER.readTree(
+                    """
+                    {"id": "%s", "email": "jean.dupont@gmail", "age": 19}"
+
+                    """.formatted(id));
 
             // When perform save
             resource.save(account, resource.get(id).get());
@@ -135,7 +147,11 @@ class AccountResourceTest {
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
-            assertThat(result).hasValue(MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": \"jean.dupont@gmail\", \"age\": 19}"));
+            assertThat(result).hasValue(MAPPER.readTree(
+                    """
+                    {"id": "%s", "email": "jean.dupont@gmail", "age": 19}"
+
+                    """.formatted(id)));
 
             // And check event
             ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
@@ -149,7 +165,11 @@ class AccountResourceTest {
         void remove() throws IOException {
 
             // Given build account
-            JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"email\": null, \"age\": null}");
+            JsonNode account = MAPPER.readTree(
+                    """
+                    {"id": "%s", "email": null, "age": null}"
+
+                    """.formatted(id));
 
             // When perform save
             resource.save(account, resource.get(id).get());
@@ -165,7 +185,11 @@ class AccountResourceTest {
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
-            assertThat(result).hasValue(MAPPER.readTree("{\"id\": \"" + id + "\"}"));
+            assertThat(result).hasValue(MAPPER.readTree(
+                    """
+                    {"id": "%s"}"
+
+                    """.formatted(id)));
         }
 
     }
@@ -185,8 +209,11 @@ class AccountResourceTest {
         void save() throws IOException {
 
             // Given build account
-            JsonNode account = MAPPER
-                    .readTree("{\"id\": \"" + id + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}}}");
+            JsonNode account = MAPPER.readTree(
+                    """
+                    {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}}}"
+
+                    """.formatted(id));
 
             // When perform save
             resource.save(account);
@@ -203,8 +230,11 @@ class AccountResourceTest {
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
-            assertThat(result).hasValue(
-                    MAPPER.readTree("{\"id\": \"" + id + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}}}"));
+            assertThat(result).hasValue(MAPPER.readTree(
+                    """
+                    {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}}}"
+
+                    """.formatted(id)));
         }
 
         @Test
@@ -213,9 +243,11 @@ class AccountResourceTest {
         void addAdresse() throws IOException {
 
             // Given build account
-            JsonNode account = MAPPER
-                    .readTree("{\"id\": \"" + id
-                            + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}, \"job\": {\"street\": \"1 rue de la paris\"}}}");
+            JsonNode account = MAPPER.readTree(
+                    """
+                     {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}, "job": {"street": "1 rue de la paris"}}}
+
+                    """.formatted(id));
 
             // When perform save
             resource.save(account, resource.get(id).get());
@@ -234,9 +266,10 @@ class AccountResourceTest {
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
-            assertThat(result).hasValue(MAPPER
-                    .readTree("{\"id\": \"" + id
-                            + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}, \"job\": {\"street\": \"1 rue de la paris\"}}}"));
+            assertThat(result).hasValue(MAPPER.readTree(
+                    """
+                    {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}, "job": {"street": "1 rue de la paris"}}}
+                    """.formatted(id)));
         }
 
         @Test
@@ -245,9 +278,13 @@ class AccountResourceTest {
         void updateAddresse() throws IOException {
 
             // Given build account
-            JsonNode account = MAPPER
-                    .readTree("{\"id\": \"" + id
-                            + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}, \"job\": {\"street\": \"10 rue de la paris\", \"floor\": 5}}}");
+            JsonNode account = MAPPER.readTree(
+                    """
+                    {
+                    "id":  "%s",
+                    "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}, "job": {"street": "10 rue de la paris", "floor": 5}}
+                    }
+                    """.formatted(id));
 
             // When perform save
             resource.save(account, resource.get(id).get());
@@ -268,9 +305,13 @@ class AccountResourceTest {
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
-            assertThat(result).hasValue(MAPPER
-                    .readTree("{\"id\": \"" + id
-                            + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}, \"job\": {\"street\": \"10 rue de la paris\", \"floor\": 5}}}"));
+            assertThat(result).hasValue(MAPPER.readTree(
+                    """
+                    {
+                    "id": "%s",
+                    "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}, "job": {"street": "10 rue de la paris", "floor": 5}}}
+                    """.formatted(id)));
+
         }
 
         @Test
@@ -279,9 +320,10 @@ class AccountResourceTest {
         void deleteAddresse() throws IOException {
 
             // Given build account
-            JsonNode account = MAPPER
-                    .readTree(
-                            "{\"id\": \"" + id + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}, \"job\": null}}");
+            JsonNode account = MAPPER.readTree(
+                    """
+                    {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}, "job": null}}
+                    """.formatted(id));
 
             // When perform save
             resource.save(account, resource.get(id).get());
@@ -300,8 +342,10 @@ class AccountResourceTest {
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
-            assertThat(result).hasValue(MAPPER
-                    .readTree("{\"id\": \"" + id + "\", \"addresses\": {\"home\": {\"street\": \"1 rue de la poste\", \"floor\": 5}}}"));
+            assertThat(result).hasValue(MAPPER.readTree(
+                    """
+                    {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}}}
+                    """.formatted(id)));
         }
 
         @Test
@@ -310,7 +354,10 @@ class AccountResourceTest {
         void remove() throws IOException {
 
             // Given build account
-            JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"addresses\": null}");
+            JsonNode account = MAPPER.readTree(
+                    """
+                    {"id": "%s", "addresses": null}
+                    """.formatted(id));
 
             // When perform save
             resource.save(account, resource.get(id).get());
@@ -325,7 +372,10 @@ class AccountResourceTest {
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
-            assertThat(result).hasValue(MAPPER.readTree("{\"id\": \"" + id + "\"}"));
+            assertThat(result).hasValue(MAPPER.readTree(
+                    """
+                    {"id": "%s"}
+                    """.formatted(id)));
         }
     }
 
@@ -344,7 +394,10 @@ class AccountResourceTest {
         void save() throws IOException {
 
             // Given build account
-            JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"cgus\": [{\"code\": \"code_1\", \"version\": \"v1\"}]}");
+            JsonNode account = MAPPER.readTree(
+                    """
+                    {"id": "%s", "cgus": [{"code": "code_1", "version": "v1"}]}
+                    """.formatted(id));
 
             // When perform save
             resource.save(account);
@@ -360,7 +413,11 @@ class AccountResourceTest {
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
-            assertThat(result).hasValue(MAPPER.readTree("{\"id\": \"" + id + "\", \"cgus\": [{\"code\": \"code_1\", \"version\": \"v1\"}]}"));
+            assertThat(result).hasValue(MAPPER.readTree(
+                    """
+                    {"id": "%s", "cgus": [{"code": "code_1", "version": "v1"}]}
+                    """.formatted(id)));
+
         }
 
         @Test
@@ -370,7 +427,9 @@ class AccountResourceTest {
 
             // Given build account
             JsonNode account = MAPPER.readTree(
-                    "{\"id\": \"" + id + "\", \"cgus\": [{\"code\": \"code_1\", \"version\": \"v1\"}, {\"code\": \"code_1\", \"version\": \"v2\"}]}");
+                    """
+                    {"id": "%s", "cgus": [{"code": "code_1", "version": "v1"}, {"code": "code_1", "version": "v2"}]}
+                    """.formatted(id));
 
             // When perform save
             resource.save(account, resource.get(id).get());
@@ -388,9 +447,10 @@ class AccountResourceTest {
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
-            assertThat(result).hasValue(MAPPER
-                    .readTree("{\"id\": \"" + id
-                            + "\", \"cgus\": [{\"code\": \"code_1\", \"version\": \"v1\"}, {\"code\": \"code_1\", \"version\": \"v2\"}]}"));
+            assertThat(result).hasValue(MAPPER.readTree(
+                    """
+                    {"id": "%s", "cgus": [{"code": "code_1", "version": "v1"}, {"code": "code_1", "version": "v2"}]}
+                    """.formatted(id)));
         }
 
         @Test
@@ -399,7 +459,10 @@ class AccountResourceTest {
         void remove() throws IOException {
 
             // Given build account
-            JsonNode account = MAPPER.readTree("{\"id\": \"" + id + "\", \"cgus\": null}");
+            JsonNode account = MAPPER.readTree(
+                    """
+                    {"id": "%s", "cgus": null}
+                    """.formatted(id));
 
             // When perform save
             resource.save(account, resource.get(id).get());
@@ -414,7 +477,10 @@ class AccountResourceTest {
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
-            assertThat(result).hasValue(MAPPER.readTree("{\"id\": \"" + id + "\"}"));
+            assertThat(result).hasValue(MAPPER.readTree(
+                    """
+                    {"id": "%s"}
+                    """.formatted(id)));
         }
     }
 
@@ -436,9 +502,18 @@ class AccountResourceTest {
         UUID id2 = UUID.randomUUID();
         UUID id3 = UUID.randomUUID();
 
-        JsonNode account1 = MAPPER.readTree("{\"id\": \"" + id1 + "\", \"status\": \"NEW\"}");
-        JsonNode account2 = MAPPER.readTree("{\"id\": \"" + id2 + "\", \"status\": \"NEW\"}");
-        JsonNode account3 = MAPPER.readTree("{\"id\": \"" + id3 + "\", \"status\": \"OLD\"}");
+        JsonNode account1 = MAPPER.readTree(
+                """
+                {"id": "%s", "status": "NEW"}
+                """.formatted(id1));
+        JsonNode account2 = MAPPER.readTree(
+                """
+                {"id": "%s", "status": "NEW"}
+                """.formatted(id2));
+        JsonNode account3 = MAPPER.readTree(
+                """
+                {"id": "%s", "status": "OLD"}
+                """.formatted(id3));
 
         resource.save(account1);
         resource.save(account2);

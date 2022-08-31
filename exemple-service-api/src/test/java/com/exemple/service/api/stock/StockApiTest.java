@@ -2,8 +2,8 @@ package com.exemple.service.api.stock;
 
 import static com.exemple.service.api.common.model.ApplicationBeanParam.APP_HEADER;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import javax.ws.rs.client.Entity;
@@ -24,8 +24,11 @@ import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.store.common.InsufficientStockException;
 import com.exemple.service.store.stock.StockService;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 class StockApiTest extends JerseySpringSupport {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
     protected ResourceConfig configure() {
@@ -66,7 +69,10 @@ class StockApiTest extends JerseySpringSupport {
         // When perform post
 
         Response response = target(URL + "/" + store + "/" + product).request(MediaType.APPLICATION_JSON).header(APP_HEADER, application)
-                .post(Entity.json("{\"increment\":5}"));
+                .post(Entity.json(
+                        """
+                        {"increment":5}
+                        """));
 
         // Then check status
 
@@ -79,7 +85,7 @@ class StockApiTest extends JerseySpringSupport {
     }
 
     @Test
-    void updateValidationFailure() {
+    void updateValidationFailure() throws IOException {
 
         // Given stock
 
@@ -102,7 +108,10 @@ class StockApiTest extends JerseySpringSupport {
 
         // And check body
 
-        assertThat(response.readEntity(String.class)).isEqualTo("{\"increment\":\"La valeur doit être renseignée.\"}");
+        assertThat(response.readEntity(JsonNode.class)).isEqualTo(MAPPER.readTree(
+                """
+                {"increment":"La valeur doit être renseignée."}
+                """));
 
     }
 
@@ -126,7 +135,10 @@ class StockApiTest extends JerseySpringSupport {
         // When perform put
 
         Response response = target(URL + "/" + store + "/" + product).request(MediaType.APPLICATION_JSON).header(APP_HEADER, application)
-                .post(Entity.json("{\"increment\":5}"));
+                .post(Entity.json(
+                        """
+                        {"increment":5}
+                        """));
 
         // Then check status
 
@@ -140,7 +152,7 @@ class StockApiTest extends JerseySpringSupport {
     }
 
     @Test
-    void get() {
+    void get() throws IOException {
 
         // Given stock
 
@@ -165,10 +177,10 @@ class StockApiTest extends JerseySpringSupport {
 
         // and check body
 
-        JsonNode responseEntity = response.readEntity(JsonNode.class);
-        assertAll(
-                () -> assertThat(responseEntity.get("amount").asLong()).isEqualTo(5L),
-                () -> assertThat(responseEntity.has("increment")).isFalse());
+        assertThat(response.readEntity(JsonNode.class)).isEqualTo(MAPPER.readTree(
+                """
+                {"amount":5}
+                """));
 
     }
 
