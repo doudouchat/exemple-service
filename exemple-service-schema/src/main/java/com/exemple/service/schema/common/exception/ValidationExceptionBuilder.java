@@ -46,16 +46,11 @@ public final class ValidationExceptionBuilder {
 
         String path = SEPARATOR.matcher(exception.getPointerToViolation()).replaceFirst("");
 
-        switch (exception.getKeyword()) {
-            case "required":
-                path = path.concat("/").concat(extractField(REQUIRED_PATTERN, exception));
-                break;
-            case "additionalProperties":
-                path = path.concat("/").concat(extractField(ADDITIONAL_PROPERTIES_PATTERN, exception));
-                break;
-            default:
-
-        }
+        path = switch (exception.getKeyword()) {
+            case "required" -> path.concat("/").concat(extractField(REQUIRED_PATTERN, exception));
+            case "additionalProperties" -> path.concat("/").concat(extractField(ADDITIONAL_PROPERTIES_PATTERN, exception));
+            default -> path;
+        };
 
         JsonNode value = source.at(path);
         if (value.isMissingNode() && !JsonPointer.compile(path).head().toString().isEmpty()) {
