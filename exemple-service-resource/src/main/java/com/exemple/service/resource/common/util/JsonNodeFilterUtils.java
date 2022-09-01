@@ -3,7 +3,6 @@ package com.exemple.service.resource.common.util;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,7 +44,7 @@ public final class JsonNodeFilterUtils {
             List<JsonNode> nodes = Streams.stream(source.getValue().elements())
                     .filter(node -> predicate.test(source.getValue(), Maps.immutableEntry(null, node)))
                     .map(node -> filter(Maps.immutableEntry(null, node), new ObjectMapper().createObjectNode(), predicate))
-                    .collect(Collectors.toList());
+                    .toList();
             arrayNode.addAll(nodes);
 
             return arrayNode;

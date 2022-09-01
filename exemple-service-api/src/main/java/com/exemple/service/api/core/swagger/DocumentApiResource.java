@@ -2,7 +2,6 @@ package com.exemple.service.api.core.swagger;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.servlet.ServletConfig;
 import javax.ws.rs.GET;
@@ -103,8 +102,9 @@ public class DocumentApiResource extends BaseOpenApiResource {
         this.openApiConfiguration.getOpenAPI().addServersItem(server);
 
         schemaResource.allVersions(app).forEach(
-                (String resource, List<SchemaVersionProfileEntity> versions) -> headers.getRequestHeaders().put(RESOURCE + resource, versions.stream()
-                        .map((SchemaVersionProfileEntity v) -> v.getVersion().concat("|").concat(v.getProfile())).collect(Collectors.toList())));
+                (String resource, List<SchemaVersionProfileEntity> versions) -> headers.getRequestHeaders().put(
+                        RESOURCE + resource,
+                        versions.stream().map((SchemaVersionProfileEntity v) -> v.getVersion().concat("|").concat(v.getProfile())).toList()));
 
         if (documentApiSecurity != null) {
 
