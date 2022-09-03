@@ -9,7 +9,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.exemple.service.schema.common.exception.ValidationException;
-import com.exemple.service.schema.common.exception.ValidationExceptionBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @FunctionalInterface
@@ -40,7 +39,7 @@ public interface SchemaValidator extends Consumer<ValidationException> {
             }
         } catch (org.everit.json.schema.ValidationException e) {
 
-            throw new ValidationException(ValidationExceptionBuilder.buildException(e, form));
+            throw new ValidationException(e, form);
         }
 
     }
