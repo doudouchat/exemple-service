@@ -546,6 +546,11 @@ class SchemaValidationTest {
             patch5.put("path", "/cgvs/0");
             patch5.set("value", MAPPER.convertValue(Map.of("code", "code_4", "version", "v1"), JsonNode.class));
 
+            ObjectNode patch6 = MAPPER.createObjectNode();
+            patch6.put("op", "replace");
+            patch6.put("path", "/lastname");
+            patch6.put("value", " ");
+
             return Stream.of(
                     // email format
                     Arguments.of("format", "/email", new JsonNode[] { patch1 }),
@@ -556,7 +561,9 @@ class SchemaValidationTest {
                     // street required
                     Arguments.of("required", "/addresses/home/street", new JsonNode[] { patch41, patch42 }),
                     // maxItems
-                    Arguments.of("maxItems", "/cgvs", new JsonNode[] { patch5 }));
+                    Arguments.of("maxItems", "/cgvs", new JsonNode[] { patch5 }),
+                    // pattern
+                    Arguments.of("pattern", "/lastname", new JsonNode[] { patch6 }));
 
         }
 
@@ -567,6 +574,10 @@ class SchemaValidationTest {
 
             // Given origin
             Map<String, Object> origin = Map.of(
+                    // And lastname is empty
+                    "lastname", "",
+                    // And firstname is blank
+                    "firstname", " ",
                     // And email incorrect
                     "email", "toto",
                     // And cgu incorrect
