@@ -41,7 +41,8 @@
 			]
 		},
 		"lastname": {
-			"type": "string"
+			"type": "string",
+			"pattern": "^(?!\\s*$).+"
 		},
 		"firstname": {
 			"type": "string",
