@@ -1,6 +1,7 @@
 package com.exemple.service.store.stock.distribution;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.locks.InterProcessLock;
@@ -30,7 +31,23 @@ public class StockDistribution {
     @Qualifier("stockCuratorFramework")
     private final CuratorFramework client;
 
-    public <T> T lockStock(String company, String store, String product, LockStock<T> action) throws Exception {
+    @SneakyThrows
+    public Optional<Long> getStock(String company, String store, String product) {
+        try {
+            return Optional.of(client.getData().forPath(company + store + product)).filter((byte[] stock) -> stock.length > 0)
+                    .map(Longs::fromByteArray);
+        } catch (KeeperException.NoNodeException e) {
+            LOG.warn("Stock " + e.getPath() + " doesn't exist", e);
+            return Optional.empty();
+        }
+    }
+
+    @SneakyThrows
+    public void updateStock(String company, String store, String product, long stock) {
+        client.setData().forPath(company + store + product, Longs.toByteArray(stock));
+    }
+
+    public <T> T lockStock(String company, String store, String product, Supplier<T> action) throws Exception {
 
         try (PersistentTtlNode node = createProduct(company, store, product)) {
 
@@ -44,31 +61,6 @@ public class StockDistribution {
             }
         }
 
-    }
-
-    @FunctionalInterface
-    public interface LockStock<T> {
-        T get() throws Exception;
-
-        @SneakyThrows
-        static <T> Optional<T> accessStock(LockStock<T> action) {
-            try {
-                return Optional.of(action.get());
-            } catch (KeeperException.NoNodeException e) {
-                LOG.warn(e.getMessage(), e);
-                return Optional.empty();
-            }
-        }
-    }
-
-    public Optional<Long> getStock(String company, String store, String product) {
-        return LockStock.accessStock(() -> client.getData().forPath(company + store + product))
-
-                .filter((byte[] stock) -> stock.length > 0).map(Longs::fromByteArray);
-    }
-
-    public void updateStock(String company, String store, String product, long stock) {
-        LockStock.accessStock(() -> client.setData().forPath(company + store + product, Longs.toByteArray(stock)));
     }
 
     private PersistentTtlNode createProduct(String company, String store, String product) throws Exception {
