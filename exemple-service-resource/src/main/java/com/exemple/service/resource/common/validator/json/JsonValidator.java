@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import org.springframework.stereotype.Component;
 
@@ -54,7 +53,9 @@ public class JsonValidator {
 
     public void valid(JsonNode source, String table) throws JsonValidatorException {
 
-        forEach(source::fields, (Map.Entry<String, JsonNode> node) -> {
+        JsonStreamer<Map.Entry<String, JsonNode>> fields = source::fields;
+
+        fields.forEach((Map.Entry<String, JsonNode> node) -> {
 
             var type = toDataType(node.getKey(), table);
 
@@ -65,12 +66,17 @@ public class JsonValidator {
 
     private void valid(DataType dataType, Map.Entry<String, JsonNode> json) throws JsonValidatorException {
 
-        Stream<AbstractJsonValidate<DataType>> validates = jsonValidates.stream()
-                .filter(validate -> validate.hasChecked(dataType))
-                .map(validate -> (AbstractJsonValidate<DataType>) validate)
-                .filter(validate -> !json.getValue().isNull());
+        if (!json.getValue().isNull()) {
 
-        forEach(validates::iterator, jsonValidate -> jsonValidate.check(dataType, json));
+            List<AbstractJsonValidate<? extends DataType>> validates = jsonValidates.stream().filter(validate -> validate.hasChecked(dataType))
+                    .toList();
+
+            JsonStreamer<AbstractJsonValidate<DataType>> validateStreamer = () -> validates.stream()
+                    .map(validate -> (AbstractJsonValidate<DataType>) validate)
+                    .iterator();
+
+            validateStreamer.forEach((AbstractJsonValidate<DataType> jsonValidate) -> jsonValidate.check(dataType, json));
+        }
 
     }
 
@@ -98,7 +104,9 @@ public class JsonValidator {
 
             checkIfCondition(json.getValue().isObject(), "OBJECT", json.getKey());
 
-            forEach(json.getValue()::fields, (Entry<String, JsonNode> node) -> {
+            JsonStreamer<Map.Entry<String, JsonNode>> fields = json.getValue()::fields;
+
+            fields.forEach((Entry<String, JsonNode> node) -> {
                 var keyType = dataType.getKeyType();
                 valid(keyType, Maps.immutableEntry(json.getKey(), new TextNode(node.getKey())));
 
@@ -122,7 +130,9 @@ public class JsonValidator {
 
             checkIfCondition(json.getValue().isArray(), ARRAY_EXCEPTION, json.getKey());
 
-            forEach(json.getValue()::elements, (JsonNode node) -> valid(dataType.getElementType(), Maps.immutableEntry(json.getKey(), node)));
+            JsonStreamer<JsonNode> elements = json.getValue()::elements;
+
+            elements.forEach((JsonNode node) -> valid(dataType.getElementType(), Maps.immutableEntry(json.getKey(), node)));
 
         }
 
@@ -139,7 +149,9 @@ public class JsonValidator {
 
             checkIfCondition(json.getValue().isArray(), ARRAY_EXCEPTION, json.getKey());
 
-            forEach(json.getValue()::elements, (JsonNode node) -> valid(dataType.getElementType(), Maps.immutableEntry(json.getKey(), node)));
+            JsonStreamer<JsonNode> elements = json.getValue()::elements;
+
+            elements.forEach((JsonNode node) -> valid(dataType.getElementType(), Maps.immutableEntry(json.getKey(), node)));
 
         }
 
@@ -154,7 +166,9 @@ public class JsonValidator {
         @Override
         protected void check(UserDefinedType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
 
-            forEach(json.getValue()::fields, (Entry<String, JsonNode> node) -> {
+            JsonStreamer<Entry<String, JsonNode>> fields = json.getValue()::fields;
+
+            fields.forEach((Entry<String, JsonNode> node) -> {
 
                 checkIfCondition(dataType.contains(node.getKey()), UNKNOWN_EXCEPTION, node.getKey());
 
@@ -177,7 +191,9 @@ public class JsonValidator {
 
             Iterator<DataType> dataTypes = dataType.getComponentTypes().iterator();
 
-            forEach(json.getValue()::elements, (JsonNode node) -> {
+            JsonStreamer<JsonNode> elements = json.getValue()::elements;
+
+            elements.forEach((JsonNode node) -> {
 
                 checkIfCondition(dataTypes.hasNext(), UNKNOWN_EXCEPTION, json.getKey());
 
@@ -273,10 +289,6 @@ public class JsonValidator {
         if (!condition) {
             throw new JsonValidatorException(keyIfException, nodeIfException);
         }
-    }
-
-    private static <T> void forEach(JsonStreamer<T> streamer, JsonConsumer<T> check) throws JsonValidatorException {
-        streamer.forEach(check);
     }
 
     @FunctionalInterface
