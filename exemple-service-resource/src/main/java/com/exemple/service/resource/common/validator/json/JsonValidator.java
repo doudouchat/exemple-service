@@ -102,7 +102,9 @@ public class JsonValidator {
         @Override
         protected void check(MapType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
 
-            checkIfCondition(json.getValue().isObject(), "OBJECT", json.getKey());
+            if (!json.getValue().isObject()) {
+                throw new JsonValidatorException("OBJECT", json.getKey());
+            }
 
             JsonStreamer<Map.Entry<String, JsonNode>> fields = json.getValue()::fields;
 
@@ -128,7 +130,9 @@ public class JsonValidator {
         @Override
         protected void check(ListType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
 
-            checkIfCondition(json.getValue().isArray(), ARRAY_EXCEPTION, json.getKey());
+            if (!json.getValue().isArray()) {
+                throw new JsonValidatorException(ARRAY_EXCEPTION, json.getKey());
+            }
 
             JsonStreamer<JsonNode> elements = json.getValue()::elements;
 
@@ -147,7 +151,9 @@ public class JsonValidator {
         @Override
         protected void check(SetType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
 
-            checkIfCondition(json.getValue().isArray(), ARRAY_EXCEPTION, json.getKey());
+            if (!json.getValue().isArray()) {
+                throw new JsonValidatorException(ARRAY_EXCEPTION, json.getKey());
+            }
 
             JsonStreamer<JsonNode> elements = json.getValue()::elements;
 
@@ -170,7 +176,9 @@ public class JsonValidator {
 
             fields.forEach((Entry<String, JsonNode> node) -> {
 
-                checkIfCondition(dataType.contains(node.getKey()), UNKNOWN_EXCEPTION, node.getKey());
+                if (!dataType.contains(node.getKey())) {
+                    throw new JsonValidatorException(UNKNOWN_EXCEPTION, node.getKey());
+                }
 
                 DataType type = dataType.getFieldTypes().get(dataType.firstIndexOf(node.getKey()));
                 valid(type, node);
@@ -195,13 +203,17 @@ public class JsonValidator {
 
             elements.forEach((JsonNode node) -> {
 
-                checkIfCondition(dataTypes.hasNext(), UNKNOWN_EXCEPTION, json.getKey());
+                if (!dataTypes.hasNext()) {
+                    throw new JsonValidatorException(UNKNOWN_EXCEPTION, json.getKey());
+                }
 
                 valid(dataTypes.next(), Maps.immutableEntry(json.getKey(), node));
 
             });
 
-            checkIfCondition(!dataTypes.hasNext(), "MISSING", json.getKey());
+            if (dataTypes.hasNext()) {
+                throw new JsonValidatorException("MISSING", json.getKey());
+            }
 
         }
 
@@ -217,7 +229,9 @@ public class JsonValidator {
         @Override
         protected void check(PrimitiveType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
 
-            checkIfCondition(json.getValue().isTextual(), "VARCHAR", json.getKey());
+            if (!json.getValue().isTextual()) {
+                throw new JsonValidatorException("VARCHAR", json.getKey());
+            }
 
             var value = new StringBuilder().append("'").append(json.getValue().asText()).append("'").toString();
             checkPrimitive(value, dataType, json);
@@ -283,12 +297,6 @@ public class JsonValidator {
 
         var tableMetadata = MetadataSchemaUtils.getTableMetadata(session, table);
         return tableMetadata.getColumn(key).orElseThrow(() -> new JsonValidatorException(UNKNOWN_EXCEPTION, key)).getType();
-    }
-
-    private static void checkIfCondition(boolean condition, String keyIfException, String nodeIfException) throws JsonValidatorException {
-        if (!condition) {
-            throw new JsonValidatorException(keyIfException, nodeIfException);
-        }
     }
 
     @FunctionalInterface
