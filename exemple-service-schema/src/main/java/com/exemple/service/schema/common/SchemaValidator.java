@@ -1,6 +1,9 @@
 package com.exemple.service.schema.common;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.everit.json.schema.ReadWriteContext;
 import org.everit.json.schema.Schema;
@@ -11,12 +14,26 @@ import org.json.JSONObject;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.fasterxml.jackson.databind.JsonNode;
 
-@FunctionalInterface
-public interface SchemaValidator extends Consumer<ValidationException> {
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-    void accept(ValidationException exception);
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class SchemaValidator {
 
-    static void performValidation(Schema schema, ReadWriteContext context, JsonNode form, SchemaValidator validator) {
+    public static <T> List<T> performValidation(Schema schema, ReadWriteContext context, JsonNode form,
+            Function<ValidationException, List<T>> validator) {
+
+        try {
+            performValidation(schema, context, form);
+            return Collections.emptyList();
+        } catch (ValidationException e) {
+            return validator.apply(e);
+        }
+
+    }
+
+    public static void performValidation(Schema schema, ReadWriteContext context, JsonNode form,
+            Consumer<ValidationException> validator) {
 
         try {
             performValidation(schema, context, form);
@@ -26,7 +43,7 @@ public interface SchemaValidator extends Consumer<ValidationException> {
 
     }
 
-    static void performValidation(Schema schema, ReadWriteContext context, JsonNode form) {
+    public static void performValidation(Schema schema, ReadWriteContext context, JsonNode form) {
 
         var validator = Validator.builder().readWriteContext(context).build();
 
