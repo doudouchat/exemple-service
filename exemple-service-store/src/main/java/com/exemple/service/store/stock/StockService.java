@@ -2,10 +2,10 @@ package com.exemple.service.store.stock;
 
 import java.util.Optional;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
 import com.exemple.service.store.common.InsufficientStockException;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public interface StockService {
 

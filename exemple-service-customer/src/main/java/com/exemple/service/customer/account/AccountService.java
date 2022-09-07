@@ -3,9 +3,9 @@ package com.exemple.service.customer.account;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.databind.JsonNode;
+
+import jakarta.validation.constraints.NotNull;
 
 public interface AccountService {
 

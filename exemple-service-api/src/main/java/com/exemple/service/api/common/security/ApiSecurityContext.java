@@ -4,10 +4,9 @@ import java.security.Principal;
 import java.util.Collection;
 import java.util.function.Predicate;
 
-import javax.ws.rs.core.SecurityContext;
-
 import org.apache.commons.lang3.ObjectUtils;
 
+import jakarta.ws.rs.core.SecurityContext;
 import lombok.Getter;
 
 public class ApiSecurityContext implements SecurityContext {

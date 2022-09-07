@@ -2,7 +2,7 @@ package com.exemple.service.store.stock;
 
 import java.util.Optional;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public interface StockResource {
 

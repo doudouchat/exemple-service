@@ -1,8 +1,5 @@
 package com.exemple.service.api.core;
 
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Application;
-
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -14,6 +11,9 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.web.WebAppConfiguration;
+
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Application;
 
 @WebAppConfiguration
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

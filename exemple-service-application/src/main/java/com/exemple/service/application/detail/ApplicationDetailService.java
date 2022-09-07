@@ -2,11 +2,11 @@ package com.exemple.service.application.detail;
 
 import java.util.Optional;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public interface ApplicationDetailService {
 

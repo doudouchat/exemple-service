@@ -4,8 +4,6 @@ import java.security.Principal;
 import java.util.Collections;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.core.MultivaluedMap;
-
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimAccessor;
@@ -15,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.api.core.authorization.impl.AuthorizationTokenValidation;
 
+import jakarta.ws.rs.core.MultivaluedMap;
 import lombok.RequiredArgsConstructor;
 
 @Service

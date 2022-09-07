@@ -158,7 +158,7 @@ class StockServiceTest {
     class FailureZookeeper {
 
         @BeforeEach
-        private void closeZookeeper() {
+        public void closeZookeeper() {
             CloseableUtils.closeQuietly(zookeeper);
 
         }

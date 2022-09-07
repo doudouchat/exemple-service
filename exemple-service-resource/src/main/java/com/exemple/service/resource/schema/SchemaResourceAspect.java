@@ -1,7 +1,5 @@
 package com.exemple.service.resource.schema;
 
-import javax.validation.constraints.NotNull;
-
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.core.annotation.Order;
@@ -9,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.exemple.service.resource.core.keystore.ResourceKeystore;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 @Aspect

@@ -2,14 +2,14 @@ package com.exemple.service.api.common.script;
 
 import java.util.function.Supplier;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.Context;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.customer.account.AccountService;
+
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.Context;
 
 @Component
 public class AccountServiceSupplier implements Supplier<AccountService> {

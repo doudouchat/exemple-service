@@ -3,11 +3,10 @@ package com.exemple.service.api.core.authorization;
 import java.util.Objects;
 import java.util.UUID;
 
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.container.ContainerRequestContext;
-
 import com.exemple.service.customer.login.LoginResource;
 
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.container.ContainerRequestContext;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
