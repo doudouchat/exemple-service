@@ -1,5 +1,7 @@
 package com.exemple.service.schema.filter.impl;
 
+import java.util.List;
+
 import org.everit.json.schema.ReadWriteContext;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +13,7 @@ import com.exemple.service.schema.filter.SchemaFilter;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.flipkart.zjsonpatch.JsonPatch;
 
 import lombok.RequiredArgsConstructor;
@@ -26,78 +29,71 @@ public class SchemaFilterImpl implements SchemaFilter {
     @Override
     public JsonNode filter(String app, String version, String resource, String profile, JsonNode source) {
 
-        JsonNode filterProperties = source.deepCopy();
-
         var schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
-
-        SchemaValidator.performValidation(schema, ReadWriteContext.READ, source, (ValidationException e) ->
-
-        e.getCauses().stream()
-                .filter((ValidationExceptionCause cause) -> isAdditionalProperties(cause) || isWriteOnly(cause))
-                .map((ValidationExceptionCause cause) -> {
-                    var patch = MAPPER.createObjectNode();
-                    patch.put("op", "remove");
-                    patch.put("path", cause.getPath());
-                    return patch;
-                })
-                .map((JsonNode patch) -> {
-                    var patchs = MAPPER.createArrayNode();
-                    patchs.add(patch);
-                    return patchs;
-                })
-                .forEach((JsonNode patch) -> JsonPatch.applyInPlace(patch, filterProperties)));
+        List<ArrayNode> exceptions = SchemaValidator.performValidation(schema, ReadWriteContext.READ, source,
+                (ValidationException e) -> e.getCauses().stream()
+                        .filter((ValidationExceptionCause cause) -> isAdditionalProperties(cause) || isWriteOnly(cause))
+                        .map((ValidationExceptionCause cause) -> {
+                            var patch = MAPPER.createObjectNode();
+                            patch.put("op", "remove");
+                            patch.put("path", cause.getPath());
+                            return patch;
+                        }).map((JsonNode patch) -> {
+                            var patchs = MAPPER.createArrayNode();
+                            patchs.add(patch);
+                            return patchs;
+                        }).toList());
+        JsonNode filterProperties = source.deepCopy();
+        exceptions.forEach((JsonNode patch) -> JsonPatch.applyInPlace(patch, filterProperties));
         return filterProperties;
     }
 
     @Override
     public JsonNode filterAllProperties(String app, String version, String resource, String profile, JsonNode source) {
 
-        JsonNode allProperties = source.deepCopy();
         var schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
 
-        SchemaValidator.performValidation(schema, ReadWriteContext.READ, source, (ValidationException e) ->
-
-        e.getCauses().stream()
-                .filter(SchemaFilterImpl::isAdditionalProperties)
-                .map((ValidationExceptionCause cause) -> {
-                    var patch = MAPPER.createObjectNode();
-                    patch.put("op", "remove");
-                    patch.put("path", cause.getPath());
-                    return patch;
-                })
-                .map((JsonNode patch) -> {
-                    var patchs = MAPPER.createArrayNode();
-                    patchs.add(patch);
-                    return patchs;
-                })
-                .forEach((JsonNode patch) -> JsonPatch.applyInPlace(patch, allProperties)));
+        List<ArrayNode> exceptions = SchemaValidator.performValidation(schema, ReadWriteContext.READ, source,
+                (ValidationException e) -> e.getCauses().stream()
+                        .filter(SchemaFilterImpl::isAdditionalProperties)
+                        .map((ValidationExceptionCause cause) -> {
+                            var patch = MAPPER.createObjectNode();
+                            patch.put("op", "remove");
+                            patch.put("path", cause.getPath());
+                            return patch;
+                        }).map((JsonNode patch) -> {
+                            var patchs = MAPPER.createArrayNode();
+                            patchs.add(patch);
+                            return patchs;
+                        }).toList());
+        JsonNode allProperties = source.deepCopy();
+        exceptions.forEach((JsonNode patch) -> JsonPatch.applyInPlace(patch, allProperties));
         return allProperties;
     }
 
     @Override
     public JsonNode filterAllAdditionalProperties(String app, String version, String resource, String profile, JsonNode source) {
 
-        JsonNode onlyAdditionalProperties = MAPPER.createObjectNode();
         var schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
 
-        SchemaValidator.performValidation(schema, ReadWriteContext.READ, source, (ValidationException e) ->
-
-        e.getCauses().stream()
-                .filter(SchemaFilterImpl::isAdditionalProperties)
-                .filter((ValidationExceptionCause cause) -> JsonPointer.empty().equals(cause.getPointer().head()))
-                .map((ValidationExceptionCause cause) -> {
-                    var patch = MAPPER.createObjectNode();
-                    patch.put("op", "add");
-                    patch.put("path", cause.getPath());
-                    patch.set("value", cause.getValue());
-                    return patch;
-                })
-                .map((JsonNode patch) -> {
-                    var patchs = MAPPER.createArrayNode();
-                    patchs.add(patch);
-                    return patchs;
-                })
-                .forEach((JsonNode patch) -> JsonPatch.applyInPlace(patch, onlyAdditionalProperties)));
+        List<ArrayNode> exceptions = SchemaValidator.performValidation(schema, ReadWriteContext.READ, source,
+                (ValidationException e) -> e.getCauses().stream()
+                        .filter(SchemaFilterImpl::isAdditionalProperties)
+                        .filter((ValidationExceptionCause cause) -> JsonPointer.empty().equals(cause.getPointer().head()))
+                        .map((ValidationExceptionCause cause) -> {
+                            var patch = MAPPER.createObjectNode();
+                            patch.put("op", "add");
+                            patch.put("path", cause.getPath());
+                            patch.set("value", cause.getValue());
+                            return patch;
+                        })
+                        .map((JsonNode patch) -> {
+                            var patchs = MAPPER.createArrayNode();
+                            patchs.add(patch);
+                            return patchs;
+                        }).toList());
+        JsonNode onlyAdditionalProperties = MAPPER.createObjectNode();
+        exceptions.forEach((JsonNode patch) -> JsonPatch.applyInPlace(patch, onlyAdditionalProperties));
         return onlyAdditionalProperties;
     }
 
