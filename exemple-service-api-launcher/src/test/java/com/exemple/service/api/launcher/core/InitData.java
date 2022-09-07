@@ -3,8 +3,6 @@ package com.exemple.service.api.launcher.core;
 import java.io.IOException;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
@@ -19,6 +17,8 @@ import com.exemple.service.resource.schema.model.SchemaEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import jakarta.annotation.PostConstruct;
 
 @Component
 @DependsOn("initCassandra")

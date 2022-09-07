@@ -2,11 +2,11 @@ package com.exemple.service.api.core.info;
 
 import java.util.logging.Level;
 
-import javax.ws.rs.ApplicationPath;
-
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
+
+import jakarta.ws.rs.ApplicationPath;
 
 @ApplicationPath("/info")
 public class InfoConfiguration extends ResourceConfig {

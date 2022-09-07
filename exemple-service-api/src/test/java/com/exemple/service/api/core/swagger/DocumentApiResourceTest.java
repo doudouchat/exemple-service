@@ -6,10 +6,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Stream;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -32,6 +28,10 @@ import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
 import com.exemple.service.schema.description.SchemaDescription;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 @SpringJUnitConfig(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
 @ActiveProfiles("AuthorizationMock")
@@ -59,7 +59,7 @@ class DocumentApiResourceTest extends JerseySpringSupport {
     private JsonNode swagger;
 
     @BeforeEach
-    private void before() {
+    public void before() {
 
         Mockito.reset(schemaResource);
 

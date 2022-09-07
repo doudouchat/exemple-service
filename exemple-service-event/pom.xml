@@ -69,11 +69,11 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- JAVAX ANNOTATION -->
+		<!-- JARKATA ANNOTATION -->
 
 		<dependency>
-			<groupId>javax.annotation</groupId>
-			<artifactId>javax.annotation-api</artifactId>
+			<groupId>jakarta.annotation</groupId>
+			<artifactId>jakarta.annotation-api</artifactId>
 		</dependency>
 
 		<!-- TEST -->

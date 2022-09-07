@@ -10,9 +10,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import javax.annotation.PostConstruct;
-import javax.validation.Validator;
-
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +33,8 @@ import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.core.cassandra.ResourceCassandraConfiguration;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.validation.Validator;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 

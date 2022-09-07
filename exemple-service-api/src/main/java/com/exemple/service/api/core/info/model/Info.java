@@ -1,7 +1,6 @@
 package com.exemple.service.api.core.info.model;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
+import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.Builder;
 import lombok.Getter;
 

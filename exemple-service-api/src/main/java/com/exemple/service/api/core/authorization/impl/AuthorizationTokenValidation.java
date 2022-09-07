@@ -1,7 +1,5 @@
 package com.exemple.service.api.core.authorization.impl;
 
-import javax.ws.rs.core.MultivaluedMap;
-
 import org.springframework.security.oauth2.jwt.JwtClaimAccessor;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +7,7 @@ import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.application.common.exception.NotFoundApplicationException;
 import com.exemple.service.application.detail.ApplicationDetailService;
 
+import jakarta.ws.rs.core.MultivaluedMap;
 import lombok.RequiredArgsConstructor;
 
 @Component

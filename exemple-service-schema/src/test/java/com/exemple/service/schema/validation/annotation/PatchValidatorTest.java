@@ -7,9 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import javax.validation.ConstraintViolationException;
-import javax.validation.Path.Node;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -24,6 +21,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.Iterables;
+
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Path.Node;
 
 @SpringJUnitConfig(SchemaTestConfiguration.class)
 class PatchValidatorTest {

@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
 import com.exemple.service.resource.schema.model.SchemaEntity;
 import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public interface SchemaResource {
 

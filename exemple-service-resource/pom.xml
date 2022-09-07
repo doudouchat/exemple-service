@@ -87,8 +87,8 @@
 		<!-- JSR303 -->
 
 		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
 		</dependency>
 
 		<dependency>
@@ -96,11 +96,11 @@
 			<artifactId>hibernate-validator</artifactId>
 		</dependency>
 
-		<!-- JAVAX EL -->
+		<!-- JARKATA EL -->
 
 		<dependency>
 			<groupId>org.glassfish</groupId>
-			<artifactId>javax.el</artifactId>
+			<artifactId>jakarta.el</artifactId>
 		</dependency>
 
 		<!-- DATASTAX -->
@@ -146,11 +146,11 @@
 			<artifactId>zjsonpatch</artifactId>
 		</dependency>
 
-		<!-- JAVAX ANNOTATION -->
+		<!-- JARKATA ANNOTATION -->
 
 		<dependency>
-			<groupId>javax.annotation</groupId>
-			<artifactId>javax.annotation-api</artifactId>
+			<groupId>jakarta.annotation</groupId>
+			<artifactId>jakarta.annotation-api</artifactId>
 			<scope>test</scope>
 		</dependency>
 

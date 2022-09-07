@@ -2,18 +2,17 @@ package com.exemple.service.api.core.check;
 
 import java.util.Locale;
 
-import javax.annotation.Priority;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Response;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
 
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 
 @Priority(Priorities.AUTHORIZATION)
@@ -55,7 +54,7 @@ public class AppAndVersionCheckRequestFilter implements ContainerRequestFilter {
 
     private String getMessage(ContainerRequestContext requestContext) {
 
-        return messageSource.getMessage("javax.validation.constraints.NotBlank.message", new Object[0], null,
+        return messageSource.getMessage("jakarta.validation.constraints.NotBlank.message", new Object[0], null,
                 requestContext.getAcceptableLanguages().stream().findFirst().orElseGet(Locale::getDefault));
     }
 

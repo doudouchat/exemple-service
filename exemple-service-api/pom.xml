@@ -84,13 +84,7 @@
 
 		<dependency>
 			<groupId>org.glassfish.jersey.ext</groupId>
-			<artifactId>jersey-spring5</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
+			<artifactId>jersey-spring6</artifactId>
 		</dependency>
 
 		<dependency>
@@ -122,7 +116,7 @@
 
 		<dependency>
 			<groupId>org.glassfish.jersey.test-framework.providers</groupId>
-			<artifactId>jersey-test-framework-provider-grizzly2</artifactId>
+			<artifactId>jersey-test-framework-provider-jetty</artifactId>
 			<scope>test</scope>
 		</dependency>
 
@@ -137,23 +131,11 @@
 			<artifactId>jersey-media-json-jackson</artifactId>
 		</dependency>
 
-		<!-- JAVAX EL -->
-
-		<dependency>
-			<groupId>javax.el</groupId>
-			<artifactId>javax.el-api</artifactId>
-		</dependency>
+		<!-- JAKARTA EL -->
 
 		<dependency>
 			<groupId>org.glassfish</groupId>
-			<artifactId>javax.el</artifactId>
-		</dependency>
-
-		<!-- JSON -->
-
-		<dependency>
-			<groupId>com.fasterxml.jackson.jaxrs</groupId>
-			<artifactId>jackson-jaxrs-json-provider</artifactId>
+			<artifactId>jakarta.el</artifactId>
 		</dependency>
 
 		<!-- SPRING FRAMEWORK -->
@@ -207,8 +189,8 @@
 		<!-- JSR303 -->
 
 		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
 		</dependency>
 
 		<dependency>
@@ -261,7 +243,7 @@
 
 		<dependency>
 			<groupId>io.swagger.core.v3</groupId>
-			<artifactId>swagger-jaxrs2</artifactId>
+			<artifactId>swagger-jaxrs2-jakarta</artifactId>
 		</dependency>
 
 		<dependency>

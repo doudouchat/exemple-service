@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.validation.Validator;
-
 import org.apache.commons.io.IOUtils;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +17,8 @@ import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import jakarta.validation.Validator;
 
 @Configuration
 @Import(SchemaConfiguration.class)

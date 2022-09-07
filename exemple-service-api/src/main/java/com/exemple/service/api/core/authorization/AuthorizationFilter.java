@@ -1,14 +1,14 @@
 package com.exemple.service.api.core.authorization;
 
-import javax.annotation.Priority;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.context.ServiceContextExecution;
+
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
 
 @Priority(Priorities.AUTHENTICATION)
 public class AuthorizationFilter implements ContainerRequestFilter {

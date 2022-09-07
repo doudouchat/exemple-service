@@ -2,10 +2,8 @@ package com.exemple.service.api.core.feature;
 
 import java.util.logging.Level;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.ext.ContextResolver;
-
 import org.glassfish.jersey.internal.inject.AbstractBinder;
+import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -30,7 +28,9 @@ import com.exemple.service.api.core.listener.ApiEventListener;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.subscription.SubscriptionService;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.ext.ContextResolver;
 
 @ApplicationPath("/ws")
 public class FeatureConfiguration extends ResourceConfig {

@@ -3,8 +3,6 @@ package com.exemple.service.api.core.authorization;
 import java.text.ParseException;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
 import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
@@ -34,6 +32,8 @@ import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jwt.PlainJWT;
+
+import jakarta.annotation.PostConstruct;
 
 @Configuration
 @ComponentScan(basePackages = "com.exemple.service.api.core.authorization")

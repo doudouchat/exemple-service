@@ -10,11 +10,6 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +36,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.PlainJWT;
 
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+
 @SpringJUnitConfig(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
 @ActiveProfiles("AuthorizationMock")
 class AccountApiTest extends JerseySpringSupport {
@@ -65,7 +65,7 @@ class AccountApiTest extends JerseySpringSupport {
     private JsonNode account;
 
     @BeforeEach
-    private void before() {
+    public void before() {
 
         Mockito.reset(service, schemaValidation);
 

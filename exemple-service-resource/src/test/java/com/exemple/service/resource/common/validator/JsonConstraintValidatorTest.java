@@ -12,8 +12,6 @@ import java.util.Collections;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import javax.validation.ConstraintViolationException;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,6 +25,8 @@ import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import jakarta.validation.ConstraintViolationException;
 
 @SpringJUnitConfig(ResourceTestConfiguration.class)
 class JsonConstraintValidatorTest {

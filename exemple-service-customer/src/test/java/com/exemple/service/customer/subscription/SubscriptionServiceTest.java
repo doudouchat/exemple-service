@@ -37,7 +37,7 @@ class SubscriptionServiceTest {
     private SubscriptionService service;
 
     @BeforeEach
-    private void before() {
+    public void before() {
 
         Mockito.reset(resource, publisher);
 

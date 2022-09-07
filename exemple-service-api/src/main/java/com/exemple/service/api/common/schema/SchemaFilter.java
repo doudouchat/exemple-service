@@ -1,12 +1,11 @@
 package com.exemple.service.api.common.schema;
 
-import javax.ws.rs.container.ContainerRequestContext;
-
 import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import jakarta.ws.rs.container.ContainerRequestContext;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

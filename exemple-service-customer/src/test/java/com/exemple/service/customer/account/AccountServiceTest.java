@@ -43,7 +43,7 @@ class AccountServiceTest {
     private ResourceEventPublisher publisher;
 
     @BeforeEach
-    private void before() {
+    public void before() {
 
         Mockito.reset(accountResource, loginResource, publisher);
 

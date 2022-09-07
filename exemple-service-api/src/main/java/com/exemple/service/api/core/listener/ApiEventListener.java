@@ -1,14 +1,13 @@
 package com.exemple.service.api.core.listener;
 
-import javax.annotation.PostConstruct;
-import javax.ws.rs.ext.Provider;
-
 import org.glassfish.jersey.server.monitoring.ApplicationEvent;
 import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
 import org.glassfish.jersey.server.monitoring.RequestEventListener;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.ws.rs.ext.Provider;
 import lombok.extern.slf4j.Slf4j;
 
 @Provider
