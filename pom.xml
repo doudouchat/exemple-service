@@ -53,6 +53,7 @@
 
 		<!-- VERSION -->
 		<cassandra-version>3.11.13</cassandra-version>
+		<jacoco-version>0.8.8</jacoco-version>
 
 		<!-- SONAR -->
 		<sonar.coverage.exclusions>**/test/**/*.java</sonar.coverage.exclusions>
@@ -337,7 +338,7 @@
 				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.8.8</version>
+					<version>${jacoco-version}</version>
 					<executions>
 						<execution>
 							<id>prepare-jacoco-ut-agent</id>
@@ -350,25 +351,6 @@
 								<includes>
 									<include>com.exemple.service.*</include>
 								</includes>
-							</configuration>
-						</execution>
-						<execution>
-							<id>prepare-jacoco-integration-agent</id>
-							<goals>
-								<goal>prepare-agent-integration</goal>
-							</goals>
-							<phase>pre-integration-test</phase>
-							<configuration>
-								<propertyName>jacoco.it.agent.argLine</propertyName>
-								<includes>
-									<include>com.exemple.service.*</include>
-								</includes>
-								<excludes>
-									<exclude>*EnhancerBySpringCGLIB*</exclude>
-									<exclude>*FastClassBySpringCGLIB*</exclude>
-									<exclude>*__MapperGenerated*</exclude>
-								</excludes>
-								<classDumpDir>${project.build.outputDirectory}</classDumpDir>
 							</configuration>
 						</execution>
 						<execution>
