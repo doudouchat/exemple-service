@@ -280,12 +280,72 @@
 						</configuration>
 						<executions>
 							<execution>
+								<id>prepare-jacoco-integration-agent</id>
+								<goals>
+									<goal>prepare-agent-integration</goal>
+								</goals>
+								<phase>pre-integration-test</phase>
+								<configuration>
+									<propertyName>jacoco.it.agent.argLine</propertyName>
+									<includes>
+										<include>com.exemple.service.*</include>
+									</includes>
+									<excludes>
+										<exclude>*EnhancerBySpringCGLIB*</exclude>
+										<exclude>*FastClassBySpringCGLIB*</exclude>
+										<exclude>*__MapperGenerated*</exclude>
+									</excludes>
+									<classDumpDir>${project.build.outputDirectory}</classDumpDir>
+								</configuration>
+							</execution>
+							<execution>
+								<id>dump</id>
+								<goals>
+									<goal>dump</goal>
+								</goals>
+								<configuration>
+									<address>127.0.0.1</address>
+									<port>6300</port>
+									<destFile>${project.build.directory}/jacoco-it.exec</destFile>
+								</configuration>
+							</execution>
+							<execution>
 								<id>report-integration</id>
 								<goals>
 									<goal>report-integration</goal>
 								</goals>
 							</execution>
 						</executions>
+					</plugin>
+
+					<!-- COPY JACOCO JAR AGENT -->
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.jacoco</groupId>
+									<artifactId>org.jacoco.agent</artifactId>
+									<version>${jacoco-version}</version>
+									<classifier>runtime</classifier>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}/lib</outputDirectory>
+									<destFileName>jacocoagent.jar</destFileName>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
 					</plugin>
 
 					<!-- DOCKER -->
@@ -413,14 +473,17 @@
 												<ports>
 													<port>${application.port}:8080</port>
 													<port>${hazelcast.port}:5701</port>
+													<port>6300:6300</port>
 												</ports>
 												<env>
 													<CATALINA_OPTS>-Dlogging.config=file:/usr/local/tomcat/etc/logback.xml</CATALINA_OPTS>
+													<JAVA_TOOL_OPTIONS>-javaagent:/usr/local/tomcat/etc/lib/jacocoagent.jar=includes=com.exemple.service.*,excludes=*EnhancerBySpringCGLIB*:*FastClassBySpringCGLIB*:*__MapperGenerated*,output=tcpserver,address=*</JAVA_TOOL_OPTIONS>
 													<spring.profiles.active>noSecurity</spring.profiles.active>
 												</env>
 												<volumes>
 													<bind>
 														<volume>${project.build.testOutputDirectory}/conf:/usr/local/tomcat/etc</volume>
+														<volume>${project.build.directory}/lib:/usr/local/tomcat/etc/lib</volume>
 													</bind>
 												</volumes>
 												<wait>
