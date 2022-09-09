@@ -1,7 +1,7 @@
 hazelcast:
    network:
       port:
-         port: ${hazelcast.port}
+         port: 5701
          auto-increment: false
       join:
          tcp-ip:

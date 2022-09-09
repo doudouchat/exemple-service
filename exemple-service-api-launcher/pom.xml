@@ -12,24 +12,11 @@
 
 	<properties>
 
-		<!-- TOMCAT -->
-		<tomcat.container.id>tomcat9x</tomcat.container.id>
-
-		<application.log.file>${project.build.testOutputDirectory}/logback.xml</application.log.file>
 		<application.contextpath>ExempleService</application.contextpath>
 		<application.host>http://localhost</application.host>
 
-		<!-- RESOURCE -->
-
-		<configuration.name>exemple-service-configuration</configuration.name>
-		<configuration.path>file:${project.build.testOutputDirectory}/exemple-service-test.yml</configuration.path>
-
 		<!-- SONAR -->
 		<sonar.coverage.jacoco.xmlReportPaths>${sonar.coverage.report.path}</sonar.coverage.jacoco.xmlReportPaths>
-
-		<!-- API -->
-		<cassandra.host>127.0.0.1</cassandra.host>
-		<hazelcast.port>5706</hazelcast.port>
 
 	</properties>
 
@@ -203,58 +190,6 @@
 
 			<plugins>
 
-				<!-- CARGO -->
-				<!-- https://codehaus-cargo.github.io/cargo/Maven2+plugin.html -->
-				<plugin>
-					<groupId>org.codehaus.cargo</groupId>
-					<artifactId>cargo-maven3-plugin</artifactId>
-					<version>1.9.3</version>
-					<configuration>
-						<container>
-							<containerId>${tomcat.container.id}</containerId>
-							<output>${project.build.directory}/cargo/configurations/${tomcat.container.id}/logs/container.log</output>
-							<timeout>180000</timeout>
-							<artifactInstaller>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat</artifactId>
-								<version>${tomcat.version}</version>
-							</artifactInstaller>
-							<systemProperties>
-								<spring.profiles.active>etude,noSecurity</spring.profiles.active>
-							</systemProperties>
-						</container>
-						<configuration>
-							<properties>
-								<!-- le choix du port permet d'arrêter proprement le tomcat sans 
-									être conflit avec un autre tomcat en cours d'exécution -->
-								<cargo.servlet.port>${application.port}</cargo.servlet.port>
-								<cargo.rmi.port>${cargo.rmi.port}</cargo.rmi.port>
-								<cargo.tomcat.ajp.port>${cargo.ajp.port}</cargo.tomcat.ajp.port>
-								<cargo.jvmargs>${jacoco.it.agent.argLine}
-									-Dlogging.config=file:${application.log.file} -Xmx1g</cargo.jvmargs>
-							</properties>
-						</configuration>
-					</configuration>
-					<executions>
-						<!-- start server before integration tests -->
-						<execution>
-							<id>start-container</id>
-							<phase>pre-integration-test</phase>
-							<goals>
-								<goal>start</goal>
-							</goals>
-						</execution>
-						<!-- stop server after integration tests -->
-						<execution>
-							<id>stop-container</id>
-							<phase>post-integration-test</phase>
-							<goals>
-								<goal>stop</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-
 				<!-- DOCKER -->
 				<!-- http://dmp.fabric8.io/ -->
 				<plugin>
@@ -301,25 +236,6 @@
 		<profile>
 			<id>service</id>
 
-			<properties>
-
-				<!-- API -->
-				<hazelcast.port>5701</hazelcast.port>
-
-			</properties>
-
-			<dependencies>
-
-				<!-- RESOURCE CONNECTOR -->
-				<dependency>
-					<groupId>org.glassfish.main.resources</groupId>
-					<artifactId>resources-connector</artifactId>
-					<version>5.1.0</version>
-					<scope>test</scope>
-				</dependency>
-
-			</dependencies>
-
 			<build>
 				<plugins>
 
@@ -337,11 +253,10 @@
 								<configuration>
 									<portNames>
 										<portName>application.port</portName>
-										<portName>cargo.rmi.port</portName>
-										<portName>cargo.ajp.port</portName>
 										<portName>cassandra.port</portName>
 										<portName>zookeeper.port</portName>
 										<portName>kafka.port</portName>
+										<portName>hazelcast.port</portName>
 									</portNames>
 								</configuration>
 							</execution>
@@ -378,6 +293,26 @@
 						<groupId>io.fabric8</groupId>
 						<artifactId>docker-maven-plugin</artifactId>
 						<executions>
+							<execution>
+								<id>build_exemple_service</id>
+								<goals>
+									<goal>build</goal>
+								</goals>
+								<phase>package</phase>
+								<configuration>
+									<images>
+										<image>
+											<name>exemple-service</name>
+											<build>
+												<dockerFile>${basedir}/../Dockerfile</dockerFile>
+												<args>
+													<VERSION_TOMCAT>${tomcat.version}-jdk17</VERSION_TOMCAT>
+												</args>
+											</build>
+										</image>
+									</images>
+								</configuration>
+							</execution>
 							<execution>
 								<id>start_cassandra</id>
 								<goals>
@@ -449,7 +384,7 @@
 													<KAFKA_CFG_ZOOKEEPER_CONNECT>172.17.0.1:${zookeeper.port}</KAFKA_CFG_ZOOKEEPER_CONNECT>
 													<KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP>CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT</KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP>
 													<KAFKA_CFG_LISTENERS>CLIENT://:9092,EXTERNAL://:9093</KAFKA_CFG_LISTENERS>
-													<KAFKA_CFG_ADVERTISED_LISTENERS>CLIENT://localhost:9092,EXTERNAL://localhost:${kafka.port}</KAFKA_CFG_ADVERTISED_LISTENERS>
+													<KAFKA_CFG_ADVERTISED_LISTENERS>CLIENT://localhost:9092,EXTERNAL://172.17.0.1:${kafka.port}</KAFKA_CFG_ADVERTISED_LISTENERS>
 													<KAFKA_CFG_INTER_BROKER_LISTENER_NAME>CLIENT</KAFKA_CFG_INTER_BROKER_LISTENER_NAME>
 												</env>
 												<wait>
@@ -464,48 +399,61 @@
 								</configuration>
 							</execution>
 							<execution>
+								<id>start_exemple_service</id>
+								<goals>
+									<goal>start</goal>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>exemple-service</name>
+											<alias>exemple-service</alias>
+											<run>
+												<ports>
+													<port>${application.port}:8080</port>
+													<port>${hazelcast.port}:5701</port>
+												</ports>
+												<env>
+													<CATALINA_OPTS>-Dlogging.config=file:/usr/local/tomcat/etc/logback.xml</CATALINA_OPTS>
+													<spring.profiles.active>noSecurity</spring.profiles.active>
+												</env>
+												<volumes>
+													<bind>
+														<volume>${project.build.testOutputDirectory}/conf:/usr/local/tomcat/etc</volume>
+													</bind>
+												</volumes>
+												<wait>
+													<http>
+														<url>http://localhost:${application.port}/ExempleService/actuator/health</url>
+														<method>GET</method>
+														<status>200</status>
+													</http>
+													<time>60000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+											<copy>
+												<entries>
+													<entry>
+														<containerPath>/usr/local/tomcat/logs/archive</containerPath>
+														<hostDirectory>${project.build.directory}/.logs</hostDirectory>
+													</entry>
+												</entries>
+											</copy>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
 								<id>stop_all</id>
 								<goals>
 									<goal>stop</goal>
 								</goals>
 							</execution>
 						</executions>
-					</plugin>
-
-					<!-- CARGO -->
-					<plugin>
-						<groupId>org.codehaus.cargo</groupId>
-						<artifactId>cargo-maven3-plugin</artifactId>
-						<configuration>
-							<ignoreFailures>true</ignoreFailures>
-							<container>
-								<dependencies>
-									<dependency>
-										<groupId>org.glassfish.main.resources</groupId>
-										<artifactId>resources-connector</artifactId>
-									</dependency>
-								</dependencies>
-							</container>
-							<deployables>
-								<deployable>
-									<groupId>${project.groupId}</groupId>
-									<artifactId>${artifactId.groupId}</artifactId>
-									<type>war</type>
-									<properties>
-										<context>/${application.contextpath}</context>
-									</properties>
-								</deployable>
-							</deployables>
-							<configuration>
-								<properties>
-									<cargo.resource.resource.spring>
-										cargo.resource.name=spring.config.additional-location|
-										cargo.resource.type=java.lang.String|
-										cargo.resource.parameters=factory=org.glassfish.resources.custom.factory.PrimitivesAndStringFactory;value=${configuration.path}
-									</cargo.resource.resource.spring>
-								</properties>
-							</configuration>
-						</configuration>
 					</plugin>
 
 				</plugins>
