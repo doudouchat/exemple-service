@@ -1,0 +1,2 @@
+exemple-service-api-launcher/target/*.war
+exemple-service-api-launcher/src/main/conf/**

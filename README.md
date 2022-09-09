@@ -6,9 +6,7 @@
 
 ## maven
 
-<p>execute with cargo and cassandra <code>mvn clean verify -Pservice,it</code></p>
-
-<p>execute without cargo and cassandra <code>mvn clean verify -Pit -Dapplication.port=8080</code></p>
+<p>execute with docker and cassandra <code>mvn clean verify -Pservice,it</code></p>
 
 ## Docker
 

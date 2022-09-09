@@ -1,0 +1,37 @@
+spring:
+   hazelcast:
+      config: file:/usr/local/tomcat/etc/hazelcast.yaml
+management:
+   endpoints:
+      web:
+         exposure:
+            include:
+             - info
+             - health
+   endpoint:
+      info:
+         enabled: true
+      health:
+         enabled: true
+   info:
+      env: 
+         enabled: true
+resource:
+   cassandra:
+      resource_configuration: file:/usr/local/tomcat/etc/cassandra.conf
+customer:
+   contexts:
+      path: /usr/local/tomcat/etc/contexts
+store:
+   zookeeper:
+      host: 172.17.0.1:${zookeeper.port}
+      sleepMsBetweenRetries: 10000
+application:
+   zookeeper:
+      host: 172.17.0.1:${zookeeper.port}
+      sleepMsBetweenRetries: 10000
+event:
+   kafka:
+      bootstrap-servers: 172.17.0.1:${kafka.port}
+   topic: test
+   timeout: 10000
