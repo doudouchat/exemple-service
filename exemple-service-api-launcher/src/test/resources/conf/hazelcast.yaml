@@ -1,10 +1,4 @@
-hazelcast:
+hazelcast-client:
    network:
-      port:
-         port: 5701
-         auto-increment: false
-      join:
-         tcp-ip:
-            enabled: false
-         multicast:
-            enabled: false
+      cluster-members:
+      - 172.17.0.1:${hazelcast.port}
