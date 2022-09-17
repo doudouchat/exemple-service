@@ -515,7 +515,6 @@
 												<env>
 													<CATALINA_OPTS>-Dlogging.config=file:/usr/local/tomcat/etc/logback.xml -Dhazelcast.client.config=/usr/local/tomcat/etc/hazelcast.yaml</CATALINA_OPTS>
 													<JAVA_TOOL_OPTIONS>-javaagent:/usr/local/tomcat/etc/lib/jacocoagent.jar=includes=com.exemple.service.*,excludes=*EnhancerBySpringCGLIB*:*FastClassBySpringCGLIB*:*__MapperGenerated*,output=tcpserver,address=*</JAVA_TOOL_OPTIONS>
-													<spring.profiles.active>noSecurity</spring.profiles.active>
 												</env>
 												<volumes>
 													<bind>

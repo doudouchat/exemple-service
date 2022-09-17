@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -23,7 +22,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.SneakyThrows;
 
 @Component
-@Profile("!noSecurity")
 public class AuthorizationAlgorithmFactory {
 
     private static final Pattern RSA_PUBLIC_KEY;

@@ -345,9 +345,7 @@
 					"default": {
 						"description": "default response",
 						"content": {
-							"*/*": {
-								
-							}
+							"*/*": {}
 						}
 					}
 				},
@@ -653,6 +651,29 @@
 			},
 			"Account.v2.admin": {
 				"$ref": "/ws/v1/schemas/account/test/v2/admin"
+			}
+		},
+		"securitySchemes": {
+			"oauth2_password": {
+				"type": "oauth2",
+				"flows": {
+					"password": {
+						"tokenUrl": "/oauth/token"
+					}
+				}
+			},
+			"oauth2_client_credentials": {
+				"type": "oauth2",
+				"flows": {
+					"clientCredentials": {
+						"tokenUrl": "/oauth/token"
+					}
+				}
+			},
+			"bearer_authentification": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
 			}
 		}
 	}

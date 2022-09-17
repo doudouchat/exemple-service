@@ -2,6 +2,8 @@ package com.exemple.service.api.stock;
 
 import static com.exemple.service.api.common.model.ApplicationBeanParam.APP_HEADER;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -13,11 +15,18 @@ import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.exemple.service.api.core.ApiTestConfiguration;
 import com.exemple.service.api.core.JerseySpringSupport;
+import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
@@ -26,6 +35,8 @@ import com.exemple.service.store.stock.StockService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@SpringJUnitConfig(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
+@ActiveProfiles("AuthorizationMock")
 class StockApiTest extends JerseySpringSupport {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -50,163 +61,261 @@ class StockApiTest extends JerseySpringSupport {
 
     public static final String URL = "/v1/stocks";
 
-    @Test
-    void update() throws InsufficientStockException {
+    @Nested
+    class update {
 
-        // Given stock
+        @Test
+        void success() throws InsufficientStockException {
 
-        String store = "store";
-        String product = "product";
-        String company = "company1";
-        String application = "application";
+            // Given stock
 
-        // And mock service
+            String store = "store";
+            String product = "product";
+            String company = "company1";
+            String application = "application";
 
-        Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
+            // And mock service
 
-        Mockito.when(service.update("/" + company, "/" + store, "/" + product, 5)).thenReturn(18L);
+            Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
 
-        // When perform post
+            Mockito.when(service.update("/" + company, "/" + store, "/" + product, 5)).thenReturn(18L);
 
-        Response response = target(URL + "/" + store + "/" + product).request(MediaType.APPLICATION_JSON).header(APP_HEADER, application)
-                .post(Entity.json(
-                        """
-                        {"increment":5}
-                        """));
+            // and token
 
-        // Then check status
+            String token = JWT.create().withArrayClaim("scope", new String[] { "stock:update" }).sign(Algorithm.none());
 
-        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
+            // When perform post
 
-        // And check body
+            Response response = target(URL + "/" + store + "/" + product)
+                    .request(MediaType.APPLICATION_JSON).header(APP_HEADER, application).header("Authorization", token)
+                    .post(Entity.json(
+                            """
+                            {"increment":5}
+                            """));
 
-        assertThat(response.readEntity(Long.class)).isEqualTo(18L);
+            // Then check status
+
+            assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
+
+            // And check body
+
+            assertThat(response.readEntity(Long.class)).isEqualTo(18L);
+
+        }
+
+        @Test
+        void validationFailure() throws IOException {
+
+            // Given stock
+
+            String store = "store";
+            String product = "product";
+            String application = "application";
+
+            // And mock service
+
+            Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
+
+            // and token
+
+            String token = JWT.create().withArrayClaim("scope", new String[] { "stock:update" }).sign(Algorithm.none());
+
+            // When perform post
+
+            Response response = target(URL + "/" + store + "/" + product)
+                    .request(MediaType.APPLICATION_JSON).header(APP_HEADER, application).header("Authorization", token)
+                    .post(Entity.json("{}"));
+
+            // Then check status
+
+            assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
+
+            // And check body
+
+            assertThat(response.readEntity(JsonNode.class)).isEqualTo(MAPPER.readTree(
+                    """
+                    {"increment":"La valeur doit être renseignée."}
+                    """));
+
+        }
+
+        @Test
+        void insufficientStock() throws InsufficientStockException {
+
+            // Given stock
+
+            String store = "store";
+            String product = "product";
+            String company = "company1";
+            String application = "application";
+
+            // And mock service
+
+            Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
+
+            Mockito.doThrow(new InsufficientStockException("/" + company, "/" + store, "/" + product, 100, 5)).when(service)
+                    .update("/" + company, "/" + store, "/" + product, 5);
+
+            // and token
+
+            String token = JWT.create().withArrayClaim("scope", new String[] { "stock:update" }).sign(Algorithm.none());
+
+            // When perform put
+
+            Response response = target(URL + "/" + store + "/" + product)
+                    .request(MediaType.APPLICATION_JSON).header(APP_HEADER, application).header("Authorization", token)
+                    .post(Entity.json(
+                            """
+                            {"increment":5}
+                            """));
+
+            // Then check status
+
+            assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
+
+            // And check body
+
+            assertThat(response.readEntity(String.class))
+                    .isEqualTo(new InsufficientStockException("/" + company, "/" + store, "/" + product, 100, 5).getMessage());
+
+        }
+
+        @Test
+        void isForbidden() throws InsufficientStockException {
+
+            // Given stock
+
+            String store = "store";
+            String product = "product";
+            String application = "application";
+
+            // and token
+
+            String token = JWT.create().withArrayClaim("scope", new String[] { "stock:read" }).sign(Algorithm.none());
+
+            // When perform put
+
+            Response response = target(URL + "/" + store + "/" + product)
+                    .request(MediaType.APPLICATION_JSON).header(APP_HEADER, application).header("Authorization", token)
+                    .post(Entity.json(
+                            """
+                            {"increment":5}
+                            """));
+
+            // Then check status
+
+            assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
+
+            // verify service
+
+            Mockito.verify(service, never()).update(any(), any(), any(), any(Integer.class));
+
+        }
 
     }
 
-    @Test
-    void updateValidationFailure() throws IOException {
+    @Nested
+    class get {
 
-        // Given stock
+        @Test
+        void success() throws IOException {
 
-        String store = "store";
-        String product = "product";
-        String application = "application";
+            // Given stock
 
-        // And mock service
+            String store = "store";
+            String product = "product";
+            String company = "company1";
+            String application = "application";
 
-        Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
+            // And mock service
 
-        // When perform post
+            Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
 
-        Response response = target(URL + "/" + store + "/" + product).request(MediaType.APPLICATION_JSON).header(APP_HEADER, application)
-                .post(Entity.json("{}"));
+            Mockito.when(service.get("/" + company, "/" + store, "/" + product)).thenReturn(Optional.of(5L));
 
-        // Then check status
+            // and token
 
-        assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
+            String token = JWT.create().withArrayClaim("scope", new String[] { "stock:read" }).sign(Algorithm.none());
 
-        // And check body
+            // When perform service
 
-        assertThat(response.readEntity(JsonNode.class)).isEqualTo(MAPPER.readTree(
-                """
-                {"increment":"La valeur doit être renseignée."}
-                """));
+            Response response = target(URL + "/" + store + "/" + product)
+                    .request(MediaType.APPLICATION_JSON).header(APP_HEADER, application).header("Authorization", token)
+                    .get();
 
-    }
+            // Then check status
 
-    @Test
-    void updateInsufficientStockFailure() throws InsufficientStockException {
+            assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
-        // Given stock
+            // and check body
 
-        String store = "store";
-        String product = "product";
-        String company = "company1";
-        String application = "application";
+            assertThat(response.readEntity(JsonNode.class)).isEqualTo(MAPPER.readTree(
+                    """
+                    {"amount":5}
+                    """));
 
-        // And mock service
+        }
 
-        Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
+        @Test
+        void notFound() {
 
-        Mockito.doThrow(new InsufficientStockException("/" + company, "/" + store, "/" + product, 100, 5)).when(service)
-                .update("/" + company, "/" + store, "/" + product, 5);
+            // Given stock
 
-        // When perform put
+            String store = "store";
+            String product = "product";
+            String company = "company1";
+            String application = "application";
 
-        Response response = target(URL + "/" + store + "/" + product).request(MediaType.APPLICATION_JSON).header(APP_HEADER, application)
-                .post(Entity.json(
-                        """
-                        {"increment":5}
-                        """));
+            // And mock service
 
-        // Then check status
+            Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
 
-        assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
+            Mockito.when(service.get("/" + company, "/" + store, "/" + product)).thenReturn(Optional.empty());
 
-        // And check body
+            // and token
 
-        assertThat(response.readEntity(String.class))
-                .isEqualTo(new InsufficientStockException("/" + company, "/" + store, "/" + product, 100, 5).getMessage());
+            String token = JWT.create().withArrayClaim("scope", new String[] { "stock:read" }).sign(Algorithm.none());
 
-    }
+            // When perform service
 
-    @Test
-    void get() throws IOException {
+            Response response = target(URL + "/" + store + "/" + product)
+                    .request(MediaType.APPLICATION_JSON).header(APP_HEADER, application).header("Authorization", token)
+                    .get();
 
-        // Given stock
+            // Then check status
 
-        String store = "store";
-        String product = "product";
-        String company = "company1";
-        String application = "application";
+            assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 
-        // And mock service
+        }
 
-        Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
+        @Test
+        void isForbidden() {
 
-        Mockito.when(service.get("/" + company, "/" + store, "/" + product)).thenReturn(Optional.of(5L));
+            // Given stock
 
-        // When perform service
+            String store = "store";
+            String product = "product";
+            String application = "application";
 
-        Response response = target(URL + "/" + store + "/" + product).request(MediaType.APPLICATION_JSON).header(APP_HEADER, application).get();
+            // and token
 
-        // Then check status
+            String token = JWT.create().withArrayClaim("scope", new String[] { "stock:update" }).sign(Algorithm.none());
 
-        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
+            // When perform service
 
-        // and check body
+            Response response = target(URL + "/" + store + "/" + product)
+                    .request(MediaType.APPLICATION_JSON).header(APP_HEADER, application).header("Authorization", token)
+                    .get();
 
-        assertThat(response.readEntity(JsonNode.class)).isEqualTo(MAPPER.readTree(
-                """
-                {"amount":5}
-                """));
+            // Then check status
 
-    }
+            assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
 
-    @Test
-    void getNotFoundStockFailure() {
+            // verify service
 
-        // Given stock
+            Mockito.verify(service, never()).get(any(), any(), any());
 
-        String store = "store";
-        String product = "product";
-        String company = "company1";
-        String application = "application";
-
-        // And mock service
-
-        Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
-
-        Mockito.when(service.get("/" + company, "/" + store, "/" + product)).thenReturn(Optional.empty());
-
-        // When perform service
-
-        Response response = target(URL + "/" + store + "/" + product).request(MediaType.APPLICATION_JSON).header(APP_HEADER, application).get();
-
-        // Then check status
-
-        assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
+        }
 
     }
 

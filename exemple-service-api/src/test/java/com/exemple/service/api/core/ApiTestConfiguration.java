@@ -8,6 +8,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
 import org.springframework.util.ResourceUtils;
 
@@ -25,7 +26,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
-public class ApiTestConfiguration extends ApiConfiguration {
+@Import(ApiConfiguration.class)
+public class ApiTestConfiguration {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 

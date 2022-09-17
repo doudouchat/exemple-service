@@ -4,9 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.UUID;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -14,39 +20,39 @@ import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import com.exemple.service.api.common.model.SchemaBeanParam;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.exemple.service.api.core.ApiTestConfiguration;
 import com.exemple.service.api.core.JerseySpringSupport;
+import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration;
+import com.exemple.service.api.core.check.AppAndVersionCheck;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
-import com.exemple.service.customer.account.AccountService;
+import com.exemple.service.customer.common.validator.NotEmpty;
+import com.exemple.service.schema.validation.annotation.Patch;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import io.swagger.v3.oas.annotations.Hidden;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.jackson.Jacksonized;
+
+@SpringJUnitConfig(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
+@ActiveProfiles("AuthorizationMock")
 class ExceptionApiTest extends JerseySpringSupport {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    public static final String ACCOUNT_URL = "/v1/accounts";
-
-    private static final String STOCK_URL = "/v1/stocks";
+    private static final String URL = "/v1/test";
 
     @Override
     protected ResourceConfig configure() {
-        return new FeatureConfiguration();
-    }
-
-    @Autowired
-    private AccountService service;
-
-    @BeforeEach
-    private void before() {
-
-        Mockito.reset(service);
-
+        return new FeatureConfiguration().register(TestApi.class);
     }
 
     @Test
@@ -67,7 +73,7 @@ class ExceptionApiTest extends JerseySpringSupport {
 
         // When perform get
 
-        Response response = target(ACCOUNT_URL + "/" + UUID.randomUUID()).request(MediaType.TEXT_HTML).get();
+        Response response = target("/v1/test").request(MediaType.TEXT_HTML).get();
 
         // Then check status
 
@@ -78,57 +84,45 @@ class ExceptionApiTest extends JerseySpringSupport {
     @Test
     void JsonException() {
 
+        // Given token
+
+        String token = JWT.create().withArrayClaim("scope", new String[] { "account:create" }).sign(Algorithm.none());
+
         // When perform post
 
-        Response response = target(ACCOUNT_URL).request(MediaType.APPLICATION_JSON).post(Entity.json("toto"));
+        Response response = target("/v1/test")
+                .request(MediaType.APPLICATION_JSON).header("Authorization", token)
+                .post(Entity.json("toto"));
 
         // Then check status
 
         assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
+
+        // And check body
+
+        assertThat(response.readEntity(String.class)).startsWith("Unrecognized token 'toto'");
     }
 
     @Test
-    void JsonEmptyException() {
+    void JsonEmptyException() throws IOException {
 
-        // When perform past
+        // When perform patch
 
-        Response response = target(ACCOUNT_URL + "/" + UUID.randomUUID()).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
+        Response response = target(URL + "/" + UUID.randomUUID()).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
                 .request(MediaType.APPLICATION_JSON)
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
                 .method("PATCH", Entity.json(Collections.EMPTY_LIST));
 
         // Then check status
 
         assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
-    }
 
-    @Test
-    void JsonPatchException() throws IOException {
+        // And check body
 
-        // Given account id
-
-        UUID id = UUID.randomUUID();
-
-        // And mock service
-
-        Mockito.when(service.get(id)).thenReturn(Optional.of(MAPPER.createObjectNode()));
-
-        // When perform patch
-
-        JsonNode patch = MAPPER.readTree(
-                """
-                {"op": "replace", "path": "/lastname", "value":"Dupond"}
-                """);
-
-        Response response = target(ACCOUNT_URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
-                .request(MediaType.APPLICATION_JSON)
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
-                .method("PATCH", Entity.json(Collections.singletonList(patch)));
-
-        // Then check status
-
-        assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
-
+        assertThat(response.readEntity(JsonNode.class))
+                .isEqualTo(MAPPER.readTree(
+                        """
+                        {"arg1":"Le json doit être renseigné."}
+                        """));
     }
 
     @Test
@@ -136,11 +130,10 @@ class ExceptionApiTest extends JerseySpringSupport {
 
         // When perform post
 
-        Response response = target(STOCK_URL + "/store/product").request(MediaType.APPLICATION_JSON)
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
+        Response response = target(URL).request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(
                         """
-                        {"other":10, "increment":5}
+                        {"lastname":"jean"}
                         """));
 
         // Then check status
@@ -154,34 +147,11 @@ class ExceptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    void internalServerError() {
-
-        // Given mock service
-
-        Mockito.when(service.get(Mockito.any(UUID.class))).thenThrow(new RuntimeException());
-
-        // When perform post
-
-        Response response = target(ACCOUNT_URL + "/" + UUID.randomUUID()).request(MediaType.APPLICATION_JSON)
-
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").get();
-
-        // Then check status
-
-        assertThat(response.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
-
-    }
-
-    @Test
-    void getFailureBecauseAppAndVersionAreMissing() throws IOException {
-
-        // Given account id
-        UUID id = UUID.randomUUID();
+    void appAndVersionAreMissing() throws IOException {
 
         // When perform get
 
-        Response response = target(ACCOUNT_URL + "/" + id).request(MediaType.APPLICATION_JSON)
-
+        Response response = target(URL).request(MediaType.APPLICATION_JSON)
                 .get();
 
         // Then check status
@@ -195,6 +165,47 @@ class ExceptionApiTest extends JerseySpringSupport {
                         """
                         {"app":"La valeur doit être renseignée.","version":"La valeur doit être renseignée."}
                         """));
+
+    }
+
+    @Path("/v1/test")
+    @Hidden
+    public static class TestApi {
+
+        @GET
+        @Produces(MediaType.APPLICATION_JSON)
+        @AppAndVersionCheck
+        public Response get() {
+
+            return Response.ok().build();
+
+        }
+
+        @POST
+        @Consumes(MediaType.APPLICATION_JSON)
+        public Response post(Test resource) {
+
+            return Response.ok().build();
+
+        }
+
+        @PATCH
+        @Path("/{id}")
+        @Consumes(MediaType.APPLICATION_JSON)
+        public Response update(@PathParam("id") String id, @NotEmpty @Patch ArrayNode patch) {
+
+            return Response.ok().build();
+
+        }
+
+        @Getter
+        @Builder
+        @Jacksonized
+        private static class Test {
+
+            private final String name;
+
+        }
 
     }
 

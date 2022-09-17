@@ -32,10 +32,6 @@ public class ApiSecurityContext implements SecurityContext {
         this(principal, scheme, roles::contains, profile);
     }
 
-    public ApiSecurityContext(Principal principal, String scheme) {
-        this(principal, scheme, (String role) -> true, null);
-    }
-
     @Override
     public Principal getUserPrincipal() {
         return this.principal;

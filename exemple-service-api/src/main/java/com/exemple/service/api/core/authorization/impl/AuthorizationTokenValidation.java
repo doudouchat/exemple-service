@@ -3,7 +3,6 @@ package com.exemple.service.api.core.authorization.impl;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
@@ -17,7 +16,6 @@ import com.exemple.service.application.detail.ApplicationDetailService;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@Profile("!noSecurity")
 @RequiredArgsConstructor
 public class AuthorizationTokenValidation {
 
@@ -35,7 +33,7 @@ public class AuthorizationTokenValidation {
         try {
             verifier.verify(jwt.getToken());
         } catch (JWTVerificationException e) {
-            throw new AuthorizationException(Response.Status.FORBIDDEN, e);
+            throw new AuthorizationException(Response.Status.FORBIDDEN, "Signature doesn't match", e);
         }
     }
 

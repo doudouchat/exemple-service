@@ -1,6 +1,8 @@
 package com.exemple.service.api.login;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -11,15 +13,24 @@ import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.exemple.service.api.common.model.SchemaBeanParam;
+import com.exemple.service.api.core.ApiTestConfiguration;
 import com.exemple.service.api.core.JerseySpringSupport;
+import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.login.LoginResource;
 
+@SpringJUnitConfig(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
+@ActiveProfiles("AuthorizationMock")
 class LoginApiTest extends JerseySpringSupport {
 
     @Override
@@ -39,75 +50,207 @@ class LoginApiTest extends JerseySpringSupport {
 
     public static final String URL = "/v1/logins";
 
-    @Test
-    void check() {
+    @Nested
+    class check {
 
-        // Given login
+        @Test
+        void success() {
 
-        String username = "jean.dupond@gmail.com";
+            // Given login
 
-        // And mock service
+            String username = "jean.dupond@gmail.com";
 
-        Mockito.when(resource.get(username)).thenReturn(Optional.of(UUID.randomUUID()));
+            // And mock service
 
-        // When perform head
+            Mockito.when(resource.get(username)).thenReturn(Optional.of(UUID.randomUUID()));
 
-        Response response = target(URL + "/" + username).request().header(SchemaBeanParam.APP_HEADER, "test").head();
+            // and token
 
-        // Then check status
+            String token = JWT.create().withArrayClaim("scope", new String[] { "login:head" }).sign(Algorithm.none());
 
-        assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
+            // When perform head
+
+            Response response = target(URL + "/" + username).request()
+                    .header(SchemaBeanParam.APP_HEADER, "test").header("Authorization", token)
+                    .head();
+
+            // Then check status
+
+            assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
+
+        }
+
+        @Test
+        void fails() throws Exception {
+
+            // Given username
+
+            String username = "jean.dupond@gmail.com";
+
+            // And mock service
+
+            Mockito.when(resource.get(username)).thenReturn(Optional.empty());
+
+            // and token
+
+            String token = JWT.create().withArrayClaim("scope", new String[] { "login:head" }).sign(Algorithm.none());
+
+            // When perform head
+
+            Response response = target(URL + "/" + username).request()
+                    .header(SchemaBeanParam.APP_HEADER, "test").header("Authorization", token)
+                    .head();
+
+            // Then check status
+
+            assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
+
+        }
+
+        @Test
+        void isForbidden() throws Exception {
+
+            // Given username
+
+            String username = "jean.dupond@gmail.com";
+
+            // and token
+
+            String token = JWT.create().withArrayClaim("scope", new String[] { "login:get" }).sign(Algorithm.none());
+
+            // When perform head
+
+            Response response = target(URL + "/" + username).request()
+                    .header(SchemaBeanParam.APP_HEADER, "test").header("Authorization", token)
+                    .head();
+
+            // Then check status
+
+            assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
+
+        }
 
     }
 
-    @Test
-    void checkNotFound() throws Exception {
+    @Nested
+    class get {
 
-        // Given username
+        @Test
+        void success() {
 
-        String username = "jean.dupond@gmail.com";
+            // Given user_name
 
-        // And mock service
+            String username = "jean.dupond@gmail.com";
 
-        Mockito.when(resource.get(username)).thenReturn(Optional.empty());
+            // And mock service
 
-        // When perform head
+            UUID id = UUID.randomUUID();
 
-        Response response = target(URL + "/" + username).request().header(SchemaBeanParam.APP_HEADER, "test").head();
+            Mockito.when(resource.get(username)).thenReturn(Optional.of(id));
 
-        // Then check status
+            // and token
 
-        assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
+            String token = JWT.create().withSubject("jean.dupond@gmail.com").withArrayClaim("scope", new String[] { "login:read" })
+                    .sign(Algorithm.none());
 
-    }
+            // When perform get
 
-    @Test
-    void get() {
+            Response response = target(URL + "/" + username).request(MediaType.APPLICATION_JSON)
+                    .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
+                    .get();
 
-        // Given user_name
+            // And check status
 
-        String username = "jean.dupond@gmail.com";
+            assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
-        // And mock service
+            // And check body
+            assertThat(response.readEntity(UUID.class)).isEqualTo(id);
 
-        UUID id = UUID.randomUUID();
+        }
 
-        Mockito.when(resource.get(username)).thenReturn(Optional.of(id));
+        @Test
+        void notFound() {
 
-        // When perform get
+            // Given user_name
 
-        Response response = target(URL + "/" + username).request(MediaType.APPLICATION_JSON)
+            String username = "jean.dupond@gmail.com";
 
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
+            // And mock service
 
-                .get();
+            Mockito.when(resource.get(username)).thenReturn(Optional.empty());
 
-        // And check status
+            // and token
 
-        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
+            String token = JWT.create().withSubject("jean.dupond@gmail.com").withArrayClaim("scope", new String[] { "login:read" })
+                    .sign(Algorithm.none());
 
-        // And check body
-        assertThat(response.readEntity(UUID.class)).isEqualTo(id);
+            // When perform get
+
+            Response response = target(URL + "/" + username).request(MediaType.APPLICATION_JSON)
+                    .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
+                    .get();
+
+            // And check status
+
+            assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
+
+        }
+
+        @Test
+        void isForbidden() {
+
+            // Given user_name
+
+            String username = "jean.dupond@gmail.com";
+
+            // and token
+
+            String token = JWT.create().withSubject("jean.dupond@gmail.com").withArrayClaim("scope", new String[] { "login:head" })
+                    .sign(Algorithm.none());
+
+            // When perform get
+
+            Response response = target(URL + "/" + username).request(MediaType.APPLICATION_JSON)
+                    .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
+                    .get();
+
+            // And check status
+
+            assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
+
+            // And check service
+
+            Mockito.verify(resource, never()).get(any());
+
+        }
+
+        @Test
+        void subjectTokenIsIncorrect() {
+
+            // Given user_name
+
+            String username = "jean.dupond@gmail.com";
+
+            // and token
+
+            String token = JWT.create().withSubject("jean.dupont@gmail.com").withArrayClaim("scope", new String[] { "login:read" })
+                    .sign(Algorithm.none());
+
+            // When perform get
+
+            Response response = target(URL + "/" + username).request(MediaType.APPLICATION_JSON)
+                    .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
+                    .get();
+
+            // And check status
+
+            assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
+
+            // And check service
+
+            Mockito.verify(resource, never()).get(any());
+
+        }
 
     }
 
