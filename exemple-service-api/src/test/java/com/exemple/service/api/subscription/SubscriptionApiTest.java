@@ -1,6 +1,8 @@
 package com.exemple.service.api.subscription;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -12,19 +14,28 @@ import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.exemple.service.api.common.model.SchemaBeanParam;
+import com.exemple.service.api.core.ApiTestConfiguration;
 import com.exemple.service.api.core.JerseySpringSupport;
+import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.subscription.SubscriptionService;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@SpringJUnitConfig(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
+@ActiveProfiles("AuthorizationMock")
 class SubscriptionApiTest extends JerseySpringSupport {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -52,135 +63,209 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
     public static final String URL = "/v1/subscriptions";
 
-    @Test
-    void save() throws IOException {
+    @Nested
+    class save {
 
-        // Given email
+        @Test
+        void success() throws IOException {
 
-        String email = "jean.dupond@gmail.com";
+            // Given email
 
-        // And mock service
-        Mockito.when(service.get(email)).thenReturn(Optional.empty());
+            String email = "jean.dupond@gmail.com";
 
-        // When perform put
+            // And mock service
+            Mockito.when(service.get(email)).thenReturn(Optional.empty());
 
-        JsonNode source = MAPPER.readTree(
-                """
-                {"lastname": "dupond", "firstname":"jean"}
-                """);
+            // and token
 
-        Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
+            String token = JWT.create().withArrayClaim("scope", new String[] { "subscription:update" }).sign(Algorithm.none());
 
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
+            // When perform put
 
-                .put(Entity.json(source));
+            JsonNode source = MAPPER.readTree(
+                    """
+                    {"lastname": "dupond", "firstname":"jean"}
+                    """);
 
-        // Then check status
+            Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
+                    .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
+                    .put(Entity.json(source));
 
-        assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
+            // Then check status
 
-        // And check service
+            assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
 
-        ArgumentCaptor<JsonNode> subscription = ArgumentCaptor.forClass(JsonNode.class);
+            // And check service
 
-        Mockito.verify(service).save(Mockito.eq(email), subscription.capture());
-        assertThat(subscription.getValue()).isEqualTo(source);
+            ArgumentCaptor<JsonNode> subscription = ArgumentCaptor.forClass(JsonNode.class);
 
-        // And check validation
+            Mockito.verify(service).save(Mockito.eq(email), subscription.capture());
+            assertThat(subscription.getValue()).isEqualTo(source);
 
-        JsonNode sourceToValidate = MAPPER.readTree(
-                """
-                {"email": "%s", "lastname": "dupond", "firstname":"jean"}
-                """.formatted(email));
-        JsonNode previousSourceToValidate = MAPPER.readTree(
-                """
-                {"email": "%s"}
-                """.formatted(email));
+            // And check validation
 
-        Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("subscription"),
-                subscription.capture(), Mockito.eq(previousSourceToValidate));
-        assertThat(subscription.getValue()).isEqualTo(sourceToValidate);
+            JsonNode sourceToValidate = MAPPER.readTree(
+                    """
+                    {"email": "%s", "lastname": "dupond", "firstname":"jean"}
+                    """.formatted(email));
+            JsonNode previousSourceToValidate = MAPPER.readTree(
+                    """
+                    {"email": "%s"}
+                    """.formatted(email));
+
+            Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("subscription"),
+                    subscription.capture(), Mockito.eq(previousSourceToValidate));
+            assertThat(subscription.getValue()).isEqualTo(sourceToValidate);
+
+        }
+
+        @Test
+        void successIfSubscriptionAlreadyExists() throws IOException {
+
+            // Given email
+
+            String email = "jean.dupond@gmail.com";
+
+            // And mock service
+            JsonNode previousSource = MAPPER.readTree(
+                    """
+                    {"email": "%s"}
+                    """.formatted(email));
+            Mockito.when(service.get(email)).thenReturn(Optional.of(previousSource));
+
+            // and token
+
+            String token = JWT.create().withArrayClaim("scope", new String[] { "subscription:update" }).sign(Algorithm.none());
+
+            // When perform put
+
+            JsonNode source = MAPPER.readTree(
+                    """
+                    {"lastname": "dupond", "firstname":"jean"}
+                    """);
+
+            Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
+                    .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
+                    .put(Entity.json(source));
+
+            // Then check status
+
+            assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
+
+            // And check service
+
+            ArgumentCaptor<JsonNode> subscription = ArgumentCaptor.forClass(JsonNode.class);
+
+            Mockito.verify(service).save(Mockito.eq(email), subscription.capture(), Mockito.eq(previousSource));
+            assertThat(subscription.getValue()).isEqualTo(source);
+
+            // And check validation
+
+            JsonNode sourceToValidate = MAPPER.readTree(
+                    """
+                    {"email": "%s", "lastname": "dupond", "firstname":"jean"}
+                    """.formatted(email));
+
+            Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("subscription"),
+                    subscription.capture(), Mockito.eq(previousSource));
+            assertThat(subscription.getValue()).isEqualTo(sourceToValidate);
+
+        }
+
+        @Test
+        void isForbidden() throws IOException {
+
+            // Given email
+
+            String email = "jean.dupond@gmail.com";
+
+            // and token
+
+            String token = JWT.create().withArrayClaim("scope", new String[] { "subscription:read" }).sign(Algorithm.none());
+
+            // When perform put
+
+            JsonNode source = MAPPER.readTree(
+                    """
+                    {"lastname": "dupond", "firstname":"jean"}
+                    """);
+
+            Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
+                    .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
+                    .put(Entity.json(source));
+
+            // Then check status
+
+            assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
+
+            // And check service
+
+            Mockito.verify(service, never()).save(any(), any());
+
+        }
 
     }
 
-    @Test
-    void update() throws IOException {
+    @Nested
+    class get {
 
-        // Given email
+        @Test
+        void success() throws IOException {
 
-        String email = "jean.dupond@gmail.com";
+            // Given email
 
-        // And mock service
-        JsonNode previousSource = MAPPER.readTree(
-                """
-                {"email": "%s"}
-                """.formatted(email));
-        Mockito.when(service.get(email)).thenReturn(Optional.of(previousSource));
+            String email = "jean.dupond@gmail.com";
 
-        // When perform put
+            // And mock service
 
-        JsonNode source = MAPPER.readTree(
-                """
-                {"lastname": "dupond", "firstname":"jean"}
-                """);
+            Mockito.when(service.get(email)).thenReturn(Optional.of(subscription));
 
-        Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
+            // and token
 
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
+            String token = JWT.create().withArrayClaim("scope", new String[] { "subscription:read" }).sign(Algorithm.none());
 
-                .put(Entity.json(source));
+            // When perform get
 
-        // Then check status
+            Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
+                    .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
+                    .get();
 
-        assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
+            // Then check status
 
-        // And check service
+            assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
-        ArgumentCaptor<JsonNode> subscription = ArgumentCaptor.forClass(JsonNode.class);
+            // And check body
 
-        Mockito.verify(service).save(Mockito.eq(email), subscription.capture(), Mockito.eq(previousSource));
-        assertThat(subscription.getValue()).isEqualTo(source);
+            assertThat(response.readEntity(JsonNode.class)).isEqualTo(subscription);
 
-        // And check validation
+        }
 
-        JsonNode sourceToValidate = MAPPER.readTree(
-                """
-                {"email": "%s", "lastname": "dupond", "firstname":"jean"}
-                """.formatted(email));
+        @Test
+        void isForbidden() {
 
-        Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("subscription"),
-                subscription.capture(), Mockito.eq(previousSource));
-        assertThat(subscription.getValue()).isEqualTo(sourceToValidate);
+            // Given email
 
-    }
+            String email = "jean.dupond@gmail.com";
 
-    @Test
-    void get() {
+            // and token
 
-        // Given email
+            String token = JWT.create().withArrayClaim("scope", new String[] { "subscription:update" }).sign(Algorithm.none());
 
-        String email = "jean.dupond@gmail.com";
+            // When perform get
 
-        // And mock service
+            Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
+                    .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
+                    .get();
 
-        Mockito.when(service.get(email)).thenReturn(Optional.of(subscription));
+            // Then check status
 
-        // When perform get
+            assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
 
-        Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
+            // And check service
 
-                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
+            Mockito.verify(service, never()).get(any());
 
-                .get();
-
-        // Then check status
-
-        assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
-
-        // And check body
-
-        assertThat(response.readEntity(JsonNode.class)).isEqualTo(subscription);
-
+        }
     }
 
 }

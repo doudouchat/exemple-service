@@ -13,26 +13,28 @@ import javax.ws.rs.core.Response.Status;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import com.exemple.service.api.core.ApiTestConfiguration;
 import com.exemple.service.api.core.JerseySpringSupport;
-import com.exemple.service.api.core.JerseySpringSupportSecure;
+import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
 import com.exemple.service.schema.description.SchemaDescription;
 import com.fasterxml.jackson.databind.JsonNode;
 
+@SpringJUnitConfig(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
+@ActiveProfiles("AuthorizationMock")
 @TestMethodOrder(OrderAnnotation.class)
 class DocumentApiResourceTest extends JerseySpringSupport {
 
@@ -142,39 +144,6 @@ class DocumentApiResourceTest extends JerseySpringSupport {
         // And check body
 
         assertThat(response.readEntity(JsonNode.class)).isEqualTo(schema);
-
-    }
-
-    @Nested
-    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    class Security extends JerseySpringSupportSecure {
-
-        @Override
-        protected ResourceConfig configure() {
-            return new FeatureConfiguration();
-        }
-
-        @Autowired
-        @Qualifier("swagger_security")
-        private JsonNode swaggerSecurity;
-
-        @Test
-        void swagger() {
-
-            // When perform get
-
-            Response response = target(URL).request(MediaType.APPLICATION_JSON).get();
-
-            // Then check status
-
-            assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
-
-            // And check body
-
-            JsonNode swagger = response.readEntity(JsonNode.class);
-            assertThat(swagger.at("/components/securitySchemes")).isEqualTo(swaggerSecurity);
-
-        }
 
     }
 

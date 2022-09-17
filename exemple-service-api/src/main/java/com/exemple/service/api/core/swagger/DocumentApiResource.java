@@ -15,7 +15,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.core.ApiContext;
@@ -56,13 +55,13 @@ public class DocumentApiResource extends BaseOpenApiResource {
     @Context
     private Application application;
 
-    private DocumentApiSecurity documentApiSecurity;
+    private final DocumentApiSecurity documentApiSecurity;
 
     private final SchemaResource schemaResource;
 
     private final ApiContext apiContext;
 
-    public DocumentApiResource(SchemaResource schemaResource, ApiContext apiContext) {
+    public DocumentApiResource(SchemaResource schemaResource, ApiContext apiContext, DocumentApiSecurity documentApiSecurity) {
 
         var openAPI = new OpenAPI();
 
@@ -75,12 +74,8 @@ public class DocumentApiResource extends BaseOpenApiResource {
                 .resourcePackages(Collections.singleton("com.exemple.service.api")).openAPI(openAPI);
         this.schemaResource = schemaResource;
         this.apiContext = apiContext;
-
-    }
-
-    @Autowired(required = false)
-    public void setDocumentApiSecurity(DocumentApiSecurity documentApiSecurity) {
         this.documentApiSecurity = documentApiSecurity;
+
     }
 
     @GET
@@ -106,16 +101,12 @@ public class DocumentApiResource extends BaseOpenApiResource {
                         RESOURCE + resource,
                         versions.stream().map((SchemaVersionProfileEntity v) -> v.getVersion().concat("|").concat(v.getProfile())).toList()));
 
-        if (documentApiSecurity != null) {
+        String ctxId = ServletConfigContextUtils.getContextIdFromServletConfig(config);
+        OpenApiContext ctx = new JaxrsOpenApiContextBuilder<>().servletConfig(config).application(application).resourcePackages(resourcePackages)
+                .configLocation(configLocation).openApiConfiguration(openApiConfiguration).ctxId(ctxId).buildContext(true);
+        OpenAPI oas = ctx.read();
 
-            String ctxId = ServletConfigContextUtils.getContextIdFromServletConfig(config);
-            OpenApiContext ctx = new JaxrsOpenApiContextBuilder<>().servletConfig(config).application(application).resourcePackages(resourcePackages)
-                    .configLocation(configLocation).openApiConfiguration(openApiConfiguration).ctxId(ctxId).buildContext(true);
-            OpenAPI oas = ctx.read();
-
-            oas.getComponents().setSecuritySchemes(documentApiSecurity.buildSecurityScheme());
-
-        }
+        oas.getComponents().setSecuritySchemes(documentApiSecurity.buildSecurityScheme());
 
         return super.getOpenApi(headers, config, application, uriInfo, type);
     }

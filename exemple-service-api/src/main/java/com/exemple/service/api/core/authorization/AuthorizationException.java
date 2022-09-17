@@ -9,8 +9,8 @@ public class AuthorizationException extends Exception {
 
     private final Response.Status status;
 
-    public AuthorizationException(Response.Status status, Throwable cause) {
-        super(cause);
+    public AuthorizationException(Response.Status status, String message, Throwable cause) {
+        super(message, cause);
         this.status = status;
     }
 

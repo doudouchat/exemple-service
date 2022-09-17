@@ -13,13 +13,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 @WebAppConfiguration
-@SpringJUnitConfig(ApiTestConfiguration.class)
-@ActiveProfiles("noSecurity")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class JerseySpringSupport {
 

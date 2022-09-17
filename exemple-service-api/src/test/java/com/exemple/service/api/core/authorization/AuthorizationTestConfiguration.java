@@ -8,10 +8,6 @@ import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.SecurityContext;
-
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
@@ -31,7 +27,6 @@ import com.hazelcast.core.HazelcastInstance;
 
 @Configuration
 @ComponentScan(basePackages = "com.exemple.service.api.core.authorization")
-@Profile("!noSecurity")
 public class AuthorizationTestConfiguration {
 
     public static final Algorithm RSA256_ALGORITHM;
@@ -112,19 +107,6 @@ public class AuthorizationTestConfiguration {
             config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
 
             return Hazelcast.newHazelcastInstance(config);
-        }
-
-    }
-
-    public static class TestFilter implements ContainerRequestFilter {
-
-        public SecurityContext context;
-
-        @Override
-        public void filter(ContainerRequestContext requestContext) {
-
-            context = requestContext.getSecurityContext();
-
         }
 
     }

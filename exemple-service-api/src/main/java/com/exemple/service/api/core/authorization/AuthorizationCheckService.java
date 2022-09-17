@@ -1,15 +1,38 @@
 package com.exemple.service.api.core.authorization;
 
+import java.util.Objects;
 import java.util.UUID;
 
-public interface AuthorizationCheckService {
+import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.container.ContainerRequestContext;
 
-    default void verifyAccountId(UUID id) {
+import com.exemple.service.customer.login.LoginResource;
+
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+public class AuthorizationCheckService {
+
+    private final LoginResource loginResource;
+
+    private final ContainerRequestContext requestContext;
+
+    public void verifyAccountId(UUID id) {
+
+        UUID loginId = loginResource.get(requestContext.getSecurityContext().getUserPrincipal().getName()).orElseThrow(ForbiddenException::new);
+
+        if (!Objects.equals(id, loginId)) {
+
+            throw new ForbiddenException();
+        }
 
     }
 
-    default void verifyLogin(String login) {
+    public void verifyLogin(String username) {
 
+        if (!Objects.equals(username, requestContext.getSecurityContext().getUserPrincipal().getName())) {
+
+            throw new ForbiddenException();
+        }
     }
-
 }
