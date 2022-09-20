@@ -14,13 +14,14 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 
 import com.exemple.service.application.core.ApplicationConfiguration;
+import com.exemple.service.integration.authorization.server.TestAlgorithmConfiguration;
 import com.exemple.service.resource.core.ResourceConfiguration;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
 
 @Configuration
-@Import({ ResourceConfiguration.class, ApplicationConfiguration.class })
+@Import({ ResourceConfiguration.class, ApplicationConfiguration.class, TestAlgorithmConfiguration.class })
 @ComponentScan(basePackages = "com.exemple.service.api.launcher", excludeFilters = @ComponentScan.Filter(SpringBootApplication.class))
 public class IntegrationTestConfiguration {
 

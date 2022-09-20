@@ -24,6 +24,7 @@
 		<module>exemple-service-customer</module>
 		<module>exemple-service-store</module>
 		<module>exemple-service-api</module>
+		<module>exemple-service-integration-authorization-server</module>
 		<module>exemple-service-api-launcher</module>
 		<module>jacoco-report</module>
 	</modules>

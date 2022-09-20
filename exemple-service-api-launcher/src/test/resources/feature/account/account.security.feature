@@ -2,6 +2,7 @@ Feature: api account security
 
   Background: 
     Given delete username 'jean.dupond@gmail.com'
+    And get authorization to create account for client 'test'
 
   Scenario: create account fails because application not exists
     When create account for application 'default' and version 'v1'

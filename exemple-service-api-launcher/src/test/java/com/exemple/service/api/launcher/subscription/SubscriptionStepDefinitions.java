@@ -14,6 +14,7 @@ import java.util.Map;
 import org.assertj.core.api.Condition;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.exemple.service.api.launcher.authorization.AuthorizationTestContext;
 import com.exemple.service.customer.subscription.SubscriptionResource;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -36,6 +37,9 @@ public class SubscriptionStepDefinitions {
     private SubscriptionTestContext context;
 
     @Autowired
+    private AuthorizationTestContext authorizationContext;
+
+    @Autowired
     private SubscriptionResource subscriptionResource;
 
     @Before
@@ -55,7 +59,7 @@ public class SubscriptionStepDefinitions {
     @When("create subscription {string}")
     public void createSubscription(String email) {
 
-        Response response = SubscriptionApiClient.put(email, Collections.emptyMap(), TEST_APP, VERSION_V1);
+        Response response = SubscriptionApiClient.put(email, Collections.emptyMap(), TEST_APP, VERSION_V1, authorizationContext.lastAccessToken());
 
         context.savePut(response);
 
@@ -70,7 +74,7 @@ public class SubscriptionStepDefinitions {
                         new Condition<>(status -> status == 201, "status"))),
                 () -> assertThat(context.lastResponse().asString()).isEmpty());
 
-        Response response = SubscriptionApiClient.get(email, TEST_APP, VERSION_V1);
+        Response response = SubscriptionApiClient.get(email, TEST_APP, VERSION_V1, authorizationContext.lastAccessToken());
 
         assertThat(response.getStatusCode()).as("subscription %s not found", email).isEqualTo(200);
 
@@ -86,7 +90,7 @@ public class SubscriptionStepDefinitions {
     @And("subscription {string} is unknown")
     public void getSubscription(String email) throws IOException {
 
-        Response response = SubscriptionApiClient.get(email, TEST_APP, VERSION_V1);
+        Response response = SubscriptionApiClient.get(email, TEST_APP, VERSION_V1, authorizationContext.lastAccessToken());
 
         assertThat(response.getStatusCode()).as("subscription %s exists", email).isEqualTo(404);
 

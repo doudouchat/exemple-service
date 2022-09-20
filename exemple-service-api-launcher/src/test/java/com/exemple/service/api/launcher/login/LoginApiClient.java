@@ -14,22 +14,18 @@ public final class LoginApiClient {
 
     }
 
-    public static Response get(String username, String application, String version) {
+    public static Response get(String username, String application, String version, String token) {
 
         return JsonRestTemplate.given()
-
-                .header(APP_HEADER, application)
-
+                .header(APP_HEADER, application).header("Authorization", token)
                 .get(LOGIN_URL + "/{username}", username);
 
     }
 
-    public static Response head(Object login, String application) {
+    public static Response head(Object login, String application, String token) {
 
         return JsonRestTemplate.given()
-
-                .header(APP_HEADER, application)
-
+                .header(APP_HEADER, application).header("Authorization", token)
                 .head(LOGIN_URL + "/{login}", login);
 
     }

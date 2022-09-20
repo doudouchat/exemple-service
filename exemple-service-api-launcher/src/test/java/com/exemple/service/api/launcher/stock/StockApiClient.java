@@ -14,22 +14,18 @@ public final class StockApiClient {
 
     }
 
-    public static Response post(String store, String product, Object body, String application) {
+    public static Response post(String store, String product, Object body, String application, String token) {
 
         return JsonRestTemplate.given().body(body)
-
-                .header(APP_HEADER, application)
-
+                .header(APP_HEADER, application).header("Authorization", token)
                 .post(STOCK_URL, store, product);
 
     }
 
-    public static Response get(String store, String product, String application) {
+    public static Response get(String store, String product, String application, String token) {
 
         return JsonRestTemplate.given()
-
-                .header(APP_HEADER, application)
-
+                .header(APP_HEADER, application).header("Authorization", token)
                 .get(STOCK_URL, store, product);
 
     }

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
+import com.exemple.service.api.launcher.authorization.AuthorizationTestContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -38,10 +39,13 @@ public class AccountStepDefinitions {
     @Autowired
     private AccountTestContext context;
 
+    @Autowired
+    private AuthorizationTestContext authorizationContext;
+
     @Given("account")
     public void buildAccount(JsonNode body) {
 
-        Response response = AccountApiClient.post(body, TEST_APP, VERSION_V1);
+        Response response = AccountApiClient.post(body, TEST_APP, VERSION_V1, authorizationContext.lastAccessToken());
 
         assertThat(response.getStatusCode()).as("failure account %s", body.toPrettyString()).isEqualTo(201);
 
@@ -52,7 +56,7 @@ public class AccountStepDefinitions {
     @When("create account for application {string} and version {string}")
     public void createAccount(String application, String version, JsonNode body) {
 
-        Response response = AccountApiClient.post(body, application, version);
+        Response response = AccountApiClient.post(body, application, version, authorizationContext.lastAccessToken());
 
         context.savePost(response);
 
@@ -72,7 +76,7 @@ public class AccountStepDefinitions {
     @When("patch account")
     public void patchAccount(JsonNode body) {
 
-        Response response = AccountApiClient.patch(context.lastId(), body, TEST_APP, VERSION_V1);
+        Response response = AccountApiClient.patch(context.lastId(), body, TEST_APP, VERSION_V1, authorizationContext.lastAccessToken());
 
         context.savePatch(response);
 
@@ -81,13 +85,13 @@ public class AccountStepDefinitions {
     @When("put account")
     public void putAccount(JsonNode body) {
 
-        Response responseGet = AccountApiClient.get(context.lastId(), TEST_APP, VERSION_V1);
+        Response responseGet = AccountApiClient.get(context.lastId(), TEST_APP, VERSION_V1, authorizationContext.lastAccessToken());
 
         if (!body.has("creation_date")) {
             ((ObjectNode) body).put("creation_date", responseGet.jsonPath().getString("creation_date"));
         }
 
-        Response response = AccountApiClient.put(context.lastId(), body, TEST_APP, VERSION_V1);
+        Response response = AccountApiClient.put(context.lastId(), body, TEST_APP, VERSION_V1, authorizationContext.lastAccessToken());
 
         context.savePut(response);
 
@@ -99,7 +103,7 @@ public class AccountStepDefinitions {
         Resource resource = new ClassPathResource("account/nominal_account.json");
         Map<String, Object> body = JsonPath.parse(resource.getInputStream()).set(property, value).json();
 
-        Response response = AccountApiClient.post(body, TEST_APP, VERSION_V1);
+        Response response = AccountApiClient.post(body, TEST_APP, VERSION_V1, authorizationContext.lastAccessToken());
 
         context.savePost(response);
 
@@ -113,7 +117,7 @@ public class AccountStepDefinitions {
         DocumentContext account = JsonPath.parse(resource.getInputStream());
         Map<String, Object> body = account.put("$", property, value).json();
 
-        Response response = AccountApiClient.post(body, TEST_APP, VERSION_V1);
+        Response response = AccountApiClient.post(body, TEST_APP, VERSION_V1, authorizationContext.lastAccessToken());
 
         context.savePost(response);
 
@@ -127,7 +131,7 @@ public class AccountStepDefinitions {
         DocumentContext account = JsonPath.parse(resource.getInputStream());
         Map<String, Object> body = account.put("$", property, value).json();
 
-        Response response = AccountApiClient.post(body, TEST_APP, VERSION_V1);
+        Response response = AccountApiClient.post(body, TEST_APP, VERSION_V1, authorizationContext.lastAccessToken());
 
         context.savePost(response);
 
@@ -136,7 +140,7 @@ public class AccountStepDefinitions {
     @When("get account for application {string} and version {string}")
     public void getAccount(String application, String version) throws IOException {
 
-        Response response = AccountApiClient.get(context.lastId(), application, version);
+        Response response = AccountApiClient.get(context.lastId(), application, version, authorizationContext.lastAccessToken());
 
         context.saveGet(response);
 
@@ -145,7 +149,7 @@ public class AccountStepDefinitions {
     @When("get account by id {id}")
     public void getAccount(UUID id) throws IOException {
 
-        Response response = AccountApiClient.get(id, TEST_APP, VERSION_V1);
+        Response response = AccountApiClient.get(id, TEST_APP, VERSION_V1, authorizationContext.lastAccessToken());
 
         context.saveGet(response);
 
@@ -179,7 +183,7 @@ public class AccountStepDefinitions {
                                 new Condition<>(status -> status == 201, "status"))),
                 () -> assertThat(context.lastResponse().asString()).as("account is incorrect %s", context.lastResponse().asString()).isEmpty());
 
-        Response response = AccountApiClient.get(context.lastId(), TEST_APP, VERSION_V1);
+        Response response = AccountApiClient.get(context.lastId(), TEST_APP, VERSION_V1, authorizationContext.lastAccessToken());
 
         assertThat(response.getStatusCode()).as("account %s not exists", context.lastId()).isEqualTo(200);
 
@@ -190,13 +194,6 @@ public class AccountStepDefinitions {
         assertThat(expectedBody).isEqualTo(body);
 
         context.saveGet(response);
-
-    }
-
-    @Then("account is unknown")
-    public void checkUnknown() {
-
-        assertThat(context.lastResponse().getStatusCode()).as("account exists").isEqualTo(404);
 
     }
 

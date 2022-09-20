@@ -2,6 +2,7 @@ Feature: api patch account
 
   Background: 
     Given delete username 'jean.dupond@gmail.com'
+    And get authorization to create account for client 'test'
     And account
       """
       {
@@ -30,6 +31,7 @@ Feature: api patch account
           "lastname": "Dupont"
       }
       """
+    And get authorization from account 'jean.dupond@gmail.com' and client 'test'
 
   Scenario: patch account
     When patch account
@@ -135,6 +137,7 @@ Feature: api patch account
          }
       ]
       """
+    And get authorization from account 'jean.dupont@gmail.com' and client 'test'
     Then account is
       """
       {
@@ -311,6 +314,7 @@ Feature: api patch account
 
   Scenario: patch account fails because username already exists
     Given delete username 'jean.dupont@gmail.com'
+    And get authorization to create account for client 'test'
     And account
       """
       {
@@ -320,6 +324,7 @@ Feature: api patch account
           "lastname": "Dupont"
       }
       """
+    And get authorization from account 'jean.dupont@gmail.com' and client 'test'
     When patch account
       """
       [

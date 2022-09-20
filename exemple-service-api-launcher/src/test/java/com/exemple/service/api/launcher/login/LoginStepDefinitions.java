@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.exemple.service.api.launcher.account.AccountTestContext;
+import com.exemple.service.api.launcher.authorization.AuthorizationTestContext;
 import com.exemple.service.customer.login.LoginResource;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 
@@ -25,6 +26,9 @@ public class LoginStepDefinitions {
 
     @Autowired
     private AccountTestContext context;
+
+    @Autowired
+    private AuthorizationTestContext authorizationContext;
 
     @Before
     public void initKeyspace() {
@@ -43,7 +47,7 @@ public class LoginStepDefinitions {
     @And("get id account {string}")
     public void getLogin(String username) {
 
-        Response response = LoginApiClient.get(username, TEST_APP, VERSION_V1);
+        Response response = LoginApiClient.get(username, TEST_APP, VERSION_V1, authorizationContext.lastAccessToken());
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).as("login %s not found", username).isEqualTo(200),
@@ -56,7 +60,7 @@ public class LoginStepDefinitions {
     @And("account {string} exists")
     public void checkExists(String username) {
 
-        Response response = LoginApiClient.head(username, TEST_APP);
+        Response response = LoginApiClient.head(username, TEST_APP, authorizationContext.lastAccessToken());
 
         assertThat(response.getStatusCode()).as("login %s not exists", username).isEqualTo(204);
 
@@ -65,7 +69,7 @@ public class LoginStepDefinitions {
     @And("account {string} not exists")
     public void checkNotExists(String username) {
 
-        Response response = LoginApiClient.head(username, TEST_APP);
+        Response response = LoginApiClient.head(username, TEST_APP, authorizationContext.lastAccessToken());
 
         assertThat(response.getStatusCode()).as("login %s exists", username).isEqualTo(404);
 
