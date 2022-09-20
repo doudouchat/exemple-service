@@ -17,22 +17,18 @@ public final class SubscriptionApiClient {
 
     }
 
-    public static Response put(String email, Object body, String application, String version) {
+    public static Response put(String email, Object body, String application, String version, String token) {
 
         return JsonRestTemplate.given()
-
-                .header(APP_HEADER, application).header(VERSION_HEADER, version)
-
+                .header(APP_HEADER, application).header(VERSION_HEADER, version).header("Authorization", token)
                 .body(Collections.emptyMap()).put(SUBSCRIPTION_URL + "/{email}", email);
 
     }
 
-    public static Response get(String email, String application, String version) {
+    public static Response get(String email, String application, String version, String token) {
 
         return JsonRestTemplate.given()
-
-                .header(APP_HEADER, application).header(VERSION_HEADER, version)
-
+                .header(APP_HEADER, application).header(VERSION_HEADER, version).header("Authorization", token)
                 .get(SUBSCRIPTION_URL + "/{email}", email);
 
     }

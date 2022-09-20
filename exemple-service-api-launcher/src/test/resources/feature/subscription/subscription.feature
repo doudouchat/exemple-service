@@ -1,5 +1,8 @@
 Feature: api subscription
 
+  Background:
+    Given get authorization to read & update subscription for client 'test'
+
   Scenario: create subscription
     Given delete subscription 'jean.dupond@gmail.com'
     When create subscription 'jean.dupond@gmail.com'

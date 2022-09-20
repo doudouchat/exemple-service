@@ -11,6 +11,7 @@ import io.cucumber.junit.platform.engine.Constants;
 @IncludeEngines("cucumber")
 @SelectClasspathResource("feature/subscription")
 @ConfigurationParameter(key = Constants.GLUE_PROPERTY_NAME, value = "com.exemple.service.api.launcher.core, "
+        + "com.exemple.service.api.launcher.authorization, "
         + "com.exemple.service.api.launcher.subscription")
 public class SubscriptionIT {
 

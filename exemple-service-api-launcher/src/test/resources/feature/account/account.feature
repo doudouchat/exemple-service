@@ -2,6 +2,7 @@ Feature: api account
 
   Background: 
     Given delete username 'jean.dupond@gmail.com'
+    And get authorization to create account for client 'test'
 
   Scenario: create account
     When create account
@@ -32,6 +33,7 @@ Feature: api account
           "lastname": "Dupond"
       }
       """
+    And get authorization from account 'jean.dupond@gmail.com' and client 'test'
     Then account 'jean.dupond@gmail.com' exists
     And get id account 'jean.dupond@gmail.com'
     And account is
@@ -187,5 +189,6 @@ Feature: api account
       """
 
   Scenario: get account fails because account not exists
+    Given get authorization from account 'd6233a2e-64f9-4e92-b894-01244515a18e' and client 'test'
     When get account by id d6233a2e-64f9-4e92-b894-01244515a18e
-    Then account is unknown
+    Then account is denied

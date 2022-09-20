@@ -12,6 +12,7 @@ import io.cucumber.junit.platform.engine.Constants;
 @SelectClasspathResource("feature/account")
 @ConfigurationParameter(key = Constants.GLUE_PROPERTY_NAME, value = "com.exemple.service.api.launcher.core, "
         + "com.exemple.service.api.launcher.account, "
+        + "com.exemple.service.api.launcher.authorization, "
         + "com.exemple.service.api.launcher.login")
 public class AccountIT {
 

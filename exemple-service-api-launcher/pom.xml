@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>exemple</groupId>
@@ -98,6 +98,15 @@
 			<groupId>exemple</groupId>
 			<artifactId>exemple-service-api</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+
+		<!-- AUTHORIZATION SERVER TEST -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-integration-authorization-server</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- JSOUP -->
@@ -253,6 +262,7 @@
 								<configuration>
 									<portNames>
 										<portName>application.port</portName>
+										<portName>authorization.port</portName>
 										<portName>cassandra.port</portName>
 										<portName>zookeeper.port</portName>
 										<portName>kafka.port</portName>
@@ -369,6 +379,59 @@
 													<VERSION_TOMCAT>${tomcat.version}-jdk17</VERSION_TOMCAT>
 												</args>
 											</build>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>build_authorization_server_test</id>
+								<goals>
+									<goal>build</goal>
+								</goals>
+								<phase>package</phase>
+								<configuration>
+									<images>
+										<image>
+											<name>exemple-authorization-server-test</name>
+											<build>
+												<dockerFile>${project.parent.basedir}/exemple-service-integration-authorization-server/Dockerfile</dockerFile>
+												<args>
+													<VERSION_OPENJDK>${maven.compiler.target}-jdk-buster</VERSION_OPENJDK>
+												</args>
+											</build>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>start_authorization_server_test</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>exemple-authorization-server-test</name>
+											<alias>exemple-authorization-server-test</alias>
+											<run>
+												<ports>
+													<port>${authorization.port}:8080</port>
+												</ports>
+												<env>
+													<server.servlet.context-path>/Authorization</server.servlet.context-path>
+												</env>
+												<wait>
+													<http>
+														<url>http://localhost:${authorization.port}/Authorization/actuator/health</url>
+														<method>GET</method>
+														<status>200</status>
+													</http>
+													<time>10000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
 										</image>
 									</images>
 								</configuration>

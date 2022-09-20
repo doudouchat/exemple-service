@@ -11,6 +11,8 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.exemple.service.api.launcher.authorization.AuthorizationTestContext;
+
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -20,6 +22,9 @@ public class StockStepDefinitions {
 
     @Autowired
     private StockTestContext context;
+
+    @Autowired
+    private AuthorizationTestContext authorizationContext;
 
     private UUID salt;
 
@@ -35,7 +40,7 @@ public class StockStepDefinitions {
 
         Map<String, Object> body = Collections.singletonMap("increment", increment);
 
-        Response response = StockApiClient.post(store + "#" + salt, product, body, BACK_APP);
+        Response response = StockApiClient.post(store + "#" + salt, product, body, BACK_APP, authorizationContext.lastAccessToken());
 
         context.savePost(response);
 
@@ -44,7 +49,7 @@ public class StockStepDefinitions {
     @When("get stock of product {string} from store {string}")
     public void getLogin(String product, String store) {
 
-        Response response = StockApiClient.get(store + "#" + salt, product, BACK_APP);
+        Response response = StockApiClient.get(store + "#" + salt, product, BACK_APP, authorizationContext.lastAccessToken());
 
         context.saveGet(response);
 
@@ -53,7 +58,7 @@ public class StockStepDefinitions {
     @Then("stock of product {string} from store {string} is {long}")
     public void check(String product, String store, long amount) throws IOException {
 
-        Response response = StockApiClient.get(store + "#" + salt, product, BACK_APP);
+        Response response = StockApiClient.get(store + "#" + salt, product, BACK_APP, authorizationContext.lastAccessToken());
 
         assertAll(
                 () -> assertThat(context.lastResponse().getStatusCode()).as("stock %s %s not found", product, store).isEqualTo(200),

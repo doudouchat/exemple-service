@@ -2,6 +2,7 @@ Feature: api put account
 
   Background: 
     Given delete username 'jean.dupond@gmail.com'
+    And get authorization to create account for client 'test'
     And account
       """
       {
@@ -30,6 +31,7 @@ Feature: api put account
           "lastname": "Dupont"
       }
       """
+    And get authorization from account 'jean.dupond@gmail.com' and client 'test'
 
   Scenario: put account
     When put account
@@ -165,6 +167,7 @@ Feature: api put account
           "lastname": "Dupont"
       }
       """
+    And get authorization from account 'jean.dupont@gmail.com' and client 'test'
     Then account is
       """
       {
@@ -329,6 +332,7 @@ Feature: api put account
 
   Scenario: put account fails because username already exists
     Given delete username 'jean.dupont@gmail.com'
+    And get authorization to create account for client 'test'
     And account
       """
       {
@@ -338,6 +342,7 @@ Feature: api put account
           "lastname": "Dupont"
       }
       """
+    And get authorization from account 'jean.dupont@gmail.com' and client 'test'
     When put account
       """
       {

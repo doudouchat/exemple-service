@@ -1,5 +1,8 @@
 Feature: api stock
 
+  Background:
+    Given get authorization to read & update stock for client 'back'
+
   Scenario: increase stock
     When increase of 5 for product 'product1' from store 'store'
     And increase of 20 for product 'product1' from store 'store'
