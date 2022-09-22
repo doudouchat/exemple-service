@@ -4,7 +4,6 @@ import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Response;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,24 +19,12 @@ public class AuthorizationFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) {
 
-        try {
+        ApiSecurityContext context = service.buildContext(requestContext.getHeaders());
 
-            ApiSecurityContext context = service.buildContext(requestContext.getHeaders());
+        ServiceContextExecution.setPrincipal(context.getUserPrincipal());
 
-            ServiceContextExecution.setPrincipal(context.getUserPrincipal());
+        requestContext.setSecurityContext(context);
 
-            requestContext.setSecurityContext(context);
-
-        } catch (AuthorizationException e) {
-
-            requestContext.abortWith(build(e));
-        }
-
-    }
-
-    private static Response build(AuthorizationException e) {
-
-        return Response.status(e.getStatus()).entity(e.getMessage()).build();
     }
 
 }
