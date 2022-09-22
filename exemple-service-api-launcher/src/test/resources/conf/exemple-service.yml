@@ -34,7 +34,4 @@ event:
    timeout: 10000
 api:
    authorization:
-      path: http://172.17.0.1:${authorization.port}/Authorization
-      client:
-         clientId: resource
-         clientSecret: secret
+      jwkSetUri: http://172.17.0.1:${authorization.port}/Authorization/oauth/jwks

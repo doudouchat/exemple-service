@@ -69,15 +69,6 @@
 
 		<dependencies>
 
-			<!-- JWT TOKEN -->
-			<!-- https://github.com/auth0/java-jwt -->
-
-			<dependency>
-				<groupId>com.auth0</groupId>
-				<artifactId>java-jwt</artifactId>
-				<version>4.0.0</version>
-			</dependency>
-
 			<!-- JAVAX EL -->
 
 			<dependency>
