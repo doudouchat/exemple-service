@@ -24,8 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.exemple.service.api.core.ApiTestConfiguration;
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration;
@@ -84,14 +82,10 @@ class ExceptionApiTest extends JerseySpringSupport {
     @Test
     void JsonException() {
 
-        // Given token
-
-        String token = JWT.create().withArrayClaim("scope", new String[] { "account:create" }).sign(Algorithm.none());
-
         // When perform post
 
         Response response = target("/v1/test")
-                .request(MediaType.APPLICATION_JSON).header("Authorization", token)
+                .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json("toto"));
 
         // Then check status

@@ -20,14 +20,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.ApiTestConfiguration;
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.login.LoginResource;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.PlainJWT;
 
 @SpringJUnitConfig(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
 @ActiveProfiles("AuthorizationMock")
@@ -66,7 +66,11 @@ class LoginApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withArrayClaim("scope", new String[] { "login:head" }).sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("scope", new String[] { "login:head" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform head
 
@@ -93,7 +97,11 @@ class LoginApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withArrayClaim("scope", new String[] { "login:head" }).sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("scope", new String[] { "login:head" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform head
 
@@ -116,7 +124,11 @@ class LoginApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withArrayClaim("scope", new String[] { "login:get" }).sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("scope", new String[] { "login:read" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform head
 
@@ -150,8 +162,12 @@ class LoginApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withSubject("jean.dupond@gmail.com").withArrayClaim("scope", new String[] { "login:read" })
-                    .sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .subject(username)
+                    .claim("scope", new String[] { "login:read" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform get
 
@@ -181,8 +197,12 @@ class LoginApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withSubject("jean.dupond@gmail.com").withArrayClaim("scope", new String[] { "login:read" })
-                    .sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .subject(username)
+                    .claim("scope", new String[] { "login:read" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform get
 
@@ -205,8 +225,12 @@ class LoginApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withSubject("jean.dupond@gmail.com").withArrayClaim("scope", new String[] { "login:head" })
-                    .sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .subject(username)
+                    .claim("scope", new String[] { "login:head" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform get
 
@@ -233,8 +257,12 @@ class LoginApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withSubject("jean.dupont@gmail.com").withArrayClaim("scope", new String[] { "login:read" })
-                    .sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .subject("jean.dupont@gmail.com")
+                    .claim("scope", new String[] { "login:read" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform get
 

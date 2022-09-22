@@ -53,13 +53,6 @@
 			<artifactId>spring-security-oauth2-authorization-server</artifactId>
 		</dependency>
 
-		<!-- JWT TOKEN -->
-
-		<dependency>
-			<groupId>com.auth0</groupId>
-			<artifactId>java-jwt</artifactId>
-		</dependency>
-
 		<!-- COMMONS APACHE -->
 
 		<dependency>

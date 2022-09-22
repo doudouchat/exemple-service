@@ -47,7 +47,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import com.auth0.jwt.JWT;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.ApiTestConfiguration;
 import com.exemple.service.api.core.JerseySpringSupport;
@@ -57,6 +56,13 @@ import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.hazelcast.core.HazelcastInstance;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 
 import io.swagger.v3.oas.annotations.Hidden;
 
@@ -110,12 +116,27 @@ class AuthorizationAPITest extends JerseySpringSupport {
             "value", "-----BEGIN PUBLIC KEY-----\n"
                     + new String(Base64.encodeBase64(AuthorizationTestConfiguration.PUBLIC_KEY.getEncoded())) + "\n-----END PUBLIC KEY-----");
 
-    private static String TOKEN = JWT.create()
-            .withSubject("john_doe")
-            .withClaim("client_id", "clientId1")
-            .withArrayClaim("scope", new String[] { "test:read" })
-            .withJWTId(UUID.randomUUID().toString())
-            .sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
+    private static JWSObject TOKEN;
+
+    static {
+
+        var payload = new JWTClaimsSet.Builder()
+                .claim("client_id", "clientId1")
+                .subject("john_doe")
+                .claim("scope", new String[] { "test:read" })
+                .jwtID(UUID.randomUUID().toString())
+                .build();
+
+        TOKEN = new SignedJWT(
+                new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                payload);
+        try {
+            TOKEN.sign(new RSASSASigner(AuthorizationTestConfiguration.RSA_KEY));
+        } catch (JOSEException e) {
+            throw new IllegalStateException(e);
+        }
+
+    }
 
     @BeforeEach
     private void before() {
@@ -131,7 +152,7 @@ class AuthorizationAPITest extends JerseySpringSupport {
 
     @Test
     @DisplayName("fails because application is not found")
-    void failsBecauseApplicationIsNotFound() {
+    void failsBecauseApplicationIsNotFound() throws JOSEException {
 
         // Given mock client
 
@@ -149,11 +170,14 @@ class AuthorizationAPITest extends JerseySpringSupport {
 
         // And build token
 
-        String token = JWT.create()
-                .withClaim("client_id", "clientId1")
-                .withArrayClaim("scope", new String[] { "test:read" })
-                .withJWTId(UUID.randomUUID().toString())
-                .sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
+        var payload = new JWTClaimsSet.Builder()
+                .claim("client_id", "clientId1")
+                .claim("scope", new String[] { "test:read" })
+                .jwtID(UUID.randomUUID().toString())
+                .build();
+
+        var token = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).build(), payload);
+        token.sign(new RSASSASigner(AuthorizationTestConfiguration.RSA_KEY));
 
         // And mock application information
 
@@ -162,7 +186,7 @@ class AuthorizationAPITest extends JerseySpringSupport {
         // When perform get
 
         Response response = target(URL).request()
-                .header(SchemaBeanParam.APP_HEADER, "test").header("Authorization", token)
+                .header(SchemaBeanParam.APP_HEADER, "test").header("Authorization", token.serialize())
                 .get();
 
         // Then check status
@@ -181,7 +205,7 @@ class AuthorizationAPITest extends JerseySpringSupport {
 
     @Test
     @DisplayName("fails because token client id and application are different")
-    void failsBecauseTokenClientIdAndApplicationAreDifferent() {
+    void failsBecauseTokenClientIdAndApplicationAreDifferent() throws JOSEException {
 
         // Given mock client
 
@@ -199,11 +223,14 @@ class AuthorizationAPITest extends JerseySpringSupport {
 
         // And build token
 
-        String token = JWT.create()
-                .withClaim("client_id", "clientId2")
-                .withArrayClaim("scope", new String[] { "test:read" })
-                .withJWTId(UUID.randomUUID().toString())
-                .sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
+        var payload = new JWTClaimsSet.Builder()
+                .claim("client_id", "clientId2")
+                .claim("scope", new String[] { "test:read" })
+                .jwtID(UUID.randomUUID().toString())
+                .build();
+
+        var token = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).build(), payload);
+        token.sign(new RSASSASigner(AuthorizationTestConfiguration.RSA_KEY));
 
         // And mock application information
 
@@ -212,7 +239,7 @@ class AuthorizationAPITest extends JerseySpringSupport {
         // When perform get
 
         Response response = target(URL).request()
-                .header(SchemaBeanParam.APP_HEADER, "test").header("Authorization", token)
+                .header(SchemaBeanParam.APP_HEADER, "test").header("Authorization", token.serialize())
                 .get();
 
         // Then check status
@@ -231,7 +258,7 @@ class AuthorizationAPITest extends JerseySpringSupport {
 
     @Test
     @DisplayName("fails because token is in black list")
-    void failsBecauseTokenIsInBlackList() {
+    void failsBecauseTokenIsInBlackList() throws JOSEException {
 
         // Given mock client
 
@@ -251,14 +278,20 @@ class AuthorizationAPITest extends JerseySpringSupport {
 
         String deprecatedTokenId = UUID.randomUUID().toString();
         hazelcastInstance.getMap(AuthorizationTokenManager.TOKEN_BLACK_LIST).put(deprecatedTokenId, Date.from(Instant.now()));
-        String token = JWT.create().withClaim("client_id", "clientId1").withSubject("john_doe")
-                .withArrayClaim("scope", new String[] { "account:write" }).withJWTId(deprecatedTokenId)
-                .sign(AuthorizationTestConfiguration.RSA256_ALGORITHM);
+
+        var payload = new JWTClaimsSet.Builder()
+                .claim("client_id", "clientId1")
+                .claim("scope", new String[] { "test:read" })
+                .jwtID(deprecatedTokenId)
+                .build();
+
+        var token = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).build(), payload);
+        token.sign(new RSASSASigner(AuthorizationTestConfiguration.RSA_KEY));
 
         // When perform get
 
         Response response = target(URL).request()
-                .header(SchemaBeanParam.APP_HEADER, "test").header("Authorization", token)
+                .header(SchemaBeanParam.APP_HEADER, "test").header("Authorization", token.serialize())
                 .get();
 
         // Then check status
@@ -297,7 +330,7 @@ class AuthorizationAPITest extends JerseySpringSupport {
         // When perform get
 
         Response response = target(URL).request(MediaType.APPLICATION_JSON)
-                .header(SchemaBeanParam.APP_HEADER, "test").header("Authorization", TOKEN)
+                .header(SchemaBeanParam.APP_HEADER, "test").header("Authorization", TOKEN.serialize())
                 .get();
 
         // Then check status
@@ -343,7 +376,7 @@ class AuthorizationAPITest extends JerseySpringSupport {
         // When perform get
 
         Response response = target(URL).request()
-                .header(SchemaBeanParam.APP_HEADER, "test").header("Authorization", TOKEN)
+                .header(SchemaBeanParam.APP_HEADER, "test").header("Authorization", TOKEN.serialize())
                 .get();
 
         // Then check status
@@ -374,7 +407,7 @@ class AuthorizationAPITest extends JerseySpringSupport {
         // When perform get
 
         Response response = target(URL).request()
-                .header(SchemaBeanParam.APP_HEADER, "test").header("Authorization", TOKEN)
+                .header(SchemaBeanParam.APP_HEADER, "test").header("Authorization", TOKEN.serialize())
                 .get();
 
         // Then check status

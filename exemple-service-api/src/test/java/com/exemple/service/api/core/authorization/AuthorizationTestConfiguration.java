@@ -1,12 +1,6 @@
 package com.exemple.service.api.core.authorization;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,54 +12,38 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 
-import com.auth0.jwt.algorithms.Algorithm;
 import com.exemple.service.api.core.authorization.impl.AuthorizationTokenManager;
 import com.exemple.service.api.core.authorization.impl.AuthorizationTokenValidation;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.KeyUse;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 
 @Configuration
 @ComponentScan(basePackages = "com.exemple.service.api.core.authorization")
 public class AuthorizationTestConfiguration {
 
-    public static final Algorithm RSA256_ALGORITHM;
+    public static final RSAKey RSA_KEY;
+
+    public static final RSAKey OTHER_RSA_KEY;
 
     public static final PublicKey PUBLIC_KEY;
-
-    public static final Algorithm OTHER_RSA256_ALGORITHM;
 
     public static final PublicKey OTHER_PUBLIC_KEY;
 
     static {
 
-        KeyPairGenerator keyPairGenerator = buildKeyPairGenerator();
-        KeyPair keypair = keyPairGenerator.genKeyPair();
-        PrivateKey privateKey = keypair.getPrivate();
+        RSA_KEY = buildRSAKey();
 
-        PUBLIC_KEY = keypair.getPublic();
-        RSA256_ALGORITHM = Algorithm.RSA256((RSAPublicKey) PUBLIC_KEY, (RSAPrivateKey) privateKey);
+        PUBLIC_KEY = toPublicKey(RSA_KEY);
 
-        KeyPairGenerator otherKeyPairGenerator = buildKeyPairGenerator();
-        KeyPair otherKeypair = otherKeyPairGenerator.genKeyPair();
-        PrivateKey otherPrivateKey = otherKeypair.getPrivate();
+        OTHER_RSA_KEY = buildRSAKey();
 
-        OTHER_PUBLIC_KEY = otherKeypair.getPublic();
-        OTHER_RSA256_ALGORITHM = Algorithm.RSA256((RSAPublicKey) OTHER_PUBLIC_KEY, (RSAPrivateKey) otherPrivateKey);
+        OTHER_PUBLIC_KEY = toPublicKey(OTHER_RSA_KEY);
 
-    }
-
-    public static KeyPairGenerator buildKeyPairGenerator() {
-
-        KeyPairGenerator keyPairGenerator;
-        try {
-            keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
-
-        keyPairGenerator.initialize(1024);
-        return keyPairGenerator;
     }
 
     @Configuration
@@ -121,6 +99,24 @@ public class AuthorizationTestConfiguration {
 
         propertySourcesPlaceholderConfigurer.setProperties(properties.getObject());
         return propertySourcesPlaceholderConfigurer;
+    }
+
+    private static RSAKey buildRSAKey() {
+
+        try {
+            return new RSAKeyGenerator(2048).keyUse(KeyUse.SIGNATURE).generate();
+        } catch (JOSEException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static PublicKey toPublicKey(RSAKey jwk) {
+
+        try {
+            return jwk.toPublicKey();
+        } catch (JOSEException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
 }

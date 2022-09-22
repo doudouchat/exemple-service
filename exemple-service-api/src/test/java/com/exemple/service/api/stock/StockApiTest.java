@@ -22,8 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.exemple.service.api.core.ApiTestConfiguration;
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration;
@@ -34,6 +32,8 @@ import com.exemple.service.store.common.InsufficientStockException;
 import com.exemple.service.store.stock.StockService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.PlainJWT;
 
 @SpringJUnitConfig(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
 @ActiveProfiles("AuthorizationMock")
@@ -82,7 +82,11 @@ class StockApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withArrayClaim("scope", new String[] { "stock:update" }).sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("scope", new String[] { "stock:update" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform post
 
@@ -118,7 +122,11 @@ class StockApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withArrayClaim("scope", new String[] { "stock:update" }).sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("scope", new String[] { "stock:update" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform post
 
@@ -158,7 +166,11 @@ class StockApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withArrayClaim("scope", new String[] { "stock:update" }).sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("scope", new String[] { "stock:update" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform put
 
@@ -191,7 +203,11 @@ class StockApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withArrayClaim("scope", new String[] { "stock:read" }).sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("scope", new String[] { "stock:read" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform put
 
@@ -235,7 +251,11 @@ class StockApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withArrayClaim("scope", new String[] { "stock:read" }).sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("scope", new String[] { "stock:read" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform service
 
@@ -274,7 +294,11 @@ class StockApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withArrayClaim("scope", new String[] { "stock:read" }).sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("scope", new String[] { "stock:read" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform service
 
@@ -299,7 +323,11 @@ class StockApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withArrayClaim("scope", new String[] { "stock:update" }).sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("scope", new String[] { "stock:update" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform service
 
