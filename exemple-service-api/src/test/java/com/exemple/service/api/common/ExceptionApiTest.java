@@ -21,9 +21,11 @@ import javax.ws.rs.core.Response.Status;
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.ApiTestConfiguration;
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration;
@@ -45,6 +47,8 @@ import lombok.extern.jackson.Jacksonized;
 class ExceptionApiTest extends JerseySpringSupport {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    private static Action action = Mockito.mock(Action.class);
 
     private static final String URL = "/v1/test";
 
@@ -141,6 +145,25 @@ class ExceptionApiTest extends JerseySpringSupport {
     }
 
     @Test
+    void internalServerError() {
+
+        // Given mock service
+
+        Mockito.doThrow(new RuntimeException()).when(action).execute();
+
+        // When perform get
+
+        Response response = target(URL).request(MediaType.APPLICATION_JSON)
+                .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1")
+                .get();
+
+        // Then check status
+
+        assertThat(response.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
+
+    }
+
+    @Test
     void appAndVersionAreMissing() throws IOException {
 
         // When perform get
@@ -170,6 +193,8 @@ class ExceptionApiTest extends JerseySpringSupport {
         @Produces(MediaType.APPLICATION_JSON)
         @AppAndVersionCheck
         public Response get() {
+
+            action.execute();
 
             return Response.ok().build();
 
@@ -201,6 +226,13 @@ class ExceptionApiTest extends JerseySpringSupport {
 
         }
 
+    }
+
+    private static class Action {
+
+        public void execute() {
+
+        }
     }
 
 }
