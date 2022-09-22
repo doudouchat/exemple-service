@@ -1,10 +1,15 @@
 package com.exemple.service.api.launcher.authorization;
 
-import org.apache.kafka.common.Uuid;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 
 import io.cucumber.java.en.Given;
 
@@ -14,58 +19,70 @@ public class AuthorizationStepDefinitions {
     private AuthorizationTestContext context;
 
     @Autowired
-    private Algorithm algo;
+    private JWSSigner signer;
 
     @Given("get authorization to create account for client {string}")
-    public void authorizationCreateAccount(String client) {
+    public void authorizationCreateAccount(String client) throws JOSEException {
 
-        String token = JWT.create()
-                .withArrayClaim("scope", new String[] { "account:create", "login:head" })
-                .withClaim("client_id", client)
-                .withJWTId(Uuid.randomUuid().toString())
-                .sign(algo);
+        var payload = new JWTClaimsSet.Builder()
+                .claim("scope", new String[] { "account:create", "login:head" })
+                .claim("client_id", client)
+                .jwtID(UUID.randomUUID().toString())
+                .build();
 
-        context.saveAccessToken(token);
+        var token = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).build(), payload);
+        token.sign(signer);
+
+        context.saveAccessToken(token.serialize());
 
     }
 
     @Given("get authorization to read & update stock for client {string}")
-    public void authorizationStock(String client) {
+    public void authorizationStock(String client) throws JOSEException {
 
-        String token = JWT.create()
-                .withArrayClaim("scope", new String[] { "stock:read", "stock:update" })
-                .withClaim("client_id", client)
-                .withJWTId(Uuid.randomUuid().toString())
-                .sign(algo);
+        var payload = new JWTClaimsSet.Builder()
+                .claim("scope", new String[] { "stock:read", "stock:update" })
+                .claim("client_id", client)
+                .jwtID(UUID.randomUUID().toString())
+                .build();
 
-        context.saveAccessToken(token);
+        var token = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).build(), payload);
+        token.sign(signer);
+
+        context.saveAccessToken(token.serialize());
 
     }
 
     @Given("get authorization to read & update subscription for client {string}")
-    public void authorizationSubscription(String client) {
+    public void authorizationSubscription(String client) throws JOSEException {
 
-        String token = JWT.create()
-                .withArrayClaim("scope", new String[] { "subscription:read", "subscription:update" })
-                .withClaim("client_id", client)
-                .withJWTId(Uuid.randomUuid().toString())
-                .sign(algo);
+        var payload = new JWTClaimsSet.Builder()
+                .claim("scope", new String[] { "subscription:read", "subscription:update" })
+                .claim("client_id", client)
+                .jwtID(UUID.randomUUID().toString())
+                .build();
 
-        context.saveAccessToken(token);
+        var token = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).build(), payload);
+        token.sign(signer);
+
+        context.saveAccessToken(token.serialize());
 
     }
 
     @Given("get authorization from account {string} and client {string}")
-    public void authorizationAccount(String username, String client) {
+    public void authorizationAccount(String username, String client) throws JOSEException {
 
-        String token = JWT.create()
-                .withArrayClaim("scope", new String[] { "account:read", "account:update", "login:read", "login:head" })
-                .withClaim("client_id", client)
-                .withSubject(username)
-                .withJWTId(Uuid.randomUuid().toString())
-                .sign(algo);
+        var payload = new JWTClaimsSet.Builder()
+                .claim("scope", new String[] { "account:read", "account:update", "login:read", "login:head" })
+                .claim("client_id", client)
+                .subject(username)
+                .jwtID(UUID.randomUUID().toString())
+                .build();
 
-        context.saveAccessToken(token);
+        var token = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).build(), payload);
+        token.sign(signer);
+
+        context.saveAccessToken(token.serialize());
 
     }
 

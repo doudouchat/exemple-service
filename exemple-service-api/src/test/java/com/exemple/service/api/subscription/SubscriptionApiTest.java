@@ -22,8 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.ApiTestConfiguration;
 import com.exemple.service.api.core.JerseySpringSupport;
@@ -33,6 +31,8 @@ import com.exemple.service.customer.subscription.SubscriptionService;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.PlainJWT;
 
 @SpringJUnitConfig(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
 @ActiveProfiles("AuthorizationMock")
@@ -78,7 +78,11 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withArrayClaim("scope", new String[] { "subscription:update" }).sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("scope", new String[] { "subscription:update" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform put
 
@@ -135,7 +139,11 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withArrayClaim("scope", new String[] { "subscription:update" }).sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("scope", new String[] { "subscription:update" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform put
 
@@ -181,7 +189,11 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withArrayClaim("scope", new String[] { "subscription:read" }).sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("scope", new String[] { "subscription:read" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform put
 
@@ -222,7 +234,11 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withArrayClaim("scope", new String[] { "subscription:read" }).sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("scope", new String[] { "subscription:read" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform get
 
@@ -249,7 +265,11 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // and token
 
-            String token = JWT.create().withArrayClaim("scope", new String[] { "subscription:update" }).sign(Algorithm.none());
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("scope", new String[] { "subscription:update" })
+                    .build();
+
+            var token = new PlainJWT(payload).serialize();
 
             // When perform get
 
