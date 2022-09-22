@@ -197,13 +197,6 @@
 			<artifactId>hazelcast-spring</artifactId>
 		</dependency>
 
-		<!-- JWT TOKEN -->
-
-		<dependency>
-			<groupId>com.auth0</groupId>
-			<artifactId>java-jwt</artifactId>
-		</dependency>
-
 		<!-- JSON PATH -->
 
 		<dependency>

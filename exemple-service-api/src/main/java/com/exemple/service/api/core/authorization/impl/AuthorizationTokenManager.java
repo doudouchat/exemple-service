@@ -1,8 +1,8 @@
 package com.exemple.service.api.core.authorization.impl;
 
+import org.springframework.security.oauth2.jwt.JwtClaimAccessor;
 import org.springframework.stereotype.Component;
 
-import com.auth0.jwt.interfaces.Payload;
 import com.hazelcast.core.HazelcastInstance;
 
 import lombok.RequiredArgsConstructor;
@@ -15,8 +15,8 @@ public class AuthorizationTokenManager {
 
     private final HazelcastInstance hazelcastInstance;
 
-    public boolean containsToken(Payload payload) {
+    public boolean containsToken(JwtClaimAccessor jwt) {
 
-        return hazelcastInstance.getMap(TOKEN_BLACK_LIST).containsKey(payload.getId());
+        return hazelcastInstance.getMap(TOKEN_BLACK_LIST).containsKey(jwt.getId());
     }
 }

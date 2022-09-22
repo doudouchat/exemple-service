@@ -7,11 +7,11 @@ import java.util.regex.Pattern;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtClaimAccessor;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.auth0.jwt.interfaces.Payload;
 import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.exemple.service.api.core.authorization.impl.AuthorizationTokenValidation;
 
@@ -25,23 +25,23 @@ public class AuthorizationContextService {
 
     private final AuthorizationTokenValidation authorizationTokenValidation;
 
+    private final JwtDecoder jwtDecoder;
+
     static {
 
         BEARER = Pattern.compile("Bearer ");
 
     }
 
-    public ApiSecurityContext buildContext(MultivaluedMap<String, String> headers) throws AuthorizationException {
+    public ApiSecurityContext buildContext(MultivaluedMap<String, String> headers) {
 
         String token = headers.getFirst("Authorization");
 
         if (token != null) {
 
-            DecodedJWT jwt = JWT.decode(BEARER.matcher(token).replaceFirst(""));
+            var jwt = jwtDecoder.decode(BEARER.matcher(token).replaceFirst(""));
 
-            authorizationTokenValidation.checkSignature(jwt);
             authorizationTokenValidation.checkClientId(jwt, headers);
-            authorizationTokenValidation.checkTokenIsInBlackList(jwt);
 
             return buildApiSecurityContext(jwt);
 
@@ -50,10 +50,10 @@ public class AuthorizationContextService {
         return buildApiSecurityAnonymousContext();
     }
 
-    private static ApiSecurityContext buildApiSecurityContext(Payload payload) {
+    private static ApiSecurityContext buildApiSecurityContext(Jwt jwt) {
 
-        Principal principal = () -> ObjectUtils.defaultIfNull(payload.getSubject(), getClientId(payload));
-        return new ApiSecurityContext(principal, "https", payload.getClaim("scope").asList(String.class), payload.getClaim("profile").asString());
+        Principal principal = () -> ObjectUtils.defaultIfNull(jwt.getSubject(), getClientId(jwt));
+        return new ApiSecurityContext(principal, "https", jwt.getClaimAsStringList("scope"), jwt.getClaimAsString("profile"));
     }
 
     private static ApiSecurityContext buildApiSecurityAnonymousContext() {
@@ -61,9 +61,9 @@ public class AuthorizationContextService {
         return new ApiSecurityContext(() -> "anonymous", "http", Collections.emptyList(), null);
     }
 
-    private static String getClientId(Payload payload) {
+    private static String getClientId(JwtClaimAccessor jwt) {
 
-        return payload.getClaim("client_id").asString();
+        return jwt.getClaimAsString("client_id");
     }
 
 }
