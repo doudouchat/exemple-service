@@ -290,25 +290,6 @@
 						</configuration>
 						<executions>
 							<execution>
-								<id>prepare-jacoco-integration-agent</id>
-								<goals>
-									<goal>prepare-agent-integration</goal>
-								</goals>
-								<phase>pre-integration-test</phase>
-								<configuration>
-									<propertyName>jacoco.it.agent.argLine</propertyName>
-									<includes>
-										<include>com.exemple.service.*</include>
-									</includes>
-									<excludes>
-										<exclude>*EnhancerBySpringCGLIB*</exclude>
-										<exclude>*FastClassBySpringCGLIB*</exclude>
-										<exclude>*__MapperGenerated*</exclude>
-									</excludes>
-									<classDumpDir>${project.build.outputDirectory}</classDumpDir>
-								</configuration>
-							</execution>
-							<execution>
 								<id>dump</id>
 								<goals>
 									<goal>dump</goal>
@@ -577,7 +558,7 @@
 												</ports>
 												<env>
 													<CATALINA_OPTS>-Dlogging.config=file:/usr/local/tomcat/etc/logback.xml -Dhazelcast.client.config=/usr/local/tomcat/etc/hazelcast.yaml</CATALINA_OPTS>
-													<JAVA_TOOL_OPTIONS>-javaagent:/usr/local/tomcat/etc/lib/jacocoagent.jar=includes=com.exemple.service.*,excludes=*EnhancerBySpringCGLIB*:*FastClassBySpringCGLIB*:*__MapperGenerated*,output=tcpserver,address=*</JAVA_TOOL_OPTIONS>
+													<JAVA_TOOL_OPTIONS>-javaagent:/usr/local/tomcat/etc/lib/jacocoagent.jar=includes=com.exemple.service.*,excludes=*EnhancerBySpringCGLIB*:*FastClassBySpringCGLIB*:*__MapperGenerated*,output=tcpserver,address=*,classdumpdir=/usr/local/tomcat/etc/source</JAVA_TOOL_OPTIONS>
 												</env>
 												<volumes>
 													<bind>
@@ -602,6 +583,10 @@
 													<entry>
 														<containerPath>/usr/local/tomcat/logs/archive</containerPath>
 														<hostDirectory>${project.build.directory}/.logs</hostDirectory>
+													</entry>
+													<entry>
+														<containerPath>/usr/local/tomcat/etc/source/com</containerPath>
+														<hostDirectory>${project.build.outputDirectory}</hostDirectory>
 													</entry>
 												</entries>
 											</copy>
@@ -638,7 +623,6 @@
 								<application.port>${application.port}</application.port>
 								<application.contextpath>${application.contextpath}</application.contextpath>
 							</systemPropertyVariables>
-							<argLine>${jacoco.it.agent.argLine}</argLine>
 						</configuration>
 					</plugin>
 
