@@ -1,5 +1,6 @@
 package com.exemple.service.api.common.script;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,8 +8,6 @@ import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
-
-import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +17,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
@@ -42,22 +42,17 @@ public class CustomerScriptFactory {
 
     private final ApplicationContext applicationContext;
 
-    private final String contextsPath;
+    private final File contextsPath;
 
     public CustomerScriptFactory(ApplicationDetailService applicationDetailService, @Value("${customer.contexts.path}") String contextsPath,
-            ApplicationContext applicationContext) {
+            ApplicationContext applicationContext) throws IOException {
         this.applicationContext = applicationContext;
         this.defaultApplicationContext = new FileSystemXmlApplicationContext(new String[] { "classpath:exemple-service-customer.xml" },
                 this.applicationContext);
         this.scriptApplicationContexts = new ConcurrentHashMap<>();
         this.checksumApplicationContexts = new ConcurrentHashMap<>();
         this.applicationDetailService = applicationDetailService;
-        this.contextsPath = contextsPath;
-    }
-
-    @PostConstruct
-    public void initScriptApplicationContexts() throws IOException {
-        completeScriptApplicationContexts();
+        this.contextsPath = ResourceUtils.getFile(contextsPath);
     }
 
     public <T> T getBean(String beanName, Class<T> beanClass, String application) {
@@ -79,14 +74,14 @@ public class CustomerScriptFactory {
     @Scheduled(fixedDelayString = "${customer.contexts.delay:30000}")
     public void completeScriptApplicationContexts() throws IOException {
 
-        try (Stream<Path> paths = Files.list(Paths.get(this.contextsPath))) {
+        try (Stream<Path> paths = Files.list(Paths.get(this.contextsPath.getPath()))) {
 
             paths.forEach(path -> saveContextIfPresent(path, "exemple-service-customer.xml"));
         }
 
     }
 
-    @SneakyThrows
+    @SneakyThrows(IOException.class)
     private void saveContextIfPresent(Path path, String contextName) {
 
         try (Stream<Path> paths = Files.list(path)) {
