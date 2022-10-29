@@ -468,7 +468,7 @@
 								<configuration>
 									<images>
 										<image>
-											<name>bitnami/kafka:3.2.0</name>
+											<name>bitnami/kafka:${kafka.version}</name>
 											<alias>kafka</alias>
 											<run>
 												<ports>
