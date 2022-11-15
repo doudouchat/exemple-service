@@ -1,13 +1,17 @@
 package com.exemple.service.api.core.authorization;
 
+import java.time.Duration;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
 import com.exemple.service.api.core.authorization.impl.AuthorizationTokenManager;
@@ -24,7 +28,9 @@ public class AuthorizationConfiguration {
     public JwtDecoder decoder(@Value("${api.authorization.jwkSetUri}") String jwkSetUri) {
         NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
 
-        jwtDecoder.setJwtValidator(new TokenNotExcludedValidator());
+        jwtDecoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
+                new JwtTimestampValidator(Duration.ZERO),
+                new TokenNotExcludedValidator()));
 
         return jwtDecoder;
     }

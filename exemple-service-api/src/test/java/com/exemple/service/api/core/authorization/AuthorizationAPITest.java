@@ -226,6 +226,44 @@ class AuthorizationAPITest extends JerseySpringSupport {
     }
 
     @Test
+    void failsBecauseTokenIsDeprecated() throws JOSEException {
+
+        // Given token
+
+        var payload = new JWTClaimsSet.Builder()
+                .claim("client_id", "clientId1")
+                .subject("john_doe")
+                .claim("scope", new String[] { "test:read" })
+                .expirationTime(Date.from(Instant.now().minusSeconds(1)))
+                .jwtID(UUID.randomUUID().toString())
+                .build();
+
+        var token = new SignedJWT(
+                new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                payload);
+        token.sign(new RSASSASigner(AuthorizationTestConfiguration.RSA_KEY));
+
+        // When perform get
+
+        Response response = target(URL).request()
+                .header(SchemaBeanParam.APP_HEADER, "test").header("Authorization", token.serialize())
+                .get();
+
+        // Then check status
+
+        assertThat(response.getStatus()).isEqualTo(Status.UNAUTHORIZED.getStatusCode());
+
+        // And check security context
+
+        assertThat(testFilter.context).isNull();
+
+        // And check body
+
+        assertThat(response.readEntity(String.class)).contains("Jwt expired at ");
+
+    }
+
+    @Test
     void success() throws JOSEException {
 
         // Given token
