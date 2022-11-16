@@ -264,6 +264,26 @@ class AuthorizationAPITest extends JerseySpringSupport {
     }
 
     @Test
+    @DisplayName("fails because public token is missing")
+    void failsBecauseTokenIsMissing() {
+
+        // When perform get
+
+        Response response = target(URL).request()
+                .header(SchemaBeanParam.APP_HEADER, "test")
+                .get();
+
+        // Then check status
+
+        assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
+
+        // And check security context
+
+        assertThat(testFilter.context).isNull();
+
+    }
+
+    @Test
     void success() throws JOSEException {
 
         // Given token
