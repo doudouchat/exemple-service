@@ -7,11 +7,15 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -282,10 +286,7 @@ class AuthorizationAPITest extends JerseySpringSupport {
 
     }
 
-    @Test
-    void success() throws JOSEException {
-
-        // Given token
+    private Stream<Arguments> success() {
 
         var payload = new JWTClaimsSet.Builder()
                 .claim("client_id", "clientId1")
@@ -293,6 +294,23 @@ class AuthorizationAPITest extends JerseySpringSupport {
                 .claim("scope", new String[] { "test:read" })
                 .jwtID(UUID.randomUUID().toString())
                 .build();
+
+        var payloadWithoutJti = new JWTClaimsSet.Builder()
+                .claim("client_id", "clientId1")
+                .subject("john_doe")
+                .claim("scope", new String[] { "test:read" })
+                .build();
+
+        return Stream.of(
+                Arguments.of(payload),
+                Arguments.of(payloadWithoutJti));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void success(JWTClaimsSet payload) throws JOSEException {
+
+        // Given token
 
         var token = new SignedJWT(
                 new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
