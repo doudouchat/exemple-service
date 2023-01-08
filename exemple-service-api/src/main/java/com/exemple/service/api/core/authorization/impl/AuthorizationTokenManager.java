@@ -17,6 +17,6 @@ public class AuthorizationTokenManager {
 
     public boolean containsToken(JwtClaimAccessor jwt) {
 
-        return hazelcastInstance.getMap(TOKEN_BLACK_LIST).containsKey(jwt.getId());
+        return jwt.getId() != null && hazelcastInstance.getMap(TOKEN_BLACK_LIST).containsKey(jwt.getId());
     }
 }
