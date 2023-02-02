@@ -18,6 +18,7 @@ import com.exemple.service.api.common.schema.SchemaFilterSupplier;
 import com.exemple.service.api.common.schema.SchemaValidation;
 import com.exemple.service.api.common.schema.SchemaValidationSupplier;
 import com.exemple.service.api.common.script.AccountServiceSupplier;
+import com.exemple.service.api.common.script.LoginServiceSupplier;
 import com.exemple.service.api.common.script.SubscriptionServiceSupplier;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
 import com.exemple.service.api.core.authorization.AuthorizationCheckServiceSupplier;
@@ -27,6 +28,7 @@ import com.exemple.service.api.core.filter.ExecutionContextResponseFilter;
 import com.exemple.service.api.core.listener.ApiEventListener;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.account.AccountService;
+import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.customer.subscription.SubscriptionService;
 
 import jakarta.ws.rs.ApplicationPath;
@@ -90,32 +92,38 @@ public class FeatureConfiguration extends ResourceConfig {
 
                 // JSON
                 .register(JacksonJsonProvider.class)
+                .register(new FeatureBinder());
 
-                .register(new AbstractBinder() {
-                    @Override
-                    protected void configure() {
-                        bindFactory(SchemaValidationSupplier.class)
-                                .to(SchemaValidation.class)
-                                .in(RequestScoped.class);
+    }
 
-                        bindFactory(SchemaFilterSupplier.class)
-                                .to(SchemaFilter.class)
-                                .in(RequestScoped.class);
+    protected static class FeatureBinder extends AbstractBinder {
 
-                        bindFactory(AuthorizationCheckServiceSupplier.class)
-                                .to(AuthorizationCheckService.class)
-                                .in(RequestScoped.class);
+        @Override
+        protected void configure() {
+            bindFactory(SchemaValidationSupplier.class)
+                    .to(SchemaValidation.class)
+                    .in(RequestScoped.class);
 
-                        bindFactory(AccountServiceSupplier.class)
-                                .to(AccountService.class)
-                                .in(RequestScoped.class);
+            bindFactory(SchemaFilterSupplier.class)
+                    .to(SchemaFilter.class)
+                    .in(RequestScoped.class);
 
-                        bindFactory(SubscriptionServiceSupplier.class)
-                                .to(SubscriptionService.class)
-                                .in(RequestScoped.class);
-                    }
-                });
+            bindFactory(AuthorizationCheckServiceSupplier.class)
+                    .to(AuthorizationCheckService.class)
+                    .in(RequestScoped.class);
 
+            bindFactory(AccountServiceSupplier.class)
+                    .to(AccountService.class)
+                    .in(RequestScoped.class);
+
+            bindFactory(SubscriptionServiceSupplier.class)
+                    .to(SubscriptionService.class)
+                    .in(RequestScoped.class);
+
+            bindFactory(LoginServiceSupplier.class)
+                    .to(LoginService.class)
+                    .in(RequestScoped.class);
+        }
     }
 
     protected static class ValidationConfigurationContextResolver implements ContextResolver<ValidationConfig> {

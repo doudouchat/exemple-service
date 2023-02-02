@@ -27,7 +27,7 @@ import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.account.AccountService;
-import com.exemple.service.customer.login.LoginResource;
+import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,7 +56,7 @@ class AccountApiTest extends JerseySpringSupport {
     private AccountService service;
 
     @Autowired
-    private LoginResource loginResource;
+    private LoginService loginService;
 
     @Autowired
     private SchemaValidation schemaValidation;
@@ -89,7 +89,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And mock login
 
-            Mockito.when(loginResource.get("john_doe")).thenReturn(Optional.of(id));
+            Mockito.when(loginService.get("john_doe")).thenReturn(Optional.of(id));
 
             // and token
 
@@ -157,7 +157,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And mock login
 
-            Mockito.when(loginResource.get("john_doe")).thenReturn(Optional.empty());
+            Mockito.when(loginService.get("john_doe")).thenReturn(Optional.empty());
 
             // and token
 
@@ -193,7 +193,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And mock login
 
-            Mockito.when(loginResource.get("john_doe")).thenReturn(Optional.of(UUID.randomUUID()));
+            Mockito.when(loginService.get("john_doe")).thenReturn(Optional.of(UUID.randomUUID()));
 
             // and token
 
@@ -238,7 +238,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And mock login
 
-            Mockito.when(loginResource.get("john_doe")).thenReturn(Optional.of(id));
+            Mockito.when(loginService.get("john_doe")).thenReturn(Optional.of(id));
 
             // and token
 
@@ -342,7 +342,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And mock login
 
-            Mockito.when(loginResource.get("john_doe")).thenReturn(Optional.of(id));
+            Mockito.when(loginService.get("john_doe")).thenReturn(Optional.of(id));
 
             // and token
 
@@ -393,7 +393,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And mock login
 
-            Mockito.when(loginResource.get("john_doe")).thenReturn(Optional.of(id));
+            Mockito.when(loginService.get("john_doe")).thenReturn(Optional.of(id));
 
             // and token
 

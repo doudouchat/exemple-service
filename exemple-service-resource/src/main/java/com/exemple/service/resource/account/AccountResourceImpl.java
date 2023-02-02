@@ -1,7 +1,6 @@
 package com.exemple.service.resource.account;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -16,6 +15,7 @@ import com.datastax.oss.driver.api.core.cql.BatchType;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.account.event.AccountEventResource;
+import com.exemple.service.resource.account.exception.UsernameNotUniqueException;
 import com.exemple.service.resource.account.history.AccountHistoryResource;
 import com.exemple.service.resource.common.JsonQueryBuilder;
 import com.exemple.service.resource.common.model.EventType;
@@ -91,6 +91,39 @@ public class AccountResourceImpl implements AccountResource {
         return source;
     }
 
+    @Override
+    public Optional<UUID> getIdByUsername(String field, String value) {
+
+        var select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), ACCOUNT_TABLE)
+                .column(AccountField.ID.field)
+                .whereColumn(field)
+                .isEqualTo(QueryBuilder.literal(value));
+
+        var ids = session.execute(select.build()).all().stream()
+                .map(row -> row.get(0, UUID.class))
+                .collect(Collectors.toSet());
+
+        if (ids.size() > 1) {
+            throw new UsernameNotUniqueException(value);
+        }
+
+        return ids.stream().findFirst();
+    }
+
+    @Override
+    public void removeByUsername(String field, String value) {
+
+        getIdByUsername(field, value).ifPresent((UUID id) -> {
+
+            var delete = QueryBuilder.deleteFrom(ResourceExecutionContext.get().keyspace(), ACCOUNT_TABLE)
+                    .whereColumn(AccountField.ID.field)
+                    .isEqualTo(QueryBuilder.literal(id));
+
+            session.execute(delete.build());
+        });
+
+    }
+
     private Optional<JsonNode> getById(UUID id) {
 
         var select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), ACCOUNT_TABLE).json().all()
@@ -101,12 +134,4 @@ public class AccountResourceImpl implements AccountResource {
         return Optional.ofNullable(row != null ? row.get(0, JsonNode.class) : null);
     }
 
-    @Override
-    public Set<JsonNode> findByIndex(String index, Object value) {
-
-        var select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), ACCOUNT_TABLE).json().all().whereColumn(index)
-                .isEqualTo(QueryBuilder.literal(value));
-
-        return session.execute(select.build()).all().stream().map(row -> row.get(0, JsonNode.class)).collect(Collectors.toSet());
-    }
 }

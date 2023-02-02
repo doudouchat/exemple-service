@@ -8,7 +8,7 @@ import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
 import com.exemple.service.api.core.check.AppAndVersionCheck;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
-import com.exemple.service.customer.login.LoginResource;
+import com.exemple.service.customer.login.LoginService;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,7 +42,8 @@ public class LoginApi {
 
     private static final String LOGIN_SCHEMA = "Login";
 
-    private final LoginResource loginResource;
+    @Context
+    private LoginService loginService;
 
     @Context
     private AuthorizationCheckService authorizationCheckService;
@@ -56,7 +57,7 @@ public class LoginApi {
     @AppAndVersionCheck(optionalVersion = true)
     public Response check(@PathParam("username") String username) {
 
-        if (loginResource.get(username).isPresent()) {
+        if (loginService.get(username).isPresent()) {
 
             return Response.status(Status.NO_CONTENT).build();
         }
@@ -84,7 +85,7 @@ public class LoginApi {
 
         authorizationCheckService.verifyLogin(username);
 
-        return loginResource.get(username).orElseThrow(NotFoundException::new);
+        return loginService.get(username).orElseThrow(NotFoundException::new);
 
     }
 

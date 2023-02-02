@@ -16,6 +16,9 @@ management:
 resource:
    cassandra:
       resource_configuration: file:/usr/local/tomcat/etc/cassandra.conf
+   zookeeper:
+      host: 172.17.0.1:${zookeeper.port}
+      sleepMsBetweenRetries: 10000
 customer:
    contexts:
       path: file:/usr/local/tomcat/etc/contexts

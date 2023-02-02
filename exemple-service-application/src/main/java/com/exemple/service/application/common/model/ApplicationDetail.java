@@ -24,4 +24,17 @@ public class ApplicationDetail {
     @Singular
     private final Set<String> clientIds;
 
+    @Builder.Default
+    private final AccountDetail account = AccountDetail.builder().build();
+
+    @Builder
+    @Getter
+    @Jacksonized
+    public static class AccountDetail {
+
+        @NotEmpty
+        @Singular
+        private final Set<String> uniqueProperties;
+    }
+
 }

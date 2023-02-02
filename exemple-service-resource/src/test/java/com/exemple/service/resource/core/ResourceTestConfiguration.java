@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.curator.test.TestingServer;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
@@ -29,6 +30,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.exemple.service.application.common.model.ApplicationDetail;
+import com.exemple.service.application.common.model.ApplicationDetail.AccountDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.core.cassandra.ResourceCassandraConfiguration;
@@ -46,6 +48,9 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
     @Value("${resource.cassandra.version}")
     private String version;
 
+    @Value("${resource.zookeeper.port}")
+    private int port;
+
     private final Path cassandraResourcePath;
 
     public ResourceTestConfiguration(@Value("${resource.cassandra.resource_configuration}") String cassandraResource) throws FileNotFoundException {
@@ -60,6 +65,12 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
                 .withExposedPorts(9042)
                 .waitingFor(Wait.forLogMessage(".*Startup complete.*\\n", 1))
                 .withLogConsumer(new Slf4jLogConsumer(LOG));
+    }
+
+    @Bean(destroyMethod = "stop")
+    public TestingServer embeddedZookeeper() throws Exception {
+
+        return new TestingServer(port, true);
     }
 
     @Bean
@@ -91,7 +102,12 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
 
         ApplicationDetailService service = Mockito.mock(ApplicationDetailService.class);
 
-        Mockito.when(service.get(Mockito.anyString())).thenReturn(Optional.of(ApplicationDetail.builder().keyspace("test").build()));
+        Mockito.when(service.get(Mockito.anyString())).thenReturn(Optional.of(
+                ApplicationDetail.builder()
+                        .keyspace("test")
+                        .account(AccountDetail.builder().uniqueProperty("email")
+                                .build())
+                        .build()));
 
         return service;
     }
@@ -123,6 +139,7 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
 
         MethodValidationPostProcessor methodValidationPostProcessor = new MethodValidationPostProcessor();
         methodValidationPostProcessor.setValidator(validator());
+        methodValidationPostProcessor.setBeforeExistingAdvisors(true);
 
         return methodValidationPostProcessor;
     }

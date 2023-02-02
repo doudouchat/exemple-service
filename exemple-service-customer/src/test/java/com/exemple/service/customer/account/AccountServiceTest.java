@@ -20,7 +20,6 @@ import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.common.event.EventType;
 import com.exemple.service.customer.common.event.ResourceEventPublisher;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
-import com.exemple.service.customer.login.LoginResource;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -37,15 +36,12 @@ class AccountServiceTest {
     private AccountResource accountResource;
 
     @Autowired
-    private LoginResource loginResource;
-
-    @Autowired
     private ResourceEventPublisher publisher;
 
     @BeforeEach
     public void before() {
 
-        Mockito.reset(accountResource, loginResource, publisher);
+        Mockito.reset(accountResource, publisher);
 
     }
 
@@ -85,10 +81,6 @@ class AccountServiceTest {
         ArgumentCaptor<JsonNode> accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
         Mockito.verify(accountResource).save(accountCaptor.capture());
         assertThat(accountCaptor.getValue()).isEqualTo(account);
-
-        // And check save login resource
-
-        Mockito.verify(loginResource).save(UUID.fromString(accountCaptor.getValue().get("id").textValue()), "jean.dupont@gmail.com");
 
         // And check publish resource
 
@@ -138,10 +130,6 @@ class AccountServiceTest {
         assertAll(
                 () -> assertThat(accountCaptor.getValue()).isEqualTo(account),
                 () -> assertThat(previousAccountCaptor.getValue()).isEqualTo(previousSource));
-
-        // And check save login resource
-
-        Mockito.verify(loginResource, Mockito.never()).save(Mockito.any(), Mockito.any());
 
         // And check publish resource
 
@@ -193,11 +181,6 @@ class AccountServiceTest {
         assertAll(
                 () -> assertThat(accountCaptor.getValue()).isEqualTo(account),
                 () -> assertThat(previousAccountCaptor.getValue()).isEqualTo(previousSource));
-
-        // And check save login resource
-
-        Mockito.verify(loginResource).save(id, "jean.dupond@gmail.com");
-        Mockito.verify(loginResource).delete("jean.dupont@gmail.com");
 
         // And check publish resource
 
