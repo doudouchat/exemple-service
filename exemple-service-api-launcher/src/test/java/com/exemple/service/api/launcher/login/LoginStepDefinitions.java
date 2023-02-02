@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.exemple.service.api.launcher.account.AccountTestContext;
 import com.exemple.service.api.launcher.authorization.AuthorizationTestContext;
-import com.exemple.service.customer.login.LoginResource;
+import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 
 import io.cucumber.java.Before;
@@ -22,7 +22,7 @@ import io.restassured.response.Response;
 public class LoginStepDefinitions {
 
     @Autowired
-    private LoginResource loginResource;
+    private AccountResource accountResource;
 
     @Autowired
     private AccountTestContext context;
@@ -39,8 +39,7 @@ public class LoginStepDefinitions {
 
     @Given("delete username {string}")
     public void remove(String username) {
-
-        loginResource.delete(username);
+        accountResource.removeByUsername("email", username);
 
     }
 

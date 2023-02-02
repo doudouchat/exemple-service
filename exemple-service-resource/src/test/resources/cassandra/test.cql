@@ -35,14 +35,9 @@ CREATE TABLE test.account (
 	preferences list<frozen<tuple<text, text, int, timestamp>>>
 );
 
-CREATE TABLE test.login (
-	id UUID,
-	username text PRIMARY KEY
-);
-
 CREATE TABLE test.subscription (
 	email text PRIMARY KEY,
-    update_date timestamp
+	update_date timestamp
 );
 
 CREATE TABLE test.account_history ( 
@@ -100,11 +95,8 @@ CREATE TABLE test.resource_schema (
 	patch set<text>,
 	PRIMARY KEY ((app), resource, version, profile)
 );
-CREATE INDEX account_status
-	ON test.account ( status );
-
-CREATE INDEX login_id
-	ON test.login ( id );
+CREATE INDEX account_email
+	ON test.account ( email );
 
 CREATE INDEX account_event_local_date
 	ON test.account_event ( local_date );

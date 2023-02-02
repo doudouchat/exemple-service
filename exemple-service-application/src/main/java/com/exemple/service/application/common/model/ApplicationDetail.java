@@ -23,5 +23,17 @@ public class ApplicationDetail {
     @NotEmpty
     @Singular
     private final Set<String> clientIds;
+    
+    private final AccountDetail account;
+    
+    @Builder
+    @Getter
+    @Jacksonized
+    public static class AccountDetail {
+
+        @NotEmpty
+        @Singular
+        private final Set<String> uniqueProperties;
+    }
 
 }

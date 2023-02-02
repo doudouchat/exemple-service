@@ -21,7 +21,7 @@ import com.exemple.service.api.core.ApiTestConfiguration;
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
-import com.exemple.service.customer.login.LoginResource;
+import com.exemple.service.customer.login.LoginService;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.PlainJWT;
 
@@ -39,7 +39,7 @@ class LoginApiTest extends JerseySpringSupport {
     }
 
     @Autowired
-    private LoginResource resource;
+    private LoginService resource;
 
     @BeforeEach
     void before() {

@@ -10,6 +10,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.application.common.model.ApplicationDetail;
+import com.exemple.service.application.common.model.ApplicationDetail.AccountDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.schema.SchemaResource;
@@ -50,8 +51,13 @@ public class InitData {
         // APP
 
         ApplicationDetail detail = ApplicationDetail.builder()
-
-                .keyspace("test_keyspace").company("test_company").clientId("test").clientId("test_user").build();
+                .keyspace("test_keyspace")
+                .company("test_company")
+                .clientId("test")
+                .clientId("test_user")
+                .account(AccountDetail.builder().uniqueProperty("email")
+                        .build())
+                .build();
 
         ResourceExecutionContext.get().setKeyspace(detail.getKeyspace());
 
@@ -93,8 +99,11 @@ public class InitData {
         // STOCK
 
         ApplicationDetail backDetail = ApplicationDetail.builder()
-
-                .keyspace("test_keyspace").company("test_company").clientId("back").clientId("back_user").build();
+                .keyspace("test_keyspace")
+                .company("test_company")
+                .clientId("back")
+                .clientId("back_user")
+                .build();
 
         applicationDetailService.put(BACK_APP, MAPPER.convertValue(backDetail, JsonNode.class));
 

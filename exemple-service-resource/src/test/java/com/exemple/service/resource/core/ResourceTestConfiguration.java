@@ -29,6 +29,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.exemple.service.application.common.model.ApplicationDetail;
+import com.exemple.service.application.common.model.ApplicationDetail.AccountDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.core.cassandra.ResourceCassandraConfiguration;
@@ -91,7 +92,12 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
 
         ApplicationDetailService service = Mockito.mock(ApplicationDetailService.class);
 
-        Mockito.when(service.get(Mockito.anyString())).thenReturn(Optional.of(ApplicationDetail.builder().keyspace("test").build()));
+        Mockito.when(service.get(Mockito.anyString())).thenReturn(Optional.of(
+                ApplicationDetail.builder()
+                        .keyspace("test")
+                        .account(AccountDetail.builder().uniqueProperty("email")
+                                .build())
+                        .build()));
 
         return service;
     }
@@ -123,6 +129,7 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
 
         MethodValidationPostProcessor methodValidationPostProcessor = new MethodValidationPostProcessor();
         methodValidationPostProcessor.setValidator(validator());
+        methodValidationPostProcessor.setBeforeExistingAdvisors(true);
 
         return methodValidationPostProcessor;
     }

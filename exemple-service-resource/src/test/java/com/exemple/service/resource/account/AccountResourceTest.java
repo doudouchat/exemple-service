@@ -1,6 +1,7 @@
 package com.exemple.service.resource.account;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
@@ -9,11 +10,10 @@ import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -31,6 +31,7 @@ import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.account.event.AccountEventResource;
+import com.exemple.service.resource.account.exception.UsernameAlreadyExistsException;
 import com.exemple.service.resource.account.history.AccountHistoryResource;
 import com.exemple.service.resource.account.model.AccountEvent;
 import com.exemple.service.resource.account.model.AccountHistory;
@@ -77,6 +78,13 @@ class AccountResourceTest {
         private final UUID id = UUID.randomUUID();
 
         private OffsetDateTime createDate;
+
+        @BeforeAll
+        void deleteAccount() throws IOException {
+
+            resource.removeByUsername("email", "jean.dupond@gmail");
+
+        }
 
         @Test
         @DisplayName("save email")
@@ -494,41 +502,103 @@ class AccountResourceTest {
         assertThat(account).isEmpty();
     }
 
-    @Test
-    void findByIndex() throws IOException {
+    @Nested
+    @TestMethodOrder(OrderAnnotation.class)
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class UsernameField {
 
-        // Given build accounts
-        UUID id1 = UUID.randomUUID();
-        UUID id2 = UUID.randomUUID();
-        UUID id3 = UUID.randomUUID();
+        private UUID id = UUID.randomUUID();
 
-        JsonNode account1 = MAPPER.readTree(
-                """
-                {"id": "%s", "status": "NEW"}
-                """.formatted(id1));
-        JsonNode account2 = MAPPER.readTree(
-                """
-                {"id": "%s", "status": "NEW"}
-                """.formatted(id2));
-        JsonNode account3 = MAPPER.readTree(
-                """
-                {"id": "%s", "status": "OLD"}
-                """.formatted(id3));
+        private String email = UUID.randomUUID() + "@gmail";
 
-        resource.save(account1);
-        resource.save(account2);
-        resource.save(account3);
+        @BeforeAll
+        void saveAccount() throws IOException {
 
-        // When perform
-        Set<JsonNode> accounts = resource.findByIndex("status", "NEW");
+            JsonNode account = MAPPER.readTree(
+                    """
+                    {"id": "%s", "email": "%s"}
+                    """.formatted(id, email));
+            resource.save(account);
 
-        // And check accounts
+        }
 
-        List<String> ids = accounts.stream().map(account -> account.get(AccountField.ID.field).asText()).collect(Collectors.toList());
+        @Test
+        @Order(1)
+        void getIdByUsername() {
 
-        assertAll(
-                () -> assertThat(ids).hasSize(2),
-                () -> assertThat(ids).containsOnly(id1.toString(), id2.toString()));
+            // When perform
+            Optional<UUID> res = resource.getIdByUsername("email", email);
+
+            // And check account
+            assertAll(
+                    () -> assertThat(res).isPresent(),
+                    () -> assertThat(res).hasValue(this.id));
+        }
+
+        @Test
+        @Order(1)
+        void saveUnique() throws IOException {
+
+            // When perform
+            JsonNode account = MAPPER.readTree(
+                    """
+                    {"id": "%s", "email": "%s"}
+                    """.formatted(id, email));
+            Throwable throwable = catchThrowable(() -> resource.save(account));
+
+            // Then check throwable
+            assertThat(throwable).isInstanceOf(UsernameAlreadyExistsException.class);
+        }
+
+        @Test
+        @Order(1)
+        void updateUnique() throws IOException {
+
+            // When perform
+            JsonNode account = MAPPER.readTree(
+                    """
+                    {"id": "%s", "email": "%s"}
+                    """.formatted(id, email));
+            JsonNode previousAccount = MAPPER.readTree(
+                    """
+                    {"id": "%s"}
+                    """.formatted(id));
+            Throwable throwable = catchThrowable(() -> resource.save(account, previousAccount));
+
+            // Then check throwable
+            assertThat(throwable).isInstanceOf(UsernameAlreadyExistsException.class);
+        }
+
+        @Test
+        @Order(1)
+        void updateSuccess() throws IOException {
+
+            // When perform
+            JsonNode account = MAPPER.readTree(
+                    """
+                    {"id": "%s", "email": "%s"}
+                    """.formatted(id, email));
+            JsonNode previousAccount = MAPPER.readTree(
+                    """
+                    {"id": "%s", "email": "%s"}
+                    """.formatted(id, email));
+            Throwable throwable = catchThrowable(() -> resource.save(account, previousAccount));
+
+            // Then check none exception
+            assertThat(throwable).as("None exception is expected").isNull();
+        }
+
+        @Test
+        @Order(2)
+        void removeByUsername() {
+
+            // When perform
+            resource.removeByUsername("email", email);
+
+            // And check account
+
+            assertThat(resource.getIdByUsername("email", email)).isEmpty();
+        }
     }
 
     private static void assertHistory(AccountHistory accountHistory, JsonNodeType expectedJsonNodeType, Instant expectedDate) {

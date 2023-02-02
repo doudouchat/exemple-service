@@ -15,7 +15,7 @@ import org.springframework.util.ResourceUtils;
 import com.exemple.service.api.common.script.CustomerScriptFactory;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.customer.account.AccountService;
-import com.exemple.service.customer.login.LoginResource;
+import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.customer.subscription.SubscriptionService;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.schema.description.SchemaDescription;
@@ -68,8 +68,8 @@ public class ApiTestConfiguration {
     }
 
     @Bean
-    public LoginResource loginResource() {
-        return Mockito.mock(LoginResource.class);
+    public LoginService loginService() {
+        return Mockito.mock(LoginService.class);
     }
 
     @Bean
@@ -99,6 +99,8 @@ public class ApiTestConfiguration {
                 .thenReturn(context.getBean(SubscriptionService.class));
         Mockito.when(customerScriptFactory.getBean(Mockito.anyString(), Mockito.eq(AccountService.class), Mockito.anyString()))
                 .thenReturn(context.getBean(AccountService.class));
+        Mockito.when(customerScriptFactory.getBean(Mockito.anyString(), Mockito.eq(LoginService.class), Mockito.anyString()))
+                .thenReturn(context.getBean(LoginService.class));
         return customerScriptFactory;
     }
 
