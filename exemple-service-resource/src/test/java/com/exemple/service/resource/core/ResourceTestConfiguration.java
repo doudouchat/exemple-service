@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.curator.test.TestingServer;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
@@ -47,6 +48,9 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
     @Value("${resource.cassandra.version}")
     private String version;
 
+    @Value("${resource.zookeeper.port}")
+    private int port;
+
     private final Path cassandraResourcePath;
 
     public ResourceTestConfiguration(@Value("${resource.cassandra.resource_configuration}") String cassandraResource) throws FileNotFoundException {
@@ -61,6 +65,12 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
                 .withExposedPorts(9042)
                 .waitingFor(Wait.forLogMessage(".*Startup complete.*\\n", 1))
                 .withLogConsumer(new Slf4jLogConsumer(LOG));
+    }
+
+    @Bean(destroyMethod = "stop")
+    public TestingServer embeddedZookeeper() throws Exception {
+
+        return new TestingServer(port, true);
     }
 
     @Bean

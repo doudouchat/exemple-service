@@ -143,6 +143,18 @@
 			<groupId>com.flipkart.zjsonpatch</groupId>
 			<artifactId>zjsonpatch</artifactId>
 		</dependency>
+		
+		<!-- CURATOR -->
+
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-recipes</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-test</artifactId>
+		</dependency>
 
 		<!-- JARKATA ANNOTATION -->
 
@@ -205,6 +217,26 @@
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
+			</plugin>
+
+			<!-- HELPER -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>reserve-network-port</id>
+						<goals>
+							<goal>reserve-network-port</goal>
+						</goals>
+						<phase>process-resources</phase>
+						<configuration>
+							<portNames>
+								<portName>zmp.clientPort</portName>
+							</portNames>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 
 		</plugins>
