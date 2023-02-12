@@ -6,16 +6,16 @@ import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
 
-@Component
+@Configuration
 public class InitCassandra {
 
     private final Resource[] scripts;
