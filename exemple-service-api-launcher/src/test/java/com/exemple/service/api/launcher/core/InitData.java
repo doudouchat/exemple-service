@@ -5,9 +5,9 @@ import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Component;
 
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.common.model.ApplicationDetail.AccountDetail;
@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.annotation.PostConstruct;
 
-@Component
+@Configuration
 @DependsOn("initCassandra")
 public class InitData {
 

@@ -64,6 +64,34 @@ Feature: api account
           "optin_mobile": true
       }
       """
+    And account event is
+      """
+      {
+          "addresses": {
+              "home": {
+                  "street": "rue de la poste",
+                  "city": "Lyon"
+              },
+              "job": {
+                  "street": "rue de la paix",
+                  "city": "Paris"
+              }
+          },
+          "birthday": "1967-06-15",
+          "cgus": [
+              {
+                  "code": "code_1",
+                  "version": "v0"
+              }
+          ],
+          "civility": "Mr",
+          "email": "jean.dupond@gmail.com",
+          "firstname": "Jean",
+          "lastname": "Dupond",
+          "mobile": "0610203040",
+          "optin_mobile": true
+      }
+      """
     And account property 'creation_date' exists
 
   Scenario: create account fails because lastname is not an integer

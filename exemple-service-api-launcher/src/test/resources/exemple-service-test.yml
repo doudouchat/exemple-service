@@ -3,6 +3,10 @@ resource:
       resource_configuration: file:${project.build.testOutputDirectory}/cassandra.conf
    zookeeper:
       host: 127.0.0.1:${zookeeper.port}
+event:
+   kafka:
+      bootstrap-servers: 127.0.0.1:${kafka.client_port}
+   topic: test
 application:
    zookeeper:
       host: 127.0.0.1:${zookeeper.port}

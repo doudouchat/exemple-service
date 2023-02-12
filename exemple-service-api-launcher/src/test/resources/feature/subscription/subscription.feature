@@ -11,6 +11,12 @@ Feature: api subscription
       {
       }
       """
+    And subscription event is
+      """
+      {
+        "email": "jean.dupond@gmail.com"
+      }
+      """
     And subscription contains 'subscription_date'
 
   Scenario: update subscription
@@ -20,6 +26,12 @@ Feature: api subscription
     Then subscription 'jean.dupond@gmail.com' is
       """
       {
+      }
+      """
+    And subscription event is
+      """
+      {
+        "email": "jean.dupond@gmail.com"
       }
       """
     And subscription contains 'subscription_date'
