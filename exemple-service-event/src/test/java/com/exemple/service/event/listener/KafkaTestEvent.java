@@ -13,7 +13,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.KafkaMessageListenerContainer;
@@ -23,6 +22,7 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 
+import com.exemple.service.event.core.EventConfigurationProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.extern.slf4j.Slf4j;
@@ -34,8 +34,8 @@ public class KafkaTestEvent {
     @Autowired
     private EmbeddedKafkaBroker embeddedKafka;
 
-    @Value("${event.topic}")
-    private String defaultTopic;
+    @Autowired
+    private EventConfigurationProperties eventProperties;
 
     private KafkaMessageListenerContainer<String, JsonNode> container;
 
@@ -50,7 +50,7 @@ public class KafkaTestEvent {
         consumerProperties.put(ConsumerConfig.GROUP_ID_CONFIG, "foo");
         DefaultKafkaConsumerFactory<String, JsonNode> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProperties,
                 new StringDeserializer(), new JsonDeserializer<>(JsonNode.class, false));
-        ContainerProperties containerProperties = new ContainerProperties(defaultTopic);
+        ContainerProperties containerProperties = new ContainerProperties(eventProperties.getTopic());
         container = new KafkaMessageListenerContainer<>(consumerFactory, containerProperties);
 
         MessageListener<String, JsonNode> listener = data -> {

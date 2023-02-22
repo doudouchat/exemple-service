@@ -1,7 +1,0 @@
-api:
-   authorization:
-      port: ${authorization.port}
-      jwkSetUri: http://localhost:${authorization.port}/oauth/jwks
-      hazelcast:
-         port: ${hazelcast.port}
-         addresses: 127.0.0.1:${hazelcast.port}

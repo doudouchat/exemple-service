@@ -23,7 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
@@ -42,7 +43,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 @TestMethodOrder(OrderAnnotation.class)
-@SpringJUnitConfig(ResourceTestConfiguration.class)
+@SpringBootTest(classes = ResourceTestConfiguration.class)
+@ActiveProfiles("test")
 class AccountResourceTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();

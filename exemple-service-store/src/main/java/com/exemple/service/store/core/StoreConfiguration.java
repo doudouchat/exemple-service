@@ -3,7 +3,7 @@ package com.exemple.service.store.core;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -14,30 +14,22 @@ import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableAspectJAutoProxy
+@EnableConfigurationProperties(StoreConfigurationProperties.class)
 @ComponentScan(basePackages = "com.exemple.service.store")
 @RequiredArgsConstructor
 @Slf4j
 public class StoreConfiguration {
 
-    @Value("${store.zookeeper.host}")
-    private final String address;
-
-    @Value("${store.zookeeper.sessionTimeout:30000}")
-    private final int sessionTimeout;
-
-    @Value("${store.zookeeper.connectionTimeout:10000}")
-    private final int connectionTimeout;
-
-    @Value("${store.zookeeper.retry:3}")
-    private final int retry;
-
-    @Value("${store.zookeeper.sleepMsBetweenRetries:1000}")
-    private final int sleepMsBetweenRetries;
+    private final StoreConfigurationProperties storeProperties;
 
     @Bean(initMethod = "start", destroyMethod = "close")
     public CuratorFramework storeCuratorFramework() {
 
-        var client = CuratorFrameworkFactory.newClient(address, sessionTimeout, connectionTimeout, new RetryNTimes(retry, sleepMsBetweenRetries));
+        var client = CuratorFrameworkFactory.newClient(
+                storeProperties.getZookeeper().getHost(),
+                storeProperties.getZookeeper().getSessionTimeout(),
+                storeProperties.getZookeeper().getConnectionTimeout(),
+                new RetryNTimes(storeProperties.getZookeeper().getRetry(), storeProperties.getZookeeper().getSleepMsBetweenRetries()));
 
         client.getConnectionStateListenable().addListener((c, state) -> LOG.debug("State changed to: {}", state));
 

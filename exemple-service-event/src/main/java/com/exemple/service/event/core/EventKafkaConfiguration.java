@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -19,22 +19,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Configuration
+@EnableConfigurationProperties(EventConfigurationProperties.class)
 @ComponentScan(basePackages = "com.exemple.service.event.listener")
 @RequiredArgsConstructor
 @Slf4j
 public class EventKafkaConfiguration {
 
-    @Value("${event.kafka.bootstrap-servers}")
-    private final String bootstrapServers;
-
-    @Value("${event.topic}")
-    private final String defaultTopic;
+    private final EventConfigurationProperties eventProperties;
 
     @Bean(destroyMethod = "reset")
     public DefaultKafkaProducerFactory<String, JsonNode> producerFactory() {
 
         Map<String, Object> props = Map.of(
-                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, eventProperties.getKafka().getBootstrapServers(),
                 ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
                 ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
@@ -44,14 +41,14 @@ public class EventKafkaConfiguration {
     @Bean
     public KafkaTemplate<String, JsonNode> kafkaTemplate() {
         KafkaTemplate<String, JsonNode> template = new KafkaTemplate<>(producerFactory());
-        template.setDefaultTopic(defaultTopic);
+        template.setDefaultTopic(eventProperties.getTopic());
         return template;
     }
 
     @PostConstruct
     public void post() {
 
-        LOG.info("Event services {} is enabled", defaultTopic);
+        LOG.info("Event services {} is enabled", eventProperties.getTopic());
 
     }
 

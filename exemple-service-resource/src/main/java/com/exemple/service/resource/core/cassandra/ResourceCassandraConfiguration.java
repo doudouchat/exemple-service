@@ -3,15 +3,16 @@ package com.exemple.service.resource.core.cassandra;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ResourceUtils;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.CqlSessionBuilder;
 import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
 import com.datastax.oss.driver.api.core.type.codec.ExtraTypeCodecs;
 import com.exemple.service.resource.common.model.EventType;
+import com.exemple.service.resource.core.ResourceConfigurationProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Configuration
@@ -19,21 +20,26 @@ public class ResourceCassandraConfiguration {
 
     private final File cassandraResource;
 
-    public ResourceCassandraConfiguration(@Value("${resource.cassandra.resource_configuration}") String cassandraResource)
+    public ResourceCassandraConfiguration(ResourceConfigurationProperties resourceProperties)
             throws FileNotFoundException {
-        this.cassandraResource = ResourceUtils.getFile(cassandraResource);
+        this.cassandraResource = ResourceUtils.getFile(resourceProperties.getCassandra().getResourceConfiguration());
     }
 
     @Bean
-    public CqlSession session() {
+    public CqlSessionBuilder sessionBuilder() {
 
         var loader = DriverConfigLoader.fromFile(cassandraResource);
 
         return CqlSession.builder().withConfigLoader(loader)
                 .addTypeCodecs(ExtraTypeCodecs.json(JsonNode.class))
                 .addTypeCodecs(ExtraTypeCodecs.BLOB_TO_ARRAY)
-                .addTypeCodecs(ExtraTypeCodecs.enumNamesOf(EventType.class))
-                .build();
+                .addTypeCodecs(ExtraTypeCodecs.enumNamesOf(EventType.class));
+    }
+
+    @Bean
+    public CqlSession session() {
+
+        return sessionBuilder().build();
     }
 
 }

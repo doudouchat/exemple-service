@@ -10,7 +10,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
@@ -21,6 +20,7 @@ import org.springframework.util.ResourceUtils;
 
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
+import com.exemple.service.customer.core.CustomerConfigurationProperties;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +44,8 @@ public class CustomerScriptFactory {
 
     private final File contextsPath;
 
-    public CustomerScriptFactory(ApplicationDetailService applicationDetailService, @Value("${customer.contexts.path}") String contextsPath,
+    public CustomerScriptFactory(ApplicationDetailService applicationDetailService,
+            CustomerConfigurationProperties customerProperties,
             ApplicationContext applicationContext) throws IOException {
         this.applicationContext = applicationContext;
         this.defaultApplicationContext = new FileSystemXmlApplicationContext(new String[] { "classpath:exemple-service-customer.xml" },
@@ -52,7 +53,7 @@ public class CustomerScriptFactory {
         this.scriptApplicationContexts = new ConcurrentHashMap<>();
         this.checksumApplicationContexts = new ConcurrentHashMap<>();
         this.applicationDetailService = applicationDetailService;
-        this.contextsPath = ResourceUtils.getFile(contextsPath);
+        this.contextsPath = ResourceUtils.getFile(customerProperties.getContexts().getPath());
     }
 
     public <T> T getBean(String beanName, Class<T> beanClass, String application) {

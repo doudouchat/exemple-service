@@ -11,3 +11,6 @@ resource:
       sleepMsBetweenRetries: 1000
       ttlMs:
          product: 30000
+spring:
+   main:
+      allow-bean-definition-overriding: true

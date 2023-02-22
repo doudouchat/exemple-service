@@ -17,8 +17,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.util.ResourceUtils;
 
 import com.exemple.service.application.common.model.ApplicationDetail;
@@ -28,8 +29,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
 
-@SpringJUnitConfig(CustomerScriptTestConfiguration.class)
+@SpringBootTest(classes = CustomerScriptTestConfiguration.class)
 @TestPropertySource(properties = { "customer.contexts.path=${java.io.tmpdir}/scripts", "customer.contexts.delay=2000" })
+@ActiveProfiles("test")
 class CustomerScriptFactoryTest {
 
     private static final String SCRIPTS_DIRECTORY_PATH = SystemUtils.JAVA_IO_TMPDIR + "/scripts";
