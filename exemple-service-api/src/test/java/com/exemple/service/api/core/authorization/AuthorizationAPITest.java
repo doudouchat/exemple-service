@@ -18,7 +18,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.ApiTestConfiguration;
@@ -47,7 +48,8 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.SecurityContext;
 
-@SpringJUnitConfig({ ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
+@SpringBootTest(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
+@ActiveProfiles("test")
 class AuthorizationAPITest extends JerseySpringSupport {
 
     private TestFilter testFilter = new TestFilter();

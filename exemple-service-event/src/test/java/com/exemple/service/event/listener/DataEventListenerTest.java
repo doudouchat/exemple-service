@@ -11,7 +11,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.common.event.EventType;
@@ -20,7 +21,8 @@ import com.exemple.service.event.publisher.DataEventPublisher;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@SpringJUnitConfig(EventTestConfiguration.class)
+@SpringBootTest(classes = EventTestConfiguration.class)
+@ActiveProfiles("test")
 class DataEventListenerTest extends KafkaTestEvent {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();

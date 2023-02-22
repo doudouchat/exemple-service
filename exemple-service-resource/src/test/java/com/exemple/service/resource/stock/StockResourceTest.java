@@ -6,12 +6,14 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.exemple.service.store.stock.StockResource;
 
-@SpringJUnitConfig(ResourceTestConfiguration.class)
+@SpringBootTest(classes = ResourceTestConfiguration.class)
+@ActiveProfiles("test")
 class StockResourceTest {
 
     @Autowired

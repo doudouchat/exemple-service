@@ -1,0 +1,16 @@
+spring:
+   main:
+      allow-bean-definition-overriding: true
+      banner-mode: off
+   hazelcast:
+      config: file:${project.build.testOutputDirectory}/hazelcast.yaml
+customer:
+   contexts:
+      path: file:${java.io.tmpdir}/scripts
+api:
+   authorization:
+      port: ${authorization.port}
+      jwkSetUri: http://localhost:${authorization.port}/oauth/jwks
+      hazelcast:
+         port: ${hazelcast.port}
+         addresses: 127.0.0.1:${hazelcast.port}
