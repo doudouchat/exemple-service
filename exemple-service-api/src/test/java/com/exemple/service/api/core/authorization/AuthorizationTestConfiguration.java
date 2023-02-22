@@ -10,14 +10,12 @@ import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 import org.mockserver.model.JsonBody;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 
@@ -32,8 +30,6 @@ import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jwt.PlainJWT;
-
-import jakarta.annotation.PostConstruct;
 
 @Configuration
 @ComponentScan(basePackages = "com.exemple.service.api.core.authorization")
@@ -95,15 +91,23 @@ public class AuthorizationTestConfiguration {
     }
 
     @Configuration
+    @Import(AuthorizationServer.class)
     @Profile("!AuthorizationMock")
     public class NotAuthorizationMock {
 
-        static {
-            System.setProperty("mockserver.logLevel", "DEBUG");
-        }
+        public NotAuthorizationMock(ClientAndServer authorizationClient) {
 
-        @Value("${api.authorization.port}")
-        private int authorizationPort;
+            var jwkSet = new JWKSet(RSA_KEY).getKeys().stream().map(jwk -> jwk.getRequiredParams()).toList();
+
+            var keys = Map.of("keys", jwkSet);
+
+            authorizationClient.when(HttpRequest.request()
+                    .withMethod("GET")
+                    .withPath("/oauth/jwks"))
+                    .respond(HttpResponse.response()
+                            .withBody(JsonBody.json(keys))
+                            .withStatusCode(200));
+        }
 
         @Bean
         public HazelcastInstance hazelcastInstanceServer(@Value("${api.authorization.hazelcast.port}") int port) {
@@ -116,6 +120,19 @@ public class AuthorizationTestConfiguration {
             return Hazelcast.newHazelcastInstance(config);
         }
 
+    }
+
+    @Configuration
+    @Profile("!AuthorizationMock")
+    public class AuthorizationServer {
+
+        static {
+            System.setProperty("mockserver.logLevel", "DEBUG");
+        }
+
+        @Value("${api.authorization.port}")
+        private int authorizationPort;
+
         @Bean
         public ClientAndServer authorizationServer() {
             return ClientAndServer.startClientAndServer(authorizationPort);
@@ -127,34 +144,6 @@ public class AuthorizationTestConfiguration {
             return new MockServerClient("localhost", authorizationPort);
         }
 
-        @PostConstruct
-        public void initJWKS() {
-
-            var jwkSet = new JWKSet(RSA_KEY).getKeys().stream().map(jwk -> jwk.getRequiredParams()).toList();
-
-            var keys = Map.of("keys", jwkSet);
-
-            authorizationClient().when(HttpRequest.request()
-                    .withMethod("GET")
-                    .withPath("/oauth/jwks"))
-                    .respond(HttpResponse.response()
-                            .withBody(JsonBody.json(keys))
-                            .withStatusCode(200));
-
-        }
-
-    }
-
-    @Bean
-    public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
-
-        PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = new PropertySourcesPlaceholderConfigurer();
-
-        YamlPropertiesFactoryBean properties = new YamlPropertiesFactoryBean();
-        properties.setResources(new ClassPathResource("exemple-service-api-test.yml"));
-
-        propertySourcesPlaceholderConfigurer.setProperties(properties.getObject());
-        return propertySourcesPlaceholderConfigurer;
     }
 
     private static RSAKey buildRSAKey() {

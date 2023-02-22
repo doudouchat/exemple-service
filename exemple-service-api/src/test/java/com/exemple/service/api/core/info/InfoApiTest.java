@@ -10,8 +10,8 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.Viewable;
 import org.glassfish.jersey.server.mvc.spi.TemplateProcessor;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.service.api.core.ApiTestConfiguration;
 import com.exemple.service.api.core.JerseySpringSupport;
@@ -23,8 +23,8 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
-@SpringJUnitConfig(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
-@ActiveProfiles("AuthorizationMock")
+@SpringBootTest(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
+@ActiveProfiles({ "test", "AuthorizationMock" })
 class InfoApiTest extends JerseySpringSupport {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();

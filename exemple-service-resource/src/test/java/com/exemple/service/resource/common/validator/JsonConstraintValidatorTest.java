@@ -18,7 +18,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
@@ -28,7 +29,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.validation.ConstraintViolationException;
 
-@SpringJUnitConfig(ResourceTestConfiguration.class)
+@SpringBootTest(classes = ResourceTestConfiguration.class)
+@ActiveProfiles("test")
 class JsonConstraintValidatorTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();

@@ -19,8 +19,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
@@ -29,7 +30,8 @@ import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@SpringJUnitConfig(ResourceTestConfiguration.class)
+@SpringBootTest(classes = ResourceTestConfiguration.class)
+@ActiveProfiles("test")
 class SchemaResourceTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();

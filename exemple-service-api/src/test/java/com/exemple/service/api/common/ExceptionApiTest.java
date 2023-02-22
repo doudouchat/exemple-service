@@ -10,8 +10,8 @@ import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.core.ApiTestConfiguration;
@@ -41,8 +41,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.jackson.Jacksonized;
 
-@SpringJUnitConfig(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
-@ActiveProfiles("AuthorizationMock")
+@SpringBootTest(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
+@ActiveProfiles({ "test", "AuthorizationMock" })
 class ExceptionApiTest extends JerseySpringSupport {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();

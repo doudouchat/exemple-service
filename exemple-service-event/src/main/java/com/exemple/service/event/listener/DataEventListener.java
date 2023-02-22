@@ -3,7 +3,6 @@ package com.exemple.service.event.listener;
 import java.time.OffsetDateTime;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -11,6 +10,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
+import com.exemple.service.event.core.EventConfigurationProperties;
 import com.exemple.service.event.publisher.EventData;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -31,8 +31,7 @@ public class DataEventListener {
 
     public static final String X_EVENT_TYPE = "X_Event_Type";
 
-    @Value("${event.timeout:3000}")
-    private final Long timeout;
+    private final EventConfigurationProperties eventProperties;
 
     private final KafkaTemplate<String, JsonNode> template;
 
@@ -50,7 +49,7 @@ public class DataEventListener {
                 .setHeader(X_EVENT_TYPE, event.getEventType().toString()).setHeader(X_ORIGIN, event.getOrigin())
                 .setHeader(X_ORIGIN_VERSION, event.getOriginVersion()).build();
 
-        template.send(message).get(timeout, TimeUnit.MILLISECONDS);
+        template.send(message).get(eventProperties.getTimeout(), TimeUnit.MILLISECONDS);
     }
 
 }
