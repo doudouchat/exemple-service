@@ -45,7 +45,11 @@ public class DataEventListener {
         LOG.debug("send event {} {}", resource, data);
 
         Message<JsonNode> message = MessageBuilder.withPayload(data)
-                .setHeader(KafkaHeaders.TIMESTAMP, OffsetDateTime.parse(event.getDate()).toInstant().toEpochMilli()).setHeader(X_RESOURCE, resource)
+                .setHeader(KafkaHeaders.TIMESTAMP, OffsetDateTime.parse(event.getDate()).toInstant().toEpochMilli())
+                .setHeader(KafkaHeaders.TOPIC, eventProperties.getTopics().computeIfAbsent(resource, (String absentResource) -> {
+                    throw new IllegalStateException(absentResource + " has not any topic");
+                }))
+                .setHeader(X_RESOURCE, resource)
                 .setHeader(X_EVENT_TYPE, event.getEventType().toString()).setHeader(X_ORIGIN, event.getOrigin())
                 .setHeader(X_ORIGIN_VERSION, event.getOriginVersion()).build();
 

@@ -1,5 +1,7 @@
 package com.exemple.service.event.core;
 
+import java.util.Map;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
@@ -10,14 +12,14 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public class EventConfigurationProperties {
 
-    private final String topic;
+    private final Map<String, String> topics;
 
     private final Long timeout;
 
     private final Kafka kafka;
 
-    public EventConfigurationProperties(String topic, @DefaultValue("3000") Long timeout, Kafka kafka) {
-        this.topic = topic;
+    public EventConfigurationProperties(Map<String, String> topics, @DefaultValue("3000") Long timeout, Kafka kafka) {
+        this.topics = topics;
         this.timeout = timeout;
         this.kafka = kafka;
     }
