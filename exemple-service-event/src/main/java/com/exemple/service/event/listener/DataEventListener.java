@@ -39,7 +39,7 @@ public class DataEventListener {
     @SneakyThrows
     public void eventConsumer(EventData event) {
 
-        JsonNode data = (JsonNode) event.getSource();
+        JsonNode data = event.getData();
         String resource = event.getResource();
 
         LOG.debug("send event {} {}", resource, data);
