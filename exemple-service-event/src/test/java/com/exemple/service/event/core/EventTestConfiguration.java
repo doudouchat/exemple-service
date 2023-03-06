@@ -21,7 +21,8 @@ public class EventTestConfiguration {
     @Bean
     public EmbeddedKafkaBroker embeddedKafka(@Value("${event.kafka.embedded.port}") int port, @Value("${event.kafka.embedded.dir}") String dir) {
 
-        EmbeddedKafkaBroker embeddedKafka = new EmbeddedKafkaBroker(1, true, eventProperties.getTopic())
+        var topics = eventProperties.getTopics().values().toArray(new String[eventProperties.getTopics().size()]);
+        EmbeddedKafkaBroker embeddedKafka = new EmbeddedKafkaBroker(1, true, topics)
                 .brokerProperty(KafkaConfig.LogDirsProp(), dir + "/" + UUID.randomUUID());
         embeddedKafka.kafkaPorts(port);
 

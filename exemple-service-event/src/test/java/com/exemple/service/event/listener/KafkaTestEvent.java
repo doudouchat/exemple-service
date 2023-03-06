@@ -50,7 +50,8 @@ public class KafkaTestEvent {
         consumerProperties.put(ConsumerConfig.GROUP_ID_CONFIG, "foo");
         DefaultKafkaConsumerFactory<String, JsonNode> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProperties,
                 new StringDeserializer(), new JsonDeserializer<>(JsonNode.class, false));
-        ContainerProperties containerProperties = new ContainerProperties(eventProperties.getTopic());
+        ContainerProperties containerProperties = new ContainerProperties(
+                eventProperties.getTopics().values().toArray(new String[eventProperties.getTopics().values().size()]));
         container = new KafkaMessageListenerContainer<>(consumerFactory, containerProperties);
 
         MessageListener<String, JsonNode> listener = data -> {

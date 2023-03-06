@@ -6,7 +6,9 @@ resource:
 event:
    kafka:
       bootstrap-servers: 127.0.0.1:${kafka.client_port}
-   topic: test
+   topics:
+      account: test
+      subscription: test
 application:
    zookeeper:
       host: 127.0.0.1:${zookeeper.port}
