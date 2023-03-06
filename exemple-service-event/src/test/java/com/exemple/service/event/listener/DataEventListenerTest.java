@@ -1,6 +1,7 @@
 package com.exemple.service.event.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -71,6 +73,33 @@ class DataEventListenerTest extends KafkaTestEvent {
                     () -> assertThat(deserializer.deserialize(null, received.headers().lastHeader(DataEventListener.X_EVENT_TYPE).value()))
                             .isEqualTo(EventType.CREATE.toString()));
         }
+
+    }
+
+    @Test
+    @DisplayName("public event fails because resource not exists")
+    void publishEventFailsBecauseTopicNotExists() throws IOException {
+
+        // Given build message
+
+        JsonNode resource = MAPPER.readTree(
+                """
+                {"key1": "value1", "key2": "value2"}
+                """);
+
+        // and build context
+        String origin = "app1";
+        String originVersion = "v1";
+        ServiceContextExecution.setDate(date);
+        ServiceContextExecution.setApp(origin);
+        ServiceContextExecution.setVersion(originVersion);
+
+        // when publish event
+        Throwable throwable = catchThrowable(
+                () -> dataEventPublisher.publish(resource, "unknown", EventType.CREATE));
+
+        // Then check throwable
+        assertThat(throwable).hasMessage("unknown has not any topic");
 
     }
 
