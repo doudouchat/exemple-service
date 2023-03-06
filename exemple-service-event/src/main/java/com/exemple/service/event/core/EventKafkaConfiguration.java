@@ -1,6 +1,7 @@
 package com.exemple.service.event.core;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -40,15 +41,13 @@ public class EventKafkaConfiguration {
 
     @Bean
     public KafkaTemplate<String, JsonNode> kafkaTemplate() {
-        KafkaTemplate<String, JsonNode> template = new KafkaTemplate<>(producerFactory());
-        template.setDefaultTopic(eventProperties.getTopic());
-        return template;
+        return new KafkaTemplate<>(producerFactory());
     }
 
     @PostConstruct
     public void post() {
-
-        LOG.info("Event services {} is enabled", eventProperties.getTopic());
+        eventProperties.getTopics().entrySet()
+                .forEach((Entry<String, String> topic) -> LOG.info("Event services {}:{} is enabled", topic.getKey(), topic.getValue()));
 
     }
 

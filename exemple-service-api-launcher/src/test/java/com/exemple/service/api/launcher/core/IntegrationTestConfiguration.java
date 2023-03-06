@@ -30,8 +30,11 @@ import jakarta.annotation.PostConstruct;
 @ComponentScan(basePackages = "com.exemple.service.api.launcher", excludeFilters = @ComponentScan.Filter(SpringBootApplication.class))
 public class IntegrationTestConfiguration {
 
-    @Value("${event.topic}")
-    private String topic;
+    @Value("${event.topics.account}")
+    private String accountTopic;
+
+    @Value("${event.topics.subscription}")
+    private String subscriptionTopic;
 
     @Autowired
     private KafkaConsumer<?, ?> consumerEvent;
@@ -48,7 +51,7 @@ public class IntegrationTestConfiguration {
     @PostConstruct
     public void suscribeConsumerEvent() throws Exception {
 
-        consumerEvent.subscribe(List.of(topic), new ConsumerRebalanceListener() {
+        consumerEvent.subscribe(List.of(accountTopic, subscriptionTopic).stream().distinct().toList(), new ConsumerRebalanceListener() {
 
             @Override
             public void onPartitionsRevoked(Collection<TopicPartition> partitions) {

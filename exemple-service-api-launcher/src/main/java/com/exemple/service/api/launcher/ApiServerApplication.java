@@ -36,7 +36,7 @@ public class ApiServerApplication extends SpringBootServletInitializer {
 
     @Configuration
     @Import(EventKafkaConfiguration.class)
-    @ConditionalOnProperty(value = { "kafka.bootstrap-servers", "topic" }, prefix = "event")
+    @ConditionalOnProperty(value = "kafka.bootstrap-servers", prefix = "event")
     public static class EventApiConfiguration {
 
     }

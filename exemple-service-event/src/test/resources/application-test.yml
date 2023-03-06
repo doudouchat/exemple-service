@@ -4,5 +4,6 @@ event:
       embedded:
          dir: ${kafka.broker.logs-dir}
          port: ${kafka.port}
-   topic: topic_test
+   topics:
+      account: topic_test
    timeout: 10000

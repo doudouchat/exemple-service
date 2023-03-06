@@ -33,7 +33,9 @@ application:
 event:
    kafka:
       bootstrap-servers: 172.17.0.1:${kafka.internal_port}
-   topic: test
+   topics:
+      account: test
+      subscription: test
    timeout: 10000
 api:
    authorization:
