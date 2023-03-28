@@ -26,4 +26,4 @@ jobs:
       -  name: display logs service
          if: ${{ always() }}
          run: cat exemple-service-api-launcher/target/.logs/archive/*.log
-      -  uses: codecov/codecov-action@v1
+      -  uses: codecov/codecov-action@v3
