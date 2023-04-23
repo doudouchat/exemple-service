@@ -43,7 +43,7 @@ public final class JsonPatchUtils {
 
     }
 
-    public static boolean isRemoveOperation(JsonNode patch) {
+    public static <T extends JsonNode> boolean isRemoveOperation(T patch) {
 
         return "remove".equals(patch.get(OP).textValue());
     }
