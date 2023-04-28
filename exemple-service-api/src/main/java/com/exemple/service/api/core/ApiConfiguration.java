@@ -42,7 +42,6 @@ public class ApiConfiguration {
 
         var methodValidationPostProcessor = new MethodValidationPostProcessor();
         methodValidationPostProcessor.setValidator(validator());
-        methodValidationPostProcessor.setBeforeExistingAdvisors(true);
 
         return methodValidationPostProcessor;
     }
