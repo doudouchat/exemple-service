@@ -98,6 +98,8 @@ class JsonConstraintValidatorTest {
                 Arguments.of("enabled", 10),
                 // map failure
                 Arguments.of("addresses", 10),
+                // map text failure
+                Arguments.of("addresses", Collections.singletonMap("home", Collections.singletonMap("street", 10))),
                 // map int failure
                 Arguments.of("addresses", Collections.singletonMap("home", Collections.singletonMap("floor", "toto"))),
                 // map field unknown
