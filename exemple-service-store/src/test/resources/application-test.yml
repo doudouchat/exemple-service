@@ -1,3 +1,10 @@
+logging:
+   pattern:
+      console: "%d %-5p: %C - %m%n"
+   level:
+      root: WARN
+      com.exemple.service: DEBUG
+      org.apache.zookeeper: INFO
 store:
    zookeeper:
       host: 127.0.0.1:${zmp.clientPort}

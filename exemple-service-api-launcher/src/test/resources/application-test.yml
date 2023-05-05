@@ -1,3 +1,11 @@
+logging:
+   pattern:
+      console: "%d %-5p: %C - %m%n"
+   level:
+      root: WARN
+      com.exemple.service: DEBUG
+      com.datastax.oss.driver: INFO
+      com.hazelcast: INFO
 resource:
    cassandra:
       resource_configuration: file:${project.build.testOutputDirectory}/cassandra.conf

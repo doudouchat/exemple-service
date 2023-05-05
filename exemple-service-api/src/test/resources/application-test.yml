@@ -1,3 +1,10 @@
+logging:
+   pattern:
+      console: "%d %-5p: %C - %m%n"
+   level:
+      root: WARN
+      com.exemple.service: DEBUG
+      org.glassfish.jersey.logging: DEBUG
 spring:
    main:
       allow-bean-definition-overriding: true

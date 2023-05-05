@@ -1,3 +1,10 @@
+logging:
+   pattern:
+      console: "%d %-5p: %C - %m%n"
+   level:
+      root: WARN
+      com.exemple.service: DEBUG
+      com.datastax.oss.driver: INFO
 resource: 
    cassandra:
       version: ${cassandra-version}
