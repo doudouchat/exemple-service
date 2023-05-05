@@ -1,3 +1,9 @@
+logging:
+   pattern:
+      console: "%d %-5p: %C - %m%n"
+   level:
+      root: WARN
+      com.exemple.service: DEBUG
 event:
    kafka:
       bootstrap-servers: localhost:${kafka.port}
