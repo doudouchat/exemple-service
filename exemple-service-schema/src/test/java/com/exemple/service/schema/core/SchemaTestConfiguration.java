@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +33,7 @@ public class SchemaTestConfiguration {
         Mockito.when(resource.get("unknown", "unknown", "schema_test", "unknown")).thenReturn(Optional.of(unknownResourceSchema));
 
         SchemaEntity schemaTest = new SchemaEntity();
-        schemaTest.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("schema_test.json").getInputStream())));
+        schemaTest.setContent(MAPPER.readTree(new ClassPathResource("schema_test.json").getContentAsByteArray()));
 
         ObjectNode patchExternalId = MAPPER.createObjectNode();
         patchExternalId.put("op", "add");
@@ -53,7 +52,7 @@ public class SchemaTestConfiguration {
         Mockito.when(resource.get("default", "default", "schema_test", "default")).thenReturn(Optional.of(schemaTest));
 
         SchemaEntity schemaArray = new SchemaEntity();
-        schemaArray.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("schema_array.json").getInputStream())));
+        schemaArray.setContent(MAPPER.readTree(new ClassPathResource("schema_array.json").getContentAsByteArray()));
 
         Mockito.when(resource.get("default", "default", "array_test", "default")).thenReturn(Optional.of(schemaArray));
 

@@ -1,14 +1,11 @@
 package com.exemple.service.api.launcher.core;
 
+import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.apache.commons.io.output.NullOutputStream;
 
 import io.restassured.RestAssured;
 import io.restassured.config.HttpClientConfig;
@@ -24,7 +21,6 @@ import io.restassured.response.Response;
 import io.restassured.specification.FilterableRequestSpecification;
 import io.restassured.specification.FilterableResponseSpecification;
 import io.restassured.specification.RequestSpecification;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -93,7 +89,7 @@ public final class JsonRestTemplate {
             int counter = COUNTER.incrementAndGet();
 
             String requestLog = RequestPrinter.print(requestSpec, requestSpec.getMethod(), requestSpec.getURI(), LogDetail.ALL,
-                    Collections.emptySet(), buildLogPrint(), true);
+                    Collections.emptySet(), new PrintStream(OutputStream.nullOutputStream()), true);
             LOG.debug("Request {}\n{}", counter, requestLog);
 
             OffsetDateTime start = OffsetDateTime.now();
@@ -104,16 +100,11 @@ public final class JsonRestTemplate {
 
             long duration = ChronoUnit.MILLIS.between(start, end);
 
-            String responseLog = ResponsePrinter.print(response, response, buildLogPrint(), LogDetail.ALL, true, Collections.emptySet());
+            String responseLog = ResponsePrinter.print(response, response, new PrintStream(OutputStream.nullOutputStream()), LogDetail.ALL, true,
+                    Collections.emptySet());
             LOG.debug("Response {} {}ms\n{}", counter, duration, responseLog);
 
             return response;
-        }
-
-        @SneakyThrows(UnsupportedEncodingException.class)
-        private static PrintStream buildLogPrint() {
-
-            return new PrintStream(NullOutputStream.NULL_OUTPUT_STREAM, true, StandardCharsets.UTF_8.name());
         }
 
     }
