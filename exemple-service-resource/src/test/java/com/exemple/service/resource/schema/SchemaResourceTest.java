@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Nested;
@@ -59,7 +58,7 @@ class SchemaResourceTest {
 
             // Given build schema
 
-            schemaResource = MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("test.json").getInputStream()));
+            schemaResource = MAPPER.readTree(new ClassPathResource("test.json").getContentAsByteArray());
 
             SchemaEntity resourceSchema = new SchemaEntity();
             resourceSchema.setApplication("app1");

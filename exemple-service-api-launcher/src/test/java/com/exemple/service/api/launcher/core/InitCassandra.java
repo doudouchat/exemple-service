@@ -4,7 +4,6 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
@@ -39,7 +38,7 @@ public class InitCassandra {
 
     @SneakyThrows
     private static String[] splitScript(Resource script) {
-        return FileUtils.readFileToString(script.getFile(), StandardCharsets.UTF_8).trim().split(";");
+        return script.getContentAsString(StandardCharsets.UTF_8).trim().split(";");
     }
 
 }

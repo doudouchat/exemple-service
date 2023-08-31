@@ -5,10 +5,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.ResourceUtils;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.exemple.service.context.ServiceContextExecution;
@@ -26,17 +26,17 @@ public class InitResourceTestConfiguration {
 
         session.setSchemaMetadataEnabled(false);
 
-        executeScript("classpath:cassandra/keyspace.cql", session::execute);
-        executeScript("classpath:cassandra/test.cql", session::execute);
-        executeScript("classpath:cassandra/exec.cql", session::execute);
+        executeScript(new ClassPathResource("cassandra/keyspace.cql"), session::execute);
+        executeScript(new ClassPathResource("cassandra/test.cql"), session::execute);
+        executeScript(new ClassPathResource("cassandra/exec.cql"), session::execute);
 
         session.setSchemaMetadataEnabled(true);
 
         ServiceContextExecution.setApp("test");
     }
 
-    private static void executeScript(String resourceLocation, Consumer<String> execute) throws IOException {
-        Stream.of(FileUtils.readFileToString(ResourceUtils.getFile(resourceLocation), StandardCharsets.UTF_8).trim().split(";"))
+    private static void executeScript(Resource script, Consumer<String> execute) throws IOException {
+        Stream.of(script.getContentAsString(StandardCharsets.UTF_8).trim().split(";"))
                 .forEach(execute);
     }
 

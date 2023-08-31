@@ -3,7 +3,6 @@ package com.exemple.service.api.launcher.core;
 import java.io.IOException;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -66,7 +65,7 @@ public class InitData {
         accountSchema.setVersion(VERSION_V1);
         accountSchema.setResource("account");
         accountSchema.setProfile("user");
-        accountSchema.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("account.json").getInputStream())));
+        accountSchema.setContent(MAPPER.readTree(new ClassPathResource("account.json").getContentAsByteArray()));
 
         ObjectNode patchUpdateDate = MAPPER.createObjectNode();
         patchUpdateDate.put("op", "add");
@@ -90,7 +89,7 @@ public class InitData {
         subscriptionSchema.setVersion(VERSION_V1);
         subscriptionSchema.setResource("subscription");
         subscriptionSchema.setProfile("user");
-        subscriptionSchema.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("subscription.json").getInputStream())));
+        subscriptionSchema.setContent(MAPPER.readTree(new ClassPathResource("subscription.json").getContentAsByteArray()));
 
         schemaResource.save(subscriptionSchema);
 
@@ -125,7 +124,7 @@ public class InitData {
         accountSchema.setVersion(VERSION_V1);
         accountSchema.setResource("account");
         accountSchema.setProfile("user");
-        accountSchema.setContent(MAPPER.readTree(IOUtils.toByteArray(new ClassPathResource("other.json").getInputStream())));
+        accountSchema.setContent(MAPPER.readTree(new ClassPathResource("other.json").getContentAsByteArray()));
 
         schemaResource.save(accountSchema);
 
