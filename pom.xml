@@ -127,15 +127,6 @@
 				<version>2.11.0</version>
 			</dependency>
 
-			<!-- GOOGLE GUAVA -->
-			<!-- https://github.com/google/guava -->
-
-			<dependency>
-				<groupId>com.google.guava</groupId>
-				<artifactId>guava</artifactId>
-				<version>32.1.2-jre</version>
-			</dependency>
-
 			<!-- SWAGGER -->
 
 			<!-- https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X -->

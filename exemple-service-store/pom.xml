@@ -44,13 +44,6 @@
 			<artifactId>jakarta.validation-api</artifactId>
 		</dependency>
 
-		<!-- GOOGLE GUAVA -->
-
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-		</dependency>
-
 		<!-- ASPECTJ -->
 
 		<dependency>
