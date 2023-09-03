@@ -18,7 +18,10 @@ public class SchemaResourceAspect {
 
     private final ResourceKeystore resourceKeystore;
 
-    @Before("@within(org.springframework.stereotype.Service) && execution(public * com.exemple.service.resource.schema..*.*(*,..)) && args(app, ..))")
+    @Before(value = "@within(org.springframework.stereotype.Service)"
+            + " && execution(public * com.exemple.service.resource.schema..*.*(*,..))"
+            + " && args(app, ..))",
+            argNames = "app")
     public void initResourceContext(@NotNull String app) {
 
         resourceKeystore.initKeyspaceResourceContext(app);

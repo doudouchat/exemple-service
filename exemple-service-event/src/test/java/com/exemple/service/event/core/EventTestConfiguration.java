@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
+import org.springframework.kafka.test.EmbeddedKafkaZKBroker;
 
 import kafka.server.KafkaConfig;
 
@@ -22,7 +23,7 @@ public class EventTestConfiguration {
     public EmbeddedKafkaBroker embeddedKafka(@Value("${event.kafka.embedded.port}") int port, @Value("${event.kafka.embedded.dir}") String dir) {
 
         var topics = eventProperties.topics().values().toArray(new String[eventProperties.topics().size()]);
-        EmbeddedKafkaBroker embeddedKafka = new EmbeddedKafkaBroker(1, true, topics)
+        var embeddedKafka = new EmbeddedKafkaZKBroker(1, true, topics)
                 .brokerProperty(KafkaConfig.LogDirsProp(), dir + "/" + UUID.randomUUID());
         embeddedKafka.kafkaPorts(port);
 
