@@ -31,7 +31,7 @@ import com.google.common.io.Files;
 
 @SpringBootTest(classes = CustomerScriptTestConfiguration.class)
 @TestPropertySource(properties = { "customer.contexts.path=${java.io.tmpdir}/scripts", "customer.contexts.delay=2000" })
-@ActiveProfiles("test")
+@ActiveProfiles({ "test", "CustomerScriptFactoryTest" })
 class CustomerScriptFactoryTest {
 
     private static final String SCRIPTS_DIRECTORY_PATH = SystemUtils.JAVA_IO_TMPDIR + "/scripts";

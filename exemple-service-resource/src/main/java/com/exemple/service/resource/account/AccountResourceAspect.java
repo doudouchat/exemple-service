@@ -39,18 +39,20 @@ public class AccountResourceAspect {
     @Qualifier("accountCuratorFramework")
     private final CuratorFramework client;
 
-    @Around("@within(org.springframework.stereotype.Service)"
+    @Around(value = "@within(org.springframework.stereotype.Service)"
             + " && execution(public void com.exemple.service.customer.account.AccountResource.save(..))"
-            + " && args(account)")
+            + " && args(account)",
+            argNames = "account")
     public void checkUniquesProperties(ProceedingJoinPoint joinPoint, JsonNode account) {
 
         save(joinPoint, account, MAPPER.createObjectNode());
 
     }
 
-    @Around("@within(org.springframework.stereotype.Service)"
+    @Around(value = "@within(org.springframework.stereotype.Service)"
             + " && execution(public void com.exemple.service.customer.account.AccountResource.save(..))"
-            + " && args(account, previousAccount)")
+            + " && args(account, previousAccount)",
+            argNames = "account,previousAccount")
     public void checkUniquesProperties(ProceedingJoinPoint joinPoint, JsonNode account, JsonNode previousAccount) {
 
         save(joinPoint, account, previousAccount);

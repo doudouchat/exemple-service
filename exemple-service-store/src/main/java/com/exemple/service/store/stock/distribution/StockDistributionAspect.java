@@ -15,8 +15,9 @@ public class StockDistributionAspect {
 
     private final StockDistribution distribution;
 
-    @Around("execution(public * com.exemple.service.store.stock.StockService.update(..)) && args(company,store,product,quantity))")
-    public Object lock(ProceedingJoinPoint joinPoint, String company, String store, String product, int quantity) throws Exception {
+    @Around(value = "execution(public * com.exemple.service.store.stock.StockService.update(..)) && args(company,store,product,..)",
+            argNames = "company,store,product")
+    public Object lock(ProceedingJoinPoint joinPoint, String company, String store, String product) throws Exception {
 
         return this.distribution.lockStock(company, store, product, () -> proceed(joinPoint));
     }
