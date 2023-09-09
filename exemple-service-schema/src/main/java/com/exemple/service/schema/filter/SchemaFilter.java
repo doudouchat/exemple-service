@@ -2,7 +2,6 @@ package com.exemple.service.schema.filter;
 
 import java.util.List;
 
-import org.everit.json.schema.ReadWriteContext;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.schema.common.SchemaBuilder;
@@ -27,8 +26,8 @@ public class SchemaFilter {
 
     public JsonNode filter(String app, String version, String resource, String profile, JsonNode source) {
 
-        var schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
-        List<ArrayNode> exceptions = SchemaValidator.performValidation(schema, ReadWriteContext.READ, source,
+        var schema = schemaBuilder.buildFilterSchema(app, version, resource, profile);
+        List<ArrayNode> exceptions = SchemaValidator.performValidation(schema, source,
                 (ValidationException e) -> e.getCauses().stream()
                         .filter((ValidationExceptionCause cause) -> isAdditionalProperties(cause) || isWriteOnly(cause))
                         .map((ValidationExceptionCause cause) -> {
@@ -48,9 +47,9 @@ public class SchemaFilter {
 
     public JsonNode filterAllProperties(String app, String version, String resource, String profile, JsonNode source) {
 
-        var schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
+        var schema = schemaBuilder.buildFilterSchema(app, version, resource, profile);
 
-        List<ArrayNode> exceptions = SchemaValidator.performValidation(schema, ReadWriteContext.READ, source,
+        List<ArrayNode> exceptions = SchemaValidator.performValidation(schema, source,
                 (ValidationException e) -> e.getCauses().stream()
                         .filter(SchemaFilter::isAdditionalProperties)
                         .map((ValidationExceptionCause cause) -> {
@@ -70,9 +69,9 @@ public class SchemaFilter {
 
     public JsonNode filterAllAdditionalProperties(String app, String version, String resource, String profile, JsonNode source) {
 
-        var schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
+        var schema = schemaBuilder.buildFilterSchema(app, version, resource, profile);
 
-        List<ArrayNode> exceptions = SchemaValidator.performValidation(schema, ReadWriteContext.READ, source,
+        List<ArrayNode> exceptions = SchemaValidator.performValidation(schema, source,
                 (ValidationException e) -> e.getCauses().stream()
                         .filter(SchemaFilter::isAdditionalProperties)
                         .filter((ValidationExceptionCause cause) -> JsonPointer.empty().equals(cause.getPointer().head()))

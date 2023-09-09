@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import org.everit.json.schema.Schema;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -149,7 +148,7 @@ class SchemaValidationTest {
                 // bad birthday
                 Arguments.of("format", "/birthday", new JsonNode[] { patch5 }),
                 // bad creation date
-                Arguments.of("format", "/creation_date", new JsonNode[] { patch6 }),
+                Arguments.of("dateTime", "/creation_date", new JsonNode[] { patch6 }),
                 // id read only
                 Arguments.of("readOnly", "/id", new JsonNode[] { patch7 }),
                 // bad email
@@ -935,7 +934,7 @@ class SchemaValidationTest {
                     "opt_in_email", true,
                     "civility", "Mr");
 
-            Schema schema = SchemaBuilder.build(new ClassPathResource("schema_test.json").getInputStream());
+            var schema = SchemaBuilder.build(new ClassPathResource("schema_test.json").getInputStream());
 
             validation.validate(schema, MAPPER.convertValue(model, JsonNode.class));
 
@@ -951,7 +950,7 @@ class SchemaValidationTest {
                     "opt_in_email", true,
                     "civility", "Mr");
 
-            Schema schema = SchemaBuilder.build(new ClassPathResource("schema_test.json").getInputStream());
+            var schema = SchemaBuilder.build(new ClassPathResource("schema_test.json").getInputStream());
 
             // When perform
             Throwable throwable = catchThrowable(
