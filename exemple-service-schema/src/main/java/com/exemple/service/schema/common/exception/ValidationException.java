@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.networknt.schema.ValidationMessage;
 
 import lombok.Getter;
 
@@ -18,8 +19,8 @@ public class ValidationException extends RuntimeException {
         this.causes = Collections.unmodifiableSet(causes);
     }
 
-    public ValidationException(org.everit.json.schema.ValidationException e, JsonNode source) {
-        this(ValidationExceptionBuilder.buildException(e, source));
+    public ValidationException(Set<ValidationMessage> messages, JsonNode source) {
+        this(ValidationExceptionBuilder.buildException(messages, source));
     }
 
 }

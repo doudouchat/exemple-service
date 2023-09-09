@@ -2,7 +2,6 @@ package com.exemple.service.api.core;
 
 import java.io.IOException;
 
-import org.everit.json.schema.Schema;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -24,6 +23,7 @@ import com.exemple.service.schema.validation.SchemaValidation;
 import com.exemple.service.store.stock.StockService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.networknt.schema.JsonSchema;
 
 @Configuration
 @Import(ApiConfiguration.class)
@@ -138,8 +138,8 @@ public class ApiTestConfiguration {
     }
 
     @Bean
-    public Schema patchSchema() {
-        return Mockito.mock(Schema.class);
+    public JsonSchema patchSchema() {
+        return Mockito.mock(JsonSchema.class);
 
     }
 }

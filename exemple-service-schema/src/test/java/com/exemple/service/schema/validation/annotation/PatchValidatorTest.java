@@ -76,7 +76,7 @@ class PatchValidatorTest {
 
         return Stream.of(
                 // bad op
-                Arguments.of(patch1, 2, new String[] { "/0/from", "/0/op" }),
+                Arguments.of(patch1, 3, new String[] { "/0/from", "/0/op" }),
                 // bad pattern
                 Arguments.of(patch2, 1, new String[] { "/0/path" }));
     }

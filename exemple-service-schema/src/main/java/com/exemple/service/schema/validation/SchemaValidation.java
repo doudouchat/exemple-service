@@ -6,8 +6,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.everit.json.schema.ReadWriteContext;
-import org.everit.json.schema.Schema;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.schema.common.SchemaBuilder;
@@ -19,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.flipkart.zjsonpatch.CompatibilityFlags;
 import com.flipkart.zjsonpatch.JsonPatch;
+import com.networknt.schema.JsonSchema;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,16 +31,16 @@ public class SchemaValidation {
 
     public void validate(String app, String version, String profile, String resource, JsonNode form) {
 
-        var schema = schemaBuilder.buildCreationSchema(app, version, resource, profile);
-        SchemaValidator.performValidation(schema, ReadWriteContext.WRITE, form);
+        var schema = schemaBuilder.buildCreationValidationSchema(app, version, resource, profile);
+        SchemaValidator.performValidation(schema, form);
 
     }
 
     public void validate(String app, String version, String profile, String resource, JsonNode form, JsonNode old) {
 
-        var schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
+        var schema = schemaBuilder.buildUpdateValidationSchema(app, version, resource, profile);
 
-        SchemaValidator.performValidation(schema, ReadWriteContext.WRITE, form, (ValidationException e) -> {
+        SchemaValidator.performValidation(schema, form, (ValidationException e) -> {
 
             Predicate<ValidationExceptionCause> newExceptionFilter = (
                     ValidationExceptionCause cause) -> !isReadOnlyAndSourceIsNotModified(cause, old);
@@ -53,14 +52,14 @@ public class SchemaValidation {
 
     public void validate(String app, String version, String profile, String resource, ArrayNode patch, JsonNode old) {
 
-        var schema = schemaBuilder.buildUpdateSchema(app, version, resource, profile);
+        var schema = schemaBuilder.buildUpdateValidationSchema(app, version, resource, profile);
 
         JsonNode oldFilterBySchema = this.schemaFilter.filterAllProperties(app, version, resource, profile, old);
 
         JsonNode form = JsonPatch.apply(patch, oldFilterBySchema,
                 EnumSet.of(CompatibilityFlags.FORBID_REMOVE_MISSING_OBJECT, CompatibilityFlags.ALLOW_MISSING_TARGET_OBJECT_ON_REPLACE));
 
-        SchemaValidator.performValidation(schema, ReadWriteContext.WRITE, form, (ValidationException e) -> {
+        SchemaValidator.performValidation(schema, form, (ValidationException e) -> {
 
             Set<ValidationExceptionCause> previousExceptions = findDistinctExceptions(schema, oldFilterBySchema);
 
@@ -73,16 +72,16 @@ public class SchemaValidation {
 
     }
 
-    public void validate(Schema schema, JsonNode target) {
+    public void validate(JsonSchema schema, JsonNode target) {
 
-        SchemaValidator.performValidation(schema, ReadWriteContext.WRITE, target);
+        SchemaValidator.performValidation(schema, target);
 
     }
 
-    private static Set<ValidationExceptionCause> findDistinctExceptions(Schema schema, JsonNode target) {
+    private static Set<ValidationExceptionCause> findDistinctExceptions(JsonSchema schema, JsonNode target) {
 
         Set<ValidationExceptionCause> exceptions = new HashSet<>();
-        SchemaValidator.performValidation(schema, ReadWriteContext.WRITE, target, (ValidationException e) -> e.getCauses().forEach(exceptions::add));
+        SchemaValidator.performValidation(schema, target, (ValidationException e) -> e.getCauses().forEach(exceptions::add));
         return exceptions;
 
     }

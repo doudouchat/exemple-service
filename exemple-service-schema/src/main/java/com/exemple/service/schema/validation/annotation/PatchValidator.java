@@ -1,12 +1,12 @@
 package com.exemple.service.schema.validation.annotation;
 
-import org.everit.json.schema.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionCause;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.networknt.schema.JsonSchema;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -17,7 +17,7 @@ public class PatchValidator implements ConstraintValidator<Patch, ArrayNode> {
     private SchemaValidation schemaValidation;
 
     @Autowired
-    private Schema patchSchema;
+    private JsonSchema patchSchema;
 
     @Override
     public boolean isValid(ArrayNode source, ConstraintValidatorContext context) {

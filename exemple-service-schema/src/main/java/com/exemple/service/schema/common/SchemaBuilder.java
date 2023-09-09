@@ -5,20 +5,19 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.Set;
 
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaEntity;
-import com.exemple.service.schema.validation.custom.CustomDateTimeFormatValidator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.flipkart.zjsonpatch.JsonPatch;
+import com.networknt.schema.JsonSchema;
+import com.networknt.schema.JsonSchemaFactory;
+import com.networknt.schema.PathType;
+import com.networknt.schema.SchemaValidatorsConfig;
+import com.networknt.schema.SpecVersionDetector;
 
 @Component
 public class SchemaBuilder {
@@ -27,50 +26,68 @@ public class SchemaBuilder {
 
     private final SchemaResource schemaResource;
 
-    private final Schema defaultSchema;
+    private final JsonSchema defaultSchema;
 
     public SchemaBuilder(SchemaResource schemaResource) throws IOException {
 
         this.schemaResource = schemaResource;
 
-        var schemaJson = new JSONObject(new JSONTokener(new ClassPathResource("default-schema.json").getInputStream()));
-        defaultSchema = SchemaBuilder.buildSchema(schemaJson);
+        var schemaJson = MAPPER.readTree(new ClassPathResource("default-schema.json").getInputStream());
+        defaultSchema = SchemaBuilder.buildSchema(schemaJson, false);
     }
 
-    public static Schema build(InputStream source) {
+    public static JsonSchema build(InputStream source) throws IOException {
 
-        return buildSchema(new JSONObject(new JSONTokener(source)));
+        return buildSchema(MAPPER.readTree(source), false);
     }
 
-    public Schema buildCreationSchema(String app, String version, String resource, String profile) {
+    public JsonSchema buildCreationValidationSchema(String app, String version, String resource, String profile) {
+
+        return buildCreationSchema(app, version, resource, profile, false);
+    }
+
+    public JsonSchema buildUpdateValidationSchema(String app, String version, String resource, String profile) {
+
+        return buildUpdateSchema(app, version, resource, profile, false);
+    }
+
+    public JsonSchema buildFilterSchema(String app, String version, String resource, String profile) {
+
+        return buildUpdateSchema(app, version, resource, profile, true);
+    }
+
+    private JsonSchema buildCreationSchema(String app, String version, String resource, String profile, boolean checkWriteOnly) {
 
         return schemaResource.get(app, version, resource, profile)
                 .map(SchemaEntity::getContent)
-                .map((JsonNode schemaContent) -> SchemaBuilder.buildSchema(schemaContent, Collections.emptySet()))
+                .map((JsonNode schemaContent) -> SchemaBuilder.buildSchema(schemaContent, Collections.emptySet(), checkWriteOnly))
                 .orElse(defaultSchema);
     }
 
-    public Schema buildUpdateSchema(String app, String version, String resource, String profile) {
+    private JsonSchema buildUpdateSchema(String app, String version, String resource, String profile, boolean checkWriteOnly) {
 
         return schemaResource.get(app, version, resource, profile)
                 .filter((SchemaEntity entity) -> entity.getContent() != null)
-                .map((SchemaEntity entity) -> SchemaBuilder.buildSchema(entity.getContent(), entity.getPatchs()))
+                .map((SchemaEntity entity) -> SchemaBuilder.buildSchema(entity.getContent(), entity.getPatchs(), checkWriteOnly))
                 .orElse(defaultSchema);
     }
 
-    private static Schema buildSchema(JsonNode schema, Set<JsonNode> patchs) {
+    private static JsonSchema buildSchema(JsonNode schema, Set<JsonNode> patchs, boolean checkWriteOnly) {
 
-        ArrayNode patch = MAPPER.createArrayNode().addAll(patchs);
-        var rawSchema = new JSONObject(new JSONTokener(JsonPatch.apply(patch, schema).toString()));
-        return buildSchema(rawSchema);
+        var patch = MAPPER.createArrayNode().addAll(patchs);
+        var rawSchema = JsonPatch.apply(patch, schema);
+        return buildSchema(rawSchema, checkWriteOnly);
 
     }
 
-    private static Schema buildSchema(JSONObject rawSchema) {
+    private static JsonSchema buildSchema(JsonNode rawSchema, boolean checkWriteOnly) {
 
-        var schemaLoader = SchemaLoader.builder().draftV7Support().schemaJson(rawSchema)
-                .addFormatValidator(new CustomDateTimeFormatValidator()).enableOverrideOfBuiltInFormatValidators().build();
-        return schemaLoader.load().build();
+        var factory = JsonSchemaFactory.getInstance(SpecVersionDetector.detect(rawSchema));
+        var config = new SchemaValidatorsConfig();
+        config.setReadOnly(true);
+        config.setWriteOnly(checkWriteOnly);
+        config.setPathType(PathType.JSON_POINTER);
+        return factory.getSchema(rawSchema, config);
 
     }
 
