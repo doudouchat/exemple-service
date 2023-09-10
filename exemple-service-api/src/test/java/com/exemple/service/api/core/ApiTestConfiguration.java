@@ -17,13 +17,13 @@ import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.customer.subscription.SubscriptionService;
 import com.exemple.service.resource.schema.SchemaResource;
+import com.exemple.service.schema.common.SchemaBuilder;
 import com.exemple.service.schema.description.SchemaDescription;
 import com.exemple.service.schema.filter.SchemaFilter;
 import com.exemple.service.schema.validation.SchemaValidation;
 import com.exemple.service.store.stock.StockService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.JsonSchema;
 
 @Configuration
 @Import(ApiConfiguration.class)
@@ -44,6 +44,11 @@ public class ApiTestConfiguration {
     @Bean
     public SchemaValidation schemaValidation() {
         return Mockito.mock(SchemaValidation.class);
+    }
+
+    @Bean
+    public SchemaBuilder schemaBuilder() {
+        return Mockito.mock(SchemaBuilder.class);
     }
 
     @Bean
@@ -135,11 +140,5 @@ public class ApiTestConfiguration {
     public JsonNode swaggerSecurity() throws IOException {
 
         return MAPPER.readTree(ResourceUtils.getFile("classpath:model/swagger_security.json"));
-    }
-
-    @Bean
-    public JsonSchema patchSchema() {
-        return Mockito.mock(JsonSchema.class);
-
     }
 }
