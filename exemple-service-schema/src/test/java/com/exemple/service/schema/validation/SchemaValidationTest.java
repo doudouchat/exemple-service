@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -19,10 +18,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import com.exemple.service.schema.common.SchemaBuilder;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionCause;
 import com.exemple.service.schema.core.SchemaTestConfiguration;
@@ -918,51 +915,5 @@ class SchemaValidationTest {
                             () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains("")));
 
         }
-    }
-
-    @Nested
-    @DisplayName("json schema validation")
-    class ValidateSchema {
-
-        @Test
-        void validationSchema() throws IOException {
-
-            Map<String, Object> model = Map.of(
-                    "email", "jean.dupont@gmail.com",
-                    "lastname", "Dupont",
-                    "firstname", "Jean",
-                    "opt_in_email", true,
-                    "civility", "Mr");
-
-            var schema = SchemaBuilder.build(new ClassPathResource("schema_test.json").getInputStream());
-
-            validation.validate(schema, MAPPER.convertValue(model, JsonNode.class));
-
-        }
-
-        @Test
-        void validationSchemaFailure() throws IOException {
-
-            Map<String, Object> model = Map.of(
-                    "email", "jean.dupont",
-                    "lastname", "Dupont",
-                    "firstname", "Jean",
-                    "opt_in_email", true,
-                    "civility", "Mr");
-
-            var schema = SchemaBuilder.build(new ClassPathResource("schema_test.json").getInputStream());
-
-            // When perform
-            Throwable throwable = catchThrowable(
-                    () -> validation.validate(schema, MAPPER.convertValue(model, JsonNode.class)));
-
-            // Then check throwable
-            assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
-                    exception -> assertAll(
-                            () -> assertThat(exception.getCauses()).hasSize(1),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode).contains("format"),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains("/email")));
-        }
-
     }
 }

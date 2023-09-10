@@ -1,7 +1,6 @@
 package com.exemple.service.schema.common;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.Set;
 
@@ -28,17 +27,22 @@ public class SchemaBuilder {
 
     private final JsonSchema defaultSchema;
 
+    private final JsonSchema patchSchema;
+
     public SchemaBuilder(SchemaResource schemaResource) throws IOException {
 
         this.schemaResource = schemaResource;
 
         var schemaJson = MAPPER.readTree(new ClassPathResource("default-schema.json").getInputStream());
         defaultSchema = SchemaBuilder.buildSchema(schemaJson, false);
+
+        patchSchema = SchemaBuilder.buildSchema(MAPPER.readTree(new ClassPathResource("json-patch.json").getInputStream()), false);
+
     }
 
-    public static JsonSchema build(InputStream source) throws IOException {
+    public JsonSchema buildPatchSchema() {
 
-        return buildSchema(MAPPER.readTree(source), false);
+        return patchSchema;
     }
 
     public JsonSchema buildCreationValidationSchema(String app, String version, String resource, String profile) {
