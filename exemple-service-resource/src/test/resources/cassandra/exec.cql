@@ -6,7 +6,7 @@ INSERT INTO test.resource_schema (app, version, resource, profile, content) VALU
 	'account',
 	'example',
 	'{
-		"$schema": "http://json-schema.org/draft-07/schema",
+		"$schema": "https://json-schema.org/draft/2020-12/schema",
 		"properties": {
 			"id": {
 				"type": "number",
