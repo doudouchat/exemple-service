@@ -60,10 +60,6 @@ public class AccountResourceAspect {
     @SneakyThrows
     private void save(ProceedingJoinPoint joinPoint, JsonNode account, JsonNode previousAccount) {
 
-        if (account == null) {
-            joinPoint.proceed();
-        }
-
         var usernameFields = new ArrayList<UsernameField>();
         var locks = new ArrayList<InterProcessLock>();
 
@@ -114,7 +110,8 @@ public class AccountResourceAspect {
         lock.release();
     }
 
-    private static record UsernameField(String field, String value) {
+    private static record UsernameField(String field,
+                                        String value) {
 
     }
 

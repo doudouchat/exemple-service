@@ -16,7 +16,9 @@ public class ResourceAspect {
 
     private final ResourceKeystore resourceKeystore;
 
-    @Before("@within(org.springframework.stereotype.Service) && execution(public * com.exemple.service.resource..*.*(..))")
+    @Before("(@within(org.springframework.stereotype.Service) && execution(public * com.exemple.service.resource..*.*(..))) "
+            + "|| "
+            + "execution(public * com.exemple.service.resource.common.validator.json.JsonValidator.*(..))")
     public void initResourceContext() {
 
         resourceKeystore.initKeyspaceResourceContext(ServiceContextExecution.context().getApp());
