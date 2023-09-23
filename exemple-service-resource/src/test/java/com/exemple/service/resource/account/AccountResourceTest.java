@@ -33,6 +33,7 @@ import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.account.event.AccountEventResource;
 import com.exemple.service.resource.account.exception.UsernameAlreadyExistsException;
+import com.exemple.service.resource.account.exception.UsernameNotUniqueException;
 import com.exemple.service.resource.account.history.AccountHistoryResource;
 import com.exemple.service.resource.account.model.AccountEvent;
 import com.exemple.service.resource.account.model.AccountHistory;
@@ -600,6 +601,32 @@ class AccountResourceTest {
             // And check account
 
             assertThat(resource.getIdByUsername("email", email)).isEmpty();
+        }
+
+        @Test
+        void getIdByUsernameNotUnique() throws IOException {
+
+            // Given loyalty_card
+            var loyaltyCardNumber = "00001";
+
+            // And create 2 accounts with loyaltyCardNumber
+            resource.save(MAPPER.readTree(
+                    """
+                    {"id": "%s", "loyalty_card": "%s"}
+                    """.formatted(UUID.randomUUID(), loyaltyCardNumber)));
+
+            resource.save(MAPPER.readTree(
+                    """
+                    {"id": "%s", "loyalty_card": "%s"}
+                    """.formatted(UUID.randomUUID(), loyaltyCardNumber)));
+
+            // When perform
+            Throwable throwable = catchThrowable(() -> resource.getIdByUsername("loyalty_card", loyaltyCardNumber));
+
+            // Then check throwable
+            assertThat(throwable).isInstanceOfSatisfying(UsernameNotUniqueException.class,
+                    exception -> assertAll(
+                            () -> assertThat(exception.getUsername()).isEqualTo(loyaltyCardNumber)));
         }
     }
 
