@@ -30,6 +30,7 @@ CREATE TABLE test.account (
 	profils set<text>,
 	cgus set<frozen<cgu>>,
 	age int,
+	loyalty_card text,
 	enabled boolean,
 	creation_date timestamp,
 	preferences list<frozen<tuple<text, text, int, timestamp>>>
@@ -97,6 +98,9 @@ CREATE TABLE test.resource_schema (
 );
 CREATE INDEX account_email
 	ON test.account ( email );
+
+CREATE INDEX account_loyalty_card
+	ON test.account ( loyalty_card );
 
 CREATE INDEX account_event_local_date
 	ON test.account_event ( local_date );
