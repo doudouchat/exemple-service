@@ -1,8 +1,6 @@
 package com.exemple.service.resource.common.validator.json;
 
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
@@ -27,6 +25,7 @@ import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class JsonValidator {
 
     private static final String UNKNOWN_EXCEPTION = "UNKNOWN";
@@ -34,22 +33,6 @@ public class JsonValidator {
     private static final String ARRAY_EXCEPTION = "ARRAY";
 
     private final CqlSession session;
-
-    private final List<AbstractJsonValidate<? extends DataType>> jsonValidates;
-
-    public JsonValidator(CqlSession session) {
-        this.session = session;
-
-        this.jsonValidates = new LinkedList<>();
-        this.jsonValidates.add(new JsonValidateMap());
-        this.jsonValidates.add(new JsonValidateList());
-        this.jsonValidates.add(new JsonValidateSet());
-        this.jsonValidates.add(new JsonValidateUDT());
-        this.jsonValidates.add(new JsonValidateTuple());
-        this.jsonValidates.add(new JsonValidateStringOrInstant());
-        this.jsonValidates.add(new JsonValidatePrimitiveNoStringAndNoInstant());
-
-    }
 
     public void valid(JsonNode source, String table) throws JsonValidatorException {
 
@@ -66,213 +49,124 @@ public class JsonValidator {
 
     private void valid(DataType dataType, Map.Entry<String, JsonNode> json) throws JsonValidatorException {
 
-        if (!json.getValue().isNull()) {
-
-            List<AbstractJsonValidate<? extends DataType>> validates = jsonValidates.stream().filter(validate -> validate.hasChecked(dataType))
-                    .toList();
-
-            JsonStreamer<AbstractJsonValidate<DataType>> validateStreamer = () -> validates.stream()
-                    .map(validate -> (AbstractJsonValidate<DataType>) validate)
-                    .iterator();
-
-            validateStreamer.forEach((AbstractJsonValidate<DataType> jsonValidate) -> jsonValidate.check(dataType, json));
+        if (json.getValue().isNull()) {
+            return;
         }
+
+        JsonConsumer<Map.Entry<String, JsonNode>> validate = switch (dataType) {
+            case MapType type -> (Map.Entry<String, JsonNode> j) -> validateMap(type, j);
+            case ListType type -> (Map.Entry<String, JsonNode> j) -> validateList(type, j);
+            case SetType type -> (Map.Entry<String, JsonNode> j) -> validateSet(type, j);
+            case UserDefinedType type -> (Map.Entry<String, JsonNode> j) -> validateUDT(type, j);
+            case TupleType type -> (Map.Entry<String, JsonNode> j) -> validateTuple(type, j);
+            case PrimitiveType type when isStringOrInstant(dataType) -> (Map.Entry<String, JsonNode> j) -> validateStringOrInstant(type, j);
+            default -> (Map.Entry<String, JsonNode> j) -> validateDefault(dataType, j);
+        };
+
+        validate.accept(json);
 
     }
 
-    @RequiredArgsConstructor
-    private abstract static class AbstractJsonValidate<T extends DataType> {
+    private void validateMap(MapType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
 
-        private final Class<T> parameterType;
-
-        protected boolean hasChecked(DataType dataType) {
-            return parameterType.isAssignableFrom(dataType.getClass());
+        if (!json.getValue().isObject()) {
+            throw new JsonValidatorException("OBJECT", json.getKey());
         }
 
-        protected abstract void check(T dataType, Entry<String, JsonNode> json) throws JsonValidatorException;
+        JsonStreamer<Map.Entry<String, JsonNode>> fields = json.getValue()::fields;
+
+        fields.forEach((Entry<String, JsonNode> node) -> {
+            var keyType = dataType.getKeyType();
+            valid(keyType, Maps.immutableEntry(json.getKey(), new TextNode(node.getKey())));
+
+            var valueType = dataType.getValueType();
+            valid(valueType, node);
+
+        });
 
     }
 
-    private class JsonValidateMap extends AbstractJsonValidate<MapType> {
+    private void validateList(ListType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
 
-        public JsonValidateMap() {
-            super(MapType.class);
+        if (!json.getValue().isArray()) {
+            throw new JsonValidatorException(ARRAY_EXCEPTION, json.getKey());
         }
 
-        @Override
-        protected void check(MapType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
+        JsonStreamer<JsonNode> elements = json.getValue()::elements;
 
-            if (!json.getValue().isObject()) {
-                throw new JsonValidatorException("OBJECT", json.getKey());
+        elements.forEach((JsonNode node) -> valid(dataType.getElementType(), Maps.immutableEntry(json.getKey(), node)));
+
+    }
+
+    private void validateSet(SetType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
+
+        if (!json.getValue().isArray()) {
+            throw new JsonValidatorException(ARRAY_EXCEPTION, json.getKey());
+        }
+
+        JsonStreamer<JsonNode> elements = json.getValue()::elements;
+
+        elements.forEach((JsonNode node) -> valid(dataType.getElementType(), Maps.immutableEntry(json.getKey(), node)));
+
+    }
+
+    private void validateUDT(UserDefinedType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
+
+        JsonStreamer<Entry<String, JsonNode>> fields = json.getValue()::fields;
+
+        fields.forEach((Entry<String, JsonNode> node) -> {
+
+            if (!dataType.contains(node.getKey())) {
+                throw new JsonValidatorException(UNKNOWN_EXCEPTION, node.getKey());
             }
 
-            JsonStreamer<Map.Entry<String, JsonNode>> fields = json.getValue()::fields;
-
-            fields.forEach((Entry<String, JsonNode> node) -> {
-                var keyType = dataType.getKeyType();
-                valid(keyType, Maps.immutableEntry(json.getKey(), new TextNode(node.getKey())));
-
-                var valueType = dataType.getValueType();
-                valid(valueType, node);
-
-            });
-
-        }
+            DataType type = dataType.getFieldTypes().get(dataType.firstIndexOf(node.getKey()));
+            valid(type, node);
+        });
 
     }
 
-    private class JsonValidateList extends AbstractJsonValidate<ListType> {
+    private void validateTuple(TupleType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
 
-        public JsonValidateList() {
-            super(ListType.class);
-        }
+        Iterator<DataType> dataTypes = dataType.getComponentTypes().iterator();
 
-        @Override
-        protected void check(ListType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
+        JsonStreamer<JsonNode> elements = json.getValue()::elements;
 
-            if (!json.getValue().isArray()) {
-                throw new JsonValidatorException(ARRAY_EXCEPTION, json.getKey());
+        elements.forEach((JsonNode node) -> {
+
+            if (!dataTypes.hasNext()) {
+                throw new JsonValidatorException(UNKNOWN_EXCEPTION, json.getKey());
             }
 
-            JsonStreamer<JsonNode> elements = json.getValue()::elements;
+            valid(dataTypes.next(), Maps.immutableEntry(json.getKey(), node));
 
-            elements.forEach((JsonNode node) -> valid(dataType.getElementType(), Maps.immutableEntry(json.getKey(), node)));
+        });
 
+        if (dataTypes.hasNext()) {
+            throw new JsonValidatorException("MISSING", json.getKey());
         }
 
     }
 
-    private class JsonValidateSet extends AbstractJsonValidate<SetType> {
+    private void validateStringOrInstant(PrimitiveType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
 
-        public JsonValidateSet() {
-            super(SetType.class);
+        if (!json.getValue().isTextual()) {
+            throw new JsonValidatorException("VARCHAR", json.getKey());
         }
 
-        @Override
-        protected void check(SetType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
-
-            if (!json.getValue().isArray()) {
-                throw new JsonValidatorException(ARRAY_EXCEPTION, json.getKey());
-            }
-
-            JsonStreamer<JsonNode> elements = json.getValue()::elements;
-
-            elements.forEach((JsonNode node) -> valid(dataType.getElementType(), Maps.immutableEntry(json.getKey(), node)));
-
-        }
+        var value = new StringBuilder().append("'").append(json.getValue().asText()).append("'").toString();
+        checkDataType(value, dataType, json);
 
     }
 
-    private class JsonValidateUDT extends AbstractJsonValidate<UserDefinedType> {
+    private void validateDefault(DataType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
 
-        public JsonValidateUDT() {
-            super(UserDefinedType.class);
-        }
-
-        @Override
-        protected void check(UserDefinedType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
-
-            JsonStreamer<Entry<String, JsonNode>> fields = json.getValue()::fields;
-
-            fields.forEach((Entry<String, JsonNode> node) -> {
-
-                if (!dataType.contains(node.getKey())) {
-                    throw new JsonValidatorException(UNKNOWN_EXCEPTION, node.getKey());
-                }
-
-                DataType type = dataType.getFieldTypes().get(dataType.firstIndexOf(node.getKey()));
-                valid(type, node);
-            });
-
-        }
+        String value = json.getValue().asText();
+        checkDataType(value, dataType, json);
 
     }
 
-    private class JsonValidateTuple extends AbstractJsonValidate<TupleType> {
-
-        public JsonValidateTuple() {
-            super(TupleType.class);
-        }
-
-        @Override
-        protected void check(TupleType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
-
-            Iterator<DataType> dataTypes = dataType.getComponentTypes().iterator();
-
-            JsonStreamer<JsonNode> elements = json.getValue()::elements;
-
-            elements.forEach((JsonNode node) -> {
-
-                if (!dataTypes.hasNext()) {
-                    throw new JsonValidatorException(UNKNOWN_EXCEPTION, json.getKey());
-                }
-
-                valid(dataTypes.next(), Maps.immutableEntry(json.getKey(), node));
-
-            });
-
-            if (dataTypes.hasNext()) {
-                throw new JsonValidatorException("MISSING", json.getKey());
-            }
-
-        }
-
-    }
-
-    private class JsonValidateStringOrInstant extends AbstractJsonValidatePrimitive {
-
-        @Override
-        protected boolean hasChecked(PrimitiveType dataType) {
-            return isStringOrInstant(dataType);
-        }
-
-        @Override
-        protected void check(PrimitiveType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
-
-            if (!json.getValue().isTextual()) {
-                throw new JsonValidatorException("VARCHAR", json.getKey());
-            }
-
-            var value = new StringBuilder().append("'").append(json.getValue().asText()).append("'").toString();
-            checkPrimitive(value, dataType, json);
-
-        }
-
-    }
-
-    private class JsonValidatePrimitiveNoStringAndNoInstant extends AbstractJsonValidatePrimitive {
-
-        @Override
-        protected boolean hasChecked(PrimitiveType dataType) {
-            return !isStringOrInstant(dataType);
-        }
-
-        @Override
-        protected void check(PrimitiveType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
-
-            String value = json.getValue().asText();
-            checkPrimitive(value, dataType, json);
-
-        }
-
-    }
-
-    private abstract class AbstractJsonValidatePrimitive extends AbstractJsonValidate<PrimitiveType> {
-
-        public AbstractJsonValidatePrimitive() {
-            super(PrimitiveType.class);
-        }
-
-        @Override
-        protected final boolean hasChecked(DataType dataType) {
-            return super.hasChecked(dataType) && hasChecked((PrimitiveType) dataType);
-        }
-
-        abstract boolean hasChecked(PrimitiveType dataType);
-
-    }
-
-    private void checkPrimitive(String value, DataType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
+    private void checkDataType(String value, DataType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
 
         TypeCodec<Object> typeCodec = toTypeCodec(dataType);
         try {

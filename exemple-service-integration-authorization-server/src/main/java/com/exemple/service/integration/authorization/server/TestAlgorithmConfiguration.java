@@ -1,7 +1,6 @@
 package com.exemple.service.integration.authorization.server;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
@@ -43,7 +42,7 @@ public class TestAlgorithmConfiguration {
     @Bean
     public RSAPublicKey publicKey() throws GeneralSecurityException {
 
-        var key = new String(publicKeyContent, StandardCharsets.UTF_8);
+        var key = new String(publicKeyContent);
 
         String publicKeyPEM = key.replace("-----BEGIN PUBLIC KEY-----", "").replaceAll(System.lineSeparator(), "").replace("-----END PUBLIC KEY-----",
                 "");
@@ -58,7 +57,7 @@ public class TestAlgorithmConfiguration {
     @Bean
     public RSAPrivateKey privateKey() throws GeneralSecurityException {
 
-        var key = new String(privateKeyContent, StandardCharsets.UTF_8);
+        var key = new String(privateKeyContent);
 
         String privateKeyPEM = key.replace("-----BEGIN PRIVATE KEY-----", "").replaceAll(System.lineSeparator(), "")
                 .replace("-----END PRIVATE KEY-----", "");

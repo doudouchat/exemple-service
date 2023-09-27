@@ -82,8 +82,8 @@ public class DocumentApiCustom extends AbstractSpecFilter {
     public Optional<Schema> filterSchema(Schema schema, Map<String, List<String>> params, Map<String, String> cookies,
             Map<String, List<String>> headers) {
 
-        String host = headers.get(DocumentApiResource.APP_HOST).stream().findFirst().orElseThrow();
-        String app = headers.get(DocumentApiResource.APP).stream().findFirst().orElseThrow();
+        String host = headers.get(DocumentApiResource.APP_HOST).getFirst();
+        String app = headers.get(DocumentApiResource.APP).getFirst();
 
         Map<String, Object> extensions = MapUtils.emptyIfNull(schema.getExtensions());
 
