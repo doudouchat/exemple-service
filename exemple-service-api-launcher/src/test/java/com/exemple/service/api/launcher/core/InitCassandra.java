@@ -1,7 +1,7 @@
 package com.exemple.service.api.launcher.core;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +38,7 @@ public class InitCassandra {
 
     @SneakyThrows
     private static String[] splitScript(Resource script) {
-        return script.getContentAsString(StandardCharsets.UTF_8).trim().split(";");
+        return script.getContentAsString(Charset.defaultCharset()).trim().split(";");
     }
 
 }

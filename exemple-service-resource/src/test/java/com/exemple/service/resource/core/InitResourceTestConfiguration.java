@@ -1,7 +1,7 @@
 package com.exemple.service.resource.core;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -36,8 +36,7 @@ public class InitResourceTestConfiguration {
     }
 
     private static void executeScript(Resource script, Consumer<String> execute) throws IOException {
-        Stream.of(script.getContentAsString(StandardCharsets.UTF_8).trim().split(";"))
-                .forEach(execute);
+        Stream.of(script.getContentAsString(Charset.defaultCharset()).trim().split(";")).forEach(execute);
     }
 
 }
