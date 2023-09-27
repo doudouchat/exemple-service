@@ -1,7 +1,5 @@
 package com.exemple.service.integration.authorization.server;
 
-import java.nio.charset.StandardCharsets;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,7 +20,7 @@ public class TestTokenEndpoint {
     public JsonNode tokenKey() {
 
         var tokenKey = MAPPER.createObjectNode();
-        tokenKey.put("value", new String(testAlgorithmConfiguration.getPublicKeyContent(), StandardCharsets.UTF_8));
+        tokenKey.put("value", new String(testAlgorithmConfiguration.getPublicKeyContent()));
 
         return tokenKey;
 
