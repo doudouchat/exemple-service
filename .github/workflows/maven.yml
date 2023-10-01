@@ -38,7 +38,7 @@ jobs:
          env:
            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-         run: mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.organization=doudouchat -Dsonar.projectKey=doudouchat_exemple-service -Dsonar.host.url=https://sonarcloud.io
+         run: mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.organization=doudouchat -Dsonar.projectKey=doudouchat_exemple-service -Dsonar.host.url=https://sonarcloud.io -Dsonar.java.enablePreview=true
       -  name: display logs service
          if: ${{ always() }}
          run: cat exemple-service-api-launcher/target/.logs/archive/*.log
