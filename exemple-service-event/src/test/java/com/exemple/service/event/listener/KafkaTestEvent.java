@@ -51,7 +51,7 @@ public class KafkaTestEvent {
         DefaultKafkaConsumerFactory<String, JsonNode> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProperties,
                 new StringDeserializer(), new JsonDeserializer<>(JsonNode.class, false));
         ContainerProperties containerProperties = new ContainerProperties(
-                eventProperties.getTopics().values().toArray(new String[eventProperties.getTopics().values().size()]));
+                eventProperties.topics().values().toArray(new String[eventProperties.topics().values().size()]));
         container = new KafkaMessageListenerContainer<>(consumerFactory, containerProperties);
 
         MessageListener<String, JsonNode> listener = data -> {

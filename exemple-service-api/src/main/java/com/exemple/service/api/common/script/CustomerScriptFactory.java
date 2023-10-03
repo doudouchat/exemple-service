@@ -53,7 +53,7 @@ public class CustomerScriptFactory {
         this.scriptApplicationContexts = new ConcurrentHashMap<>();
         this.checksumApplicationContexts = new ConcurrentHashMap<>();
         this.applicationDetailService = applicationDetailService;
-        this.contextsPath = ResourceUtils.getFile(customerProperties.getContexts().getPath());
+        this.contextsPath = ResourceUtils.getFile(customerProperties.contexts().path());
     }
 
     public <T> T getBean(String beanName, Class<T> beanClass, String application) {

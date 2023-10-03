@@ -26,10 +26,10 @@ public class StoreConfiguration {
     public CuratorFramework storeCuratorFramework() {
 
         var client = CuratorFrameworkFactory.newClient(
-                storeProperties.getZookeeper().getHost(),
-                storeProperties.getZookeeper().getSessionTimeout(),
-                storeProperties.getZookeeper().getConnectionTimeout(),
-                new RetryNTimes(storeProperties.getZookeeper().getRetry(), storeProperties.getZookeeper().getSleepMsBetweenRetries()));
+                storeProperties.zookeeper().host(),
+                storeProperties.zookeeper().sessionTimeout(),
+                storeProperties.zookeeper().connectionTimeout(),
+                new RetryNTimes(storeProperties.zookeeper().retry(), storeProperties.zookeeper().sleepMsBetweenRetries()));
 
         client.getConnectionStateListenable().addListener((c, state) -> LOG.debug("State changed to: {}", state));
 

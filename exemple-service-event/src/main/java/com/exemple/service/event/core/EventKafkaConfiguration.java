@@ -32,7 +32,7 @@ public class EventKafkaConfiguration {
     public DefaultKafkaProducerFactory<String, JsonNode> producerFactory() {
 
         Map<String, Object> props = Map.of(
-                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, eventProperties.getKafka().getBootstrapServers(),
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, eventProperties.kafka().bootstrapServers(),
                 ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
                 ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
@@ -46,7 +46,7 @@ public class EventKafkaConfiguration {
 
     @PostConstruct
     public void post() {
-        eventProperties.getTopics().entrySet()
+        eventProperties.topics().entrySet()
                 .forEach((Entry<String, String> topic) -> LOG.info("Event services {}:{} is enabled", topic.getKey(), topic.getValue()));
 
     }
