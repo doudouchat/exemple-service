@@ -56,11 +56,6 @@
 
 		<!-- SONAR -->
 		<sonar.coverage.exclusions>**/test/**/*.java</sonar.coverage.exclusions>
-		<sonar.cpd.exclusions>
-			**/StoreConfigurationProperties.java,
-			**/ResourceConfigurationProperties.java,
-			**/ApplicationConfigurationProperties.java
-		</sonar.cpd.exclusions>
 		<sonar.coverage.report.path>${basedir}/../jacoco-report/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.report.path>
 
 		<!-- force sonar to use jacoco -->

@@ -26,7 +26,7 @@ public class AuthorizationConfiguration {
 
     @Bean
     public JwtDecoder decoder(ApiConfigurationProperties apiProperties) {
-        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(apiProperties.getAuthorization().getJwkSetUri()).build();
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(apiProperties.authorization().jwkSetUri()).build();
 
         jwtDecoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
                 new JwtTimestampValidator(Duration.ZERO),
