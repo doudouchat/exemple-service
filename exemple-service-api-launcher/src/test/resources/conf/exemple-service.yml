@@ -30,13 +30,6 @@ application:
    zookeeper:
       host: 172.17.0.1:${zookeeper.port}
       sleepMsBetweenRetries: 10000
-event:
-   kafka:
-      bootstrap-servers: 172.17.0.1:${kafka.internal_port}
-   topics:
-      account: test
-      subscription: test
-   timeout: 10000
 api:
    authorization:
       jwkSetUri: http://172.17.0.1:${authorization.port}/Authorization/oauth/jwks

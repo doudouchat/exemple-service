@@ -1,0 +1,22 @@
+<configuration scan="30">
+
+	<!-- console -->
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d %-5p: %C - %m%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="org.apache.cassandra.service.CassandraDaemon" level="INFO" />
+	<logger name="org.apache.cassandra.db.commitlog.CommitLogReader" level="INFO" />
+	<logger name="com.exemple.cdc.core.event" level="TRACE" />
+	<logger name="com.exemple.cdc.core.commitlog.CommitLogReadHandlerImpl" level="TRACE" />
+	<logger name="com.exemple" level="DEBUG" />
+
+	<!-- Niveau general pour l'application -->
+
+	<root level="WARN">
+		<appender-ref ref="console" />
+	</root>
+
+</configuration>

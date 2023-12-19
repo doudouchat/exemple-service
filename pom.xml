@@ -18,7 +18,6 @@
 		<module>exemple-service-application</module>
 		<module>exemple-service-resource</module>
 		<module>exemple-service-schema</module>
-		<module>exemple-service-event</module>
 		<module>exemple-service-customer</module>
 		<module>exemple-service-store</module>
 		<module>exemple-service-api</module>

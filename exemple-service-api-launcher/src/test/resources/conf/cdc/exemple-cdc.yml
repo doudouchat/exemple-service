@@ -1,0 +1,12 @@
+kafka:
+   bootstrap_servers: 172.17.0.1:${kafka.internal_port}
+   timeout: 10
+   topics:
+      account: test
+      subscription: test
+zookeeper:
+   host: 172.17.0.1:${zookeeper.port}
+   session_timeout: 30000
+   connection_timeout: 10000
+   retry: 3
+   eventTTL: 60000

@@ -129,6 +129,20 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- SPRING KAFKA -->
+
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- AWAITILITY -->
 
 		<dependency>
@@ -323,8 +337,7 @@
 						</executions>
 					</plugin>
 
-					<!-- COPY JACOCO JAR AGENT -->
-
+					<!-- COPY JACOCO JAR AGENT && CDC AGENT -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
@@ -348,6 +361,16 @@
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.build.directory}/lib</outputDirectory>
 									<destFileName>jacocoagent.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>exemple</groupId>
+									<artifactId>exemple-cdc-agent</artifactId>
+									<version>1.0.0-SNAPSHOT</version>
+									<classifier>exec</classifier>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}/cdc</outputDirectory>
+									<destFileName>exemple-cdc-agent.jar</destFileName>
 								</artifactItem>
 							</artifactItems>
 						</configuration>
@@ -432,35 +455,6 @@
 								</configuration>
 							</execution>
 							<execution>
-								<id>start_cassandra</id>
-								<goals>
-									<goal>start</goal>
-								</goals>
-								<configuration>
-									<images>
-										<image>
-											<name>cassandra:${cassandra-version}</name>
-											<alias>cassandra</alias>
-											<run>
-												<ports>
-													<port>${cassandra.port}:9042</port>
-												</ports>
-												<env>
-													<JVM_OPTS>-Dcassandra.skip_wait_for_gossip_to_settle=0 -Dcassandra.initial_token=0</JVM_OPTS>
-												</env>
-												<wait>
-													<log>(?s)Startup complete</log>
-													<time>60000</time>
-												</wait>
-												<log>
-													<date>default</date>
-												</log>
-											</run>
-										</image>
-									</images>
-								</configuration>
-							</execution>
-							<execution>
 								<id>start_zookeeper</id>
 								<goals>
 									<goal>start</goal>
@@ -520,6 +514,45 @@
 									</images>
 								</configuration>
 							</execution>
+							<execution>
+								<id>start_cassandra</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>cassandra:${cassandra-version}</name>
+											<alias>cassandra</alias>
+											<run>
+												<ports>
+													<port>${cassandra.port}:9042</port>
+												</ports>
+												<env>
+													<JVM_OPTS>-Dcassandra.skip_wait_for_gossip_to_settle=0 -Dcassandra.initial_token=0</JVM_OPTS>
+													<JVM_EXTRA_OPTS>-javaagent:/exemple-cdc-agent.jar</JVM_EXTRA_OPTS>
+												</env>
+												<volumes>
+													<bind>
+														<volume>${project.build.directory}/cdc/exemple-cdc-agent.jar:/exemple-cdc-agent.jar</volume>
+														<volume>${project.build.testOutputDirectory}/conf/cdc:/tmp/conf</volume>
+														<volume>${project.build.testOutputDirectory}/conf/cassandra/cassandra.yaml:/etc/cassandra/cassandra.yaml</volume>
+														<volume>${project.build.testOutputDirectory}/conf/cassandra/logback.xml:/etc/cassandra/logback.xml</volume>
+													</bind>
+												</volumes>
+												<wait>
+													<log>(?s)Startup complete</log>
+													<time>60000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+
 							<execution>
 								<id>start_hazelcast</id>
 								<goals>

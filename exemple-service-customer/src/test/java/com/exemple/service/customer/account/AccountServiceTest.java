@@ -17,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.service.context.ServiceContextExecution;
-import com.exemple.service.customer.common.event.EventType;
-import com.exemple.service.customer.common.event.ResourceEventPublisher;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,13 +33,10 @@ class AccountServiceTest {
     @Autowired
     private AccountResource accountResource;
 
-    @Autowired
-    private ResourceEventPublisher publisher;
-
     @BeforeEach
     public void before() {
 
-        Mockito.reset(accountResource, publisher);
+        Mockito.reset(accountResource);
 
     }
 
@@ -80,12 +75,6 @@ class AccountServiceTest {
 
         ArgumentCaptor<JsonNode> accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
         Mockito.verify(accountResource).save(accountCaptor.capture());
-        assertThat(accountCaptor.getValue()).isEqualTo(account);
-
-        // And check publish resource
-
-        ArgumentCaptor<JsonNode> eventCaptor = ArgumentCaptor.forClass(JsonNode.class);
-        Mockito.verify(publisher).publish(eventCaptor.capture(), Mockito.eq("account"), Mockito.eq(EventType.CREATE));
         assertThat(accountCaptor.getValue()).isEqualTo(account);
 
     }
@@ -131,12 +120,6 @@ class AccountServiceTest {
                 () -> assertThat(accountCaptor.getValue()).isEqualTo(account),
                 () -> assertThat(previousAccountCaptor.getValue()).isEqualTo(previousSource));
 
-        // And check publish resource
-
-        ArgumentCaptor<JsonNode> eventCaptor = ArgumentCaptor.forClass(JsonNode.class);
-        Mockito.verify(publisher).publish(eventCaptor.capture(), Mockito.eq("account"), Mockito.eq(EventType.UPDATE));
-        assertThat(eventCaptor.getValue()).isEqualTo(account);
-
     }
 
     @Test
@@ -181,12 +164,6 @@ class AccountServiceTest {
         assertAll(
                 () -> assertThat(accountCaptor.getValue()).isEqualTo(account),
                 () -> assertThat(previousAccountCaptor.getValue()).isEqualTo(previousSource));
-
-        // And check publish resource
-
-        ArgumentCaptor<JsonNode> eventCaptor = ArgumentCaptor.forClass(JsonNode.class);
-        Mockito.verify(publisher).publish(eventCaptor.capture(), Mockito.eq("account"), Mockito.eq(EventType.UPDATE));
-        assertThat(eventCaptor.getValue()).isEqualTo(account);
 
     }
 
