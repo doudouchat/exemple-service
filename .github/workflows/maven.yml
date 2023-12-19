@@ -1,8 +1,17 @@
 name: build
 on:
-- push
-- pull_request
-- workflow_dispatch
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+  workflow_dispatch:
+    inputs:
+      branch_cdc:
+        description: 'Cdc branch'
+        required: true
+        default: 'master'
 env:
    MAVEN_OPTS: -Xmx1g
 jobs:
@@ -32,6 +41,14 @@ jobs:
          with:
            repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
            plugin_repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
+      -  name: Checkout exemple cdc
+         uses: actions/checkout@v3
+         with:
+            path: exemple-cdc
+            repository: doudouchat/exemple-cdc
+            ref: ${{ github.event.inputs.branch_cdc }}
+      -  name: Build exemple cdc
+         run: mvn -f ${{ github.workspace }}/exemple-cdc --batch-mode clean install -Dmaven.test.skip=true
       -  name: Build with Maven
          run: mvn --batch-mode clean verify -Pservice,it -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
       -  name: Analyse

@@ -32,14 +32,6 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- EVENT -->
-
-		<dependency>
-			<groupId>exemple</groupId>
-			<artifactId>exemple-service-event</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<!-- SCHEMA -->
 
 		<dependency>

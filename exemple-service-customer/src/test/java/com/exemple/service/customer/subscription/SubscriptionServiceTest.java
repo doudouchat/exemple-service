@@ -15,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.service.context.ServiceContextExecution;
-import com.exemple.service.customer.common.event.EventType;
-import com.exemple.service.customer.common.event.ResourceEventPublisher;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,15 +29,12 @@ class SubscriptionServiceTest {
     private SubscriptionResource resource;
 
     @Autowired
-    private ResourceEventPublisher publisher;
-
-    @Autowired
     private SubscriptionService service;
 
     @BeforeEach
     public void before() {
 
-        Mockito.reset(resource, publisher);
+        Mockito.reset(resource);
 
     }
 
@@ -71,12 +66,6 @@ class SubscriptionServiceTest {
         Mockito.verify(resource).save(subscriptionCaptor.capture());
         assertThat(subscriptionCaptor.getValue()).isEqualTo(expectedSubscription);
 
-        // And check publish resource
-
-        ArgumentCaptor<JsonNode> eventCaptor = ArgumentCaptor.forClass(JsonNode.class);
-        Mockito.verify(publisher).publish(eventCaptor.capture(), Mockito.eq("subscription"), Mockito.eq(EventType.CREATE));
-        assertThat(eventCaptor.getValue()).isEqualTo(expectedSubscription);
-
     }
 
     @Test
@@ -104,12 +93,6 @@ class SubscriptionServiceTest {
 
         Mockito.verify(resource).save(subscriptionCaptor.capture(), Mockito.eq(previousSource));
         assertThat(subscriptionCaptor.getValue()).isEqualTo(expectedSubscription);
-
-        // And check publish resource
-
-        ArgumentCaptor<JsonNode> eventCaptor = ArgumentCaptor.forClass(JsonNode.class);
-        Mockito.verify(publisher).publish(eventCaptor.capture(), Mockito.eq("subscription"), Mockito.eq(EventType.UPDATE));
-        assertThat(eventCaptor.getValue()).isEqualTo(expectedSubscription);
 
     }
 
