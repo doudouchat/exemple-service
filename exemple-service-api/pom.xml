@@ -12,8 +12,6 @@
 		<!-- SONAR -->
 		<sonar.coverage.jacoco.xmlReportPaths>${sonar.coverage.report.path}</sonar.coverage.jacoco.xmlReportPaths>
 
-		<jersey.version>3.1.4</jersey.version>
-
 	</properties>
 
 	<dependencies>
