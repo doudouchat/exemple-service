@@ -58,5 +58,8 @@ jobs:
          run: mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.organization=doudouchat -Dsonar.projectKey=doudouchat_exemple-service -Dsonar.host.url=https://sonarcloud.io -Dsonar.java.enablePreview=true
       -  name: display logs service
          if: ${{ always() }}
-         run: cat exemple-service-api-launcher/target/.logs/archive/*.log
+         run: cat exemple-service-api-launcher/target/.logs/service/archive/*.log
+      -  name: display logs cdc
+         if: ${{ always() }}
+         run: cat exemple-service-api-launcher/target/.logs/cassandra/archive/*.log
       -  uses: codecov/codecov-action@v3
