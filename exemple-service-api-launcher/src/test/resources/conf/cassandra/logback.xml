@@ -7,6 +7,19 @@
 		</encoder>
 	</appender>
 
+	<appender name="archive"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>/tmp/logs/archive/exemple_cdc.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<maxHistory>2</maxHistory>
+		</rollingPolicy>
+
+		<encoder>
+			<pattern>%d %-5p: %C - %m%n</pattern>
+		</encoder>
+	</appender>
+
 	<logger name="org.apache.cassandra.service.CassandraDaemon" level="INFO" />
 	<logger name="org.apache.cassandra.db.commitlog.CommitLogReader" level="INFO" />
 	<logger name="com.exemple.cdc.core.event" level="TRACE" />
@@ -17,6 +30,7 @@
 
 	<root level="WARN">
 		<appender-ref ref="console" />
+		<appender-ref ref="archive" />
 	</root>
 
 </configuration>
