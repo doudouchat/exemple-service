@@ -366,7 +366,6 @@
 									<groupId>exemple</groupId>
 									<artifactId>exemple-cdc-agent</artifactId>
 									<version>1.0.0-SNAPSHOT</version>
-									<classifier>exec</classifier>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.build.directory}/cdc</outputDirectory>
