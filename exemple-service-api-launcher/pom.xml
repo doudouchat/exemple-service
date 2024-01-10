@@ -529,7 +529,7 @@
 												</ports>
 												<env>
 													<JVM_OPTS>-Dcassandra.skip_wait_for_gossip_to_settle=0 -Dcassandra.initial_token=0</JVM_OPTS>
-													<JVM_EXTRA_OPTS>-javaagent:/exemple-cdc-agent.jar</JVM_EXTRA_OPTS>
+													<JVM_EXTRA_OPTS>-javaagent:/exemple-cdc-agent.jar=conf=/tmp/conf/exemple-cdc.yml</JVM_EXTRA_OPTS>
 												</env>
 												<volumes>
 													<bind>
