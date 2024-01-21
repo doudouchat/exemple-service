@@ -23,20 +23,6 @@
 			<artifactId>spring-boot</artifactId>
 		</dependency>
 
-		<!-- FASTER JACKSON -->
-
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-		</dependency>
-
-		<!-- COMMONS APACHE -->
-
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-		</dependency>
-
 		<!-- JSR303 -->
 
 		<dependency>

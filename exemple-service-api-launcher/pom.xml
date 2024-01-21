@@ -58,15 +58,6 @@
 				<scope>test</scope>
 			</dependency>
 
-			<!-- BCRYPT -->
-			<!-- https://www.mindrot.org/projects/jBCrypt/ -->
-
-			<dependency>
-				<groupId>org.mindrot</groupId>
-				<artifactId>jbcrypt</artifactId>
-				<version>0.4</version>
-			</dependency>
-
 			<!-- JSOUP -->
 			<!-- https://jsoup.org/ -->
 
@@ -107,14 +98,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- BCRYPT -->
-
-		<dependency>
-			<groupId>org.mindrot</groupId>
-			<artifactId>jbcrypt</artifactId>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- TEST -->
 
 		<dependency>
@@ -126,6 +109,14 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- JSON PATH -->
+
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path</artifactId>
 			<scope>test</scope>
 		</dependency>
 

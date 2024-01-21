@@ -124,13 +124,6 @@
 			<artifactId>aspectjweaver</artifactId>
 		</dependency>
 
-		<!-- JSON PATH -->
-
-		<dependency>
-			<groupId>com.jayway.jsonpath</groupId>
-			<artifactId>json-path</artifactId>
-		</dependency>
-
 		<!-- JSON PATCH -->
 
 		<dependency>
