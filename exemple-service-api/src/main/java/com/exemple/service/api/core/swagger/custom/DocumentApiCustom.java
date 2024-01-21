@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.WordUtils;
 
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
@@ -109,7 +108,7 @@ public class DocumentApiCustom extends AbstractSpecFilter {
                     .append('/')
 
                     .append(profile);
-            schema.setName(WordUtils.capitalize(schema.getName()) + '.' + version + '.' + profile);
+            schema.setName(StringUtils.capitalize(schema.getName()) + '.' + version + '.' + profile);
             schema.$ref(ref.toString());
 
         }
@@ -146,7 +145,7 @@ public class DocumentApiCustom extends AbstractSpecFilter {
                         schema.setName(name);
                         schema.setExtensions(extensions);
 
-                        openAPI.getComponents().addSchemas(WordUtils.capitalize(name) + '.' + v.getVersion() + '.' + v.getProfile(), schema);
+                        openAPI.getComponents().addSchemas(StringUtils.capitalize(name) + '.' + v.getVersion() + '.' + v.getProfile(), schema);
 
                     });
 
