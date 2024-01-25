@@ -91,6 +91,7 @@ public class SchemaBuilder {
         config.setReadOnly(true);
         config.setWriteOnly(checkWriteOnly);
         config.setPathType(PathType.JSON_POINTER);
+        config.setFormatAssertionsEnabled(true);
         return factory.getSchema(rawSchema, config);
 
     }
