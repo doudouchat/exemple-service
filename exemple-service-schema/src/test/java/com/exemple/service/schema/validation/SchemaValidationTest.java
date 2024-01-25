@@ -145,7 +145,7 @@ class SchemaValidationTest {
                 // bad birthday
                 Arguments.of("format", "/birthday", new JsonNode[] { patch5 }),
                 // bad creation date
-                Arguments.of("dateTime", "/creation_date", new JsonNode[] { patch6 }),
+                Arguments.of("format", "/creation_date", new JsonNode[] { patch6 }),
                 // id read only
                 Arguments.of("readOnly", "/id", new JsonNode[] { patch7 }),
                 // bad email

@@ -22,10 +22,9 @@ public final class ValidationExceptionBuilder {
 
     private static ValidationExceptionCause build(ValidationMessage exception, JsonNode source) {
 
-        String path = switch (exception.getType()) {
-            case "required" -> exception.getPath().concat("/").concat(exception.getArguments()[0]);
-            case "additionalProperties" -> exception.getPath().concat("/").concat(exception.getArguments()[0]);
-            default -> exception.getPath();
+        var path = switch (exception.getType()) {
+            case "required" -> exception.getInstanceLocation() + String.valueOf(JsonPointer.SEPARATOR) + exception.getArguments()[0];
+            default -> exception.getInstanceLocation().toString();
         };
 
         JsonNode value = source.at(path);
