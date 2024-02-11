@@ -24,6 +24,7 @@ public final class ValidationExceptionBuilder {
 
         var path = switch (exception.getType()) {
             case "required" -> exception.getInstanceLocation() + String.valueOf(JsonPointer.SEPARATOR) + exception.getArguments()[0];
+            case "additionalProperties" -> exception.getInstanceLocation() + String.valueOf(JsonPointer.SEPARATOR) + exception.getArguments()[0];
             default -> exception.getInstanceLocation().toString();
         };
 
