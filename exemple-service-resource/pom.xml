@@ -95,20 +95,20 @@
 			<artifactId>jakarta.el</artifactId>
 		</dependency>
 
-		<!-- DATASTAX -->
+		<!-- CASSANDRA -->
 
 		<dependency>
-			<groupId>com.datastax.oss</groupId>
+			<groupId>org.apache.cassandra</groupId>
 			<artifactId>java-driver-core</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>com.datastax.oss</groupId>
+			<groupId>org.apache.cassandra</groupId>
 			<artifactId>java-driver-query-builder</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>com.datastax.oss</groupId>
+			<groupId>org.apache.cassandra</groupId>
 			<artifactId>java-driver-mapper-runtime</artifactId>
 		</dependency>
 
@@ -226,7 +226,7 @@
 							<version>${lombok.version}</version>
 						</path>
 						<path>
-							<groupId>com.datastax.oss</groupId>
+							<groupId>org.apache.cassandra</groupId>
 							<artifactId>java-driver-mapper-processor</artifactId>
 							<version>${cassandra-driver.version}</version>
 						</path>
