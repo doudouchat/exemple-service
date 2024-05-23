@@ -131,13 +131,13 @@
 			<dependency>
 				<groupId>io.swagger.core.v3</groupId>
 				<artifactId>swagger-jaxrs2-jakarta</artifactId>
-				<version>2.2.20</version>
+				<version>2.2.22</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.swagger.core.v3</groupId>
 				<artifactId>swagger-annotations</artifactId>
-				<version>2.2.20</version>
+				<version>2.2.22</version>
 			</dependency>
 
 			<!-- MOCK SERVER -->
