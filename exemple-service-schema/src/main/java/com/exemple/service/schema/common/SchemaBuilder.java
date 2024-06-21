@@ -87,11 +87,12 @@ public class SchemaBuilder {
     private static JsonSchema buildSchema(JsonNode rawSchema, boolean checkWriteOnly) {
 
         var factory = JsonSchemaFactory.getInstance(SpecVersionDetector.detect(rawSchema));
-        var config = new SchemaValidatorsConfig();
-        config.setReadOnly(true);
-        config.setWriteOnly(checkWriteOnly);
-        config.setPathType(PathType.JSON_POINTER);
-        config.setFormatAssertionsEnabled(true);
+        var config = SchemaValidatorsConfig.builder()
+                .readOnly(true)
+                .writeOnly(checkWriteOnly)
+                .pathType(PathType.JSON_POINTER)
+                .formatAssertionsEnabled(true)
+                .build();
         return factory.getSchema(rawSchema, config);
 
     }
