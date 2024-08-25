@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
-import org.testcontainers.containers.CassandraContainer;
+import org.testcontainers.cassandra.CassandraContainer;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.CqlSessionBuilder;
@@ -28,7 +28,7 @@ import jakarta.validation.Validator;
 public class ResourceTestConfiguration {
 
     @Autowired
-    private CassandraContainer<?> cassandraContainer;
+    private CassandraContainer cassandraContainer;
 
     @Bean(destroyMethod = "stop")
     public TestingServer embeddedZookeeper(@Value("${resource.zookeeper.port}") int port) throws Exception {

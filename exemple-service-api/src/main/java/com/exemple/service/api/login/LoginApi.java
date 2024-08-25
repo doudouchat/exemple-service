@@ -30,8 +30,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
 import lombok.RequiredArgsConstructor;
 
 @Path("/v1/logins")
@@ -49,20 +47,19 @@ public class LoginApi {
     private AuthorizationCheckService authorizationCheckService;
 
     @HEAD
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/{username}")
     @Operation(tags = "login", security = { @SecurityRequirement(name = DocumentApiResource.BEARER_AUTH),
             @SecurityRequirement(name = DocumentApiResource.OAUTH2_CLIENT_CREDENTIALS) })
     @Parameter(in = ParameterIn.HEADER, schema = @Schema(implementation = ApplicationBeanParam.class))
     @RolesAllowed("login:head")
     @AppAndVersionCheck(optionalVersion = true)
-    public Response check(@PathParam("username") String username) {
+    public void check(@PathParam("username") String username) {
 
-        if (loginService.get(username).isPresent()) {
+        if (loginService.get(username).isEmpty()) {
 
-            return Response.status(Status.NO_CONTENT).build();
+            throw new NotFoundException();
         }
-
-        return Response.status(Status.NOT_FOUND).build();
 
     }
 
