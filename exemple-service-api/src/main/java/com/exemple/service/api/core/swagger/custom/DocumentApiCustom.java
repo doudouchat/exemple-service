@@ -49,7 +49,7 @@ public class DocumentApiCustom extends AbstractSpecFilter {
 
         var mediaType = MapUtils.emptyIfNull(content).get(jakarta.ws.rs.core.MediaType.APPLICATION_JSON);
 
-        if (mediaType != null) {
+        if (mediaType != null && mediaType.getSchema() != null) {
 
             var name = StringUtils.substring(mediaType.getSchema().get$ref(), "#/components/schemas/".length());
             headers.entrySet().stream()
