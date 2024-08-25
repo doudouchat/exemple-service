@@ -345,7 +345,7 @@
 					"default": {
 						"description": "default response",
 						"content": {
-							"*/*": {}
+							"application/json": {}
 						}
 					}
 				},
@@ -603,8 +603,11 @@
 					}
 				}
 			},
+			"JsonNode": {
+				"$ref": "#/components/schemas/Subscription"
+			},
 			"Patch": {
-				"$ref": "/ws/v1/schemas/patch"
+				"type": "object"
 			},
 			"Info": {
 				"type": "object",
@@ -647,10 +650,12 @@
 				}
 			},
 			"Account.v1.user": {
-				"$ref": "/ws/v1/schemas/account/test/v1/user"
+				"x_version": "v1",
+				"x_profile": "user"
 			},
 			"Account.v2.admin": {
-				"$ref": "/ws/v1/schemas/account/test/v2/admin"
+				"x_version": "v2",
+				"x_profile": "admin"
 			}
 		},
 		"securitySchemes": {
