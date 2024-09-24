@@ -1,7 +1,6 @@
 package com.exemple.service.api.core.swagger.custom;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -78,52 +77,6 @@ public class DocumentApiCustom extends AbstractSpecFilter {
     }
 
     @Override
-    public Optional<Schema> filterSchema(Schema schema, Map<String, List<String>> params, Map<String, String> cookies,
-            Map<String, List<String>> headers) {
-
-        String host = headers.get(DocumentApiResource.APP_HOST).getFirst();
-        String app = headers.get(DocumentApiResource.APP).getFirst();
-
-        Map<String, Object> extensions = MapUtils.emptyIfNull(schema.getExtensions());
-
-        String version = (String) extensions.get(X_VERSION);
-        if (version != null) {
-
-            String profile = (String) extensions.get(X_PROFILE);
-            var ref = new StringBuilder();
-            ref.append(host)
-
-                    .append("ws/v1/schemas/")
-
-                    .append(schema.getName().toLowerCase(Locale.getDefault()))
-
-                    .append('/')
-
-                    .append(app)
-
-                    .append('/')
-
-                    .append(version)
-
-                    .append('/')
-
-                    .append(profile);
-            schema.setName(StringUtils.capitalize(schema.getName()) + '.' + version + '.' + profile);
-            schema.$ref(ref.toString());
-
-        }
-
-        if ("Patch".equals(schema.getName())) {
-
-            schema.$ref(host.concat("ws/v1/schemas/patch"));
-
-        }
-
-        return Optional.of(schema);
-
-    }
-
-    @Override
     public Optional<OpenAPI> filterOpenAPI(OpenAPI openAPI, Map<String, List<String>> params, Map<String, String> cookies,
             Map<String, List<String>> headers) {
 
@@ -152,10 +105,5 @@ public class DocumentApiCustom extends AbstractSpecFilter {
                 });
 
         return Optional.of(openAPI);
-    }
-
-    @Override
-    public boolean isRemovingUnreferencedDefinitions() {
-        return true;
     }
 }
