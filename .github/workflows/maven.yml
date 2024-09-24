@@ -12,6 +12,9 @@ on:
         description: 'Cdc branch'
         required: true
         default: 'master'
+concurrency:
+  group: ${{ github.repository }}
+  cancel-in-progress: false
 env:
    MAVEN_OPTS: -Xmx1g
 jobs:
