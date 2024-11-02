@@ -52,6 +52,7 @@
 
 		<!-- VERSION -->
 		<cassandra-version>5.0.2</cassandra-version>
+		<zookeeper.version>3.9.2</zookeeper.version>
 		<jacoco-version>0.8.12</jacoco-version>
 
 		<!-- SONAR -->
@@ -82,13 +83,6 @@
 				<groupId>org.apache.curator</groupId>
 				<artifactId>curator-recipes</artifactId>
 				<version>5.7.0</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.apache.curator</groupId>
-				<artifactId>curator-test</artifactId>
-				<version>5.7.0</version>
-				<scope>test</scope>
 			</dependency>
 
 			<!-- JSON PATCH -->

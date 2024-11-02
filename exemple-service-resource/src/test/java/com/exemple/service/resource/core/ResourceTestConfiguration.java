@@ -2,17 +2,18 @@ package com.exemple.service.resource.core;
 
 import java.util.Optional;
 
-import org.apache.curator.test.TestingServer;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.DynamicPropertyRegistrar;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.testcontainers.cassandra.CassandraContainer;
+import org.testcontainers.containers.GenericContainer;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.CqlSessionBuilder;
@@ -30,10 +31,9 @@ public class ResourceTestConfiguration {
     @Autowired
     private CassandraContainer cassandraContainer;
 
-    @Bean(destroyMethod = "stop")
-    public TestingServer embeddedZookeeper(@Value("${resource.zookeeper.port}") int port) throws Exception {
-
-        return new TestingServer(port, true);
+    @Bean
+    public DynamicPropertyRegistrar applicationProperties(@Qualifier("embeddedZookeeper") GenericContainer embeddedZookeeper) {
+        return registry -> registry.add("resource.zookeeper.host", () -> "127.0.0.1:" + embeddedZookeeper.getMappedPort(2181));
     }
 
     @Bean
