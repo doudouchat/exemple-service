@@ -52,7 +52,7 @@ class NotEmptyConstraintValidatorTest {
 
     }
 
-    private static Stream<Arguments> updateFailure() {
+    static Stream<Arguments> updateFailure() {
 
         return Stream.of(
                 Arguments.of(MAPPER.createObjectNode()));

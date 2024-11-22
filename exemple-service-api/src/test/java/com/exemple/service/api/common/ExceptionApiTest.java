@@ -230,7 +230,7 @@ class ExceptionApiTest extends JerseySpringSupport {
     private static class Action {
 
         public void execute() {
-
+            // NOP
         }
     }
 

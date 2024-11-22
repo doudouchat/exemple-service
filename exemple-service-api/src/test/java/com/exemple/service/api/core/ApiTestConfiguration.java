@@ -56,14 +56,17 @@ public class ApiTestConfiguration {
 
         return new SchemaFilter(null) {
 
+            @Override
             public JsonNode filter(String app, String version, String resource, String profile, JsonNode source) {
                 return source;
             }
 
+            @Override
             public JsonNode filterAllProperties(String app, String version, String resource, String profile, JsonNode source) {
                 return source;
             }
 
+            @Override
             public JsonNode filterAllAdditionalProperties(String app, String version, String resource, String profile, JsonNode source) {
                 return MAPPER.nullNode();
             }

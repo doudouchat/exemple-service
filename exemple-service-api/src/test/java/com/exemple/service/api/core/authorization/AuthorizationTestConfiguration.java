@@ -78,8 +78,8 @@ public class AuthorizationTestConfiguration {
                     Map<String, Object> claims = jwt.getJWTClaimsSet().toJSONObject();
                     return Jwt
                             .withTokenValue(token)
-                            .headers((h) -> h.putAll(headers))
-                            .claims((c) -> c.putAll(claims))
+                            .headers(h -> h.putAll(headers))
+                            .claims(c -> c.putAll(claims))
                             .build();
                 } catch (ParseException e) {
                     throw new IllegalArgumentException(e);

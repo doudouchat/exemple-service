@@ -101,10 +101,10 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // And check service
 
-            ArgumentCaptor<JsonNode> subscription = ArgumentCaptor.forClass(JsonNode.class);
+            ArgumentCaptor<JsonNode> actualSubscription = ArgumentCaptor.forClass(JsonNode.class);
 
-            Mockito.verify(service).save(Mockito.eq(email), subscription.capture());
-            assertThat(subscription.getValue()).isEqualTo(source);
+            Mockito.verify(service).save(Mockito.eq(email), actualSubscription.capture());
+            assertThat(actualSubscription.getValue()).isEqualTo(source);
 
             // And check validation
 
@@ -118,8 +118,8 @@ class SubscriptionApiTest extends JerseySpringSupport {
                     """.formatted(email));
 
             Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("subscription"),
-                    subscription.capture(), Mockito.eq(previousSourceToValidate));
-            assertThat(subscription.getValue()).isEqualTo(sourceToValidate);
+                    actualSubscription.capture(), Mockito.eq(previousSourceToValidate));
+            assertThat(actualSubscription.getValue()).isEqualTo(sourceToValidate);
 
         }
 
@@ -162,10 +162,10 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // And check service
 
-            ArgumentCaptor<JsonNode> subscription = ArgumentCaptor.forClass(JsonNode.class);
+            ArgumentCaptor<JsonNode> actualSubscription = ArgumentCaptor.forClass(JsonNode.class);
 
-            Mockito.verify(service).save(Mockito.eq(email), subscription.capture(), Mockito.eq(previousSource));
-            assertThat(subscription.getValue()).isEqualTo(source);
+            Mockito.verify(service).save(Mockito.eq(email), actualSubscription.capture(), Mockito.eq(previousSource));
+            assertThat(actualSubscription.getValue()).isEqualTo(source);
 
             // And check validation
 
@@ -175,8 +175,8 @@ class SubscriptionApiTest extends JerseySpringSupport {
                     """.formatted(email));
 
             Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("subscription"),
-                    subscription.capture(), Mockito.eq(previousSource));
-            assertThat(subscription.getValue()).isEqualTo(sourceToValidate);
+                    actualSubscription.capture(), Mockito.eq(previousSource));
+            assertThat(actualSubscription.getValue()).isEqualTo(sourceToValidate);
 
         }
 
@@ -222,7 +222,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
     class get {
 
         @Test
-        void success() throws IOException {
+        void success() {
 
             // Given email
 

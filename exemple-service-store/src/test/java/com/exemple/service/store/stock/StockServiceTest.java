@@ -60,21 +60,22 @@ class StockServiceTest {
 
             // when perform multiple update
 
-            ExecutorService executorService = new ThreadPoolExecutor(5, 100, 1000, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+            try (ExecutorService executorService = new ThreadPoolExecutor(5, 100, 1000, TimeUnit.SECONDS, new LinkedBlockingQueue<>())) {
 
-            executorService.submit(() -> update(store, product, -15));
-            executorService.submit(() -> update(store, product, -5));
-            executorService.submit(() -> update(store, product, -3));
-            executorService.submit(() -> update(store, product, -7));
-            executorService.submit(() -> update(store, product, -8));
-            executorService.submit(() -> update(store, product, -6));
-            executorService.submit(() -> update(store, product, -9));
-            executorService.submit(() -> update(store, product, -5));
-            executorService.submit(() -> update(store, product, -2));
-            executorService.submit(() -> update(store, product, 100));
+                executorService.submit(() -> update(store, product, -15));
+                executorService.submit(() -> update(store, product, -5));
+                executorService.submit(() -> update(store, product, -3));
+                executorService.submit(() -> update(store, product, -7));
+                executorService.submit(() -> update(store, product, -8));
+                executorService.submit(() -> update(store, product, -6));
+                executorService.submit(() -> update(store, product, -9));
+                executorService.submit(() -> update(store, product, -5));
+                executorService.submit(() -> update(store, product, -2));
+                executorService.submit(() -> update(store, product, 100));
 
-            executorService.awaitTermination(5, TimeUnit.SECONDS);
-            executorService.shutdown();
+                executorService.awaitTermination(5, TimeUnit.SECONDS);
+                executorService.shutdown();
+            }
 
             // Then check mock
 
@@ -103,10 +104,10 @@ class StockServiceTest {
 
         // when perform get
 
-        String product = "/product#" + UUID.randomUUID();
-        String store = "/store#" + UUID.randomUUID();
+        String productId = "/product#" + UUID.randomUUID();
+        String storeId = "/store#" + UUID.randomUUID();
 
-        Optional<Long> stock = service.get(company, store, product);
+        Optional<Long> stock = service.get(company, storeId, productId);
 
         // Then check stock is missing
         assertThat(stock).isEmpty();
@@ -119,16 +120,16 @@ class StockServiceTest {
 
         // setup mock resource
 
-        String product = "/product#" + UUID.randomUUID();
-        String store = "/store#" + UUID.randomUUID();
+        String productId = "/product#" + UUID.randomUUID();
+        String storeId = "/store#" + UUID.randomUUID();
 
-        Mockito.when(resource.get(store, product)).thenReturn(Optional.of(5L));
+        Mockito.when(resource.get(storeId, productId)).thenReturn(Optional.of(5L));
 
         // when update stock
-        service.update(company, store, product, -3);
+        service.update(company, storeId, productId, -3);
 
         // and update again
-        Throwable throwable = catchThrowable(() -> service.update(company, store, product, -3));
+        Throwable throwable = catchThrowable(() -> service.update(company, storeId, productId, -3));
 
         // Then check throwable
         assertAll(
@@ -139,15 +140,15 @@ class StockServiceTest {
 
     @DisplayName("update stock if stock is insufficient because resource is missing")
     @Test
-    void updateFailureInsufficientStockBecauseNonStock() throws InsufficientStockException {
+    void updateFailureInsufficientStockBecauseNonStock() {
 
         // setup mock resource
 
-        String product = "/product#" + UUID.randomUUID();
-        String store = "/store#" + UUID.randomUUID();
+        String productId = "/product#" + UUID.randomUUID();
+        String storeId = "/store#" + UUID.randomUUID();
 
         // when update stock
-        Throwable throwable = catchThrowable(() -> service.update(company, store, product, -3));
+        Throwable throwable = catchThrowable(() -> service.update(company, storeId, productId, -3));
 
         // Then check throwable
         assertAll(
@@ -169,9 +170,9 @@ class StockServiceTest {
         void updateFailure() {
 
             // when update stock
-            String product = "/product#" + UUID.randomUUID();
-            String store = "/store#" + UUID.randomUUID();
-            Throwable throwable = catchThrowable(() -> service.update(company, store, product, 5));
+            String productId = "/product#" + UUID.randomUUID();
+            String storeId = "/store#" + UUID.randomUUID();
+            Throwable throwable = catchThrowable(() -> service.update(company, storeId, productId, 5));
 
             // Then check throwable
             assertThat(throwable).isInstanceOf(IllegalStateException.class);
@@ -182,9 +183,9 @@ class StockServiceTest {
         void getFailure() {
 
             // when get stock
-            String product = "/product#" + UUID.randomUUID();
-            String store = "/store#" + UUID.randomUUID();
-            Throwable throwable = catchThrowable(() -> service.get(company, store, product));
+            String productId = "/product#" + UUID.randomUUID();
+            String storeId = "/store#" + UUID.randomUUID();
+            Throwable throwable = catchThrowable(() -> service.get(company, storeId, productId));
 
             // Then check throwable
             assertThat(throwable).isInstanceOf(IllegalStateException.class);

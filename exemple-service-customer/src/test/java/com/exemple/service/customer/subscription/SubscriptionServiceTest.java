@@ -19,6 +19,7 @@ import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 @SpringJUnitConfig(CustomerTestConfiguration.class)
 class SubscriptionServiceTest {
@@ -59,7 +60,8 @@ class SubscriptionServiceTest {
 
         // Then check save resource
 
-        JsonNode expectedSubscription = ((ObjectNode) source).put("subscription_date", ServiceContextExecution.context().getDate().toString());
+        JsonNode expectedSubscription = ((ObjectNode) source).set("subscription_date",
+                TextNode.valueOf(ServiceContextExecution.context().getDate().toString()));
 
         ArgumentCaptor<JsonNode> subscriptionCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
@@ -87,7 +89,8 @@ class SubscriptionServiceTest {
 
         // Then check save resource
 
-        JsonNode expectedSubscription = ((ObjectNode) source).put("subscription_date", ServiceContextExecution.context().getDate().toString());
+        JsonNode expectedSubscription = ((ObjectNode) source).set("subscription_date",
+                TextNode.valueOf(ServiceContextExecution.context().getDate().toString()));
 
         ArgumentCaptor<JsonNode> subscriptionCaptor = ArgumentCaptor.forClass(JsonNode.class);
 

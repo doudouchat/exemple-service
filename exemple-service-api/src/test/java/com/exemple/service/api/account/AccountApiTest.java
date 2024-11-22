@@ -248,7 +248,6 @@ class AccountApiTest extends JerseySpringSupport {
                     .build();
 
             var token = new PlainJWT(payload).serialize();
-            ;
 
             // When perform patch
 
@@ -524,15 +523,15 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And check service
 
-            ArgumentCaptor<JsonNode> account = ArgumentCaptor.forClass(JsonNode.class);
-            Mockito.verify(service).save(account.capture());
-            assertThat(account.getValue()).isEqualTo(source);
+            ArgumentCaptor<JsonNode> actualAccount = ArgumentCaptor.forClass(JsonNode.class);
+            Mockito.verify(service).save(actualAccount.capture());
+            assertThat(actualAccount.getValue()).isEqualTo(source);
 
             // And check validation
 
             Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("account"),
-                    account.capture());
-            assertThat(account.getValue()).isEqualTo(source);
+                    actualAccount.capture());
+            assertThat(actualAccount.getValue()).isEqualTo(source);
 
         }
 
