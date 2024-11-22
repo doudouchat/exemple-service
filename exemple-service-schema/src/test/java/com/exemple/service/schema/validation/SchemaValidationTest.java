@@ -300,7 +300,7 @@ class SchemaValidationTest {
     @DisplayName("source patch validation")
     class ValidateToPatch {
 
-        private Stream<Arguments> patchSuccess() {
+        Stream<Arguments> patchSuccess() {
 
             ObjectNode patch1 = MAPPER.createObjectNode();
             patch1.put("op", "replace");
@@ -356,7 +356,7 @@ class SchemaValidationTest {
             assertThat(throwable).as("None exception is expected").isNull();
         }
 
-        private Stream<Arguments> patchFailure() {
+        Stream<Arguments> patchFailure() {
 
             ObjectNode patch1 = MAPPER.createObjectNode();
             patch1.put("op", "add");
@@ -444,7 +444,7 @@ class SchemaValidationTest {
                             () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains(expectedPath)));
         }
 
-        private Stream<Arguments> fixIncorrectSource() {
+        Stream<Arguments> fixIncorrectSource() {
 
             ObjectNode patch1 = MAPPER.createObjectNode();
             patch1.put("op", "replace");
@@ -505,7 +505,7 @@ class SchemaValidationTest {
             assertThat(throwable).as("None exception is expected").isNull();
         }
 
-        private Stream<Arguments> fixIncorrectSourceFailure() {
+        Stream<Arguments> fixIncorrectSourceFailure() {
 
             ObjectNode patch1 = MAPPER.createObjectNode();
             patch1.put("op", "replace");
@@ -666,7 +666,7 @@ class SchemaValidationTest {
     @DisplayName("source update validation")
     class ValidateToUpdate {
 
-        private Stream<Arguments> updateSuccess() {
+        Stream<Arguments> updateSuccess() {
 
             ObjectNode patch1 = MAPPER.createObjectNode();
             patch1.put("op", "replace");
@@ -722,7 +722,7 @@ class SchemaValidationTest {
 
         }
 
-        private Stream<Arguments> updateFailure() {
+        Stream<Arguments> updateFailure() {
 
             new ValidateToCreation().creationFailure();
 

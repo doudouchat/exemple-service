@@ -49,12 +49,13 @@ public class IntegrationTestConfiguration {
     }
 
     @PostConstruct
-    public void suscribeConsumerEvent() throws Exception {
+    public void suscribeConsumerEvent() {
 
         consumerEvent.subscribe(List.of(accountTopic, subscriptionTopic).stream().distinct().toList(), new ConsumerRebalanceListener() {
 
             @Override
             public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
+                // NOP
             }
 
             @Override

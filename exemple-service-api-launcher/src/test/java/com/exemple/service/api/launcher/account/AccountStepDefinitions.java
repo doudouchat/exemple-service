@@ -145,7 +145,7 @@ public class AccountStepDefinitions {
     }
 
     @When("get account for application {string} and version {string}")
-    public void getAccount(String application, String version) throws IOException {
+    public void getAccount(String application, String version) {
 
         Response response = AccountApiClient.get(context.lastId(), application, version, authorizationContext.lastAccessToken());
 
@@ -154,7 +154,7 @@ public class AccountStepDefinitions {
     }
 
     @When("get account by id {id}")
-    public void getAccount(UUID id) throws IOException {
+    public void getAccount(UUID id) {
 
         Response response = AccountApiClient.get(id, TEST_APP, VERSION_V1, authorizationContext.lastAccessToken());
 
@@ -209,9 +209,9 @@ public class AccountStepDefinitions {
 
         await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
             ConsumerRecords<String, JsonNode> records = consumerEvent.poll(Duration.ofSeconds(5));
-            assertThat(records.iterator()).toIterable().last().satisfies(record -> {
+            assertThat(records.iterator()).toIterable().last().satisfies(event -> {
 
-                ObjectNode expectedBody = (ObjectNode) record.value();
+                ObjectNode expectedBody = (ObjectNode) event.value();
                 expectedBody.remove("creation_date");
                 expectedBody.remove("update_date");
                 expectedBody.remove("id");

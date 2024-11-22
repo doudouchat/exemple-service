@@ -82,7 +82,7 @@ class SchemaResourceTest {
 
         @Test
         @Order(2)
-        void cleanAll() throws IOException {
+        void cleanAll() {
 
             // Given build schema
 
@@ -140,7 +140,7 @@ class SchemaResourceTest {
     }
 
     @Test
-    void getEmptySchema() throws IOException {
+    void getEmptySchema() {
 
         // When perform get
         Optional<SchemaEntity> schemaResource = resource.get("app3", UUID.randomUUID().toString(), "account", "example");

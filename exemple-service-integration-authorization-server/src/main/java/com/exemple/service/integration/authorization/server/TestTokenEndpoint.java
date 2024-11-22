@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +21,7 @@ public class TestTokenEndpoint {
     public JsonNode tokenKey() {
 
         var tokenKey = MAPPER.createObjectNode();
-        tokenKey.put("value", new String(testAlgorithmConfiguration.getPublicKeyContent()));
+        tokenKey.set("value", TextNode.valueOf(String.valueOf(testAlgorithmConfiguration.getPublicKeyContent())));
 
         return tokenKey;
 

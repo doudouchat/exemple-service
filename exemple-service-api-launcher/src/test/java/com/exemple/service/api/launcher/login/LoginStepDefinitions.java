@@ -1,7 +1,6 @@
 package com.exemple.service.api.launcher.login;
 
 import static com.exemple.service.api.launcher.core.InitData.TEST_APP;
-import static com.exemple.service.api.launcher.core.InitData.VERSION_V1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -46,7 +45,7 @@ public class LoginStepDefinitions {
     @And("get id account {string}")
     public void getLogin(String username) {
 
-        Response response = LoginApiClient.get(username, TEST_APP, VERSION_V1, authorizationContext.lastAccessToken());
+        Response response = LoginApiClient.get(username, TEST_APP, authorizationContext.lastAccessToken());
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).as("login %s not found", username).isEqualTo(200),

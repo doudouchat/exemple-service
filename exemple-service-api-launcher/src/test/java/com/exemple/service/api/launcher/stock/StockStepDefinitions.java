@@ -4,7 +4,6 @@ import static com.exemple.service.api.launcher.core.InitData.BACK_APP;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
@@ -56,7 +55,7 @@ public class StockStepDefinitions {
     }
 
     @Then("stock of product {string} from store {string} is {long}")
-    public void check(String product, String store, long amount) throws IOException {
+    public void check(String product, String store, long amount) {
 
         Response response = StockApiClient.get(store + "#" + salt, product, BACK_APP, authorizationContext.lastAccessToken());
 
@@ -67,14 +66,14 @@ public class StockStepDefinitions {
     }
 
     @Then("stock of product {string} from store {string} is unknown")
-    public void checkUnknown(String product, String store) throws IOException {
+    public void checkUnknown(String product, String store) {
 
         assertThat(context.lastResponse().getStatusCode()).as("stock %s %s exists", product, store).isEqualTo(404);
 
     }
 
     @Then("stock of product {string} from store {string} is {long}, is insufficient for {long}")
-    public void checkError(String product, String store, long stock, long quantity) throws IOException {
+    public void checkError(String product, String store, long stock, long quantity) {
 
         assertAll(
                 () -> assertThat(context.lastResponse().getStatusCode()).as("stock %s %s is correct", product, store).isEqualTo(400),
