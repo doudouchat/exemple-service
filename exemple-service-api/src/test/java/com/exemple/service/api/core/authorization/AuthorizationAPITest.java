@@ -288,7 +288,7 @@ class AuthorizationAPITest extends JerseySpringSupport {
 
     }
 
-    private Stream<Arguments> success() {
+    Stream<Arguments> success() {
 
         var payload = new JWTClaimsSet.Builder()
                 .claim("client_id", "clientId1")

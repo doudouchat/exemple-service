@@ -94,7 +94,7 @@ class SchemaFilterTest {
         assertThat(newSource).isEqualTo(MAPPER.readTree("{}"));
     }
 
-    private static Stream<Arguments> filterAllAdditionalProperties() throws IOException {
+    static Stream<Arguments> filterAllAdditionalProperties() throws IOException {
 
         JsonNode source1 = MAPPER.readTree(
                 """

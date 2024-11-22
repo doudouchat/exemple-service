@@ -94,7 +94,7 @@ class DocumentApiResourceTest extends JerseySpringSupport {
 
     }
 
-    private Stream<Arguments> schemas() {
+    Stream<Arguments> schemas() {
 
         return Stream.of(
                 Arguments.of(ACCOUNT_V1_URL),
@@ -104,7 +104,7 @@ class DocumentApiResourceTest extends JerseySpringSupport {
     @ParameterizedTest
     @MethodSource
     @Order(2)
-    void schemas(String url) throws Exception {
+    void schemas(String url) {
 
         // Given mock service
 

@@ -17,7 +17,7 @@ public final class SubscriptionApiClient {
 
     }
 
-    public static Response put(String email, Object body, String application, String version, String token) {
+    public static Response put(String email, String application, String version, String token) {
 
         return JsonRestTemplate.given()
                 .header(APP_HEADER, application).header(VERSION_HEADER, version).header("Authorization", token)

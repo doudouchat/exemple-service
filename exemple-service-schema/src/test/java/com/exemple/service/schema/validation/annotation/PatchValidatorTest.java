@@ -31,7 +31,7 @@ class PatchValidatorTest {
     @Autowired
     private IExemple exemple;
 
-    private static Stream<Arguments> patchSuccess() {
+    static Stream<Arguments> patchSuccess() {
 
         Map<String, Object> patch = Map.of(
                 "op", "add",
@@ -62,7 +62,7 @@ class PatchValidatorTest {
 
     }
 
-    private static Stream<Arguments> patchFailure() {
+    static Stream<Arguments> patchFailure() {
 
         Map<String, Object> patch1 = Map.of(
                 "op", "bad",
@@ -125,7 +125,7 @@ class PatchValidatorTest {
 
         @Override
         public void exemple(ArrayNode patch) {
-
+            // NOP
         }
 
     }

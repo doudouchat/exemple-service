@@ -20,7 +20,7 @@ public class TestTokenEndpoint {
     public JsonNode tokenKey() {
 
         var tokenKey = MAPPER.createObjectNode();
-        tokenKey.put("value", new String(testAlgorithmConfiguration.getPublicKeyContent()));
+        tokenKey.put("value", String.valueOf(testAlgorithmConfiguration.getPublicKeyContent()));
 
         return tokenKey;
 

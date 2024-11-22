@@ -81,7 +81,7 @@ class JsonConstraintValidatorTest {
 
     }
 
-    private static Stream<Arguments> saveFailure() {
+    static Stream<Arguments> saveFailure() {
 
         return Stream.of(
                 // text failure

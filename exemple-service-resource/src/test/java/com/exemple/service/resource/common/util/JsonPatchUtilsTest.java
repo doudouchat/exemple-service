@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
@@ -177,7 +176,6 @@ class JsonPatchUtilsTest {
 
     private List<JsonNode> sortPatchByPath(ArrayNode patch) {
 
-        return Streams.stream(patch.elements()).sorted((n1, n2) -> n1.get("path").textValue().compareTo(n2.get("path").textValue()))
-                .collect(Collectors.toList());
+        return Streams.stream(patch.elements()).sorted((n1, n2) -> n1.get("path").textValue().compareTo(n2.get("path").textValue())).toList();
     }
 }

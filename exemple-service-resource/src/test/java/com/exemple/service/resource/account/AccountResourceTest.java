@@ -83,7 +83,7 @@ class AccountResourceTest {
         private OffsetDateTime createDate;
 
         @BeforeAll
-        void deleteAccount() throws IOException {
+        void deleteAccount() {
 
             resource.removeByUsername("email", "jean.dupond@gmail");
 

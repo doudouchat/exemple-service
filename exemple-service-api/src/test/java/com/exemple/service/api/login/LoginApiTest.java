@@ -85,7 +85,7 @@ class LoginApiTest extends JerseySpringSupport {
         }
 
         @Test
-        void fails() throws Exception {
+        void fails() {
 
             // Given username
 
@@ -116,7 +116,7 @@ class LoginApiTest extends JerseySpringSupport {
         }
 
         @Test
-        void isForbidden() throws Exception {
+        void isForbidden() {
 
             // Given username
 
