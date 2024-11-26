@@ -61,7 +61,6 @@ public class InitData {
         ResourceExecutionContext.get().setKeyspace(detail.getKeyspace());
 
         SchemaEntity accountSchema = new SchemaEntity();
-        accountSchema.setApplication(TEST_APP);
         accountSchema.setVersion(VERSION_V1);
         accountSchema.setResource("account");
         accountSchema.setProfile("user");
@@ -85,7 +84,6 @@ public class InitData {
         schemaResource.save(accountSchema);
 
         SchemaEntity subscriptionSchema = new SchemaEntity();
-        subscriptionSchema.setApplication(TEST_APP);
         subscriptionSchema.setVersion(VERSION_V1);
         subscriptionSchema.setResource("subscription");
         subscriptionSchema.setProfile("user");
@@ -120,7 +118,6 @@ public class InitData {
         ResourceExecutionContext.get().setKeyspace(detail.getKeyspace());
 
         SchemaEntity accountSchema = new SchemaEntity();
-        accountSchema.setApplication("other");
         accountSchema.setVersion(VERSION_V1);
         accountSchema.setResource("account");
         accountSchema.setProfile("user");

@@ -20,16 +20,12 @@ import lombok.Setter;
 public class SchemaEntity implements Serializable {
 
     @PartitionKey
-    @CqlName("app")
-    private String application;
-
-    @ClusteringColumn
     private String resource;
 
-    @ClusteringColumn(1)
+    @ClusteringColumn
     private String version;
 
-    @ClusteringColumn(2)
+    @ClusteringColumn(1)
     private String profile;
 
     private JsonNode content;

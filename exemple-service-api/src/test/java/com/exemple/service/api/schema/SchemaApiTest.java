@@ -14,7 +14,6 @@ import com.exemple.service.api.core.ApiTestConfiguration;
 import com.exemple.service.api.core.JerseySpringSupport;
 import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
-import com.exemple.service.application.common.exception.NotFoundApplicationException;
 import com.exemple.service.schema.description.SchemaDescription;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -56,7 +55,7 @@ class SchemaApiTest extends JerseySpringSupport {
         String version = "v1";
         String profile = "user";
 
-        Mockito.when(service.get(app, version, resource, profile)).thenReturn(schema);
+        Mockito.when(service.get(resource, version, profile)).thenReturn(schema);
 
         // When perform get
 
@@ -90,28 +89,6 @@ class SchemaApiTest extends JerseySpringSupport {
         // And check body
 
         assertThat(response.readEntity(JsonNode.class)).isEqualTo(schema);
-
-    }
-
-    @Test
-    void getFailureNotFoundApplicationException() {
-
-        // Given mock service
-
-        String resource = "account";
-        String app = "default";
-        String version = "v1";
-        String profile = "user";
-
-        Mockito.when(service.get(app, version, resource, profile)).thenThrow(new NotFoundApplicationException(app));
-
-        // When perform get
-
-        Response response = target(URL + "/" + resource + "/" + app + "/" + version + "/" + profile).request(MediaType.APPLICATION_JSON).get();
-
-        // Then check status
-
-        assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
 
     }
 

@@ -1,7 +1,6 @@
 SELECT * FROM test.account;
 
-INSERT INTO test.resource_schema (app, version, resource, profile, content) VALUES (
-	'app1',
+INSERT INTO test.resource_schema (version, resource, profile, content) VALUES (
 	'v1',
 	'account',
 	'example',

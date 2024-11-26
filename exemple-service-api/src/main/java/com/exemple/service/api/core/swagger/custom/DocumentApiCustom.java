@@ -53,14 +53,14 @@ public class DocumentApiCustom extends AbstractSpecFilter {
 
             var name = StringUtils.substring(mediaType.getSchema().get$ref(), "#/components/schemas/".length());
             headers.entrySet().stream()
-
-                    .filter((Map.Entry<String, List<String>> header) -> StringUtils.equalsAnyIgnoreCase(header.getKey(),
-                            DocumentApiResource.RESOURCE + name))
-                    .forEach((Map.Entry<String, List<String>> header) -> {
+                    .filter(header -> StringUtils.equalsAnyIgnoreCase(header.getKey(), DocumentApiResource.RESOURCE + name))
+                    .map(Map.Entry::getValue)
+                    .filter(header -> !header.isEmpty())
+                    .forEach((List<String> header) -> {
 
                         var composedSchema = new ComposedSchema();
 
-                        header.getValue().stream().map((String version) -> {
+                        header.stream().map((String version) -> {
                             String[] values = version.split("\\|");
                             return SchemaVersionProfileEntity.builder().version(values[0]).profile(values[1]).build();
                         }).forEach((SchemaVersionProfileEntity v) -> {
@@ -82,7 +82,6 @@ public class DocumentApiCustom extends AbstractSpecFilter {
             Map<String, List<String>> headers) {
 
         String host = headers.get(DocumentApiResource.APP_HOST).getFirst();
-        String app = headers.get(DocumentApiResource.APP).getFirst();
 
         Map<String, Object> extensions = MapUtils.emptyIfNull(schema.getExtensions());
 
@@ -92,21 +91,11 @@ public class DocumentApiCustom extends AbstractSpecFilter {
             String profile = (String) extensions.get(X_PROFILE);
             var ref = new StringBuilder();
             ref.append(host)
-
                     .append("ws/v1/schemas/")
-
                     .append(schema.getName().toLowerCase(Locale.getDefault()))
-
                     .append('/')
-
-                    .append(app)
-
-                    .append('/')
-
                     .append(version)
-
                     .append('/')
-
                     .append(profile);
             schema.setName(StringUtils.capitalize(schema.getName()) + '.' + version + '.' + profile);
             schema.$ref(ref.toString());

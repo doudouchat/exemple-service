@@ -25,7 +25,7 @@ class SchemaDescriptionTest {
     void get() {
 
         // when perform get schema
-        JsonNode schema = service.get("default", "default", "schema_test", "default");
+        JsonNode schema = service.get("schema_test", "default", "default");
 
         // Then check response
         assertThat(schema.get("$schema").textValue()).isEqualTo("https://json-schema.org/draft/2020-12/schema");
@@ -36,7 +36,7 @@ class SchemaDescriptionTest {
     void getNotExistSchema() throws IOException {
 
         // when perform get schema
-        JsonNode schema = service.get("unknown", "unknown", "schema_test", "unknown");
+        JsonNode schema = service.get("schema_test", "unknown", "unknown");
 
         // Then check response
         assertThat(schema).isEqualTo(MAPPER.readTree(new ClassPathResource("default-schema.json").getInputStream()));

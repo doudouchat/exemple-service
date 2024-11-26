@@ -24,9 +24,9 @@ public class SchemaFilter {
 
     private final SchemaBuilder schemaBuilder;
 
-    public JsonNode filter(String app, String version, String resource, String profile, JsonNode source) {
+    public JsonNode filter(String resource, String version, String profile, JsonNode source) {
 
-        var schema = schemaBuilder.buildFilterSchema(app, version, resource, profile);
+        var schema = schemaBuilder.buildFilterSchema(resource, version, profile);
         List<ArrayNode> exceptions = SchemaValidator.performValidation(schema, source,
                 (ValidationException e) -> e.getCauses().stream()
                         .filter((ValidationExceptionCause cause) -> isAdditionalProperties(cause) || isWriteOnly(cause))
@@ -45,9 +45,9 @@ public class SchemaFilter {
         return filterProperties;
     }
 
-    public JsonNode filterAllProperties(String app, String version, String resource, String profile, JsonNode source) {
+    public JsonNode filterAllProperties(String resource, String version, String profile, JsonNode source) {
 
-        var schema = schemaBuilder.buildFilterSchema(app, version, resource, profile);
+        var schema = schemaBuilder.buildFilterSchema(resource, version, profile);
 
         List<ArrayNode> exceptions = SchemaValidator.performValidation(schema, source,
                 (ValidationException e) -> e.getCauses().stream()
@@ -67,9 +67,9 @@ public class SchemaFilter {
         return allProperties;
     }
 
-    public JsonNode filterAllAdditionalProperties(String app, String version, String resource, String profile, JsonNode source) {
+    public JsonNode filterAllAdditionalProperties(String resource, String version, String profile, JsonNode source) {
 
-        var schema = schemaBuilder.buildFilterSchema(app, version, resource, profile);
+        var schema = schemaBuilder.buildFilterSchema(resource, version, profile);
 
         List<ArrayNode> exceptions = SchemaValidator.performValidation(schema, source,
                 (ValidationException e) -> e.getCauses().stream()

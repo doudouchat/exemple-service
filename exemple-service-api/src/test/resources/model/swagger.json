@@ -647,13 +647,18 @@
 				}
 			},
 			"Account.v1.user": {
-				"$ref": "/ws/v1/schemas/account/test/v1/user"
+				"$ref": "/ws/v1/schemas/account/v1/user"
 			},
 			"Account.v2.admin": {
-				"$ref": "/ws/v1/schemas/account/test/v2/admin"
+				"$ref": "/ws/v1/schemas/account/v2/admin"
 			}
 		},
 		"securitySchemes": {
+			"bearer_authentification": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
+			},
 			"oauth2_password": {
 				"type": "oauth2",
 				"flows": {
@@ -669,11 +674,6 @@
 						"tokenUrl": "/oauth/token"
 					}
 				}
-			},
-			"bearer_authentification": {
-				"type": "http",
-				"scheme": "bearer",
-				"bearerFormat": "JWT"
 			}
 		}
 	}

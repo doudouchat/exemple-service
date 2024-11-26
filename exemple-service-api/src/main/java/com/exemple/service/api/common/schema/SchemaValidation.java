@@ -1,6 +1,5 @@
 package com.exemple.service.api.common.schema;
 
-import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.security.ApiSecurityContext;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,29 +17,26 @@ public class SchemaValidation {
 
     public void validate(JsonNode source, String resourceName) {
 
-        var app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
         var version = requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER);
         var profile = ((ApiSecurityContext) requestContext.getSecurityContext()).getProfile();
 
-        schema.validate(app, version, profile, resourceName, source);
+        schema.validate(resourceName, version, profile, source);
     }
 
     public void validate(JsonNode source, JsonNode previousSource, String resourceName) {
 
-        var app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
         var version = requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER);
         var profile = ((ApiSecurityContext) requestContext.getSecurityContext()).getProfile();
 
-        schema.validate(app, version, profile, resourceName, source, previousSource);
+        schema.validate(resourceName, version, profile, source, previousSource);
     }
 
     public void validate(ArrayNode patch, JsonNode previousSource, String resourceName) {
 
-        var app = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
         var version = requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER);
         var profile = ((ApiSecurityContext) requestContext.getSecurityContext()).getProfile();
 
-        schema.validate(app, version, profile, resourceName, patch, previousSource);
+        schema.validate(resourceName, version, profile, patch, previousSource);
     }
 
 }

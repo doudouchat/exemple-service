@@ -1,13 +1,13 @@
 package com.exemple.service.api.core.swagger;
 
 import java.util.Collections;
-import java.util.List;
 
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.core.ApiContext;
 import com.exemple.service.api.core.swagger.custom.DocumentApiCustom;
 import com.exemple.service.api.core.swagger.security.DocumentApiSecurity;
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
 
@@ -20,6 +20,7 @@ import io.swagger.v3.oas.integration.api.OpenApiContext;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.tags.Tag;
 import jakarta.servlet.ServletConfig;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -83,6 +84,8 @@ public class DocumentApiResource extends BaseOpenApiResource {
     public Response getOpenApi(@Context HttpHeaders headers, @Context UriInfo uriInfo, @PathParam("type") String type, @PathParam("app") String app)
             throws Exception {
 
+        ServiceContextExecution.setApp(app);
+
         String host = uriInfo.getBaseUri().getPath().replace("/ws", "");
 
         headers.getRequestHeaders().put(APP, Collections.singletonList(app));
@@ -95,17 +98,19 @@ public class DocumentApiResource extends BaseOpenApiResource {
 
         this.openApiConfiguration.getOpenAPI().addServersItem(server);
 
-        schemaResource.allVersions(app).forEach(
-                (String resource, List<SchemaVersionProfileEntity> versions) -> headers.getRequestHeaders().put(
-                        RESOURCE + resource,
-                        versions.stream().map((SchemaVersionProfileEntity v) -> v.getVersion().concat("|").concat(v.getProfile())).toList()));
-
         String ctxId = ServletConfigContextUtils.getContextIdFromServletConfig(config);
         OpenApiContext ctx = new JaxrsOpenApiContextBuilder<>().servletConfig(config).application(application).resourcePackages(resourcePackages)
                 .configLocation(configLocation).openApiConfiguration(openApiConfiguration).ctxId(ctxId).buildContext(true);
         OpenAPI oas = ctx.read();
 
         oas.getComponents().setSecuritySchemes(documentApiSecurity.buildSecurityScheme());
+
+        oas.getTags().stream()
+                .map(Tag::getName)
+                .forEach(resource -> headers.getRequestHeaders().put(
+                        RESOURCE + resource,
+                        schemaResource.allVersions(resource).stream()
+                                .map((SchemaVersionProfileEntity v) -> v.getVersion().concat("|").concat(v.getProfile())).toList()));
 
         return super.getOpenApi(headers, config, application, uriInfo, type);
     }

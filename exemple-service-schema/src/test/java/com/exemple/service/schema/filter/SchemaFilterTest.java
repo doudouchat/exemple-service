@@ -34,7 +34,7 @@ class SchemaFilterTest {
                 """);
 
         // When perform filter
-        JsonNode newSource = schemaFilter.filter("default", "default", "schema_test", "default", source);
+        JsonNode newSource = schemaFilter.filter("schema_test", "default", "default", source);
 
         // Then check source after filter
         assertThat(newSource).isEqualTo(MAPPER.readTree(
@@ -53,7 +53,7 @@ class SchemaFilterTest {
                 """);
 
         // When perform filter
-        JsonNode newSource = schemaFilter.filter("other", "default", "schema_test", "default", source);
+        JsonNode newSource = schemaFilter.filter("other_test", "default", "default", source);
 
         // Then check source after filter
         assertThat(newSource).isEqualTo(MAPPER.readTree("{}"));
@@ -69,7 +69,7 @@ class SchemaFilterTest {
                 """);
 
         // When perform filter
-        JsonNode newSource = schemaFilter.filterAllProperties("default", "default", "schema_test", "default", source);
+        JsonNode newSource = schemaFilter.filterAllProperties("schema_test", "default", "default", source);
 
         // Then check source after filter
         assertThat(newSource).isEqualTo(MAPPER.readTree(
@@ -88,7 +88,7 @@ class SchemaFilterTest {
                 """);
 
         // When perform filter
-        JsonNode newSource = schemaFilter.filterAllProperties("other", "default", "schema_test", "default", source);
+        JsonNode newSource = schemaFilter.filterAllProperties("other_test", "default", "default", source);
 
         // Then check source after filter
         assertThat(newSource).isEqualTo(MAPPER.readTree("{}"));
@@ -128,7 +128,7 @@ class SchemaFilterTest {
     void filterAllAdditionalProperties(JsonNode source, JsonNode expectedSource) {
 
         // When perform filter
-        JsonNode newSource = schemaFilter.filterAllAdditionalProperties("default", "default", "schema_test", "default", source);
+        JsonNode newSource = schemaFilter.filterAllAdditionalProperties("schema_test", "default", "default", source);
 
         // Then check source after filter
         assertThat(newSource).isEqualTo(expectedSource);
@@ -144,7 +144,7 @@ class SchemaFilterTest {
                 """);
 
         // When perform filter
-        JsonNode newSource = schemaFilter.filterAllAdditionalProperties("other", "default", "schema_test", "default", source);
+        JsonNode newSource = schemaFilter.filterAllAdditionalProperties("other_test", "default", "default", source);
 
         // Then check source after filter
         assertThat(newSource).isEqualTo(source);

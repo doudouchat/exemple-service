@@ -29,16 +29,16 @@ public class SchemaValidation {
 
     private final SchemaFilter schemaFilter;
 
-    public void validate(String app, String version, String profile, String resource, JsonNode form) {
+    public void validate(String resource, String version, String profile, JsonNode form) {
 
-        var schema = schemaBuilder.buildCreationValidationSchema(app, version, resource, profile);
+        var schema = schemaBuilder.buildCreationValidationSchema(resource, version, profile);
         SchemaValidator.performValidation(schema, form);
 
     }
 
-    public void validate(String app, String version, String profile, String resource, JsonNode form, JsonNode old) {
+    public void validate(String resource, String version, String profile, JsonNode form, JsonNode old) {
 
-        var schema = schemaBuilder.buildUpdateValidationSchema(app, version, resource, profile);
+        var schema = schemaBuilder.buildUpdateValidationSchema(resource, version, profile);
 
         SchemaValidator.performValidation(schema, form, (ValidationException e) -> {
 
@@ -50,11 +50,11 @@ public class SchemaValidation {
 
     }
 
-    public void validate(String app, String version, String profile, String resource, ArrayNode patch, JsonNode old) {
+    public void validate(String resource, String version, String profile, ArrayNode patch, JsonNode old) {
 
-        var schema = schemaBuilder.buildUpdateValidationSchema(app, version, resource, profile);
+        var schema = schemaBuilder.buildUpdateValidationSchema(resource, version, profile);
 
-        JsonNode oldFilterBySchema = this.schemaFilter.filterAllProperties(app, version, resource, profile, old);
+        JsonNode oldFilterBySchema = this.schemaFilter.filterAllProperties(resource, version,profile, old);
 
         JsonNode form = JsonPatch.apply(patch, oldFilterBySchema,
                 EnumSet.of(CompatibilityFlags.FORBID_REMOVE_MISSING_OBJECT, CompatibilityFlags.ALLOW_MISSING_TARGET_OBJECT_ON_REPLACE));

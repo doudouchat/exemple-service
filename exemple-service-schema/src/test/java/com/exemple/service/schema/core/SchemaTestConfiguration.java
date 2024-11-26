@@ -30,7 +30,7 @@ public class SchemaTestConfiguration {
         SchemaResource resource = Mockito.mock(SchemaResource.class);
 
         SchemaEntity unknownResourceSchema = new SchemaEntity();
-        Mockito.when(resource.get("unknown", "unknown", "schema_test", "unknown")).thenReturn(Optional.of(unknownResourceSchema));
+        Mockito.when(resource.get("schema_test", "unknown", "unknown")).thenReturn(Optional.of(unknownResourceSchema));
 
         SchemaEntity schemaTest = new SchemaEntity();
         schemaTest.setContent(MAPPER.readTree(new ClassPathResource("schema_test.json").getContentAsByteArray()));
@@ -49,12 +49,12 @@ public class SchemaTestConfiguration {
                 """));
 
         schemaTest.setPatchs(Set.of(patchExternalId, patchUpdateDate));
-        Mockito.when(resource.get("default", "default", "schema_test", "default")).thenReturn(Optional.of(schemaTest));
+        Mockito.when(resource.get("schema_test", "default", "default")).thenReturn(Optional.of(schemaTest));
 
         SchemaEntity schemaArray = new SchemaEntity();
         schemaArray.setContent(MAPPER.readTree(new ClassPathResource("schema_array.json").getContentAsByteArray()));
 
-        Mockito.when(resource.get("default", "default", "array_test", "default")).thenReturn(Optional.of(schemaArray));
+        Mockito.when(resource.get("array_test", "default", "default")).thenReturn(Optional.of(schemaArray));
 
         return resource;
     }

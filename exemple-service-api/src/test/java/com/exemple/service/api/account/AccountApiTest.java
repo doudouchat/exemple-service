@@ -281,7 +281,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             ArgumentCaptor<ArrayNode> patchCapture = ArgumentCaptor.forClass(ArrayNode.class);
 
-            Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("account"),
+            Mockito.verify(schemaValidation).validate(Mockito.eq("account"), Mockito.eq("v1"), Mockito.anyString(),
                     patchCapture.capture(),
                     previousAccount.capture());
             assertAll(
@@ -435,7 +435,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And check validation
 
-            Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("account"),
+            Mockito.verify(schemaValidation).validate(Mockito.eq("account"), Mockito.eq("v1"), Mockito.anyString(),
                     actualAccount.capture(),
                     previousAccount.capture());
             assertAll(
@@ -529,7 +529,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And check validation
 
-            Mockito.verify(schemaValidation).validate(Mockito.eq("test"), Mockito.eq("v1"), Mockito.anyString(), Mockito.eq("account"),
+            Mockito.verify(schemaValidation).validate(Mockito.eq("account"), Mockito.eq("v1"), Mockito.anyString(),
                     actualAccount.capture());
             assertThat(actualAccount.getValue()).isEqualTo(source);
 

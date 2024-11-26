@@ -45,32 +45,32 @@ public class SchemaBuilder {
         return patchSchema;
     }
 
-    public JsonSchema buildCreationValidationSchema(String app, String version, String resource, String profile) {
+    public JsonSchema buildCreationValidationSchema(String resource, String version, String profile) {
 
-        return buildCreationSchema(app, version, resource, profile, false);
+        return buildCreationSchema(resource, version, profile, false);
     }
 
-    public JsonSchema buildUpdateValidationSchema(String app, String version, String resource, String profile) {
+    public JsonSchema buildUpdateValidationSchema(String resource, String version, String profile) {
 
-        return buildUpdateSchema(app, version, resource, profile, false);
+        return buildUpdateSchema(resource, version, profile, false);
     }
 
-    public JsonSchema buildFilterSchema(String app, String version, String resource, String profile) {
+    public JsonSchema buildFilterSchema(String resource, String version, String profile) {
 
-        return buildUpdateSchema(app, version, resource, profile, true);
+        return buildUpdateSchema(resource, version, profile, true);
     }
 
-    private JsonSchema buildCreationSchema(String app, String version, String resource, String profile, boolean checkWriteOnly) {
+    private JsonSchema buildCreationSchema(String resource, String version, String profile, boolean checkWriteOnly) {
 
-        return schemaResource.get(app, version, resource, profile)
+        return schemaResource.get(resource, version, profile)
                 .map(SchemaEntity::getContent)
                 .map((JsonNode schemaContent) -> SchemaBuilder.buildSchema(schemaContent, Collections.emptySet(), checkWriteOnly))
                 .orElse(defaultSchema);
     }
 
-    private JsonSchema buildUpdateSchema(String app, String version, String resource, String profile, boolean checkWriteOnly) {
+    private JsonSchema buildUpdateSchema(String resource, String version, String profile, boolean checkWriteOnly) {
 
-        return schemaResource.get(app, version, resource, profile)
+        return schemaResource.get(resource, version, profile)
                 .filter((SchemaEntity entity) -> entity.getContent() != null)
                 .map((SchemaEntity entity) -> SchemaBuilder.buildSchema(entity.getContent(), entity.getPatchs(), checkWriteOnly))
                 .orElse(defaultSchema);

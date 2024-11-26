@@ -29,9 +29,9 @@ public class SchemaDescription {
 
     }
 
-    public JsonNode get(String app, String version, String resource, String profile) {
+    public JsonNode get(String resource, String version, String profile) {
 
-        return schemaResource.get(app, version, resource, profile).map(SchemaEntity::getContent).orElse(defaultSchema);
+        return schemaResource.get(resource, version, profile).map(SchemaEntity::getContent).orElse(defaultSchema);
     }
 
     public JsonNode getPatch() {

@@ -14,10 +14,10 @@ import com.exemple.service.resource.schema.model.SchemaEntity;
 public interface ResourceSchemaDao {
 
     @Select
-    Optional<SchemaEntity> findByApplicationAndResourceAndVersionAndProfile(String application, String resource, String version, String profile);
+    Optional<SchemaEntity> findByResourceAndVersionAndProfile(String resource, String version, String profile);
 
     @Select
-    PagingIterable<SchemaEntity> findByApplication(String application);
+    PagingIterable<SchemaEntity> findByResource(String resource);
 
     @Insert
     void create(SchemaEntity resourceSchema);

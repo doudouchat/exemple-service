@@ -2,6 +2,7 @@ package com.exemple.service.api.schema;
 
 import org.springframework.stereotype.Component;
 
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.schema.description.SchemaDescription;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -28,7 +29,9 @@ public class SchemaApi {
     public JsonNode get(@NotNull @PathParam("resource") String resource, @NotNull @PathParam("app") String app,
             @NotNull @PathParam("version") String version, @NotNull @PathParam("profile") String profile) {
 
-        return service.get(app, version, resource, profile);
+        ServiceContextExecution.setApp(app);
+
+        return service.get(resource, version, profile);
 
     }
 
