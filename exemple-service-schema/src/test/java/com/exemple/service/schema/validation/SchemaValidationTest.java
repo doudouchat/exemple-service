@@ -183,7 +183,7 @@ class SchemaValidationTest {
 
             // When perform validate
             Throwable throwable = catchThrowable(
-                    () -> validation.validate("default", "default", "default", "schema_test", MAPPER.convertValue(model, JsonNode.class)));
+                    () -> validation.validate("schema_test", "default", "default", MAPPER.convertValue(model, JsonNode.class)));
 
             // Then check none exception
             assertThat(throwable).as("None exception is expected").isNull();
@@ -216,7 +216,7 @@ class SchemaValidationTest {
             JsonNode model = JsonPatch.apply(patch, old);
 
             // When perform
-            Throwable throwable = catchThrowable(() -> validation.validate("default", "default", "default", "schema_test", model));
+            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", model));
 
             // Then check throwable
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
@@ -237,7 +237,7 @@ class SchemaValidationTest {
 
             // When perform
             Throwable throwable = catchThrowable(
-                    () -> validation.validate("unknown", "unknown", "unknown", "schema_test", source));
+                    () -> validation.validate("schema_test", "unknown", "unknown", source));
 
             // Then check throwable
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
@@ -267,7 +267,7 @@ class SchemaValidationTest {
 
             // When perform validate
 
-            validation.validate("default", "default", "default", "array_test", model);
+            validation.validate("array_test", "default", "default", model);
 
         }
 
@@ -283,7 +283,7 @@ class SchemaValidationTest {
             JsonNode model = MAPPER.convertValue(addresses, JsonNode.class);
 
             // When perform
-            Throwable throwable = catchThrowable(() -> validation.validate("default", "default", "default", "array_test", model));
+            Throwable throwable = catchThrowable(() -> validation.validate("array_test", "default", "default", model));
 
             // Then check throwable
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
@@ -350,7 +350,7 @@ class SchemaValidationTest {
             patchs.add(patch);
 
             // When perform validate
-            Throwable throwable = catchThrowable(() -> validation.validate("default", "default", "default", "schema_test", patchs, old));
+            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patchs, old));
 
             // Then check none exception
             assertThat(throwable).as("None exception is expected").isNull();
@@ -391,7 +391,7 @@ class SchemaValidationTest {
             patch.addAll(Arrays.asList(patchs));
 
             // When perform
-            Throwable throwable = catchThrowable(() -> validation.validate("default", "default", "default", "schema_test", patch, old));
+            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patch, old));
 
             // Then check throwable
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
@@ -434,7 +434,7 @@ class SchemaValidationTest {
             patch.addAll(Arrays.asList(patchs));
 
             // When perform
-            Throwable throwable = catchThrowable(() -> validation.validate("default", "default", "default", "schema_test", patch, old));
+            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patch, old));
 
             // Then check throwable
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
@@ -499,7 +499,7 @@ class SchemaValidationTest {
 
             // When perform
             JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
-            Throwable throwable = catchThrowable(() -> validation.validate("default", "default", "default", "schema_test", patchs, old));
+            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patchs, old));
 
             // Then check none exception
             assertThat(throwable).as("None exception is expected").isNull();
@@ -593,7 +593,7 @@ class SchemaValidationTest {
 
             // When perform
             JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
-            Throwable throwable = catchThrowable(() -> validation.validate("default", "default", "default", "schema_test", patch, old));
+            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patch, old));
 
             // Then check throwable
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
@@ -623,7 +623,7 @@ class SchemaValidationTest {
 
             // When perform
             Throwable throwable = catchThrowable(
-                    () -> validation.validate("unknown", "unknown", "unknown", "schema_test", patchs, old));
+                    () -> validation.validate("schema_test", "unknown", "unknown", patchs, old));
 
             // Then check throwable
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
@@ -653,7 +653,7 @@ class SchemaValidationTest {
             patchs.add(patch);
 
             // When perform
-            Throwable throwable = catchThrowable(() -> validation.validate("default", "default", "default", "schema_test", patchs, old));
+            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patchs, old));
 
             // Then check throwable
             assertThat(throwable).isInstanceOf(JsonPatchApplicationException.class);
@@ -715,7 +715,7 @@ class SchemaValidationTest {
             JsonNode model = JsonPatch.apply(patchs, old);
 
             // When perform validate
-            Throwable throwable = catchThrowable(() -> validation.validate("default", "default", "default", "schema_test", model, old));
+            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", model, old));
 
             // Then check none exception
             assertThat(throwable).as("None exception is expected").isNull();
@@ -768,7 +768,7 @@ class SchemaValidationTest {
             ((ObjectNode) old).set("hide", BooleanNode.TRUE);
 
             // When perform
-            Throwable throwable = catchThrowable(() -> validation.validate("default", "default", "default", "schema_test", model, old));
+            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", model, old));
 
             // Then check throwable
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
@@ -817,7 +817,7 @@ class SchemaValidationTest {
             ((ObjectNode) old).set("hide", BooleanNode.TRUE);
 
             // When perform
-            Throwable throwable = catchThrowable(() -> validation.validate("default", "default", "default", "schema_test", model, old));
+            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", model, old));
 
             // Then check throwable
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
@@ -850,7 +850,7 @@ class SchemaValidationTest {
             // When perform
             JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
             JsonNode source = MAPPER.convertValue(model, JsonNode.class);
-            Throwable throwable = catchThrowable(() -> validation.validate("default", "default", "default", "schema_test", source, old));
+            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", source, old));
 
             // Then check none exception
             assertThat(throwable).as("None exception is expected").isNull();
@@ -877,7 +877,7 @@ class SchemaValidationTest {
 
             // When perform
             Throwable throwable = catchThrowable(
-                    () -> validation.validate("unknown", "unknown", "unknown", "schema_test", model, old));
+                    () -> validation.validate("schema_test", "unknown", "unknown", model, old));
 
             // Then check throwable
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
@@ -905,7 +905,7 @@ class SchemaValidationTest {
 
             // When perform
             Throwable throwable = catchThrowable(
-                    () -> validation.validate("default", "default", "default", "array_test", model, MAPPER.createArrayNode()));
+                    () -> validation.validate("array_test", "default", "default", model, MAPPER.createArrayNode()));
 
             // Then check throwable
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,

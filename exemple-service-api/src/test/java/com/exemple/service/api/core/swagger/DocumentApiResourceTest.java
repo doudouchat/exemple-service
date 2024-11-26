@@ -3,7 +3,6 @@ package com.exemple.service.api.core.swagger;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.stream.Stream;
 
 import org.glassfish.jersey.server.ResourceConfig;
@@ -76,9 +75,9 @@ class DocumentApiResourceTest extends JerseySpringSupport {
 
         // Given service mock
 
-        Mockito.when(schemaResource.allVersions(Mockito.anyString())).thenReturn(
-                Collections.singletonMap("account", Arrays.asList(SchemaVersionProfileEntity.builder().version("v1").profile("user").build(),
-                        SchemaVersionProfileEntity.builder().version("v2").profile("admin").build())));
+        Mockito.when(schemaResource.allVersions("account")).thenReturn(
+                Arrays.asList(SchemaVersionProfileEntity.builder().version("v1").profile("user").build(),
+                        SchemaVersionProfileEntity.builder().version("v2").profile("admin").build()));
 
         // When perform get
 
@@ -108,8 +107,7 @@ class DocumentApiResourceTest extends JerseySpringSupport {
 
         // Given mock service
 
-        Mockito.when(schemaDescription.get(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
-                .thenReturn(schema);
+        Mockito.when(schemaDescription.get(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(schema);
 
         // When perform get
 

@@ -7,11 +7,10 @@ CREATE KEYSPACE IF NOT EXISTS other_keyspace
 USE other_keyspace;
 
 CREATE TABLE IF NOT EXISTS resource_schema ( 
-	app text,
 	version text,
 	resource text,
 	profile text,
 	content text,
 	patch set<text>,
-	PRIMARY KEY ((app), resource, version, profile)
+	PRIMARY KEY ((resource), version, profile)
 );

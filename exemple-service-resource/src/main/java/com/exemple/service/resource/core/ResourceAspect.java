@@ -2,6 +2,7 @@ package com.exemple.service.resource.core;
 
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.context.ServiceContextExecution;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 @Aspect
 @Component
+@Order(0)
 @RequiredArgsConstructor
 public class ResourceAspect {
 
