@@ -327,7 +327,7 @@
 								<artifactItem>
 									<groupId>org.jacoco</groupId>
 									<artifactId>org.jacoco.agent</artifactId>
-									<version>${jacoco-version}</version>
+									<version>${jacoco.version}</version>
 									<classifier>runtime</classifier>
 									<type>jar</type>
 									<overWrite>false</overWrite>
@@ -427,7 +427,7 @@
 								<configuration>
 									<images>
 										<image>
-											<name>zookeeper:${zookeeper-version}</name>
+											<name>zookeeper:${zookeeper.version}</name>
 											<alias>zookeeper</alias>
 											<run>
 												<ports>
@@ -492,7 +492,7 @@
 								<configuration>
 									<images>
 										<image>
-											<name>cassandra:${cassandra-version}</name>
+											<name>cassandra:${cassandra.version}</name>
 											<alias>cassandra</alias>
 											<run>
 												<ports>
