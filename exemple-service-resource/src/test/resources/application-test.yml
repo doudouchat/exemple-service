@@ -7,7 +7,7 @@ logging:
       com.datastax.oss.driver: INFO
 resource: 
    cassandra:
-      version: ${cassandra-version}
+      version: ${cassandra.version}
       resource_configuration: classpath:cassandra.conf
    zookeeper:
       host: 127.0.0.1:${zmp.clientPort}
