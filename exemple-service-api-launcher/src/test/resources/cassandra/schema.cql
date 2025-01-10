@@ -112,5 +112,5 @@ CREATE TABLE IF NOT EXISTS stock (
 	store text,
 	product text,
 	quantity counter,
-	PRIMARY KEY ((store, product))
+	PRIMARY KEY ((store), product)
 );
