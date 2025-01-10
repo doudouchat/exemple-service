@@ -2,7 +2,6 @@ package com.exemple.service.api.stock;
 
 import static com.exemple.service.api.common.model.ApplicationBeanParam.APP_HEADER;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 
 import java.io.IOException;
@@ -224,7 +223,7 @@ class StockApiTest extends JerseySpringSupport {
 
             // verify service
 
-            Mockito.verify(service, never()).update(any(), any(), any(), any(Integer.class));
+            Mockito.verify(service, never()).update("application", "store", "product", 5);
 
         }
 
@@ -341,7 +340,7 @@ class StockApiTest extends JerseySpringSupport {
 
             // verify service
 
-            Mockito.verify(service, never()).get(any(), any(), any());
+            Mockito.verify(service, never()).get(application, store, product);
 
         }
 

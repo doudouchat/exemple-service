@@ -1,14 +1,17 @@
 package com.exemple.service.resource.stock;
 
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import com.datastax.oss.driver.api.core.ConsistencyLevel;
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.exemple.service.resource.core.ResourceExecutionContext;
+import com.exemple.service.resource.stock.dao.StockDao;
+import com.exemple.service.resource.stock.mapper.StockMapper;
+import com.exemple.service.resource.stock.model.StockEntity;
 import com.exemple.service.store.stock.StockResource;
 
 import lombok.RequiredArgsConstructor;
@@ -18,29 +21,30 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StockResourceImpl implements StockResource {
 
-    private static final String STOCK_TABLE = "stock";
-
     private final CqlSession session;
+
+    private final ConcurrentMap<String, StockMapper> mappers = new ConcurrentHashMap<>();
 
     @Override
     public void update(String store, String product, long quantity) {
 
-        var update = QueryBuilder.update(ResourceExecutionContext.get().keyspace(), STOCK_TABLE)
-                .increment("quantity", QueryBuilder.literal(quantity)).whereColumn("store").isEqualTo(QueryBuilder.literal(store))
-                .whereColumn("product").isEqualTo(QueryBuilder.literal(product));
-
-        session.execute(update.build());
+        dao().incrementQuantity(store, product, quantity);
     }
 
     @Override
     public Optional<Long> get(String store, String product) {
 
-        var select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), STOCK_TABLE).column("quantity").whereColumn("store")
-                .isEqualTo(QueryBuilder.literal(store)).whereColumn("product").isEqualTo(QueryBuilder.literal(product));
+        return dao().findByStoreAndProduct(store, product).map(StockEntity::getQuantity);
+    }
 
-        var row = session.execute(select.build().setConsistencyLevel(ConsistencyLevel.QUORUM)).one();
+    private StockDao dao() {
 
-        return Optional.ofNullable(row != null ? row.getLong(0) : null);
+        return mappers.computeIfAbsent(ResourceExecutionContext.get().keyspace(), this::build).stockDao();
+    }
+
+    private StockMapper build(String keyspace) {
+
+        return StockMapper.builder(session).withDefaultKeyspace(keyspace).build();
     }
 
 }
