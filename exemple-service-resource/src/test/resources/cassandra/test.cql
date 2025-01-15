@@ -111,7 +111,17 @@ CREATE TABLE test.stock (
 	store text,
 	product text,
 	quantity counter,
-	PRIMARY KEY ((store), product)
+	PRIMARY KEY ((store, product))
+);
+
+CREATE TABLE test.stock_history ( 
+	store text,
+	product text,
+	date timestamp,
+	user text,
+	application text,
+	quantity counter,
+	PRIMARY KEY ((store, product), date, user, application)
 );
 
 CREATE TABLE test.exemple ( 

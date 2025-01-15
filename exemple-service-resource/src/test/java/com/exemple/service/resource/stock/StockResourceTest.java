@@ -1,15 +1,21 @@
 package com.exemple.service.resource.stock;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
+import java.util.List;
 import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
+import com.exemple.service.resource.stock.history.StockHistoryResource;
+import com.exemple.service.resource.stock.model.StockHistory;
 import com.exemple.service.store.stock.StockResource;
 
 @SpringBootTest(classes = ResourceTestConfiguration.class)
@@ -18,6 +24,17 @@ class StockResourceTest {
 
     @Autowired
     private StockResource resource;
+
+    @Autowired
+    private StockHistoryResource historyResource;
+
+    @BeforeEach
+    void initExecutionContextDate() {
+
+        ServiceContextExecution.setPrincipal(() -> "user");
+        ServiceContextExecution.setApp("test");
+
+    }
 
     @Test
     void update() {
@@ -30,6 +47,12 @@ class StockResourceTest {
 
         // Then check stock
         assertThat(resource.get("store1", "product1")).hasValue(-10L);
+
+        // And check history
+        List<StockHistory> histories = historyResource.findByStoreAndProduct("store1", "product1");
+        assertAll(
+                () -> assertThat(histories).hasSize(2),
+                () -> assertThat(histories).extracting(StockHistory::getQuantity).contains(5L, -15L));
 
     }
 
