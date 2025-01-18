@@ -8,9 +8,14 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -33,7 +38,6 @@ import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.account.event.AccountEventResource;
 import com.exemple.service.resource.account.exception.UsernameAlreadyExistsException;
-import com.exemple.service.resource.account.exception.UsernameNotUniqueException;
 import com.exemple.service.resource.account.history.AccountHistoryResource;
 import com.exemple.service.resource.account.model.AccountEvent;
 import com.exemple.service.resource.account.model.AccountHistory;
@@ -506,17 +510,16 @@ class AccountResourceTest {
     }
 
     @Nested
-    @TestMethodOrder(OrderAnnotation.class)
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    class UsernameField {
+    class AccountUsername {
 
         private UUID id = UUID.randomUUID();
 
-        private String email = UUID.randomUUID() + "@gmail";
+        private String email;
 
-        @BeforeAll
+        @BeforeEach
         void saveAccount() throws IOException {
-
+            email = UUID.randomUUID() + "@gmail";
             JsonNode account = MAPPER.readTree(
                     """
                     {"id": "%s", "email": "%s"}
@@ -526,20 +529,6 @@ class AccountResourceTest {
         }
 
         @Test
-        @Order(1)
-        void getIdByUsername() {
-
-            // When perform
-            Optional<UUID> res = resource.getIdByUsername("email", email);
-
-            // And check account
-            assertAll(
-                    () -> assertThat(res).isPresent(),
-                    () -> assertThat(res).hasValue(this.id));
-        }
-
-        @Test
-        @Order(1)
         void saveUnique() throws IOException {
 
             // When perform
@@ -550,11 +539,13 @@ class AccountResourceTest {
             Throwable throwable = catchThrowable(() -> resource.save(account));
 
             // Then check throwable
-            assertThat(throwable).isInstanceOf(UsernameAlreadyExistsException.class);
+            assertThat(throwable).isInstanceOf(UsernameAlreadyExistsException.class).hasFieldOrPropertyWithValue("username", email);
+
+            // And check account
+            assertThat(resource.getIdByUsername("email", email)).hasValue(this.id);
         }
 
         @Test
-        @Order(1)
         void updateUnique() throws IOException {
 
             // When perform
@@ -569,12 +560,14 @@ class AccountResourceTest {
             Throwable throwable = catchThrowable(() -> resource.save(account, previousAccount));
 
             // Then check throwable
-            assertThat(throwable).isInstanceOf(UsernameAlreadyExistsException.class);
+            assertThat(throwable).isInstanceOf(UsernameAlreadyExistsException.class).hasFieldOrPropertyWithValue("username", email);
+
+            // And check account
+            assertThat(resource.getIdByUsername("email", email)).hasValue(this.id);
         }
 
         @Test
-        @Order(1)
-        void updateSuccess() throws IOException {
+        void updateSuccessIfEmailNotChange() throws IOException {
 
             // When perform
             JsonNode account = MAPPER.readTree(
@@ -589,44 +582,109 @@ class AccountResourceTest {
 
             // Then check none exception
             assertThat(throwable).as("None exception is expected").isNull();
+
+            // And check account
+            assertThat(resource.getIdByUsername("email", email)).hasValue(this.id);
         }
 
         @Test
-        @Order(2)
+        void updateSuccessIfEmailChange() throws IOException {
+
+            // setup email
+            var newEmail = UUID.randomUUID() + "@gmail";
+
+            // When perform
+            JsonNode account = MAPPER.readTree(
+                    """
+                    {"id": "%s", "email": "%s"}
+                    """.formatted(id, newEmail));
+            JsonNode previousAccount = MAPPER.readTree(
+                    """
+                    {"id": "%s", "email": "%s"}
+                    """.formatted(id, email));
+            Throwable throwable = catchThrowable(() -> resource.save(account, previousAccount));
+
+            // Then check none exception
+            assertThat(throwable).as("None exception is expected").isNull();
+
+            // And check account
+            assertThat(resource.getIdByUsername("email", newEmail)).hasValue(this.id);
+        }
+
+        @Test
+        void updateSuccessIfEmailIsRemove() throws IOException {
+
+            // When perform
+            JsonNode account = MAPPER.readTree(
+                    """
+                    {"id": "%s"}
+                    """.formatted(id));
+            JsonNode previousAccount = MAPPER.readTree(
+                    """
+                    {"id": "%s", "email": "%s"}
+                    """.formatted(id, email));
+            Throwable throwable = catchThrowable(() -> resource.save(account, previousAccount));
+
+            // Then check none exception
+            assertThat(throwable).as("None exception is expected").isNull();
+
+            // And check account
+            assertThat(resource.getIdByUsername("email", email)).isEmpty();
+        }
+
+        @Test
         void removeByUsername() {
 
             // When perform
             resource.removeByUsername("email", email);
 
             // And check account
-
             assertThat(resource.getIdByUsername("email", email)).isEmpty();
         }
 
+        @DisplayName("multiple save")
         @Test
-        void getIdByUsernameNotUnique() throws IOException {
+        void multipleSave() throws InterruptedException {
 
-            // Given loyalty_card
-            var loyaltyCardNumber = "00001";
+            // setup email
+            var uniqueEmail = UUID.randomUUID() + "@gmail";
 
-            // And create 2 accounts with loyaltyCardNumber
-            resource.save(MAPPER.readTree(
+            // when perform multiple update
+
+            List<Throwable> exceptions = new ArrayList<>();
+            try (ExecutorService executorService = new ThreadPoolExecutor(5, 100, 1000, TimeUnit.SECONDS, new LinkedBlockingQueue<>())) {
+
+                for (int i = 0; i < 10; i++) {
+                    executorService.submit(() -> exceptions.add(save(uniqueEmail)));
+                }
+
+                executorService.awaitTermination(5, TimeUnit.SECONDS);
+                executorService.shutdown();
+            }
+
+            // And check exceptions
+            assertThat(exceptions.stream().filter(UsernameAlreadyExistsException.class::isInstance)).hasSize(9);
+
+        }
+
+        private Throwable save(String email) throws IOException {
+
+            OffsetDateTime now = OffsetDateTime.now();
+            ServiceContextExecution.setDate(now);
+            ServiceContextExecution.setPrincipal(() -> "user");
+            ServiceContextExecution.setApp("test");
+            ServiceContextExecution.setVersion("v1");
+
+            JsonNode account = MAPPER.readTree(
                     """
-                    {"id": "%s", "loyalty_card": "%s"}
-                    """.formatted(UUID.randomUUID(), loyaltyCardNumber)));
-
-            resource.save(MAPPER.readTree(
+                    {"id": "%s", "email": "%s"}
+                    """.formatted(id, email));
+            JsonNode previousAccount = MAPPER.readTree(
                     """
-                    {"id": "%s", "loyalty_card": "%s"}
-                    """.formatted(UUID.randomUUID(), loyaltyCardNumber)));
+                    {"id": "%s"}
+                    """.formatted(id));
 
-            // When perform
-            Throwable throwable = catchThrowable(() -> resource.getIdByUsername("loyalty_card", loyaltyCardNumber));
-
-            // Then check throwable
-            assertThat(throwable).isInstanceOfSatisfying(UsernameNotUniqueException.class,
-                    exception -> assertAll(
-                            () -> assertThat(exception.getUsername()).isEqualTo(loyaltyCardNumber)));
+            return catchThrowable(() -> resource.save(account, previousAccount));
         }
     }
 

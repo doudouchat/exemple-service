@@ -2,7 +2,6 @@ package com.exemple.service.resource.account;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -15,8 +14,8 @@ import com.datastax.oss.driver.api.core.cql.BatchType;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.account.event.AccountEventResource;
-import com.exemple.service.resource.account.exception.UsernameNotUniqueException;
 import com.exemple.service.resource.account.history.AccountHistoryResource;
+import com.exemple.service.resource.account.username.AccountUsernameResource;
 import com.exemple.service.resource.common.JsonQueryBuilder;
 import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.core.ResourceExecutionContext;
@@ -37,12 +36,16 @@ public class AccountResourceImpl implements AccountResource {
 
     private final AccountEventResource accountEventResource;
 
+    private final AccountUsernameResource accountUsernameResource;
+
     private final JsonQueryBuilder jsonQueryBuilder;
 
-    public AccountResourceImpl(CqlSession session, AccountHistoryResource accountHistoryResource, AccountEventResource accountEventResource) {
+    public AccountResourceImpl(CqlSession session, AccountHistoryResource accountHistoryResource, AccountEventResource accountEventResource,
+            AccountUsernameResource accountUsernameResource) {
         this.session = session;
         this.accountHistoryResource = accountHistoryResource;
         this.accountEventResource = accountEventResource;
+        this.accountUsernameResource = accountUsernameResource;
         this.jsonQueryBuilder = new JsonQueryBuilder(session, ACCOUNT_TABLE);
 
     }
@@ -94,20 +97,7 @@ public class AccountResourceImpl implements AccountResource {
     @Override
     public Optional<UUID> getIdByUsername(String field, String value) {
 
-        var select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), ACCOUNT_TABLE)
-                .column(AccountField.ID.field)
-                .whereColumn(field)
-                .isEqualTo(QueryBuilder.literal(value));
-
-        var ids = session.execute(select.build()).all().stream()
-                .map(row -> row.get(0, UUID.class))
-                .collect(Collectors.toSet());
-
-        if (ids.size() > 1) {
-            throw new UsernameNotUniqueException(value);
-        }
-
-        return ids.stream().findFirst();
+        return accountUsernameResource.findByUsernameAndField(value, field);
     }
 
     @Override
@@ -120,6 +110,7 @@ public class AccountResourceImpl implements AccountResource {
                     .isEqualTo(QueryBuilder.literal(id));
 
             session.execute(delete.build());
+            accountUsernameResource.delete(value, field);
         });
 
     }

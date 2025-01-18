@@ -67,6 +67,13 @@ CREATE TABLE IF NOT EXISTS account_event (
 	PRIMARY KEY ((id), date)
 ) WITH cdc=true;
 
+CREATE TABLE account_username ( 
+	id UUID,
+	username text,
+	field text,
+	PRIMARY KEY ((username, field))
+);
+
 CREATE TABLE IF NOT EXISTS subscription_event ( 
 	email text,
 	date timestamp,
@@ -98,15 +105,6 @@ CREATE TABLE IF NOT EXISTS resource_schema (
 	patch set<text>,
 	PRIMARY KEY ((resource), version, profile)
 );
-
-CREATE INDEX IF NOT EXISTS account_email
-	ON account ( email );
-	
-CREATE INDEX IF NOT EXISTS account_event_local_date
-	ON account_event ( local_date );
-	
-CREATE INDEX IF NOT EXISTS subscription_event_local_date
-	ON subscription_event ( local_date );
 	
 CREATE TABLE IF NOT EXISTS stock ( 
 	store text,

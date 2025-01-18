@@ -1,9 +1,8 @@
 package com.exemple.service.resource.account;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.locks.InterProcessLock;
 import org.apache.curator.framework.recipes.locks.InterProcessSemaphoreMutex;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -12,10 +11,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.context.ServiceContextExecution;
-import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.account.exception.UsernameAlreadyExistsException;
+import com.exemple.service.resource.account.username.AccountUsername;
+import com.exemple.service.resource.account.username.AccountUsernameService;
+import com.exemple.service.resource.common.lock.Lock;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,7 +36,7 @@ public class AccountResourceAspect {
 
     private final ApplicationDetailService applicationDetailService;
 
-    private final AccountResource accountResource;
+    private final AccountUsernameService accountUsernameService;
 
     @Qualifier("accountCuratorFramework")
     private final CuratorFramework client;
@@ -43,78 +45,51 @@ public class AccountResourceAspect {
             + " && execution(public void com.exemple.service.customer.account.AccountResource.save(..))"
             + " && args(account)",
             argNames = "account")
-    public void checkUniquesProperties(ProceedingJoinPoint joinPoint, JsonNode account) {
+    public void saveUniquesProperties(ProceedingJoinPoint joinPoint, JsonNode account) {
 
-        save(joinPoint, account, MAPPER.createObjectNode());
-
+        this.saveUniquesProperties(joinPoint, account, MAPPER.createObjectNode());
     }
 
     @Around(value = "@within(org.springframework.stereotype.Service)"
             + " && execution(public void com.exemple.service.customer.account.AccountResource.save(..))"
             + " && args(account, previousAccount)",
             argNames = "account,previousAccount")
-    public void checkUniquesProperties(ProceedingJoinPoint joinPoint, JsonNode account, JsonNode previousAccount) {
+    public void saveUniquesProperties(ProceedingJoinPoint joinPoint, JsonNode account, JsonNode previousAccount) {
 
-        save(joinPoint, account, previousAccount);
+        var applicationDetail = this.applicationDetailService.get(ServiceContextExecution.context().getApp()).orElseThrow();
 
+        var changedUsernames = accountUsernameService.findAllUsernames(applicationDetail, account, previousAccount).stream()
+                .filter(AccountUsername::hasChanged)
+                .toList();
+        var lock = new AccountUsernameLock(changedUsernames, applicationDetail);
+        lock.execute(() -> {
+
+            accountUsernameService.findAllAlreadyExistsUsernames(changedUsernames).stream()
+                    .findAny()
+                    .ifPresent((AccountUsername username) -> {
+                        throw new UsernameAlreadyExistsException(username.value());
+                    });
+
+            proceed(joinPoint);
+
+            changedUsernames.forEach(accountUsernameService::saveUsername);
+        });
     }
 
     @SneakyThrows
-    private void save(ProceedingJoinPoint joinPoint, JsonNode account, JsonNode previousAccount) {
+    private static void proceed(ProceedingJoinPoint joinPoint) {
+        joinPoint.proceed();
+    }
 
-        var usernameFields = new ArrayList<UsernameField>();
-        var locks = new ArrayList<InterProcessLock>();
+    private class AccountUsernameLock extends Lock {
 
-        this.applicationDetailService.get(ServiceContextExecution.context().getApp())
-                .ifPresent(
-                        applicationDetail -> applicationDetail.getAccount().getUniqueProperties().stream()
-                                .filter((String property) -> {
-                                    var actualEmail = account.path(property);
-                                    var previousEmail = previousAccount.path(property);
-                                    return !actualEmail.isNull() && !actualEmail.equals(previousEmail);
-                                })
-                                .map((String property) -> new UsernameField(property, account.path(property).textValue()))
-                                .forEach((UsernameField usernameField) -> {
-                                    usernameFields.add(usernameField);
-                                    locks.add(new InterProcessSemaphoreMutex(client,
-                                            "/" + applicationDetail.getCompany() + "/username/" + usernameField.field));
-                                }));
+        AccountUsernameLock(List<AccountUsername> usernames, ApplicationDetail applicationDetail) {
 
-        try {
-            locks.forEach(AccountResourceAspect::acquire);
-
-            usernameFields.forEach(this::checkUsername);
-
-            joinPoint.proceed();
-
-        } finally {
-            locks.forEach(AccountResourceAspect::release);
+            super(usernames.stream()
+                    .filter(AccountUsername::hasValue)
+                    .map(username -> new InterProcessSemaphoreMutex(client, "/" + applicationDetail.getCompany() + "/username/" + username.value()))
+                    .toList());
         }
 
     }
-
-    private void checkUsername(UsernameField usernameField) {
-
-        if (accountResource.getIdByUsername(usernameField.field, usernameField.value).isPresent()) {
-
-            throw new UsernameAlreadyExistsException(usernameField.value);
-
-        }
-    }
-
-    @SneakyThrows
-    private static void acquire(InterProcessLock lock) {
-        lock.acquire();
-    }
-
-    @SneakyThrows
-    private static void release(InterProcessLock lock) {
-        lock.release();
-    }
-
-    private static record UsernameField(String field,
-                                        String value) {
-
-    }
-
 }
