@@ -53,6 +53,13 @@ CREATE TABLE test.account_history (
 	PRIMARY KEY ((id), field)
 );
 
+CREATE TABLE test.account_username ( 
+	id UUID,
+	username text,
+	field text,
+	PRIMARY KEY ((username, field))
+);
+
 CREATE TABLE test.account_event ( 
 	id UUID,
 	date timestamp,
@@ -95,11 +102,6 @@ CREATE TABLE test.resource_schema (
 	patch set<text>,
 	PRIMARY KEY ((resource), version, profile)
 );
-CREATE INDEX account_email
-	ON test.account ( email );
-
-CREATE INDEX account_loyalty_card
-	ON test.account ( loyalty_card );
 
 CREATE INDEX account_event_local_date
 	ON test.account_event ( local_date );
