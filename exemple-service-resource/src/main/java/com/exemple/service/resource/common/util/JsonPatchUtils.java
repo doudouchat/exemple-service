@@ -53,7 +53,7 @@ public final class JsonPatchUtils {
         JsonNode value = element.path(VALUE);
         if (value.isObject()) {
 
-            return Streams.stream(value.fields()).flatMap((Map.Entry<String, JsonNode> node) -> {
+            return value.properties().stream().flatMap((Map.Entry<String, JsonNode> node) -> {
                 var patch = MAPPER.createObjectNode();
                 patch.set(OP, element.get(OP));
                 patch.set(PATH, MAPPER.convertValue(element.get(PATH).textValue() + JsonPointer.SEPARATOR + node.getKey(), JsonNode.class));

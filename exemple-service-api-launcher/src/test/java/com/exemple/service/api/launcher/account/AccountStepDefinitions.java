@@ -248,7 +248,7 @@ public class AccountStepDefinitions {
         ArrayNode errors = (ArrayNode) MAPPER.readTree(context.lastResponse().asString());
         assertThat(errors).as("errors %s not contain %s", errors.toPrettyString(), body.toPrettyString())
                 .anySatisfy(error -> {
-                    Iterator<Map.Entry<String, JsonNode>> expectedErrors = body.fields();
+                    Iterator<Map.Entry<String, JsonNode>> expectedErrors = body.properties().iterator();
                     while (expectedErrors.hasNext()) {
                         Map.Entry<String, JsonNode> expectedError = expectedErrors.next();
                         assertThat(error.get(expectedError.getKey())).isEqualTo(expectedError.getValue());

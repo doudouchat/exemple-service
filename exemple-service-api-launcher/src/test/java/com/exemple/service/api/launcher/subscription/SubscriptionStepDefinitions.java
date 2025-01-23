@@ -151,7 +151,7 @@ public class SubscriptionStepDefinitions {
                 () -> assertThat(context.lastResponse().getStatusCode()).isEqualTo(400),
                 () -> assertThat(errors).as("errors {} not contain {}", errors.toPrettyString(), body.toPrettyString())
                         .anySatisfy(error -> {
-                            Iterator<Map.Entry<String, JsonNode>> expectedErrors = body.fields();
+                            Iterator<Map.Entry<String, JsonNode>> expectedErrors = body.properties().iterator();
                             while (expectedErrors.hasNext()) {
                                 Map.Entry<String, JsonNode> expectedError = expectedErrors.next();
                                 assertThat(error.get(expectedError.getKey())).isEqualTo(expectedError.getValue());

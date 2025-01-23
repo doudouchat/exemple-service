@@ -36,7 +36,7 @@ public class JsonValidator {
 
     public void valid(JsonNode source, String table) throws JsonValidatorException {
 
-        JsonStreamer<Map.Entry<String, JsonNode>> fields = source::fields;
+        JsonStreamer<Map.Entry<String, JsonNode>> fields = source.properties()::iterator;
 
         fields.forEach((Map.Entry<String, JsonNode> node) -> {
 
@@ -73,7 +73,7 @@ public class JsonValidator {
             throw new JsonValidatorException("OBJECT", json.getKey());
         }
 
-        JsonStreamer<Map.Entry<String, JsonNode>> fields = json.getValue()::fields;
+        JsonStreamer<Map.Entry<String, JsonNode>> fields = json.getValue().properties()::iterator;
 
         fields.forEach((Entry<String, JsonNode> node) -> {
             var keyType = dataType.getKeyType();
@@ -112,7 +112,7 @@ public class JsonValidator {
 
     private void validateUDT(UserDefinedType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
 
-        JsonStreamer<Entry<String, JsonNode>> fields = json.getValue()::fields;
+        JsonStreamer<Entry<String, JsonNode>> fields = json.getValue().properties()::iterator;
 
         fields.forEach((Entry<String, JsonNode> node) -> {
 
