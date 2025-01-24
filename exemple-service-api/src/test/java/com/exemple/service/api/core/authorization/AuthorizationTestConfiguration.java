@@ -25,6 +25,7 @@ import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -97,7 +98,7 @@ public class AuthorizationTestConfiguration {
 
         public NotAuthorizationMock(ClientAndServer authorizationClient) {
 
-            var jwkSet = new JWKSet(RSA_KEY).getKeys().stream().map(jwk -> jwk.getRequiredParams()).toList();
+            var jwkSet = new JWKSet(RSA_KEY).getKeys().stream().map(JWK::getRequiredParams).toList();
 
             var keys = Map.of("keys", jwkSet);
 

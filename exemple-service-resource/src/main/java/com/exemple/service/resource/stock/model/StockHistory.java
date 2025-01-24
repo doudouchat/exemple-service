@@ -1,6 +1,5 @@
 package com.exemple.service.resource.stock.model;
 
-import java.io.Serializable;
 import java.time.Instant;
 
 import com.datastax.oss.driver.api.mapper.annotations.ClusteringColumn;
@@ -15,7 +14,7 @@ import lombok.Setter;
 @CqlName("stock_history")
 @Getter
 @Setter
-public class StockHistory implements Serializable {
+public class StockHistory {
 
     @PartitionKey
     private String store;
