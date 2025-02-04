@@ -4,6 +4,7 @@ kafka:
    topics:
       account: test
       subscription: test
+      stock: test
 zookeeper:
    host: 172.17.0.1:${zookeeper.port}
    session_timeout: 30000

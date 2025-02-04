@@ -121,4 +121,4 @@ CREATE TABLE IF NOT EXISTS stock_history (
 	application text,
 	quantity counter,
 	PRIMARY KEY ((store, product), date, user, application)
-);
+) WITH cdc=true;

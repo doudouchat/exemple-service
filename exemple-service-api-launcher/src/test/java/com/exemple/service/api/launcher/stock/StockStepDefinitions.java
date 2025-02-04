@@ -2,17 +2,24 @@ package com.exemple.service.api.launcher.stock;
 
 import static com.exemple.service.api.launcher.core.InitData.BACK_APP;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.exemple.service.api.launcher.authorization.AuthorizationTestContext;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
@@ -24,6 +31,9 @@ public class StockStepDefinitions {
 
     @Autowired
     private AuthorizationTestContext authorizationContext;
+
+    @Autowired
+    private KafkaConsumer<String, JsonNode> consumerEvent;
 
     private UUID salt;
 
@@ -80,6 +90,21 @@ public class StockStepDefinitions {
                 () -> assertThat(context.lastResponse().getBody().asString())
                         .isEqualTo("Stock /test_company/" + store + "#" + salt + "/" + product + ":" + stock + " is insufficient for quantity "
                                 + quantity));
+
+    }
+
+    @And("stock event is")
+    public void getStockEvent(JsonNode body) {
+
+        await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
+            ConsumerRecords<String, JsonNode> records = consumerEvent.poll(Duration.ofSeconds(5));
+            assertThat(records.iterator()).toIterable().last().satisfies(event -> {
+
+                ObjectNode expectedBody = (ObjectNode) event.value();
+                expectedBody.remove("store");
+                assertThat(expectedBody).isEqualTo(body);
+            });
+        });
 
     }
 
