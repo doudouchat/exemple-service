@@ -63,6 +63,7 @@ CREATE TABLE test.account_username (
 CREATE TABLE test.account_event ( 
 	id UUID,
 	date timestamp,
+	user text,
 	local_date date,
 	data text,
 	event_type text,
@@ -74,6 +75,7 @@ CREATE TABLE test.account_event (
 CREATE TABLE test.subscription_event ( 
 	email text,
 	date timestamp,
+	user text,
 	local_date date,
 	data text,
 	event_type text,

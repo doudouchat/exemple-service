@@ -42,6 +42,7 @@ public class SubscriptionEventResource {
         subscriptionEvent.setDate(context.getDate().toInstant());
         subscriptionEvent.setLocalDate(context.getDate().toLocalDate());
         subscriptionEvent.setEventType(eventType);
+        subscriptionEvent.setUser(context.getPrincipal().getName());
 
         return dao().create(subscriptionEvent);
     }
@@ -57,6 +58,7 @@ public class SubscriptionEventResource {
         subscriptionEvent.setDate(context.getDate().toInstant());
         subscriptionEvent.setLocalDate(context.getDate().toLocalDate());
         subscriptionEvent.setEventType(eventType);
+        subscriptionEvent.setUser(context.getPrincipal().getName());
 
         return dao().create(subscriptionEvent);
     }

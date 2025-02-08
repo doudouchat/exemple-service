@@ -132,6 +132,7 @@ class AccountResourceTest {
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
+            expectedEvent.setUser("user");
             expectedEvent.setId(id);
             expectedEvent.setData((MAPPER.readTree(
                     """
@@ -186,6 +187,7 @@ class AccountResourceTest {
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
+            expectedEvent.setUser("user");
             expectedEvent.setId(id);
             expectedEvent.setData((MAPPER.readTree(
                     """
@@ -240,6 +242,7 @@ class AccountResourceTest {
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
+            expectedEvent.setUser("user");
             expectedEvent.setId(id);
             expectedEvent.setData((MAPPER.readTree(
                     """
@@ -306,6 +309,7 @@ class AccountResourceTest {
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
+            expectedEvent.setUser("user");
             expectedEvent.setId(id);
             expectedEvent.setData((MAPPER.readTree(
                     """
@@ -362,6 +366,7 @@ class AccountResourceTest {
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
+            expectedEvent.setUser("user");
             expectedEvent.setId(id);
             expectedEvent.setData((MAPPER.readTree(
                     """
@@ -424,6 +429,7 @@ class AccountResourceTest {
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
+            expectedEvent.setUser("user");
             expectedEvent.setId(id);
             expectedEvent.setData((MAPPER.readTree(
                     """
@@ -481,6 +487,7 @@ class AccountResourceTest {
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
+            expectedEvent.setUser("user");
             expectedEvent.setId(id);
             expectedEvent.setData((MAPPER.readTree(
                     """
@@ -531,6 +538,7 @@ class AccountResourceTest {
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
+            expectedEvent.setUser("user");
             expectedEvent.setId(id);
             expectedEvent.setData((MAPPER.readTree(
                     """
@@ -592,6 +600,7 @@ class AccountResourceTest {
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
+            expectedEvent.setUser("user");
             expectedEvent.setId(id);
             expectedEvent.setData((MAPPER.readTree(
                     """
@@ -646,6 +655,7 @@ class AccountResourceTest {
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
+            expectedEvent.setUser("user");
             expectedEvent.setId(id);
             expectedEvent.setData((MAPPER.readTree(
                     """
@@ -696,6 +706,7 @@ class AccountResourceTest {
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
+            expectedEvent.setUser("user");
             expectedEvent.setId(id);
             expectedEvent.setData((MAPPER.readTree(
                     """

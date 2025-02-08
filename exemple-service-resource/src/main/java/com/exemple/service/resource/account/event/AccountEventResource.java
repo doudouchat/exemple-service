@@ -43,6 +43,7 @@ public class AccountEventResource {
         accountEvent.setDate(context.getDate().toInstant());
         accountEvent.setLocalDate(context.getDate().toLocalDate());
         accountEvent.setEventType(eventType);
+        accountEvent.setUser(context.getPrincipal().getName());
 
         return dao().create(accountEvent);
     }

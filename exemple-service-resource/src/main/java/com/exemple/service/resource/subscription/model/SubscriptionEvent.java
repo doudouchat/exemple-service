@@ -27,6 +27,8 @@ public class SubscriptionEvent {
 
     private EventType eventType;
 
+    private String user;
+
     private String application;
 
     private String version;

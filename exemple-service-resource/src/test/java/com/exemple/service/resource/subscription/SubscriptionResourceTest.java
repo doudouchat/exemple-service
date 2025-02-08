@@ -97,6 +97,7 @@ class SubscriptionResourceTest {
         expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
         expectedEvent.setApplication("test");
         expectedEvent.setVersion("v1");
+        expectedEvent.setUser("user");
         expectedEvent.setEmail(email);
         expectedEvent.setData((MAPPER.readTree(
                 """
@@ -150,6 +151,7 @@ class SubscriptionResourceTest {
         expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
         expectedEvent.setApplication("test");
         expectedEvent.setVersion("v1");
+        expectedEvent.setUser("user");
         expectedEvent.setEmail(email);
         expectedEvent.setData((MAPPER.readTree(
                 """
@@ -191,6 +193,7 @@ class SubscriptionResourceTest {
         expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
         expectedEvent.setApplication("test");
         expectedEvent.setVersion("v1");
+        expectedEvent.setUser("user");
         expectedEvent.setEmail(email);
         assertThat(event).usingRecursiveComparison()
                 .isEqualTo(expectedEvent);

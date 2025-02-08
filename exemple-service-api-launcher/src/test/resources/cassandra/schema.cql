@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS account_history (
 CREATE TABLE IF NOT EXISTS account_event ( 
 	id UUID,
 	date timestamp,
+	user text,
 	local_date date,
 	data text,
 	event_type text,
@@ -77,6 +78,7 @@ CREATE TABLE account_username (
 CREATE TABLE IF NOT EXISTS subscription_event ( 
 	email text,
 	date timestamp,
+	user text,
 	local_date date,
 	data text,
 	event_type text,
