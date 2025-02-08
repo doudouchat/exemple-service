@@ -15,6 +15,7 @@ import com.exemple.service.resource.account.event.dao.AccountEventDao;
 import com.exemple.service.resource.account.event.mapper.AccountEventMapper;
 import com.exemple.service.resource.account.model.AccountEvent;
 import com.exemple.service.resource.common.model.EventType;
+import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -36,7 +37,7 @@ public class AccountEventResource {
 
         var accountEvent = new AccountEvent();
         accountEvent.setId(id);
-        accountEvent.setData(source);
+        accountEvent.setData(JsonNodeFilterUtils.clean(source));
         accountEvent.setVersion(context.getVersion());
         accountEvent.setApplication(context.getApp());
         accountEvent.setDate(context.getDate().toInstant());

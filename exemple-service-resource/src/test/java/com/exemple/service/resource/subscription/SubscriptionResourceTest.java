@@ -90,13 +90,21 @@ class SubscriptionResourceTest {
                 """.formatted(email)));
 
         // And check event
-        OffsetDateTime createDate = ServiceContextExecution.context().getDate();
         SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
-        assertAll(
-                () -> assertThat(event.getEventType()).isEqualTo(EventType.CREATE),
-                () -> assertThat(event.getLocalDate()).isEqualTo(createDate.toLocalDate()),
-                () -> assertThat(event.getData().get("email").textValue()).isEqualTo(email),
-                () -> assertThat(event.getData().get("update_date").textValue()).isEqualTo("2019-01-01T09:00:00Z"));
+        var expectedEvent = new SubscriptionEvent();
+        expectedEvent.setEventType(EventType.CREATE);
+        expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
+        expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+        expectedEvent.setApplication("test");
+        expectedEvent.setVersion("v1");
+        expectedEvent.setEmail(email);
+        expectedEvent.setData((MAPPER.readTree(
+                """
+                {"email": "%s", "update_date": "2019-01-01T09:00:00Z"}
+
+                """.formatted(email))));
+        assertThat(event).usingRecursiveComparison()
+                .isEqualTo(expectedEvent);
 
         ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("local_date")
                 .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
@@ -106,9 +114,10 @@ class SubscriptionResourceTest {
         List<SubscriptionHistory> histories = subscriptionHistoryResource.findById(email);
         assertAll(
                 () -> assertThat(histories).hasSize(2),
-                () -> assertHistory(subscriptionHistoryResource.findByIdAndField(email, "/email"), email, createDate.toInstant()),
+                () -> assertHistory(subscriptionHistoryResource.findByIdAndField(email, "/email"), email,
+                        ServiceContextExecution.context().getDate().toInstant()),
                 () -> assertHistory(subscriptionHistoryResource.findByIdAndField(email, "/update_date"), "2019-01-01T09:00:00Z",
-                        createDate.toInstant()));
+                        ServiceContextExecution.context().getDate().toInstant()));
 
     }
 
@@ -134,13 +143,21 @@ class SubscriptionResourceTest {
                 """.formatted(email)));
 
         // And check event
-        OffsetDateTime createDate = ServiceContextExecution.context().getDate();
         SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
-        assertAll(
-                () -> assertThat(event.getEventType()).isEqualTo(EventType.UPDATE),
-                () -> assertThat(event.getLocalDate()).isEqualTo(createDate.toLocalDate()),
-                () -> assertThat(event.getData().get("email").textValue()).isEqualTo(email),
-                () -> assertThat(event.getData().get("update_date").textValue()).isEqualTo("2019-01-01T10:00:00Z"));
+        var expectedEvent = new SubscriptionEvent();
+        expectedEvent.setEventType(EventType.UPDATE);
+        expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
+        expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+        expectedEvent.setApplication("test");
+        expectedEvent.setVersion("v1");
+        expectedEvent.setEmail(email);
+        expectedEvent.setData((MAPPER.readTree(
+                """
+                {"email": "%s", "update_date": "2019-01-01T10:00:00Z"}
+
+                """.formatted(email))));
+        assertThat(event).usingRecursiveComparison()
+                .isEqualTo(expectedEvent);
 
         ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("local_date")
                 .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
@@ -152,7 +169,7 @@ class SubscriptionResourceTest {
                 () -> assertThat(histories).hasSize(2),
                 () -> assertHistory(subscriptionHistoryResource.findByIdAndField(email, "/email"), email),
                 () -> assertHistory(subscriptionHistoryResource.findByIdAndField(email, "/update_date"), "2019-01-01T10:00:00Z",
-                        createDate.toInstant()));
+                        ServiceContextExecution.context().getDate().toInstant()));
 
     }
 
@@ -168,9 +185,15 @@ class SubscriptionResourceTest {
 
         // And check event
         SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
-        assertThat(event.getEventType()).isEqualTo(EventType.DELETE);
-        assertThat(event.getLocalDate()).isEqualTo(ServiceContextExecution.context().getDate().toLocalDate());
-        assertThat(event.getData()).isNull();
+        var expectedEvent = new SubscriptionEvent();
+        expectedEvent.setEventType(EventType.DELETE);
+        expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
+        expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+        expectedEvent.setApplication("test");
+        expectedEvent.setVersion("v1");
+        expectedEvent.setEmail(email);
+        assertThat(event).usingRecursiveComparison()
+                .isEqualTo(expectedEvent);
 
         ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("local_date")
                 .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());

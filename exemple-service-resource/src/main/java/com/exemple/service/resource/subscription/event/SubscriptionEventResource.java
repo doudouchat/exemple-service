@@ -10,6 +10,7 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.common.model.EventType;
+import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.subscription.SubscriptionField;
 import com.exemple.service.resource.subscription.event.dao.SubscriptionEventDao;
@@ -35,7 +36,7 @@ public class SubscriptionEventResource {
 
         var subscriptionEvent = new SubscriptionEvent();
         subscriptionEvent.setEmail(email);
-        subscriptionEvent.setData(source);
+        subscriptionEvent.setData(JsonNodeFilterUtils.clean(source));
         subscriptionEvent.setVersion(context.getVersion());
         subscriptionEvent.setApplication(context.getApp());
         subscriptionEvent.setDate(context.getDate().toInstant());

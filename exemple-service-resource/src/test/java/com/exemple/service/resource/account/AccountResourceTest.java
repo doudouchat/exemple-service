@@ -126,10 +126,20 @@ class AccountResourceTest {
 
             // And check event
             AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
-            assertAll(
-                    () -> assertThat(event.getEventType()).isEqualTo(EventType.CREATE),
-                    () -> assertThat(event.getLocalDate()).isEqualTo(ServiceContextExecution.context().getDate().toLocalDate()),
-                    () -> assertThat(event.getData()).isNotNull());
+            var expectedEvent = new AccountEvent();
+            expectedEvent.setEventType(EventType.CREATE);
+            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
+            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setApplication("test");
+            expectedEvent.setVersion("v1");
+            expectedEvent.setId(id);
+            expectedEvent.setData((MAPPER.readTree(
+                    """
+                    {"id": "%s", "email": "jean.dupond@gmail"}"
+
+                    """.formatted(id))));
+            assertThat(event).usingRecursiveComparison()
+                    .isEqualTo(expectedEvent);
 
             ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
                     .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
@@ -169,6 +179,22 @@ class AccountResourceTest {
                     """.formatted(id)));
 
             // And check event
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            var expectedEvent = new AccountEvent();
+            expectedEvent.setEventType(EventType.UPDATE);
+            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
+            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setApplication("test");
+            expectedEvent.setVersion("v1");
+            expectedEvent.setId(id);
+            expectedEvent.setData((MAPPER.readTree(
+                    """
+                    {"id": "%s", "email": "jean.dupont@gmail", "age": 19}"
+
+                    """.formatted(id))));
+            assertThat(event).usingRecursiveComparison()
+                    .isEqualTo(expectedEvent);
+
             ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
                     .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
             assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(2);
@@ -205,6 +231,27 @@ class AccountResourceTest {
                     {"id": "%s"}"
 
                     """.formatted(id)));
+
+            // And check event
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            var expectedEvent = new AccountEvent();
+            expectedEvent.setEventType(EventType.UPDATE);
+            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
+            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setApplication("test");
+            expectedEvent.setVersion("v1");
+            expectedEvent.setId(id);
+            expectedEvent.setData((MAPPER.readTree(
+                    """
+                    {"id": "%s"}"
+
+                    """.formatted(id))));
+            assertThat(event).usingRecursiveComparison()
+                    .isEqualTo(expectedEvent);
+
+            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
+                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
+            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(3);
         }
 
     }
@@ -250,6 +297,27 @@ class AccountResourceTest {
                     {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}}}"
 
                     """.formatted(id)));
+
+            // And check event
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            var expectedEvent = new AccountEvent();
+            expectedEvent.setEventType(EventType.CREATE);
+            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
+            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setApplication("test");
+            expectedEvent.setVersion("v1");
+            expectedEvent.setId(id);
+            expectedEvent.setData((MAPPER.readTree(
+                    """
+                    {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}}}"
+
+                    """.formatted(id))));
+            assertThat(event).usingRecursiveComparison()
+                    .isEqualTo(expectedEvent);
+
+            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
+                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
+            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(1);
         }
 
         @Test
@@ -285,6 +353,27 @@ class AccountResourceTest {
                     """
                     {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}, "job": {"street": "1 rue de la paris"}}}
                     """.formatted(id)));
+
+            // And check event
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            var expectedEvent = new AccountEvent();
+            expectedEvent.setEventType(EventType.UPDATE);
+            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
+            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setApplication("test");
+            expectedEvent.setVersion("v1");
+            expectedEvent.setId(id);
+            expectedEvent.setData((MAPPER.readTree(
+                    """
+                    {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}, "job": {"street": "1 rue de la paris"}}}
+
+                    """.formatted(id))));
+            assertThat(event).usingRecursiveComparison()
+                    .isEqualTo(expectedEvent);
+
+            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
+                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
+            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(2);
         }
 
         @Test
@@ -327,6 +416,28 @@ class AccountResourceTest {
                     "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}, "job": {"street": "10 rue de la paris", "floor": 5}}}
                     """.formatted(id)));
 
+            // And check event
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            var expectedEvent = new AccountEvent();
+            expectedEvent.setEventType(EventType.UPDATE);
+            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
+            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setApplication("test");
+            expectedEvent.setVersion("v1");
+            expectedEvent.setId(id);
+            expectedEvent.setData((MAPPER.readTree(
+                    """
+                    {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}, "job": {"street": "10 rue de la paris", "floor": 5}}}
+                    """
+                            .formatted(
+                                    id))));
+            assertThat(event).usingRecursiveComparison()
+                    .isEqualTo(expectedEvent);
+
+            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
+                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
+            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(4);
+
         }
 
         @Test
@@ -361,6 +472,26 @@ class AccountResourceTest {
                     """
                     {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}}}
                     """.formatted(id)));
+
+            // And check event
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            var expectedEvent = new AccountEvent();
+            expectedEvent.setEventType(EventType.UPDATE);
+            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
+            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setApplication("test");
+            expectedEvent.setVersion("v1");
+            expectedEvent.setId(id);
+            expectedEvent.setData((MAPPER.readTree(
+                    """
+                    {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}}}
+                    """.formatted(id))));
+            assertThat(event).usingRecursiveComparison()
+                    .isEqualTo(expectedEvent);
+
+            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
+                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
+            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(5);
         }
 
         @Test
@@ -391,6 +522,26 @@ class AccountResourceTest {
                     """
                     {"id": "%s"}
                     """.formatted(id)));
+
+            // And check event
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            var expectedEvent = new AccountEvent();
+            expectedEvent.setEventType(EventType.UPDATE);
+            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
+            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setApplication("test");
+            expectedEvent.setVersion("v1");
+            expectedEvent.setId(id);
+            expectedEvent.setData((MAPPER.readTree(
+                    """
+                    {"id": "%s"}
+                    """.formatted(id))));
+            assertThat(event).usingRecursiveComparison()
+                    .isEqualTo(expectedEvent);
+
+            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
+                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
+            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(6);
         }
     }
 
@@ -433,6 +584,26 @@ class AccountResourceTest {
                     {"id": "%s", "cgus": [{"code": "code_1", "version": "v1"}]}
                     """.formatted(id)));
 
+            // And check event
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            var expectedEvent = new AccountEvent();
+            expectedEvent.setEventType(EventType.CREATE);
+            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
+            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setApplication("test");
+            expectedEvent.setVersion("v1");
+            expectedEvent.setId(id);
+            expectedEvent.setData((MAPPER.readTree(
+                    """
+                    {"id": "%s", "cgus": [{"code": "code_1", "version": "v1"}]}
+                    """.formatted(id))));
+            assertThat(event).usingRecursiveComparison()
+                    .isEqualTo(expectedEvent);
+
+            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
+                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
+            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(1);
+
         }
 
         @Test
@@ -466,6 +637,26 @@ class AccountResourceTest {
                     """
                     {"id": "%s", "cgus": [{"code": "code_1", "version": "v1"}, {"code": "code_1", "version": "v2"}]}
                     """.formatted(id)));
+
+            // And check event
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            var expectedEvent = new AccountEvent();
+            expectedEvent.setEventType(EventType.UPDATE);
+            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
+            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setApplication("test");
+            expectedEvent.setVersion("v1");
+            expectedEvent.setId(id);
+            expectedEvent.setData((MAPPER.readTree(
+                    """
+                     {"id": "%s", "cgus": [{"code": "code_1", "version": "v1"}, {"code": "code_1", "version": "v2"}]}
+                    """.formatted(id))));
+            assertThat(event).usingRecursiveComparison()
+                    .isEqualTo(expectedEvent);
+
+            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
+                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
+            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(2);
         }
 
         @Test
@@ -496,6 +687,26 @@ class AccountResourceTest {
                     """
                     {"id": "%s"}
                     """.formatted(id)));
+
+            // And check event
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            var expectedEvent = new AccountEvent();
+            expectedEvent.setEventType(EventType.UPDATE);
+            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
+            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setApplication("test");
+            expectedEvent.setVersion("v1");
+            expectedEvent.setId(id);
+            expectedEvent.setData((MAPPER.readTree(
+                    """
+                     {"id": "%s"}
+                    """.formatted(id))));
+            assertThat(event).usingRecursiveComparison()
+                    .isEqualTo(expectedEvent);
+
+            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
+                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
+            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(3);
         }
     }
 

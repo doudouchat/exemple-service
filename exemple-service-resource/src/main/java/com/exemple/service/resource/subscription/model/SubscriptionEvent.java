@@ -14,9 +14,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@CqlName("subscription_event")
 @Getter
 @Setter
+@CqlName("subscription_event")
 public class SubscriptionEvent {
 
     @PartitionKey
