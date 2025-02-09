@@ -40,7 +40,6 @@ public class SubscriptionEventResource {
         subscriptionEvent.setVersion(context.getVersion());
         subscriptionEvent.setApplication(context.getApp());
         subscriptionEvent.setDate(context.getDate().toInstant());
-        subscriptionEvent.setLocalDate(context.getDate().toLocalDate());
         subscriptionEvent.setEventType(eventType);
         subscriptionEvent.setUser(context.getPrincipal().getName());
 
@@ -56,7 +55,6 @@ public class SubscriptionEventResource {
         subscriptionEvent.setVersion(context.getVersion());
         subscriptionEvent.setApplication(context.getApp());
         subscriptionEvent.setDate(context.getDate().toInstant());
-        subscriptionEvent.setLocalDate(context.getDate().toLocalDate());
         subscriptionEvent.setEventType(eventType);
         subscriptionEvent.setUser(context.getPrincipal().getName());
 

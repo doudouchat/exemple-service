@@ -1,7 +1,6 @@
 package com.exemple.service.resource.account.model;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.UUID;
 
 import com.datastax.oss.driver.api.mapper.annotations.ClusteringColumn;
@@ -35,7 +34,5 @@ public class AccountEvent {
     private String version;
 
     private JsonNode data;
-
-    private LocalDate localDate;
 
 }

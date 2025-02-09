@@ -23,7 +23,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.subscription.SubscriptionResource;
@@ -93,7 +92,6 @@ class SubscriptionResourceTest {
         SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
         var expectedEvent = new SubscriptionEvent();
         expectedEvent.setEventType(EventType.CREATE);
-        expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
         expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
         expectedEvent.setApplication("test");
         expectedEvent.setVersion("v1");
@@ -107,9 +105,9 @@ class SubscriptionResourceTest {
         assertThat(event).usingRecursiveComparison()
                 .isEqualTo(expectedEvent);
 
-        ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("local_date")
-                .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-        assertThat(countAccountEvents.all()).hasSize(1);
+        var events = session.execute(
+                QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("email").isEqualTo(QueryBuilder.literal(email)).build());
+        assertThat(events.all()).hasSize(1);
 
         // and check history
         List<SubscriptionHistory> histories = subscriptionHistoryResource.findById(email);
@@ -147,7 +145,6 @@ class SubscriptionResourceTest {
         SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
         var expectedEvent = new SubscriptionEvent();
         expectedEvent.setEventType(EventType.UPDATE);
-        expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
         expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
         expectedEvent.setApplication("test");
         expectedEvent.setVersion("v1");
@@ -161,9 +158,9 @@ class SubscriptionResourceTest {
         assertThat(event).usingRecursiveComparison()
                 .isEqualTo(expectedEvent);
 
-        ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("local_date")
-                .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-        assertThat(countAccountEvents.all()).hasSize(2);
+        var events = session.execute(
+                QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("email").isEqualTo(QueryBuilder.literal(email)).build());
+        assertThat(events.all()).hasSize(2);
 
         // and check history
         List<SubscriptionHistory> histories = subscriptionHistoryResource.findById(email);
@@ -189,7 +186,6 @@ class SubscriptionResourceTest {
         SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
         var expectedEvent = new SubscriptionEvent();
         expectedEvent.setEventType(EventType.DELETE);
-        expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
         expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
         expectedEvent.setApplication("test");
         expectedEvent.setVersion("v1");
@@ -198,9 +194,9 @@ class SubscriptionResourceTest {
         assertThat(event).usingRecursiveComparison()
                 .isEqualTo(expectedEvent);
 
-        ResultSet countAccountEvents = session.execute(QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("local_date")
-                .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-        assertThat(countAccountEvents.all()).hasSize(3);
+        var events = session.execute(
+                QueryBuilder.selectFrom("test", "subscription_event").all().whereColumn("email").isEqualTo(QueryBuilder.literal(email)).build());
+        assertThat(events.all()).hasSize(3);
 
     }
 

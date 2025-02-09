@@ -32,7 +32,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.account.AccountResource;
@@ -128,7 +127,6 @@ class AccountResourceTest {
             AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.CREATE);
-            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
@@ -142,9 +140,9 @@ class AccountResourceTest {
             assertThat(event).usingRecursiveComparison()
                     .isEqualTo(expectedEvent);
 
-            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
-                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(1);
+            var events = session
+                    .execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("id").isEqualTo(QueryBuilder.literal(id)).build());
+            assertThat(events.all()).hasSizeGreaterThanOrEqualTo(1);
         }
 
         @Test
@@ -183,7 +181,6 @@ class AccountResourceTest {
             AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.UPDATE);
-            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
@@ -197,9 +194,9 @@ class AccountResourceTest {
             assertThat(event).usingRecursiveComparison()
                     .isEqualTo(expectedEvent);
 
-            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
-                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(2);
+            var events = session
+                    .execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("id").isEqualTo(QueryBuilder.literal(id)).build());
+            assertThat(events.all()).hasSizeGreaterThanOrEqualTo(2);
         }
 
         @Test
@@ -238,7 +235,6 @@ class AccountResourceTest {
             AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.UPDATE);
-            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
@@ -252,9 +248,9 @@ class AccountResourceTest {
             assertThat(event).usingRecursiveComparison()
                     .isEqualTo(expectedEvent);
 
-            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
-                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(3);
+            var events = session
+                    .execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("id").isEqualTo(QueryBuilder.literal(id)).build());
+            assertThat(events.all()).hasSizeGreaterThanOrEqualTo(3);
         }
 
     }
@@ -305,7 +301,6 @@ class AccountResourceTest {
             AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.CREATE);
-            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
@@ -319,9 +314,9 @@ class AccountResourceTest {
             assertThat(event).usingRecursiveComparison()
                     .isEqualTo(expectedEvent);
 
-            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
-                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(1);
+            var events = session
+                    .execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("id").isEqualTo(QueryBuilder.literal(id)).build());
+            assertThat(events.all()).hasSizeGreaterThanOrEqualTo(1);
         }
 
         @Test
@@ -362,7 +357,6 @@ class AccountResourceTest {
             AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.UPDATE);
-            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
@@ -376,9 +370,9 @@ class AccountResourceTest {
             assertThat(event).usingRecursiveComparison()
                     .isEqualTo(expectedEvent);
 
-            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
-                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(2);
+            var events = session
+                    .execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("id").isEqualTo(QueryBuilder.literal(id)).build());
+            assertThat(events.all()).hasSizeGreaterThanOrEqualTo(2);
         }
 
         @Test
@@ -425,7 +419,6 @@ class AccountResourceTest {
             AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.UPDATE);
-            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
@@ -440,9 +433,9 @@ class AccountResourceTest {
             assertThat(event).usingRecursiveComparison()
                     .isEqualTo(expectedEvent);
 
-            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
-                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(4);
+            var events = session
+                    .execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("id").isEqualTo(QueryBuilder.literal(id)).build());
+            assertThat(events.all()).hasSizeGreaterThanOrEqualTo(3);
 
         }
 
@@ -483,7 +476,6 @@ class AccountResourceTest {
             AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.UPDATE);
-            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
@@ -496,9 +488,9 @@ class AccountResourceTest {
             assertThat(event).usingRecursiveComparison()
                     .isEqualTo(expectedEvent);
 
-            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
-                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(5);
+            var events = session
+                    .execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("id").isEqualTo(QueryBuilder.literal(id)).build());
+            assertThat(events.all()).hasSizeGreaterThanOrEqualTo(4);
         }
 
         @Test
@@ -534,7 +526,6 @@ class AccountResourceTest {
             AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.UPDATE);
-            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
@@ -547,9 +538,9 @@ class AccountResourceTest {
             assertThat(event).usingRecursiveComparison()
                     .isEqualTo(expectedEvent);
 
-            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
-                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(6);
+            var events = session
+                    .execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("id").isEqualTo(QueryBuilder.literal(id)).build());
+            assertThat(events.all()).hasSizeGreaterThanOrEqualTo(5);
         }
     }
 
@@ -596,7 +587,6 @@ class AccountResourceTest {
             AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.CREATE);
-            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
@@ -609,9 +599,9 @@ class AccountResourceTest {
             assertThat(event).usingRecursiveComparison()
                     .isEqualTo(expectedEvent);
 
-            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
-                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(1);
+            var events = session
+                    .execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("id").isEqualTo(QueryBuilder.literal(id)).build());
+            assertThat(events.all()).hasSizeGreaterThanOrEqualTo(1);
 
         }
 
@@ -651,7 +641,6 @@ class AccountResourceTest {
             AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.UPDATE);
-            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
@@ -664,9 +653,9 @@ class AccountResourceTest {
             assertThat(event).usingRecursiveComparison()
                     .isEqualTo(expectedEvent);
 
-            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
-                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(2);
+            var events = session
+                    .execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("id").isEqualTo(QueryBuilder.literal(id)).build());
+            assertThat(events.all()).hasSizeGreaterThanOrEqualTo(2);
         }
 
         @Test
@@ -702,7 +691,6 @@ class AccountResourceTest {
             AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.UPDATE);
-            expectedEvent.setLocalDate(ServiceContextExecution.context().getDate().toLocalDate());
             expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
@@ -715,9 +703,9 @@ class AccountResourceTest {
             assertThat(event).usingRecursiveComparison()
                     .isEqualTo(expectedEvent);
 
-            ResultSet acountAccountEvents = session.execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("local_date")
-                    .isEqualTo(QueryBuilder.literal(ServiceContextExecution.context().getDate().toLocalDate())).build());
-            assertThat(acountAccountEvents.all()).hasSizeGreaterThanOrEqualTo(3);
+            var events = session
+                    .execute(QueryBuilder.selectFrom("test", "account_event").all().whereColumn("id").isEqualTo(QueryBuilder.literal(id)).build());
+            assertThat(events.all()).hasSizeGreaterThanOrEqualTo(3);
         }
     }
 

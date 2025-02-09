@@ -1,7 +1,6 @@
 package com.exemple.service.resource.subscription.model;
 
 import java.time.Instant;
-import java.time.LocalDate;
 
 import com.datastax.oss.driver.api.mapper.annotations.ClusteringColumn;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
@@ -34,6 +33,4 @@ public class SubscriptionEvent {
     private String version;
 
     private JsonNode data;
-
-    private LocalDate localDate;
 }
