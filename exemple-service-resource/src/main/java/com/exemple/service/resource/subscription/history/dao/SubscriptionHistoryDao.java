@@ -17,9 +17,6 @@ public interface SubscriptionHistoryDao {
     @Select
     PagingIterable<SubscriptionHistory> findById(String email);
 
-    @Select
-    SubscriptionHistory findByIdAndField(String email, String field);
-
     @Delete(entityClass = SubscriptionHistory.class)
     BoundStatement deleteByIdAndField(String email, String field);
 }

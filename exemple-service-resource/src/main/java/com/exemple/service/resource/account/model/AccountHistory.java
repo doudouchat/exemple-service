@@ -10,12 +10,14 @@ import com.exemple.service.resource.common.history.HistoryModel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
 @CqlName("account_history")
+@ToString(callSuper = true)
 public class AccountHistory extends HistoryModel<UUID> {
 
     @PartitionKey

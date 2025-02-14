@@ -1,7 +1,6 @@
 package com.exemple.service.resource.stock;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.List;
 import java.util.UUID;
@@ -49,10 +48,24 @@ class StockResourceTest {
         assertThat(resource.get("store1", "product1")).hasValue(-10L);
 
         // And check history
-        List<StockHistory> histories = historyResource.findByStoreAndProduct("store1", "product1");
-        assertAll(
-                () -> assertThat(histories).hasSize(2),
-                () -> assertThat(histories).extracting(StockHistory::getQuantity).contains(5L, -15L));
+        var expectedHistory1 = new StockHistory();
+        expectedHistory1.setApplication("test");
+        expectedHistory1.setUser("user");
+        expectedHistory1.setStore("store1");
+        expectedHistory1.setProduct("product1");
+        expectedHistory1.setQuantity(5L);
+
+        var expectedHistory2 = new StockHistory();
+        expectedHistory2.setApplication("test");
+        expectedHistory2.setUser("user");
+        expectedHistory2.setStore("store1");
+        expectedHistory2.setProduct("product1");
+        expectedHistory2.setQuantity(-15L);
+
+        assertThat(historyResource.findByStoreAndProduct("store1", "product1")).usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .ignoringFields("date")
+                .isEqualTo(List.of(expectedHistory1, expectedHistory2));
 
     }
 

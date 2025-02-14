@@ -41,11 +41,6 @@ public class AccountHistoryResource {
         return dao().findById(id).all();
     }
 
-    public AccountHistory findByIdAndField(UUID id, String field) {
-
-        return dao().findByIdAndField(id, field);
-    }
-
     public Collection<BoundStatement> saveHistories(JsonNode source) {
 
         return saveHistories(source, MAPPER.createObjectNode());

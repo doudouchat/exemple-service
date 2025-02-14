@@ -1,17 +1,14 @@
 package com.exemple.service.resource.subscription;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -26,6 +23,8 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.subscription.SubscriptionResource;
+import com.exemple.service.resource.common.history.ExpectedHistory;
+import com.exemple.service.resource.common.history.HistoryAssert;
 import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.exemple.service.resource.subscription.event.SubscriptionEventResource;
@@ -34,6 +33,8 @@ import com.exemple.service.resource.subscription.model.SubscriptionEvent;
 import com.exemple.service.resource.subscription.model.SubscriptionHistory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.experimental.SuperBuilder;
 
 @TestMethodOrder(OrderAnnotation.class)
 @SpringBootTest(classes = ResourceTestConfiguration.class)
@@ -56,6 +57,8 @@ class SubscriptionResourceTest {
     private CqlSession session;
 
     private final String email = UUID.randomUUID() + "@gmail.com";
+
+    private OffsetDateTime createDate;
 
     @BeforeEach
     void initExecutionContextDate() {
@@ -110,13 +113,21 @@ class SubscriptionResourceTest {
         assertThat(events.all()).hasSize(1);
 
         // and check history
-        List<SubscriptionHistory> histories = subscriptionHistoryResource.findById(email);
-        assertAll(
-                () -> assertThat(histories).hasSize(2),
-                () -> assertHistory(subscriptionHistoryResource.findByIdAndField(email, "/email"), email,
-                        ServiceContextExecution.context().getDate().toInstant()),
-                () -> assertHistory(subscriptionHistoryResource.findByIdAndField(email, "/update_date"), "2019-01-01T09:00:00Z",
-                        ServiceContextExecution.context().getDate().toInstant()));
+        createDate = ServiceContextExecution.context().getDate();
+
+        var expectedHistory1 = ExpectedSubscriptionHistory.builder()
+                .field("/email")
+                .date(createDate)
+                .value(email)
+                .build();
+
+        var expectedHistory2 = ExpectedSubscriptionHistory.builder()
+                .field("/update_date")
+                .date(createDate)
+                .value("2019-01-01T09:00:00Z")
+                .build();
+
+        new SubscriptionHistoryAssert(email).contains(List.of(expectedHistory1, expectedHistory2));
 
     }
 
@@ -163,12 +174,22 @@ class SubscriptionResourceTest {
         assertThat(events.all()).hasSize(2);
 
         // and check history
-        List<SubscriptionHistory> histories = subscriptionHistoryResource.findById(email);
-        assertAll(
-                () -> assertThat(histories).hasSize(2),
-                () -> assertHistory(subscriptionHistoryResource.findByIdAndField(email, "/email"), email),
-                () -> assertHistory(subscriptionHistoryResource.findByIdAndField(email, "/update_date"), "2019-01-01T10:00:00Z",
-                        ServiceContextExecution.context().getDate().toInstant()));
+        var updateDate = ServiceContextExecution.context().getDate();
+
+        var expectedHistory1 = ExpectedSubscriptionHistory.builder()
+                .field("/email")
+                .date(createDate)
+                .value(email)
+                .build();
+
+        var expectedHistory2 = ExpectedSubscriptionHistory.builder()
+                .field("/update_date")
+                .date(updateDate)
+                .previousValue("2019-01-01T09:00:00Z")
+                .value("2019-01-01T10:00:00Z")
+                .build();
+
+        new SubscriptionHistoryAssert(email).contains(List.of(expectedHistory1, expectedHistory2));
 
     }
 
@@ -200,29 +221,31 @@ class SubscriptionResourceTest {
 
     }
 
-    private static void assertHistory(SubscriptionHistory subscriptionHistory, Object expectedValue, Instant expectedDate) {
+    public class SubscriptionHistoryAssert extends HistoryAssert<String> {
 
-        assertAll(
-                () -> assertThat(subscriptionHistory.getValue().asText()).isEqualTo(expectedValue.toString()),
-                () -> assertThat(subscriptionHistory.getDate()).isCloseTo(expectedDate, Assertions.within(1, ChronoUnit.MILLIS)),
-                () -> assertHistory(subscriptionHistory));
-
+        public SubscriptionHistoryAssert(String email) {
+            super(email, subscriptionHistoryResource.findById(email));
+        }
     }
 
-    private static void assertHistory(SubscriptionHistory subscriptionHistory, Object expectedValue) {
+    @SuperBuilder
+    public static class ExpectedSubscriptionHistory extends ExpectedHistory<String> {
 
-        assertAll(
-                () -> assertThat(subscriptionHistory.getValue().asText()).isEqualTo(expectedValue.toString()),
-                () -> assertHistory(subscriptionHistory));
+        @Override
+        public SubscriptionHistory buildHistory(String email) {
 
-    }
+            var history = new SubscriptionHistory();
+            history.setId(email);
+            history.setField(getField());
+            history.setDate(getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            history.setApplication("test");
+            history.setVersion("v1");
+            history.setUser("user");
+            history.setPreviousValue(getPreviousValue());
+            history.setValue(getValue());
 
-    private static void assertHistory(SubscriptionHistory subscriptionHistory) {
-
-        assertAll(
-                () -> assertThat(subscriptionHistory.getApplication()).isEqualTo("test"),
-                () -> assertThat(subscriptionHistory.getVersion()).isEqualTo("v1"),
-                () -> assertThat(subscriptionHistory.getUser()).isEqualTo("user"));
+            return history;
+        }
 
     }
 

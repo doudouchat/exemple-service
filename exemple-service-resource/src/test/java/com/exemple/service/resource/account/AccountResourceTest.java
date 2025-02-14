@@ -2,10 +2,8 @@ package com.exemple.service.resource.account;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -17,7 +15,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,11 +37,14 @@ import com.exemple.service.resource.account.exception.UsernameAlreadyExistsExcep
 import com.exemple.service.resource.account.history.AccountHistoryResource;
 import com.exemple.service.resource.account.model.AccountEvent;
 import com.exemple.service.resource.account.model.AccountHistory;
+import com.exemple.service.resource.common.history.ExpectedHistory;
+import com.exemple.service.resource.common.history.HistoryAssert;
 import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
+
+import lombok.experimental.SuperBuilder;
 
 @TestMethodOrder(OrderAnnotation.class)
 @SpringBootTest(classes = ResourceTestConfiguration.class)
@@ -108,12 +108,21 @@ class AccountResourceTest {
             resource.save(account);
 
             // Then check history
-            List<AccountHistory> histories = accountHistoryResource.findById(id);
             createDate = ServiceContextExecution.context().getDate();
-            assertAll(
-                    () -> assertThat(histories).hasSize(2),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/email"), "jean.dupond@gmail", createDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            var expectedHistory1 = ExpectedAccountHistory.builder()
+                    .field("/email")
+                    .date(createDate)
+                    .value("jean.dupond@gmail")
+                    .build();
+
+            var expectedHistory2 = ExpectedAccountHistory.builder()
+                    .field("/id")
+                    .date(createDate)
+                    .value(id.toString())
+                    .build();
+
+            new AccountHistoryAssert(id).contains(List.of(expectedHistory1, expectedHistory2));
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
@@ -161,13 +170,28 @@ class AccountResourceTest {
             resource.save(account, resource.get(id).get());
 
             // Then check history
-            List<AccountHistory> histories = accountHistoryResource.findById(id);
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
-            assertAll(
-                    () -> assertThat(histories).hasSize(3),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/email"), "jean.dupont@gmail", updateDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/age"), 19, updateDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            var expectedHistory1 = ExpectedAccountHistory.builder()
+                    .field("/email")
+                    .date(updateDate)
+                    .value("jean.dupont@gmail")
+                    .previousValue("jean.dupond@gmail")
+                    .build();
+
+            var expectedHistory2 = ExpectedAccountHistory.builder()
+                    .field("/id")
+                    .date(createDate)
+                    .value(id.toString())
+                    .build();
+
+            var expectedHistory3 = ExpectedAccountHistory.builder()
+                    .field("/age")
+                    .date(updateDate)
+                    .value(19)
+                    .build();
+
+            new AccountHistoryAssert(id).contains(List.of(expectedHistory1, expectedHistory2, expectedHistory3));
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
@@ -215,13 +239,27 @@ class AccountResourceTest {
             resource.save(account, resource.get(id).get());
 
             // Then check history
-            List<AccountHistory> histories = accountHistoryResource.findById(id);
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
-            assertAll(
-                    () -> assertThat(histories).hasSize(3),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/email"), JsonNodeType.NULL, updateDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/age"), JsonNodeType.NULL, updateDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            var expectedHistory1 = ExpectedAccountHistory.builder()
+                    .field("/email")
+                    .date(updateDate)
+                    .previousValue("jean.dupont@gmail")
+                    .build();
+
+            var expectedHistory2 = ExpectedAccountHistory.builder()
+                    .field("/id")
+                    .date(createDate)
+                    .value(id.toString())
+                    .build();
+
+            var expectedHistory3 = ExpectedAccountHistory.builder()
+                    .field("/age")
+                    .date(updateDate)
+                    .previousValue(19)
+                    .build();
+
+            new AccountHistoryAssert(id).contains(List.of(expectedHistory1, expectedHistory2, expectedHistory3));
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
@@ -280,14 +318,27 @@ class AccountResourceTest {
             resource.save(account);
 
             // Then check history
-            List<AccountHistory> histories = accountHistoryResource.findById(id);
             createDate = ServiceContextExecution.context().getDate();
-            assertAll(
-                    () -> assertThat(histories).hasSize(3),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/street"), "1 rue de la poste",
-                            createDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/floor"), 5, createDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            var expectedHistory1 = ExpectedAccountHistory.builder()
+                    .field("/addresses/home/floor")
+                    .date(createDate)
+                    .value(5)
+                    .build();
+
+            var expectedHistory2 = ExpectedAccountHistory.builder()
+                    .field("/id")
+                    .date(createDate)
+                    .value(id.toString())
+                    .build();
+
+            var expectedHistory3 = ExpectedAccountHistory.builder()
+                    .field("/addresses/home/street")
+                    .date(createDate)
+                    .value("1 rue de la poste")
+                    .build();
+
+            new AccountHistoryAssert(id).contains(List.of(expectedHistory1, expectedHistory2, expectedHistory3));
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
@@ -335,16 +386,33 @@ class AccountResourceTest {
             resource.save(account, resource.get(id).get());
 
             // Then check history
-            List<AccountHistory> histories = accountHistoryResource.findById(id);
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
-            assertAll(
-                    () -> assertThat(histories).hasSize(4),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/street"), "1 rue de la poste",
-                            createDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/floor"), 5, createDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/job/street"), "1 rue de la paris",
-                            updateDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            var expectedHistory1 = ExpectedAccountHistory.builder()
+                    .field("/addresses/home/floor")
+                    .date(createDate)
+                    .value(5)
+                    .build();
+
+            var expectedHistory2 = ExpectedAccountHistory.builder()
+                    .field("/id")
+                    .date(createDate)
+                    .value(id.toString())
+                    .build();
+
+            var expectedHistory3 = ExpectedAccountHistory.builder()
+                    .field("/addresses/home/street")
+                    .date(createDate)
+                    .value("1 rue de la poste")
+                    .build();
+
+            var expectedHistory4 = ExpectedAccountHistory.builder()
+                    .field("/addresses/job/street")
+                    .date(updateDate)
+                    .value("1 rue de la paris")
+                    .build();
+
+            new AccountHistoryAssert(id).contains(List.of(expectedHistory1, expectedHistory2, expectedHistory3, expectedHistory4));
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
@@ -393,18 +461,40 @@ class AccountResourceTest {
             resource.save(account, resource.get(id).get());
 
             // Then check history
-            List<AccountHistory> histories = accountHistoryResource.findById(id);
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
-            assertAll(
-                    () -> assertThat(histories).hasSize(5),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/street"), "1 rue de la poste",
-                            createDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/floor"), 5, createDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/job/street"), "10 rue de la paris",
-                            updateDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/job/floor"), 5,
-                            updateDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            var expectedHistory1 = ExpectedAccountHistory.builder()
+                    .field("/addresses/home/floor")
+                    .date(createDate)
+                    .value(5)
+                    .build();
+
+            var expectedHistory2 = ExpectedAccountHistory.builder()
+                    .field("/id")
+                    .date(createDate)
+                    .value(id.toString())
+                    .build();
+
+            var expectedHistory3 = ExpectedAccountHistory.builder()
+                    .field("/addresses/home/street")
+                    .date(createDate)
+                    .value("1 rue de la poste")
+                    .build();
+
+            var expectedHistory4 = ExpectedAccountHistory.builder()
+                    .field("/addresses/job/street")
+                    .date(updateDate)
+                    .value("10 rue de la paris")
+                    .previousValue("1 rue de la paris")
+                    .build();
+
+            var expectedHistory5 = ExpectedAccountHistory.builder()
+                    .field("/addresses/job/floor")
+                    .date(updateDate)
+                    .value(5)
+                    .build();
+
+            new AccountHistoryAssert(id).contains(List.of(expectedHistory1, expectedHistory2, expectedHistory3, expectedHistory4, expectedHistory5));
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
@@ -454,16 +544,35 @@ class AccountResourceTest {
             resource.save(account, resource.get(id).get());
 
             // Then check history
-            List<AccountHistory> histories = accountHistoryResource.findById(id);
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
-            assertAll(
-                    () -> assertThat(histories).hasSize(4),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/street"), "1 rue de la poste",
-                            createDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/home/floor"), 5, createDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses/job"), JsonNodeType.NULL,
-                            updateDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            var expectedHistory1 = ExpectedAccountHistory.builder()
+                    .field("/addresses/home/floor")
+                    .date(createDate)
+                    .value(5)
+                    .build();
+
+            var expectedHistory2 = ExpectedAccountHistory.builder()
+                    .field("/id")
+                    .date(createDate)
+                    .value(id.toString())
+                    .build();
+
+            var expectedHistory3 = ExpectedAccountHistory.builder()
+                    .field("/addresses/home/street")
+                    .date(createDate)
+                    .value("1 rue de la poste")
+                    .build();
+
+            var expectedHistory4 = ExpectedAccountHistory.builder()
+                    .field("/addresses/job")
+                    .date(updateDate)
+                    .previousValue(MAPPER.readTree("""
+                                                   {"street": "10 rue de la paris", "floor": 5}
+                                                   """))
+                    .build();
+
+            new AccountHistoryAssert(id).contains(List.of(expectedHistory1, expectedHistory2, expectedHistory3, expectedHistory4));
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
@@ -508,12 +617,23 @@ class AccountResourceTest {
             resource.save(account, resource.get(id).get());
 
             // Then check history
-            List<AccountHistory> histories = accountHistoryResource.findById(id);
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
-            assertAll(
-                    () -> assertThat(histories).hasSize(2),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/addresses"), JsonNodeType.NULL, updateDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            var expectedHistory1 = ExpectedAccountHistory.builder()
+                    .field("/id")
+                    .date(createDate)
+                    .value(id.toString())
+                    .build();
+
+            var expectedHistory2 = ExpectedAccountHistory.builder()
+                    .field("/addresses")
+                    .date(updateDate)
+                    .previousValue(MAPPER.readTree("""
+                                                   {"home": {"street": "1 rue de la poste", "floor": 5}}
+                                                   """))
+                    .build();
+
+            new AccountHistoryAssert(id).contains(List.of(expectedHistory1, expectedHistory2));
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
@@ -568,13 +688,27 @@ class AccountResourceTest {
             resource.save(account);
 
             // Then check history
-            List<AccountHistory> histories = accountHistoryResource.findById(id);
             createDate = ServiceContextExecution.context().getDate();
-            assertAll(
-                    () -> assertThat(histories).hasSize(3),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/code"), "code_1", createDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/version"), "v1", createDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            var expectedHistory1 = ExpectedAccountHistory.builder()
+                    .field("/cgus/0/code")
+                    .date(createDate)
+                    .value("code_1")
+                    .build();
+
+            var expectedHistory2 = ExpectedAccountHistory.builder()
+                    .field("/id")
+                    .date(createDate)
+                    .value(id.toString())
+                    .build();
+
+            var expectedHistory3 = ExpectedAccountHistory.builder()
+                    .field("/cgus/0/version")
+                    .date(createDate)
+                    .value("v1")
+                    .build();
+
+            new AccountHistoryAssert(id).contains(List.of(expectedHistory1, expectedHistory2, expectedHistory3));
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
@@ -620,15 +754,39 @@ class AccountResourceTest {
             resource.save(account, resource.get(id).get());
 
             // Then check history
-            List<AccountHistory> histories = accountHistoryResource.findById(id);
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
-            assertAll(
-                    () -> assertThat(histories).hasSize(5),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/code"), "code_1", createDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/0/version"), "v1", createDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/1/code"), "code_1", updateDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus/1/version"), "v2", updateDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            var expectedHistory1 = ExpectedAccountHistory.builder()
+                    .field("/cgus/0/code")
+                    .date(createDate)
+                    .value("code_1")
+                    .build();
+
+            var expectedHistory2 = ExpectedAccountHistory.builder()
+                    .field("/id")
+                    .date(createDate)
+                    .value(id.toString())
+                    .build();
+
+            var expectedHistory3 = ExpectedAccountHistory.builder()
+                    .field("/cgus/0/version")
+                    .date(createDate)
+                    .value("v1")
+                    .build();
+
+            var expectedHistory4 = ExpectedAccountHistory.builder()
+                    .field("/cgus/1/code")
+                    .date(updateDate)
+                    .value("code_1")
+                    .build();
+
+            var expectedHistory5 = ExpectedAccountHistory.builder()
+                    .field("/cgus/1/version")
+                    .date(updateDate)
+                    .value("v2")
+                    .build();
+
+            new AccountHistoryAssert(id).contains(List.of(expectedHistory1, expectedHistory2, expectedHistory3, expectedHistory4, expectedHistory5));
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
@@ -673,12 +831,23 @@ class AccountResourceTest {
             resource.save(account, resource.get(id).get());
 
             // Then check history
-            List<AccountHistory> histories = accountHistoryResource.findById(id);
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
-            assertAll(
-                    () -> assertThat(histories).hasSize(2),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/cgus"), JsonNodeType.NULL, updateDate.toInstant()),
-                    () -> assertHistory(accountHistoryResource.findByIdAndField(id, "/id"), id, createDate.toInstant()));
+
+            var expectedHistory1 = ExpectedAccountHistory.builder()
+                    .field("/cgus")
+                    .date(updateDate)
+                    .previousValue(MAPPER.readTree("""
+                                                   [{"code": "code_1", "version": "v1"}, {"code": "code_1", "version": "v2"}]
+                                                   """))
+                    .build();
+
+            var expectedHistory2 = ExpectedAccountHistory.builder()
+                    .field("/id")
+                    .date(createDate)
+                    .value(id.toString())
+                    .build();
+
+            new AccountHistoryAssert(id).contains(List.of(expectedHistory1, expectedHistory2));
 
             // And check account
             Optional<JsonNode> result = resource.get(id);
@@ -898,30 +1067,31 @@ class AccountResourceTest {
         }
     }
 
-    private static void assertHistory(AccountHistory accountHistory, JsonNodeType expectedJsonNodeType, Instant expectedDate) {
+    public class AccountHistoryAssert extends HistoryAssert<UUID> {
 
-        assertAll(
-                () -> assertThat(accountHistory.getValue().getNodeType()).isEqualTo(expectedJsonNodeType),
-                () -> assertThat(accountHistory.getDate()).isCloseTo(expectedDate, Assertions.within(1, ChronoUnit.MILLIS)),
-                () -> assertHistory(accountHistory));
-
+        public AccountHistoryAssert(UUID id) {
+            super(id, accountHistoryResource.findById(id));
+        }
     }
 
-    private static void assertHistory(AccountHistory accountHistory, Object expectedValue, Instant expectedDate) {
+    @SuperBuilder
+    public static class ExpectedAccountHistory extends ExpectedHistory<UUID> {
 
-        assertAll(
-                () -> assertThat(accountHistory.getValue().asText()).isEqualTo(expectedValue.toString()),
-                () -> assertThat(accountHistory.getDate()).isCloseTo(expectedDate, Assertions.within(1, ChronoUnit.MILLIS)),
-                () -> assertHistory(accountHistory));
+        @Override
+        public AccountHistory buildHistory(UUID id) {
 
-    }
+            var history = new AccountHistory();
+            history.setId(id);
+            history.setField(getField());
+            history.setDate(getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            history.setApplication("test");
+            history.setVersion("v1");
+            history.setUser("user");
+            history.setPreviousValue(getPreviousValue());
+            history.setValue(getValue());
 
-    private static void assertHistory(AccountHistory accountHistory) {
-
-        assertAll(
-                () -> assertThat(accountHistory.getApplication()).isEqualTo("test"),
-                () -> assertThat(accountHistory.getVersion()).isEqualTo("v1"),
-                () -> assertThat(accountHistory.getUser()).isEqualTo("user"));
+            return history;
+        }
 
     }
 }

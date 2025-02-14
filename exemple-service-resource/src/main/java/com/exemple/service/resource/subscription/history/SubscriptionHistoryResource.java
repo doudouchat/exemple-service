@@ -41,11 +41,6 @@ public class SubscriptionHistoryResource {
         return dao().findById(id).all();
     }
 
-    public SubscriptionHistory findByIdAndField(String email, String field) {
-
-        return dao().findByIdAndField(email, field);
-    }
-
     public Collection<BoundStatement> saveHistories(JsonNode source) {
 
         return saveHistories(source, MAPPER.createObjectNode());
