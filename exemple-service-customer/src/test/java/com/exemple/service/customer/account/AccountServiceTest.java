@@ -20,7 +20,6 @@ import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @SpringJUnitConfig(CustomerTestConfiguration.class)
 class AccountServiceTest {
@@ -34,14 +33,14 @@ class AccountServiceTest {
     private AccountResource accountResource;
 
     @BeforeEach
-    public void before() {
+    void before() {
 
         Mockito.reset(accountResource);
 
     }
 
     @BeforeAll
-    public static void initServiceContextExecution() {
+    static void initServiceContextExecution() {
 
         ServiceContextExecution.setApp("default");
     }
@@ -52,28 +51,26 @@ class AccountServiceTest {
 
         // Given account
 
-        JsonNode source = MAPPER.readTree(
+        var source = MAPPER.readTree(
                 """
                 {"email": "jean.dupont@gmail.com", "lastname": "Dupont", "firstname":"Jean"}
                 """);
 
         // When perform save
 
-        ObjectNode account = service.save(source).deepCopy();
+        var account = service.save(source);
+        var id = account.get("id");
 
         // Then check account
 
-        assertAll(
-                () -> assertThat(account).isNotNull(),
-                () -> assertThat(account.get("id").isTextual()).isTrue(),
-                () -> assertThat(account.deepCopy().putNull("id")).isEqualTo(MAPPER.readTree(
-                        """
-                        {"email": "jean.dupont@gmail.com", "lastname": "Dupont", "firstname": "Jean", "creation_date": "%s", "id": null}
-                        """.formatted(ServiceContextExecution.context().getDate()))));
+        assertThat(account).isEqualTo(MAPPER.readTree(
+                """
+                {"email": "jean.dupont@gmail.com", "lastname": "Dupont", "firstname": "Jean", "creation_date": "%s", "id": "%s"}
+                """.formatted(ServiceContextExecution.context().getDate(), id.textValue())));
 
         // And check save account resource
 
-        ArgumentCaptor<JsonNode> accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
+        var accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
         Mockito.verify(accountResource).save(accountCaptor.capture());
         assertThat(accountCaptor.getValue()).isEqualTo(account);
 
@@ -85,35 +82,33 @@ class AccountServiceTest {
 
         // Given account
 
-        JsonNode source = MAPPER.readTree(
+        var source = MAPPER.readTree(
                 """
                 {"email": "jean.dupont@gmail.com", "lastname": "Dupond"}
                 """);
 
         // And previousAccount
 
-        JsonNode previousSource = MAPPER.readTree(
+        var previousSource = MAPPER.readTree(
                 """
                 {"email": "jean.dupont@gmail.com", "lastname": "Dupont", "firstname":"Jean"}
                 """);
 
         // When perform save
 
-        JsonNode account = service.save(source, previousSource);
+        var account = service.save(source, previousSource);
 
         // Then check account
 
-        assertAll(
-                () -> assertThat(account).isNotNull(),
-                () -> assertThat(account).isEqualTo(MAPPER.readTree(
-                        """
-                        {"email": "jean.dupont@gmail.com", "lastname": "Dupond"}
-                        """)));
+        assertThat(account).isEqualTo(MAPPER.readTree(
+                """
+                {"email": "jean.dupont@gmail.com", "lastname": "Dupond"}
+                """));
 
         // And check save resource
 
-        ArgumentCaptor<JsonNode> accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
-        ArgumentCaptor<JsonNode> previousAccountCaptor = ArgumentCaptor.forClass(JsonNode.class);
+        var accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
+        var previousAccountCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
         Mockito.verify(accountResource).save(accountCaptor.capture(), previousAccountCaptor.capture());
         assertAll(
@@ -128,37 +123,35 @@ class AccountServiceTest {
 
         // Given account
 
-        UUID id = UUID.randomUUID();
+        var id = UUID.randomUUID();
 
-        JsonNode source = MAPPER.readTree(
+        var source = MAPPER.readTree(
                 """
                 {"id": "%s", "email": "jean.dupond@gmail.com"}
                 """.formatted(id));
 
         // And previousAccount
 
-        JsonNode previousSource = MAPPER.readTree(
+        var previousSource = MAPPER.readTree(
                 """
                 {"id": "%s", "email": "jean.dupont@gmail.com"}
                 """.formatted(id));
 
         // When perform save
 
-        JsonNode account = service.save(source, previousSource);
+        var account = service.save(source, previousSource);
 
         // Then check account
 
-        assertAll(
-                () -> assertThat(account).isNotNull(),
-                () -> assertThat(account).isEqualTo(MAPPER.readTree(
-                        """
-                        {"id": "%s", "email": "jean.dupond@gmail.com"}
-                        """.formatted(id))));
+        assertThat(account).isEqualTo(MAPPER.readTree(
+                """
+                {"id": "%s", "email": "jean.dupond@gmail.com"}
+                """.formatted(id)));
 
         // And check save resource
 
-        ArgumentCaptor<JsonNode> accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
-        ArgumentCaptor<JsonNode> previousAccountCaptor = ArgumentCaptor.forClass(JsonNode.class);
+        var accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
+        var previousAccountCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
         Mockito.verify(accountResource).save(accountCaptor.capture(), previousAccountCaptor.capture());
         assertAll(
@@ -173,11 +166,11 @@ class AccountServiceTest {
 
         // Given account id
 
-        UUID id = UUID.randomUUID();
+        var id = UUID.randomUUID();
 
         // And mock resource
 
-        JsonNode source = MAPPER.readTree(
+        var source = MAPPER.readTree(
                 """
                 {"email": "jean.dupont@gmail.com", "lastname": "Dupont", "firstname":"Jean"}
                 """);
@@ -185,7 +178,7 @@ class AccountServiceTest {
 
         // When perform get
 
-        Optional<JsonNode> account = service.get(id);
+        var account = service.get(id);
 
         // Then check account
 

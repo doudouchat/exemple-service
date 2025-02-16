@@ -1,12 +1,10 @@
 package com.exemple.service.resource.schema;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -59,7 +57,7 @@ class SchemaResourceTest {
 
             schemaResource = MAPPER.readTree(new ClassPathResource("test.json").getContentAsByteArray());
 
-            SchemaEntity resourceSchema = new SchemaEntity();
+            var resourceSchema = new SchemaEntity();
             resourceSchema.setVersion("v1");
             resourceSchema.setResource("account");
             resourceSchema.setProfile("example");
@@ -71,10 +69,15 @@ class SchemaResourceTest {
             resource.save(resourceSchema);
 
             // Then check schema
-            Optional<SchemaEntity> schema = resource.get("account", "v1", "example");
-            assertAll(
-                    () -> assertThat(schema.get().getContent()).isEqualTo(this.schemaResource),
-                    () -> assertThat(schema.get().getPatchs()).extracting(patch -> patch.get("op").textValue()).containsOnly("add"));
+            var expectedResourceSchema = new SchemaEntity();
+            expectedResourceSchema.setVersion("v1");
+            expectedResourceSchema.setResource("account");
+            expectedResourceSchema.setProfile("example");
+            expectedResourceSchema.setContent(schemaResource);
+            expectedResourceSchema.setPatchs(Collections.singleton(MAPPER.convertValue(Collections.singletonMap("op", "add"), JsonNode.class)));
+            assertThat(resource.get("account", "v1", "example")).get()
+                    .usingRecursiveComparison()
+                    .isEqualTo(expectedResourceSchema);
 
         }
 
@@ -84,7 +87,7 @@ class SchemaResourceTest {
 
             // Given build schema
 
-            SchemaEntity resourceSchema = new SchemaEntity();
+            var resourceSchema = new SchemaEntity();
             resourceSchema.setVersion("v1");
             resourceSchema.setResource("account");
             resourceSchema.setProfile("example");
@@ -94,10 +97,14 @@ class SchemaResourceTest {
             resource.update(resourceSchema);
 
             // Then check schema
-            Optional<SchemaEntity> schema = resource.get("account", "v1", "example");
-            assertAll(
-                    () -> assertThat(schema.get().getContent()).isNull(),
-                    () -> assertThat(schema.get().getPatchs()).isEmpty());
+            var expectedResourceSchema = new SchemaEntity();
+            expectedResourceSchema.setVersion("v1");
+            expectedResourceSchema.setResource("account");
+            expectedResourceSchema.setProfile("example");
+            expectedResourceSchema.setPatchs(Collections.emptySet());
+            assertThat(resource.get("account", "v1", "example")).get()
+                    .usingRecursiveComparison()
+                    .isEqualTo(expectedResourceSchema);
         }
 
     }
@@ -107,7 +114,7 @@ class SchemaResourceTest {
 
         // Given create schema
 
-        SchemaEntity resourceSchema1 = new SchemaEntity();
+        var resourceSchema1 = new SchemaEntity();
         resourceSchema1.setVersion("v1");
         resourceSchema1.setResource("product");
         resourceSchema1.setProfile("example1");
@@ -116,7 +123,7 @@ class SchemaResourceTest {
 
         // And create other schema
 
-        SchemaEntity resourceSchema2 = new SchemaEntity();
+        var resourceSchema2 = new SchemaEntity();
         resourceSchema2.setVersion("v2");
         resourceSchema2.setResource("product");
         resourceSchema2.setProfile("example2");
@@ -124,10 +131,10 @@ class SchemaResourceTest {
         resource.save(resourceSchema2);
 
         // When perform all versions
-        List<SchemaVersionProfileEntity> versions = resource.allVersions("product");
+        var versions = resource.allVersions("product");
 
         // Then check result
-        List<SchemaVersionProfileEntity> expectedSchemaVersionProfiles = List.of(
+        var expectedSchemaVersionProfiles = List.of(
                 SchemaVersionProfileEntity.builder().version("v1").profile("example1").build(),
                 SchemaVersionProfileEntity.builder().version("v2").profile("example2").build());
         assertThat(versions)
@@ -141,7 +148,7 @@ class SchemaResourceTest {
     void getEmptySchema() {
 
         // When perform get
-        Optional<SchemaEntity> schemaResource = resource.get("account", UUID.randomUUID().toString(), "example");
+        var schemaResource = resource.get("account", UUID.randomUUID().toString(), "example");
 
         // Then check schema
         assertThat(schemaResource).isEmpty();

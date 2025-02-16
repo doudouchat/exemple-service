@@ -2,7 +2,6 @@ package com.exemple.service.store.stock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -104,10 +103,10 @@ class StockServiceTest {
 
         // when perform get
 
-        String productId = "/product#" + UUID.randomUUID();
-        String storeId = "/store#" + UUID.randomUUID();
+        var productId = "/product#" + UUID.randomUUID();
+        var storeId = "/store#" + UUID.randomUUID();
 
-        Optional<Long> stock = service.get(company, storeId, productId);
+        var stock = service.get(company, storeId, productId);
 
         // Then check stock is missing
         assertThat(stock).isEmpty();
@@ -120,8 +119,8 @@ class StockServiceTest {
 
         // setup mock resource
 
-        String productId = "/product#" + UUID.randomUUID();
-        String storeId = "/store#" + UUID.randomUUID();
+        var productId = "/product#" + UUID.randomUUID();
+        var storeId = "/store#" + UUID.randomUUID();
 
         Mockito.when(resource.get(storeId, productId)).thenReturn(Optional.of(5L));
 
@@ -129,12 +128,12 @@ class StockServiceTest {
         service.update(company, storeId, productId, -3);
 
         // and update again
-        Throwable throwable = catchThrowable(() -> service.update(company, storeId, productId, -3));
+        var throwable = catchThrowable(() -> service.update(company, storeId, productId, -3));
 
         // Then check throwable
-        assertAll(
-                () -> assertThat(throwable).isInstanceOf(InsufficientStockException.class),
-                () -> assertThat(throwable).hasMessageEndingWith("2 is insufficient for quantity -3"));
+        assertThat(throwable)
+                .isInstanceOf(InsufficientStockException.class)
+                .hasMessageEndingWith("2 is insufficient for quantity -3");
 
     }
 
@@ -144,16 +143,16 @@ class StockServiceTest {
 
         // setup mock resource
 
-        String productId = "/product#" + UUID.randomUUID();
-        String storeId = "/store#" + UUID.randomUUID();
+        var productId = "/product#" + UUID.randomUUID();
+        var storeId = "/store#" + UUID.randomUUID();
 
         // when update stock
-        Throwable throwable = catchThrowable(() -> service.update(company, storeId, productId, -3));
+        var throwable = catchThrowable(() -> service.update(company, storeId, productId, -3));
 
         // Then check throwable
-        assertAll(
-                () -> assertThat(throwable).isInstanceOf(InsufficientStockException.class),
-                () -> assertThat(throwable).hasMessageEndingWith("0 is insufficient for quantity -3"));
+        assertThat(throwable)
+                .isInstanceOf(InsufficientStockException.class)
+                .hasMessageEndingWith("0 is insufficient for quantity -3");
     }
 
     @Nested
@@ -161,7 +160,7 @@ class StockServiceTest {
     class FailureZookeeper {
 
         @BeforeEach
-        public void closeZookeeper() {
+        void closeZookeeper() {
             CloseableUtils.closeQuietly(zookeeper);
 
         }
@@ -170,9 +169,9 @@ class StockServiceTest {
         void updateFailure() {
 
             // when update stock
-            String productId = "/product#" + UUID.randomUUID();
-            String storeId = "/store#" + UUID.randomUUID();
-            Throwable throwable = catchThrowable(() -> service.update(company, storeId, productId, 5));
+            var productId = "/product#" + UUID.randomUUID();
+            var storeId = "/store#" + UUID.randomUUID();
+            var throwable = catchThrowable(() -> service.update(company, storeId, productId, 5));
 
             // Then check throwable
             assertThat(throwable).isInstanceOf(IllegalStateException.class);
@@ -183,9 +182,9 @@ class StockServiceTest {
         void getFailure() {
 
             // when get stock
-            String productId = "/product#" + UUID.randomUUID();
-            String storeId = "/store#" + UUID.randomUUID();
-            Throwable throwable = catchThrowable(() -> service.get(company, storeId, productId));
+            var productId = "/product#" + UUID.randomUUID();
+            var storeId = "/store#" + UUID.randomUUID();
+            var throwable = catchThrowable(() -> service.get(company, storeId, productId));
 
             // Then check throwable
             assertThat(throwable).isInstanceOf(IllegalStateException.class);

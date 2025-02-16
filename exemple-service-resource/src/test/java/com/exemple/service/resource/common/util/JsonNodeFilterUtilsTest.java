@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 class JsonNodeFilterUtilsTest {
@@ -17,7 +16,7 @@ class JsonNodeFilterUtilsTest {
     void clean() throws IOException {
 
         // Given build account
-        JsonNode account = MAPPER.readTree(
+        var account = MAPPER.readTree(
                 """
                  {
                      "birthday": null,
@@ -61,10 +60,10 @@ class JsonNodeFilterUtilsTest {
                 """);
 
         // When perform clean
-        JsonNode source = JsonNodeFilterUtils.clean(account);
+        var source = JsonNodeFilterUtils.clean(account);
 
         // Then check clean source
-        JsonNode expectedResult = MAPPER.readTree(
+        assertThat(source).isEqualTo(MAPPER.readTree(
                 """
                  {
                      "addresses": {
@@ -91,9 +90,7 @@ class JsonNodeFilterUtilsTest {
                      ],
                      "email": "jean.dupont@gmail.com"
                  }
-                """);
-
-        assertThat(expectedResult).isEqualTo(source);
+                """));
 
     }
 

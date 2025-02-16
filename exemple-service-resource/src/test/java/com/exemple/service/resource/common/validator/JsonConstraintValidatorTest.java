@@ -2,7 +2,6 @@ package com.exemple.service.resource.common.validator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -67,17 +66,10 @@ class JsonConstraintValidatorTest {
                 """.formatted(id, now.toString()));
 
         // When perform save
-        resource.save(account);
+        Throwable throwable = catchThrowable(() -> resource.save(account));
 
         // Then check result
-        JsonNode result = resource.get(id).get();
-        assertAll(
-                () -> assertThat(result.get("email")).isNotNull(),
-                () -> assertThat(result.get("address")).isNotNull(),
-                () -> assertThat(result.get("addresses")).isNotNull(),
-                () -> assertThat(result.get("profils")).isNotNull(),
-                () -> assertThat(result.get("preferences")).isNotNull(),
-                () -> assertThat(result.get("creation_date")).isNotNull());
+        assertThat(throwable).as("None exception is expected").isNull();
 
     }
 

@@ -2,7 +2,6 @@ package com.exemple.service.schema.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,6 +9,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.stream.Streams;
+import org.assertj.core.api.AbstractAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,14 +24,16 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionCause;
 import com.exemple.service.schema.core.SchemaTestConfiguration;
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.flipkart.zjsonpatch.JsonPatch;
 import com.flipkart.zjsonpatch.JsonPatchApplicationException;
+
+import lombok.Builder;
 
 @SpringJUnitConfig(SchemaTestConfiguration.class)
 class SchemaValidationTest {
@@ -42,80 +45,80 @@ class SchemaValidationTest {
 
     private Stream<Arguments> failures() {
 
-        ObjectNode patch1 = MAPPER.createObjectNode();
+        var patch1 = MAPPER.createObjectNode();
         patch1.put("op", "replace");
         patch1.put("path", "/opt_in_email");
         patch1.put("value", true);
 
-        ObjectNode patch2 = MAPPER.createObjectNode();
+        var patch2 = MAPPER.createObjectNode();
         patch2.put("op", "remove");
         patch2.put("path", "/firstname");
 
-        Map<String, Object> cgu1 = Map.of("code", "code_1", "version", "v1");
-        Map<String, Object> cgu2 = Map.of("code", "code_1", "version", "v2");
-        Map<String, Object> cgu3 = Map.of("code", "code_2", "version", "v1");
+        var cgu1 = Map.of("code", "code_1", "version", "v1");
+        var cgu2 = Map.of("code", "code_1", "version", "v2");
+        var cgu3 = Map.of("code", "code_2", "version", "v1");
 
-        ObjectNode patch31 = MAPPER.createObjectNode();
+        var patch31 = MAPPER.createObjectNode();
         patch31.put("op", "add");
         patch31.put("path", "/cgus/0");
         patch31.set("value", MAPPER.convertValue(cgu1, JsonNode.class));
 
-        ObjectNode patch32 = MAPPER.createObjectNode();
+        var patch32 = MAPPER.createObjectNode();
         patch32.put("op", "add");
         patch32.put("path", "/cgus/1");
         patch32.set("value", MAPPER.convertValue(cgu1, JsonNode.class));
 
-        ObjectNode patch41 = MAPPER.createObjectNode();
+        var patch41 = MAPPER.createObjectNode();
         patch41.put("op", "add");
         patch41.put("path", "/cgus/0");
         patch41.set("value", MAPPER.convertValue(cgu1, JsonNode.class));
 
-        ObjectNode patch42 = MAPPER.createObjectNode();
+        var patch42 = MAPPER.createObjectNode();
         patch42.put("op", "add");
         patch42.put("path", "/cgus/1");
         patch42.set("value", MAPPER.convertValue(cgu2, JsonNode.class));
 
-        ObjectNode patch43 = MAPPER.createObjectNode();
+        var patch43 = MAPPER.createObjectNode();
         patch43.put("op", "add");
         patch43.put("path", "/cgus/2");
         patch43.set("value", MAPPER.convertValue(cgu3, JsonNode.class));
 
-        ObjectNode patch5 = MAPPER.createObjectNode();
+        var patch5 = MAPPER.createObjectNode();
         patch5.put("op", "add");
         patch5.put("path", "/birthday");
         patch5.put("value", "2018-02-30");
 
-        ObjectNode patch6 = MAPPER.createObjectNode();
+        var patch6 = MAPPER.createObjectNode();
         patch6.put("op", "add");
         patch6.put("path", "/creation_date");
         patch6.put("value", "2018-02-30T12:00:00Z");
 
-        ObjectNode patch7 = MAPPER.createObjectNode();
+        var patch7 = MAPPER.createObjectNode();
         patch7.put("op", "add");
         patch7.put("path", "/id");
         patch7.put("value", UUID.randomUUID().toString());
 
-        ObjectNode patch8 = MAPPER.createObjectNode();
+        var patch8 = MAPPER.createObjectNode();
         patch8.put("op", "add");
         patch8.put("path", "/email");
         patch8.put("value", "toto");
 
-        ObjectNode patch9 = MAPPER.createObjectNode();
+        var patch9 = MAPPER.createObjectNode();
         patch9.put("op", "add");
         patch9.put("path", "/hide");
         patch9.put("value", false);
 
-        ObjectNode patch10 = MAPPER.createObjectNode();
+        var patch10 = MAPPER.createObjectNode();
         patch10.put("op", "add");
         patch10.put("path", "/firstname");
         patch10.put("value", " ");
 
-        ObjectNode patch11 = MAPPER.createObjectNode();
+        var patch11 = MAPPER.createObjectNode();
         patch11.put("op", "add");
         patch11.put("path", "/addresses/home");
         patch11.set("value", MAPPER.convertValue(Map.of("city", "Paris"), JsonNode.class));
 
-        ObjectNode patch12 = MAPPER.createObjectNode();
+        var patch12 = MAPPER.createObjectNode();
         patch12.put("op", "add");
         patch12.put("path", "/addresses");
         patch12.set("value", MAPPER.convertValue(Map.of(
@@ -123,12 +126,12 @@ class SchemaValidationTest {
                 "holiday2", Map.of("city", "Paris", "street", "rue de la paix"),
                 "holiday3", Map.of("city", "Paris", "street", "rue de la paix")), JsonNode.class));
 
-        ObjectNode patch13 = MAPPER.createObjectNode();
+        var patch13 = MAPPER.createObjectNode();
         patch13.put("op", "add");
         patch13.put("path", "/email");
         patch13.put("value", "");
 
-        ObjectNode patch14 = MAPPER.createObjectNode();
+        var patch14 = MAPPER.createObjectNode();
         patch14.put("op", "add");
         patch14.put("path", "/civility");
         patch14.put("value", "Mlle");
@@ -173,7 +176,7 @@ class SchemaValidationTest {
         @DisplayName("source creation success")
         void creationSuccess() {
 
-            Map<String, Object> model = Map.of(
+            var model = Map.of(
                     "email", "jean.dupont@gmail.com",
                     "lastname", "Dupont",
                     "firstname", "Jean",
@@ -182,7 +185,7 @@ class SchemaValidationTest {
                     "creation_date", "2019-06-17T19:16:40Z");
 
             // When perform validate
-            Throwable throwable = catchThrowable(
+            var throwable = catchThrowable(
                     () -> validation.validate("schema_test", "default", "default", MAPPER.convertValue(model, JsonNode.class)));
 
             // Then check none exception
@@ -200,7 +203,7 @@ class SchemaValidationTest {
         void creationFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
 
             // Given model
-            Map<String, Object> origin = Map.of(
+            var origin = Map.of(
                     "lastname", "Dupont",
                     "firstname", "Jean",
                     "opt_in_email", false,
@@ -208,22 +211,20 @@ class SchemaValidationTest {
                     "cgus", MAPPER.createArrayNode(),
                     "addresses", MAPPER.createObjectNode());
 
-            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+            var old = MAPPER.convertValue(origin, JsonNode.class);
 
-            ArrayNode patch = MAPPER.createArrayNode();
+            var patch = MAPPER.createArrayNode();
             patch.addAll(Arrays.asList(patchs));
 
-            JsonNode model = JsonPatch.apply(patch, old);
+            var model = JsonPatch.apply(patch, old);
 
             // When perform
-            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", model));
+            var throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", model));
 
             // Then check throwable
+            var validationExceptionCause = ExpectedValidationExceptionCause.builder().code(expectedCode).path(expectedPath).build();
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
-                    exception -> assertAll(
-                            () -> assertThat(exception.getCauses()).hasSize(1),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode).contains(expectedCode),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains(expectedPath)));
+                    exception -> Assertions.assertThat(exception).isCause(validationExceptionCause));
 
         }
 
@@ -232,20 +233,17 @@ class SchemaValidationTest {
         void creationFailureWhenSchemaNotExists() {
 
             // Given source
-            Map<String, Object> model = Map.of("email", "jean.dupont@gmail.com");
-            JsonNode source = MAPPER.convertValue(model, JsonNode.class);
+            var model = Map.of("email", "jean.dupont@gmail.com");
+            var source = MAPPER.convertValue(model, JsonNode.class);
 
             // When perform
-            Throwable throwable = catchThrowable(
+            var throwable = catchThrowable(
                     () -> validation.validate("schema_test", "unknown", "unknown", source));
 
             // Then check throwable
+            var validationExceptionCause = ExpectedValidationExceptionCause.builder().code("additionalProperties").path("/email").build();
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
-                    exception -> assertAll(
-                            () -> assertThat(exception.getCauses()).hasSize(1),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode)
-                                    .contains("additionalProperties"),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains("/email")));
+                    exception -> Assertions.assertThat(exception).isCause(validationExceptionCause));
         }
     }
 
@@ -258,12 +256,12 @@ class SchemaValidationTest {
         void creationSuccess() {
 
             // Given build model
-            Map<String, Object> addresse1 = Map.of("street", "1 rue de la paix", "city", "Paris");
-            Map<String, Object> addresse2 = Map.of("street", "2 rue de la paix", "city", "Paris");
+            var addresse1 = Map.of("street", "1 rue de la paix", "city", "Paris");
+            var addresse2 = Map.of("street", "2 rue de la paix", "city", "Paris");
 
-            List<Object> addresses = List.of(addresse1, addresse2);
+            var addresses = List.of(addresse1, addresse2);
 
-            JsonNode model = MAPPER.convertValue(addresses, JsonNode.class);
+            var model = MAPPER.convertValue(addresses, JsonNode.class);
 
             // When perform validate
 
@@ -276,21 +274,19 @@ class SchemaValidationTest {
         void creationFailure() {
 
             // Given build model
-            Map<String, Object> addresse = Map.of("street", "1 rue de la paix");
+            var addresse = Map.of("street", "1 rue de la paix");
 
-            List<Object> addresses = List.of(addresse);
+            var addresses = List.of(addresse);
 
-            JsonNode model = MAPPER.convertValue(addresses, JsonNode.class);
+            var model = MAPPER.convertValue(addresses, JsonNode.class);
 
             // When perform
-            Throwable throwable = catchThrowable(() -> validation.validate("array_test", "default", "default", model));
+            var throwable = catchThrowable(() -> validation.validate("array_test", "default", "default", model));
 
             // Then check throwable
+            var validationExceptionCause = ExpectedValidationExceptionCause.builder().code("required").path("/0/city").build();
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
-                    exception -> assertAll(
-                            () -> assertThat(exception.getCauses()).hasSize(1),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode).contains("required"),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains("/0/city")));
+                    exception -> Assertions.assertThat(exception).isCause(validationExceptionCause));
 
         }
     }
@@ -302,19 +298,19 @@ class SchemaValidationTest {
 
         Stream<Arguments> patchSuccess() {
 
-            ObjectNode patch1 = MAPPER.createObjectNode();
+            var patch1 = MAPPER.createObjectNode();
             patch1.put("op", "replace");
             patch1.put("path", "/email");
             patch1.put("value", "jack.dupond@gmail.com");
 
-            ObjectNode patch2 = MAPPER.createObjectNode();
+            var patch2 = MAPPER.createObjectNode();
             patch2.put("op", "add");
             patch2.put("path", "/addresses/holidays");
             patch2.set("value", MAPPER.convertValue(Map.of("city", "New York", "street", "5th avenue"), JsonNode.class));
 
-            Map<String, Object> cgu = Map.of("code", "code_1", "version", "v1");
+            var cgu = Map.of("code", "code_1", "version", "v1");
 
-            ObjectNode patch3 = MAPPER.createObjectNode();
+            var patch3 = MAPPER.createObjectNode();
             patch3.put("op", "add");
             patch3.put("path", "/cgus/0");
             patch3.set("value", MAPPER.convertValue(cgu, JsonNode.class));
@@ -336,7 +332,7 @@ class SchemaValidationTest {
         void patchSuccess(JsonNode patch) {
 
             // build source
-            Map<String, Object> origin = Map.of(
+            var origin = Map.of(
                     "email", "jean.dupont@gmail.com",
                     "lastname", "Dupont",
                     "firstname", "Jean",
@@ -344,13 +340,13 @@ class SchemaValidationTest {
                     "civility", "Mr",
                     "addresses", MAPPER.createObjectNode(),
                     "cgus", MAPPER.createArrayNode());
-            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+            var old = MAPPER.convertValue(origin, JsonNode.class);
 
-            ArrayNode patchs = MAPPER.createArrayNode();
+            var patchs = MAPPER.createArrayNode();
             patchs.add(patch);
 
             // When perform validate
-            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patchs, old));
+            var throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patchs, old));
 
             // Then check none exception
             assertThat(throwable).as("None exception is expected").isNull();
@@ -358,7 +354,7 @@ class SchemaValidationTest {
 
         Stream<Arguments> patchFailure() {
 
-            ObjectNode patch1 = MAPPER.createObjectNode();
+            var patch1 = MAPPER.createObjectNode();
             patch1.put("op", "add");
             patch1.put("path", "/external_id");
             patch1.put("value", UUID.randomUUID().toString());
@@ -376,7 +372,7 @@ class SchemaValidationTest {
         void patchFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
 
             // Given origin
-            Map<String, Object> origin = Map.of(
+            var origin = Map.of(
                     "opt_in_email", false,
                     "lastname", "doe",
                     "firstname", "john",
@@ -384,42 +380,40 @@ class SchemaValidationTest {
                     "addresses", MAPPER.createObjectNode(),
                     "hide", BooleanNode.TRUE);
 
-            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+            var old = MAPPER.convertValue(origin, JsonNode.class);
 
             // And form
-            ArrayNode patch = MAPPER.createArrayNode();
+            var patch = MAPPER.createArrayNode();
             patch.addAll(Arrays.asList(patchs));
 
             // When perform
-            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patch, old));
+            var throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patch, old));
 
             // Then check throwable
+            var validationExceptionCause = ExpectedValidationExceptionCause.builder().code(expectedCode).path(expectedPath).build();
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
-                    exception -> assertAll(
-                            () -> assertThat(exception.getCauses()).hasSize(1),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode).contains(expectedCode),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains(expectedPath)));
+                    exception -> Assertions.assertThat(exception).isCause(validationExceptionCause));
         }
 
         private Stream<Arguments> patchFailures() {
 
-            ObjectNode patch1 = MAPPER.createObjectNode();
+            var patch1 = MAPPER.createObjectNode();
             patch1.put("op", "add");
             patch1.put("path", "/external_id");
             patch1.set("value", NullNode.instance);
 
             return Stream.of(
                     // external_id create only
-                    Arguments.of(new String[] { "readOnly", "type" }, "/external_id", 2, new JsonNode[] { patch1 }));
+                    Arguments.of(new String[] { "readOnly", "type" }, "/external_id", new JsonNode[] { patch1 }));
         }
 
         @ParameterizedTest
         @MethodSource("patchFailures")
         @DisplayName("source patch fails")
-        void patchFailure(String[] expectedCode, String expectedPath, int expectedExceptions, JsonNode... patchs) {
+        void patchFailure(String[] expectedCodes, String expectedPath, JsonNode... patchs) {
 
             // Given origin
-            Map<String, Object> origin = Map.of(
+            var origin = Map.of(
                     "opt_in_email", false,
                     "lastname", "doe",
                     "firstname", "john",
@@ -427,40 +421,40 @@ class SchemaValidationTest {
                     "addresses", MAPPER.createObjectNode(),
                     "hide", BooleanNode.TRUE);
 
-            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+            var old = MAPPER.convertValue(origin, JsonNode.class);
 
             // And form
-            ArrayNode patch = MAPPER.createArrayNode();
+            var patch = MAPPER.createArrayNode();
             patch.addAll(Arrays.asList(patchs));
 
             // When perform
-            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patch, old));
+            var throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patch, old));
 
             // Then check throwable
+            var validationExceptionCauses = Streams.of(expectedCodes)
+                    .map(expectedCode -> ExpectedValidationExceptionCause.builder().code(expectedCode).path(expectedPath).build())
+                    .toList();
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
-                    exception -> assertAll(
-                            () -> assertThat(exception.getCauses()).hasSize(expectedExceptions),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode).containsOnly(expectedCode),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains(expectedPath)));
+                    exception -> Assertions.assertThat(exception).containCauses(validationExceptionCauses));
         }
 
         Stream<Arguments> fixIncorrectSource() {
 
-            ObjectNode patch1 = MAPPER.createObjectNode();
+            var patch1 = MAPPER.createObjectNode();
             patch1.put("op", "replace");
             patch1.put("path", "/email");
             patch1.put("value", "jean.dupond@gmail.com");
 
-            ObjectNode patch2 = MAPPER.createObjectNode();
+            var patch2 = MAPPER.createObjectNode();
             patch2.put("op", "remove");
             patch2.put("path", "/cgus/0");
 
-            ObjectNode patch3 = MAPPER.createObjectNode();
+            var patch3 = MAPPER.createObjectNode();
             patch3.put("op", "add");
             patch3.put("path", "/addresses/home/street");
             patch3.put("value", "1 rue de la paix");
 
-            ObjectNode patch4 = MAPPER.createObjectNode();
+            var patch4 = MAPPER.createObjectNode();
             patch4.put("op", "remove");
             patch4.put("path", "/cgvs/0");
 
@@ -482,7 +476,7 @@ class SchemaValidationTest {
         void fixIncorrectSource(JsonNode patch) {
 
             // Given origin
-            Map<String, Object> origin = Map.of(
+            var origin = Map.of(
                     // And email incorrect
                     "email", "toto",
                     // And cgu incorrect
@@ -494,12 +488,12 @@ class SchemaValidationTest {
                     "addresses", Map.of("home", Map.of("city", "Paris")));
 
             // And form
-            ArrayNode patchs = MAPPER.createArrayNode();
+            var patchs = MAPPER.createArrayNode();
             patchs.add(patch);
 
             // When perform
-            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
-            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patchs, old));
+            var old = MAPPER.convertValue(origin, JsonNode.class);
+            var throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patchs, old));
 
             // Then check none exception
             assertThat(throwable).as("None exception is expected").isNull();
@@ -507,42 +501,42 @@ class SchemaValidationTest {
 
         Stream<Arguments> fixIncorrectSourceFailure() {
 
-            ObjectNode patch1 = MAPPER.createObjectNode();
+            var patch1 = MAPPER.createObjectNode();
             patch1.put("op", "replace");
             patch1.put("path", "/email");
             patch1.put("value", "tata");
 
-            ObjectNode patch21 = MAPPER.createObjectNode();
+            var patch21 = MAPPER.createObjectNode();
             patch21.put("op", "replace");
             patch21.put("path", "/cgus/0");
             patch21.set("value", MAPPER.convertValue(Map.of("code", "code_1", "version", "v2"), JsonNode.class));
 
-            ObjectNode patch22 = MAPPER.createObjectNode();
+            var patch22 = MAPPER.createObjectNode();
             patch22.put("op", "replace");
             patch22.put("path", "/cgus/1");
             patch22.set("value", MAPPER.convertValue(Map.of("code", "code_1", "version", "v2"), JsonNode.class));
 
-            ObjectNode patch3 = MAPPER.createObjectNode();
+            var patch3 = MAPPER.createObjectNode();
             patch3.put("op", "replace");
             patch3.put("path", "/addresses/holiday");
             patch3.set("value", MAPPER.convertValue(Map.of("city", "Paris", "street", "2 rue de la paix"), JsonNode.class));
 
-            ObjectNode patch41 = MAPPER.createObjectNode();
+            var patch41 = MAPPER.createObjectNode();
             patch41.put("op", "remove");
             patch41.put("path", "/addresses/holiday");
 
-            ObjectNode patch42 = MAPPER.createObjectNode();
+            var patch42 = MAPPER.createObjectNode();
             patch42.put("op", "replace");
             patch42.put("path", "/addresses/home");
-            Map<String, Object> home = Map.of("city", "Londres");
+            var home = Map.of("city", "Londres");
             patch42.set("value", MAPPER.convertValue(home, JsonNode.class));
 
-            ObjectNode patch5 = MAPPER.createObjectNode();
+            var patch5 = MAPPER.createObjectNode();
             patch5.put("op", "add");
             patch5.put("path", "/cgvs/0");
             patch5.set("value", MAPPER.convertValue(Map.of("code", "code_4", "version", "v1"), JsonNode.class));
 
-            ObjectNode patch6 = MAPPER.createObjectNode();
+            var patch6 = MAPPER.createObjectNode();
             patch6.put("op", "replace");
             patch6.put("path", "/lastname");
             patch6.put("value", " ");
@@ -569,7 +563,7 @@ class SchemaValidationTest {
         void fixIncorrectSourceFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
 
             // Given origin
-            Map<String, Object> origin = Map.of(
+            var origin = Map.of(
                     // And lastname is empty
                     "lastname", "",
                     // And firstname is blank
@@ -588,19 +582,17 @@ class SchemaValidationTest {
                             "home", Map.of("city", "Paris")));
 
             // And form
-            ArrayNode patch = MAPPER.createArrayNode();
+            var patch = MAPPER.createArrayNode();
             patch.addAll(Arrays.asList(patchs));
 
             // When perform
-            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
-            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patch, old));
+            var old = MAPPER.convertValue(origin, JsonNode.class);
+            var throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patch, old));
 
             // Then check throwable
+            var validationExceptionCause = ExpectedValidationExceptionCause.builder().code(expectedCode).path(expectedPath).build();
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
-                    exception -> assertAll(
-                            () -> assertThat(exception.getCauses()).hasSize(1),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode).contains(expectedCode),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains(expectedPath)));
+                    exception -> Assertions.assertThat(exception).isCause(validationExceptionCause));
         }
 
         @Test
@@ -609,29 +601,26 @@ class SchemaValidationTest {
 
             // Given origin
 
-            Map<String, Object> origin = Map.of("email", "jean.dupond@gmail.com");
-            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+            var origin = Map.of("email", "jean.dupond@gmail.com");
+            var old = MAPPER.convertValue(origin, JsonNode.class);
 
             // And Patch
-            ObjectNode patch = MAPPER.createObjectNode();
+            var patch = MAPPER.createObjectNode();
             patch.put("op", "replace");
             patch.put("path", "/email");
             patch.put("value", "jack.dupont@gmail.com");
 
-            ArrayNode patchs = MAPPER.createArrayNode();
+            var patchs = MAPPER.createArrayNode();
             patchs.add(patch);
 
             // When perform
-            Throwable throwable = catchThrowable(
+            var throwable = catchThrowable(
                     () -> validation.validate("schema_test", "unknown", "unknown", patchs, old));
 
             // Then check throwable
+            var validationExceptionCause = ExpectedValidationExceptionCause.builder().code("additionalProperties").path("/email").build();
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
-                    exception -> assertAll(
-                            () -> assertThat(exception.getCauses()).hasSize(1),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode)
-                                    .contains("additionalProperties"),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains("/email")));
+                    exception -> Assertions.assertThat(exception).isCause(validationExceptionCause));
         }
 
         @Test
@@ -639,21 +628,21 @@ class SchemaValidationTest {
         void patchFailureWhenFieldIsMissing() {
 
             // Given origin
-            Map<String, Object> origin = Map.of("hide", BooleanNode.TRUE);
+            var origin = Map.of("hide", BooleanNode.TRUE);
 
-            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+            var old = MAPPER.convertValue(origin, JsonNode.class);
 
             // And form
-            ArrayNode patchs = MAPPER.createArrayNode();
+            var patchs = MAPPER.createArrayNode();
 
-            ObjectNode patch = MAPPER.createObjectNode();
+            var patch = MAPPER.createObjectNode();
             patch.put("op", "remove");
             patch.put("path", "/hide");
 
             patchs.add(patch);
 
             // When perform
-            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patchs, old));
+            var throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patchs, old));
 
             // Then check throwable
             assertThat(throwable).isInstanceOf(JsonPatchApplicationException.class);
@@ -668,17 +657,17 @@ class SchemaValidationTest {
 
         Stream<Arguments> updateSuccess() {
 
-            ObjectNode patch1 = MAPPER.createObjectNode();
+            var patch1 = MAPPER.createObjectNode();
             patch1.put("op", "replace");
             patch1.put("path", "/email");
             patch1.put("value", "jack.dupont@gmail.com");
 
-            ObjectNode patch2 = MAPPER.createObjectNode();
+            var patch2 = MAPPER.createObjectNode();
             patch2.put("op", "add");
             patch2.put("path", "/addresses/holidays");
             patch2.set("value", MAPPER.convertValue(Map.of("city", "New York", "street", "5th avenue"), JsonNode.class));
 
-            ObjectNode patch3 = MAPPER.createObjectNode();
+            var patch3 = MAPPER.createObjectNode();
             patch3.put("op", "add");
             patch3.put("path", "/cgus/0");
             patch3.set("value", MAPPER.convertValue(Map.of("code", "code_1", "version", "v1"), JsonNode.class));
@@ -698,7 +687,7 @@ class SchemaValidationTest {
         void updateSuccess(JsonNode patch) {
 
             // build source
-            Map<String, Object> origin = Map.of(
+            var origin = Map.of(
                     "email", "jean.dupont@gmail.com",
                     "lastname", "Dupont",
                     "firstname", "Jean",
@@ -707,15 +696,15 @@ class SchemaValidationTest {
                     "addresses", MAPPER.createObjectNode(),
                     "cgus", MAPPER.createArrayNode());
 
-            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+            var old = MAPPER.convertValue(origin, JsonNode.class);
 
             // And form
-            ArrayNode patchs = MAPPER.createArrayNode();
+            var patchs = MAPPER.createArrayNode();
             patchs.add(patch);
-            JsonNode model = JsonPatch.apply(patchs, old);
+            var model = JsonPatch.apply(patchs, old);
 
             // When perform validate
-            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", model, old));
+            var throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", model, old));
 
             // Then check none exception
             assertThat(throwable).as("None exception is expected").isNull();
@@ -726,12 +715,12 @@ class SchemaValidationTest {
 
             new ValidateToCreation().creationFailure();
 
-            ObjectNode patch1 = MAPPER.createObjectNode();
+            var patch1 = MAPPER.createObjectNode();
             patch1.put("op", "add");
             patch1.put("path", "/external_id");
             patch1.put("value", UUID.randomUUID().toString());
 
-            ObjectNode patch2 = MAPPER.createObjectNode();
+            var patch2 = MAPPER.createObjectNode();
             patch2.put("op", "add");
             patch2.put("path", "/external_id");
             patch2.set("value", NullNode.instance);
@@ -750,81 +739,79 @@ class SchemaValidationTest {
         void updateFailure(String expectedCode, String expectedPath, JsonNode... patchs) {
 
             // Given origin
-            Map<String, Object> origin = Map.of(
+            var origin = Map.of(
                     "id", UUID.randomUUID().toString(),
                     "opt_in_email", false,
                     "firstname", "john",
                     "lastname", "doe",
                     "cgus", MAPPER.createArrayNode(),
                     "addresses", MAPPER.createObjectNode());
-            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+            var old = MAPPER.convertValue(origin, JsonNode.class);
 
             // And form
-            ArrayNode patch = MAPPER.createArrayNode();
+            var patch = MAPPER.createArrayNode();
             patch.addAll(Arrays.asList(patchs));
-            JsonNode model = JsonPatch.apply(patch, old);
+            var model = JsonPatch.apply(patch, old);
 
             // And add hide
             ((ObjectNode) old).set("hide", BooleanNode.TRUE);
 
             // When perform
-            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", model, old));
+            var throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", model, old));
 
             // Then check throwable
+            var validationExceptionCause = ExpectedValidationExceptionCause.builder().code(expectedCode).path(expectedPath).build();
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
-                    exception -> assertAll(
-                            () -> assertThat(exception.getCauses()).hasSize(1),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode).contains(expectedCode),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains(expectedPath)));
+                    exception -> Assertions.assertThat(exception).isCause(validationExceptionCause));
         }
 
         private Stream<Arguments> updateFailures() {
 
             new ValidateToCreation().creationFailure();
 
-            ObjectNode patch1 = MAPPER.createObjectNode();
+            var patch1 = MAPPER.createObjectNode();
             patch1.put("op", "add");
             patch1.put("path", "/external_id");
             patch1.set("value", NullNode.instance);
 
             return Stream.of(
                     // external_id create only
-                    Arguments.of(new String[] { "readOnly", "type" }, "/external_id", 2, new JsonNode[] { patch1 }));
+                    Arguments.of(new String[] { "readOnly", "type" }, "/external_id", new JsonNode[] { patch1 }));
 
         }
 
         @ParameterizedTest
         @MethodSource("updateFailures")
         @DisplayName("source update fails")
-        void updateFailure(String[] expectedCode, String expectedPath, int expectedExceptions, JsonNode... patchs) {
+        void updateFailure(String[] expectedCodes, String expectedPath, JsonNode... patchs) {
 
             // Given origin
-            Map<String, Object> origin = Map.of(
+            var origin = Map.of(
                     "id", UUID.randomUUID().toString(),
                     "opt_in_email", false,
                     "firstname", "john",
                     "lastname", "doe",
                     "cgus", MAPPER.createArrayNode(),
                     "addresses", MAPPER.createObjectNode());
-            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+            var old = MAPPER.convertValue(origin, JsonNode.class);
 
             // And form
-            ArrayNode patch = MAPPER.createArrayNode();
+            var patch = MAPPER.createArrayNode();
             patch.addAll(Arrays.asList(patchs));
-            JsonNode model = JsonPatch.apply(patch, old);
+            var model = JsonPatch.apply(patch, old);
 
             // And add hide
             ((ObjectNode) old).set("hide", BooleanNode.TRUE);
 
             // When perform
-            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", model, old));
+            var throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", model, old));
 
             // Then check throwable
+            var validationExceptionCauses = Streams.of(expectedCodes)
+                    .map(expectedCode -> ExpectedValidationExceptionCause.builder().code(expectedCode).path(expectedPath).build())
+                    .toList();
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
-                    exception -> assertAll(
-                            () -> assertThat(exception.getCauses()).hasSize(expectedExceptions),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode).containsOnly(expectedCode),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains(expectedPath)));
+                    exception -> Assertions.assertThat(exception).containCauses(validationExceptionCauses));
         }
 
         @Test
@@ -832,7 +819,7 @@ class SchemaValidationTest {
         void fixIncorrectSource() {
 
             // Given origin
-            Map<String, Object> origin = Map.of(
+            var origin = Map.of(
                     "id", UUID.randomUUID().toString(),
                     "email", "toto",
                     "opt_in_email", false,
@@ -840,7 +827,7 @@ class SchemaValidationTest {
                     "lastname", "doe");
 
             // And email incorrect
-            Map<String, Object> model = Map.of(
+            var model = Map.of(
                     "id", origin.get("id"),
                     "email", "jean.dupond@gmail.com",
                     "opt_in_email", false,
@@ -848,9 +835,9 @@ class SchemaValidationTest {
                     "lastname", "doe");
 
             // When perform
-            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
-            JsonNode source = MAPPER.convertValue(model, JsonNode.class);
-            Throwable throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", source, old));
+            var old = MAPPER.convertValue(origin, JsonNode.class);
+            var source = MAPPER.convertValue(model, JsonNode.class);
+            var throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", source, old));
 
             // Then check none exception
             assertThat(throwable).as("None exception is expected").isNull();
@@ -861,31 +848,28 @@ class SchemaValidationTest {
         void updateFailureWhenSchemaNotExists() {
 
             // Given origin
-            Map<String, Object> origin = Map.of("email", "jean.dupont@gmail.com");
-            JsonNode old = MAPPER.convertValue(origin, JsonNode.class);
+            var origin = Map.of("email", "jean.dupont@gmail.com");
+            var old = MAPPER.convertValue(origin, JsonNode.class);
 
             // And Patch
-            ObjectNode patch = MAPPER.createObjectNode();
+            var patch = MAPPER.createObjectNode();
             patch.put("op", "replace");
             patch.put("path", "/email");
             patch.put("value", "jack.dupont@gmail.com");
 
             // And form
-            ArrayNode patchs = MAPPER.createArrayNode();
+            var patchs = MAPPER.createArrayNode();
             patchs.add(patch);
-            JsonNode model = JsonPatch.apply(patchs, old);
+            var model = JsonPatch.apply(patchs, old);
 
             // When perform
-            Throwable throwable = catchThrowable(
+            var throwable = catchThrowable(
                     () -> validation.validate("schema_test", "unknown", "unknown", model, old));
 
             // Then check throwable
+            var validationExceptionCause = ExpectedValidationExceptionCause.builder().code("additionalProperties").path("/email").build();
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
-                    exception -> assertAll(
-                            () -> assertThat(exception.getCauses()).hasSize(1),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode)
-                                    .contains("additionalProperties"),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains("/email")));
+                    exception -> Assertions.assertThat(exception).isCause(validationExceptionCause));
         }
 
     }
@@ -898,22 +882,60 @@ class SchemaValidationTest {
         void validationNotUniqueItemsFailure() {
 
             // Given build model
-            Map<String, Object> addresse = Map.of("street", "1 rue de la paix", "city", "paris");
-            List<Object> addresses = List.of(addresse, addresse);
+            var addresse = Map.of("street", "1 rue de la paix", "city", "paris");
+            var addresses = List.of(addresse, addresse);
 
-            JsonNode model = MAPPER.convertValue(addresses, JsonNode.class);
+            var model = MAPPER.convertValue(addresses, JsonNode.class);
 
             // When perform
-            Throwable throwable = catchThrowable(
+            var throwable = catchThrowable(
                     () -> validation.validate("array_test", "default", "default", model, MAPPER.createArrayNode()));
 
             // Then check throwable
+            var validationExceptionCause = ExpectedValidationExceptionCause.builder().code("uniqueItems").path("").build();
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
-                    exception -> assertAll(
-                            () -> assertThat(exception.getCauses()).hasSize(1),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getCode).contains("uniqueItems"),
-                            () -> assertThat(exception.getCauses()).extracting(ValidationExceptionCause::getPath).contains("")));
+                    exception -> Assertions.assertThat(exception).isCause(validationExceptionCause));
 
         }
+    }
+
+    static class ValidationExceptionAssert extends AbstractAssert<ValidationExceptionAssert, ValidationException> {
+
+        public ValidationExceptionAssert(ValidationException exception) {
+            super(exception, ValidationExceptionAssert.class);
+        }
+
+        public ValidationExceptionAssert containCauses(List<ExpectedValidationExceptionCause> expectedCauses) {
+            isNotNull();
+
+            assertThat(this.actual.getCauses()).usingRecursiveComparison()
+                    .ignoringCollectionOrder()
+                    .ignoringFields("message", "value")
+                    .isEqualTo(expectedCauses.stream()
+                            .map(expectedCause -> expectedCause.buildValidationExceptionCause())
+                            .toList());
+            return this;
+        }
+
+        public ValidationExceptionAssert isCause(ExpectedValidationExceptionCause expectedCause) {
+            return containCauses(List.of(expectedCause));
+        }
+
+    }
+
+    class Assertions {
+        public static ValidationExceptionAssert assertThat(ValidationException actual) {
+            return new ValidationExceptionAssert(actual);
+        }
+    }
+
+    @Builder
+    public static record ExpectedValidationExceptionCause(String code,
+                                                          String path) {
+
+        ValidationExceptionCause buildValidationExceptionCause() {
+            return ValidationExceptionCause.builder().code(code).pointer(JsonPointer.valueOf(path)).build();
+        }
+
     }
 }
