@@ -58,7 +58,7 @@ class DocumentApiResourceTest extends JerseySpringSupport {
     private JsonNode swagger;
 
     @BeforeEach
-    public void before() {
+    void before() {
 
         Mockito.reset(schemaResource);
 

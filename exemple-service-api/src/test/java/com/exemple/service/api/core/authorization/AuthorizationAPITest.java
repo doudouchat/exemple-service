@@ -68,7 +68,7 @@ class AuthorizationAPITest extends JerseySpringSupport {
     private static final String URL = "/v1/test";
 
     @BeforeEach
-    public void before() {
+    void before() {
 
         Mockito.when(applicationDetailService.get("test")).thenReturn(Optional.of(ApplicationDetail.builder().clientId("clientId1").build()));
 

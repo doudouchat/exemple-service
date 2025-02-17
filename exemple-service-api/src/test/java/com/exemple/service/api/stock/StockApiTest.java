@@ -52,7 +52,7 @@ class StockApiTest extends JerseySpringSupport {
     private ApplicationDetailService applicationDetailService;
 
     @BeforeEach
-    public void before() {
+    void before() {
 
         Mockito.reset(service, applicationDetailService);
 

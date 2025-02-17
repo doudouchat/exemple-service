@@ -65,7 +65,7 @@ class AccountApiTest extends JerseySpringSupport {
     private JsonNode account;
 
     @BeforeEach
-    public void before() {
+    void before() {
 
         Mockito.reset(service, schemaValidation);
 

@@ -43,13 +43,13 @@ class CustomerScriptFactoryTest {
     private ApplicationDetailService applicationDetailService;
 
     @BeforeAll
-    public static void createScriptDirectory() throws IOException {
+    static void createScriptDirectory() throws IOException {
         ResourceUtils.getFile(SCRIPTS_DIRECTORY_PATH).delete();
         ResourceUtils.getFile(SCRIPTS_DIRECTORY_PATH).mkdir();
     }
 
     @BeforeAll
-    public static void deleteScriptDirectory() throws IOException {
+    static void deleteScriptDirectory() throws IOException {
         ResourceUtils.getFile(SCRIPTS_DIRECTORY_PATH).delete();
     }
 

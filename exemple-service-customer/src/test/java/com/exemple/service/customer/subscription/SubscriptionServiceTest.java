@@ -33,14 +33,14 @@ class SubscriptionServiceTest {
     private SubscriptionService service;
 
     @BeforeEach
-    public void before() {
+    void before() {
 
         Mockito.reset(resource);
 
     }
 
     @BeforeAll
-    public static void initServiceContextExecution() {
+    static void initServiceContextExecution() {
 
         ServiceContextExecution.setApp("default");
     }
