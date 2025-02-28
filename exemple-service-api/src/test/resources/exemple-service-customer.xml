@@ -17,11 +17,11 @@
 
 			class AccountServiceTest implements AccountService {
 
-				JsonNode save(JsonNode account) {
+				JsonNode create(JsonNode account) {
 					account
 				}
 
-				JsonNode save(JsonNode account, JsonNode previousSource) {
+				JsonNode update(JsonNode account) {
 					account
 				}
 

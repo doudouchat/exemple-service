@@ -12,9 +12,9 @@ public interface SubscriptionResource {
 
     Optional<JsonNode> get(@NotBlank String email);
 
-    void save(@Json(table = "subscription") JsonNode source);
+    void create(@Json(table = "subscription") JsonNode source);
 
-    void save(@NotEmpty @Json(table = "subscription") JsonNode subscription, @NotEmpty JsonNode previousSubscription);
+    void update(@NotEmpty @Json(table = "subscription") JsonNode subscription);
 
     void delete(String email);
 }

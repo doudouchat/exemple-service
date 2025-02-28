@@ -103,7 +103,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             ArgumentCaptor<JsonNode> actualSubscription = ArgumentCaptor.forClass(JsonNode.class);
 
-            Mockito.verify(service).save(Mockito.eq(email), actualSubscription.capture());
+            Mockito.verify(service).create(Mockito.eq(email), actualSubscription.capture());
             assertThat(actualSubscription.getValue()).isEqualTo(source);
 
             // And check validation
@@ -164,7 +164,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             ArgumentCaptor<JsonNode> actualSubscription = ArgumentCaptor.forClass(JsonNode.class);
 
-            Mockito.verify(service).save(Mockito.eq(email), actualSubscription.capture(), Mockito.eq(previousSource));
+            Mockito.verify(service).update(Mockito.eq(email), actualSubscription.capture());
             assertThat(actualSubscription.getValue()).isEqualTo(source);
 
             // And check validation
@@ -212,7 +212,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // And check service
 
-            Mockito.verify(service, never()).save(any(), any());
+            Mockito.verify(service, never()).update(any(), any());
 
         }
 

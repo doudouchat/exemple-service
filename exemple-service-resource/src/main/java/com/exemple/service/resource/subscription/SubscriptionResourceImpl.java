@@ -53,7 +53,7 @@ public class SubscriptionResourceImpl implements SubscriptionResource {
     }
 
     @Override
-    public void save(JsonNode subscription) {
+    public void create(JsonNode subscription) {
 
         Assert.isTrue(subscription.path(SubscriptionField.EMAIL.field).isTextual(), SubscriptionField.EMAIL.field + " is required");
 
@@ -69,7 +69,7 @@ public class SubscriptionResourceImpl implements SubscriptionResource {
     }
 
     @Override
-    public void save(JsonNode subscription, JsonNode previousSubscription) {
+    public void update(JsonNode subscription) {
 
         Assert.isTrue(subscription.path(SubscriptionField.EMAIL.field).isTextual(), SubscriptionField.EMAIL.field + " is required");
 
@@ -77,7 +77,7 @@ public class SubscriptionResourceImpl implements SubscriptionResource {
 
         var batch = new BatchStatementBuilder(BatchType.LOGGED);
         batch.addStatement(createSubscription.build());
-        subscriptionHistoryResource.saveHistories(subscription, previousSubscription).forEach(batch::addStatements);
+        subscriptionHistoryResource.saveHistories(subscription).forEach(batch::addStatements);
         batch.addStatement(subscriptionEventResource.saveEvent(subscription, EventType.UPDATE));
 
         session.execute(batch.build());

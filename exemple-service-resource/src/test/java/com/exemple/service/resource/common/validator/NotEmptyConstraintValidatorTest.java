@@ -44,7 +44,7 @@ class NotEmptyConstraintValidatorTest {
                 """.formatted(id, id + "@gmail.com"));
 
         // When perform save
-        resource.save(account);
+        resource.create(account);
 
         // Then check result
         JsonNode result = resource.get(id).get();
@@ -65,7 +65,7 @@ class NotEmptyConstraintValidatorTest {
     void updateFailure(JsonNode account) {
 
         // When perform save
-        Throwable throwable = catchThrowable(() -> resource.save(account));
+        Throwable throwable = catchThrowable(() -> resource.create(account));
 
         // Then check throwable
         assertThat(throwable).isInstanceOf(ConstraintViolationException.class);

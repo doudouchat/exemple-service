@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
+import com.exemple.service.context.SubscriptionContextExecution;
 import com.exemple.service.resource.common.history.HistoryResource;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.subscription.SubscriptionField;
@@ -16,13 +17,10 @@ import com.exemple.service.resource.subscription.history.dao.SubscriptionHistory
 import com.exemple.service.resource.subscription.history.mapper.SubscriptionHistoryMapper;
 import com.exemple.service.resource.subscription.model.SubscriptionHistory;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 
 public class SubscriptionHistoryResource {
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final CqlSession session;
 
@@ -43,14 +41,9 @@ public class SubscriptionHistoryResource {
 
     public Collection<BoundStatement> saveHistories(JsonNode source) {
 
-        return saveHistories(source, MAPPER.createObjectNode());
-    }
-
-    public Collection<BoundStatement> saveHistories(JsonNode source, JsonNode previousSource) {
-
         String email = source.get(SubscriptionField.EMAIL.field).textValue();
 
-        return this.historyResource.saveHistories(email, source, previousSource);
+        return this.historyResource.saveHistories(email, source, SubscriptionContextExecution.getPreviousSubscription());
     }
 
     private SubscriptionHistoryDao dao() {

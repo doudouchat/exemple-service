@@ -11,9 +11,9 @@ import jakarta.validation.constraints.NotBlank;
 
 public interface AccountResource {
 
-    void save(@NotEmpty @Json(table = "account") JsonNode account);
+    void create(@NotEmpty @Json(table = "account") JsonNode account);
 
-    void save(@NotEmpty @Json(table = "account") JsonNode account, @NotEmpty JsonNode previousAccount);
+    void update(@NotEmpty @Json(table = "account") JsonNode account);
 
     Optional<JsonNode> get(UUID id);
 

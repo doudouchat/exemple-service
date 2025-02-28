@@ -9,9 +9,9 @@ import jakarta.validation.constraints.NotNull;
 
 public interface SubscriptionService {
 
-    void save(@NotBlank String email, @NotNull JsonNode source);
+    void create(@NotBlank String email, @NotNull JsonNode source);
 
-    void save(@NotBlank String email, @NotNull JsonNode source, @NotNull JsonNode previousSource);
+    void update(@NotBlank String email, @NotNull JsonNode source);
 
     Optional<JsonNode> get(@NotBlank String email);
 }

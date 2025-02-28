@@ -5,7 +5,9 @@ import java.time.temporal.ChronoUnit;
 
 import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.api.common.model.SchemaBeanParam;
+import com.exemple.service.context.AccountContextExecution;
 import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.SubscriptionContextExecution;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 
 import jakarta.annotation.Priority;
@@ -32,6 +34,8 @@ public class ExecutionContextResponseFilter implements ContainerRequestFilter, C
 
         ServiceContextExecution.destroy();
         ResourceExecutionContext.destroy();
+        AccountContextExecution.destroy();
+        SubscriptionContextExecution.destroy();
 
     }
 

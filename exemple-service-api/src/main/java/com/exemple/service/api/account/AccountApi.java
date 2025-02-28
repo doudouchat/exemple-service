@@ -12,6 +12,7 @@ import com.exemple.service.api.common.schema.SchemaValidation;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
 import com.exemple.service.api.core.check.AppAndVersionCheck;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
+import com.exemple.service.context.AccountContextExecution;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.common.validator.NotEmpty;
 import com.exemple.service.resource.account.AccountField;
@@ -47,7 +48,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 import lombok.RequiredArgsConstructor;
 
@@ -92,10 +92,12 @@ public class AccountApi {
 
         authorizationCheckService.verifyAccountId(id);
 
-        JsonNode account = accountService.get(id).orElseThrow(NotFoundException::new);
-
-        ObjectNode response = (ObjectNode) schemaFilter.filter(account, ACCOUNT_RESOURCE);
+        var response = accountService.get(id)
+                .map(account -> schemaFilter.filter(account, ACCOUNT_RESOURCE))
+                .map(ObjectNode.class::cast)
+                .orElseThrow(NotFoundException::new);
         response.remove(AccountField.ID.field);
+
         return response;
     }
 
@@ -116,9 +118,9 @@ public class AccountApi {
 
         schemaValidation.validate(account, ACCOUNT_RESOURCE);
 
-        JsonNode source = accountService.save(account);
+        var source = accountService.create(account);
 
-        UriBuilder builder = uriInfo.getAbsolutePathBuilder();
+        var builder = uriInfo.getAbsolutePathBuilder();
         builder.path(source.get(AccountField.ID.field).textValue());
         return Response.created(builder.build()).build();
 
@@ -143,13 +145,13 @@ public class AccountApi {
 
         authorizationCheckService.verifyAccountId(id);
 
-        JsonNode previousSource = accountService.get(id).orElseThrow(NotFoundException::new);
+        var previousAccount = getPreviousAccount(id);
 
-        schemaValidation.validate(patch, previousSource, ACCOUNT_RESOURCE);
+        schemaValidation.validate(patch, previousAccount, ACCOUNT_RESOURCE);
 
-        JsonNode source = JsonPatch.apply(patch, previousSource);
+        var account = JsonPatch.apply(patch, previousAccount);
 
-        accountService.save(source, previousSource);
+        accountService.update(account);
 
         return Response.status(Status.NO_CONTENT).build();
 
@@ -175,15 +177,23 @@ public class AccountApi {
 
         authorizationCheckService.verifyAccountId(id);
 
-        JsonNode previousSource = accountService.get(id).orElseThrow(NotFoundException::new);
+        var previousAccount = getPreviousAccount(id);
 
         ((ObjectNode) account).put(AccountField.ID.field, id.toString());
-        schemaValidation.validate(account, previousSource, ACCOUNT_RESOURCE);
+        schemaValidation.validate(account, previousAccount, ACCOUNT_RESOURCE);
 
-        JsonNode accountFinal = JsonUtils.merge(account, schemaFilter.filterAllAdditionalProperties(previousSource, ACCOUNT_RESOURCE));
-        accountService.save(accountFinal, previousSource);
+        var accountFinal = JsonUtils.merge(account, schemaFilter.filterAllAdditionalProperties(previousAccount, ACCOUNT_RESOURCE));
+        accountService.update(accountFinal);
 
         return Response.status(Status.NO_CONTENT).build();
+
+    }
+
+    private JsonNode getPreviousAccount(UUID id) {
+
+        accountService.get(id).ifPresentOrElse(AccountContextExecution::setPreviousAccount, NotFoundException::new);
+
+        return AccountContextExecution.getPreviousAccount();
 
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.SubscriptionContextExecution;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,7 +47,7 @@ class SubscriptionServiceTest {
     }
 
     @Test
-    void save() {
+    void create() {
 
         // Given email
 
@@ -56,7 +57,7 @@ class SubscriptionServiceTest {
 
         JsonNode source = MAPPER.createObjectNode();
 
-        service.save(email, source);
+        service.create(email, source);
 
         // Then check save resource
 
@@ -65,7 +66,7 @@ class SubscriptionServiceTest {
 
         ArgumentCaptor<JsonNode> subscriptionCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
-        Mockito.verify(resource).save(subscriptionCaptor.capture());
+        Mockito.verify(resource).create(subscriptionCaptor.capture());
         assertThat(subscriptionCaptor.getValue()).isEqualTo(expectedSubscription);
 
     }
@@ -84,8 +85,9 @@ class SubscriptionServiceTest {
                 """
                 {"email": "jean.dupont@gmail.com"}
                 """);
+        SubscriptionContextExecution.setPreviousSubscription(previousSource);
 
-        service.save(email, source, previousSource);
+        service.update(email, source);
 
         // Then check save resource
 
@@ -94,7 +96,7 @@ class SubscriptionServiceTest {
 
         ArgumentCaptor<JsonNode> subscriptionCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
-        Mockito.verify(resource).save(subscriptionCaptor.capture(), Mockito.eq(previousSource));
+        Mockito.verify(resource).update(subscriptionCaptor.capture());
         assertThat(subscriptionCaptor.getValue()).isEqualTo(expectedSubscription);
 
     }

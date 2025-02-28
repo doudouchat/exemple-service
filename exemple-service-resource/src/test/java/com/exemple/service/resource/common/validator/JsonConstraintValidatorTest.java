@@ -66,7 +66,7 @@ class JsonConstraintValidatorTest {
                 """.formatted(id, now.toString()));
 
         // When perform save
-        Throwable throwable = catchThrowable(() -> resource.save(account));
+        Throwable throwable = catchThrowable(() -> resource.create(account));
 
         // Then check result
         assertThat(throwable).as("None exception is expected").isNull();
@@ -131,7 +131,7 @@ class JsonConstraintValidatorTest {
         node.set(property, MAPPER.convertValue(value, JsonNode.class));
 
         // When perform save
-        Throwable throwable = catchThrowable(() -> resource.save(node));
+        Throwable throwable = catchThrowable(() -> resource.create(node));
 
         // Then check throwable
         assertThat(throwable).isInstanceOf(ConstraintViolationException.class);

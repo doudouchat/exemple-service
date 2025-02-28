@@ -22,6 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.SubscriptionContextExecution;
 import com.exemple.service.customer.subscription.SubscriptionResource;
 import com.exemple.service.resource.common.history.ExpectedHistory;
 import com.exemple.service.resource.common.history.HistoryAssert;
@@ -82,7 +83,7 @@ class SubscriptionResourceTest {
                 """.formatted(email));
 
         // When perform save
-        resource.save(subscription);
+        resource.create(subscription);
 
         // Then check subscription
         Optional<JsonNode> result = resource.get(email);
@@ -141,9 +142,10 @@ class SubscriptionResourceTest {
                 {"email": "%s", "update_date": "2019-01-01T10:00:00Z"}
                 """.formatted(email));
         JsonNode previouSubscription = resource.get(email).get();
+        SubscriptionContextExecution.setPreviousSubscription(previouSubscription);
 
         // When perform save
-        resource.save(subscription, previouSubscription);
+        resource.update(subscription);
 
         // Then check subscription
         Optional<JsonNode> result = resource.get(email);

@@ -9,9 +9,9 @@ import jakarta.validation.constraints.NotNull;
 
 public interface AccountService {
 
-    JsonNode save(@NotNull JsonNode account);
+    JsonNode create(@NotNull JsonNode account);
 
-    JsonNode save(@NotNull JsonNode source, @NotNull JsonNode previousSource);
+    JsonNode update(@NotNull JsonNode account);
 
     Optional<JsonNode> get(@NotNull UUID id);
 

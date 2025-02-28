@@ -1,7 +1,6 @@
 package com.exemple.service.customer.account;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -16,6 +15,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import com.exemple.service.context.AccountContextExecution;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -46,8 +46,8 @@ class AccountServiceTest {
     }
 
     @Test
-    @DisplayName("save account")
-    void save() throws IOException {
+    @DisplayName("create account")
+    void create() throws IOException {
 
         // Given account
 
@@ -58,7 +58,7 @@ class AccountServiceTest {
 
         // When perform save
 
-        var account = service.save(source);
+        var account = service.create(source);
         var id = account.get("id");
 
         // Then check account
@@ -71,7 +71,7 @@ class AccountServiceTest {
         // And check save account resource
 
         var accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
-        Mockito.verify(accountResource).save(accountCaptor.capture());
+        Mockito.verify(accountResource).create(accountCaptor.capture());
         assertThat(accountCaptor.getValue()).isEqualTo(account);
 
     }
@@ -93,10 +93,11 @@ class AccountServiceTest {
                 """
                 {"email": "jean.dupont@gmail.com", "lastname": "Dupont", "firstname":"Jean"}
                 """);
+        AccountContextExecution.setPreviousAccount(previousSource);
 
         // When perform save
 
-        var account = service.save(source, previousSource);
+        var account = service.update(source);
 
         // Then check account
 
@@ -108,12 +109,9 @@ class AccountServiceTest {
         // And check save resource
 
         var accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
-        var previousAccountCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
-        Mockito.verify(accountResource).save(accountCaptor.capture(), previousAccountCaptor.capture());
-        assertAll(
-                () -> assertThat(accountCaptor.getValue()).isEqualTo(account),
-                () -> assertThat(previousAccountCaptor.getValue()).isEqualTo(previousSource));
+        Mockito.verify(accountResource).update(accountCaptor.capture());
+        assertThat(accountCaptor.getValue()).isEqualTo(account);
 
     }
 
@@ -136,10 +134,11 @@ class AccountServiceTest {
                 """
                 {"id": "%s", "email": "jean.dupont@gmail.com"}
                 """.formatted(id));
+        AccountContextExecution.setPreviousAccount(previousSource);
 
         // When perform save
 
-        var account = service.save(source, previousSource);
+        var account = service.update(source);
 
         // Then check account
 
@@ -151,12 +150,9 @@ class AccountServiceTest {
         // And check save resource
 
         var accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
-        var previousAccountCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
-        Mockito.verify(accountResource).save(accountCaptor.capture(), previousAccountCaptor.capture());
-        assertAll(
-                () -> assertThat(accountCaptor.getValue()).isEqualTo(account),
-                () -> assertThat(previousAccountCaptor.getValue()).isEqualTo(previousSource));
+        Mockito.verify(accountResource).update(accountCaptor.capture());
+        assertThat(accountCaptor.getValue()).isEqualTo(account);
 
     }
 

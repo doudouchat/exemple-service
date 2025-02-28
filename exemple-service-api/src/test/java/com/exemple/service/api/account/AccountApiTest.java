@@ -272,10 +272,8 @@ class AccountApiTest extends JerseySpringSupport {
 
             JsonNode expectedAccount = ((ObjectNode) account).put("birthday", "1976-12-12");
 
-            Mockito.verify(service).save(actualAccount.capture(), previousAccount.capture());
-            assertAll(
-                    () -> assertThat(previousAccount.getValue()).isEqualTo(account),
-                    () -> assertThat(actualAccount.getValue()).isEqualTo(expectedAccount));
+            Mockito.verify(service).update(actualAccount.capture());
+            assertThat(actualAccount.getValue()).isEqualTo(expectedAccount);
 
             // And check validation
 
@@ -324,7 +322,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And check service
 
-            Mockito.verify(service, never()).save(any(), any());
+            Mockito.verify(service, never()).update(any());
 
         }
 
@@ -428,10 +426,8 @@ class AccountApiTest extends JerseySpringSupport {
             ArgumentCaptor<JsonNode> previousAccount = ArgumentCaptor.forClass(JsonNode.class);
             ArgumentCaptor<JsonNode> actualAccount = ArgumentCaptor.forClass(JsonNode.class);
 
-            Mockito.verify(service).save(actualAccount.capture(), previousAccount.capture());
-            assertAll(
-                    () -> assertThat(previousAccount.getValue()).isEqualTo(account),
-                    () -> assertThat(actualAccount.getValue()).isEqualTo(sourceToValidate));
+            Mockito.verify(service).update(actualAccount.capture());
+            assertThat(actualAccount.getValue()).isEqualTo(sourceToValidate);
 
             // And check validation
 
@@ -477,7 +473,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And check service
 
-            Mockito.verify(service, never()).save(any(), any());
+            Mockito.verify(service, never()).update(any());
 
         }
 
@@ -491,7 +487,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // Given mock service
 
-            Mockito.when(service.save(Mockito.any(JsonNode.class))).thenReturn(account);
+            Mockito.when(service.create(Mockito.any(JsonNode.class))).thenReturn(account);
 
             // and token
 
@@ -524,7 +520,7 @@ class AccountApiTest extends JerseySpringSupport {
             // And check service
 
             ArgumentCaptor<JsonNode> actualAccount = ArgumentCaptor.forClass(JsonNode.class);
-            Mockito.verify(service).save(actualAccount.capture());
+            Mockito.verify(service).create(actualAccount.capture());
             assertThat(actualAccount.getValue()).isEqualTo(source);
 
             // And check validation
@@ -563,7 +559,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And check service
 
-            Mockito.verify(service, never()).save(any());
+            Mockito.verify(service, never()).create(any());
 
         }
 

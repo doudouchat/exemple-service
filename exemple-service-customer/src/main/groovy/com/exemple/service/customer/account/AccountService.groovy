@@ -12,22 +12,22 @@ class AccountServiceImpl implements AccountService {
     AccountResource accountResource
 
     @Override
-    JsonNode save(JsonNode account) {
+    JsonNode create(JsonNode account) {
 
         UUID id = UUID.randomUUID()
 
         ((ObjectNode) account).put('id', id.toString())
         ((ObjectNode) account).put('creation_date', ServiceContextExecution.context().date.toString())
 
-        accountResource.save(account)
+        accountResource.create(account)
 
         account
     }
 
     @Override
-    JsonNode save(JsonNode account, JsonNode previousSource) {
+    JsonNode update(JsonNode account) {
 
-        accountResource.save(account, previousSource)
+        accountResource.update(account)
 
         account
     }

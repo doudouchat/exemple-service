@@ -19,7 +19,6 @@ import com.exemple.service.resource.account.username.AccountUsername;
 import com.exemple.service.resource.account.username.AccountUsernameService;
 import com.exemple.service.resource.common.lock.Lock;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -28,8 +27,6 @@ import lombok.SneakyThrows;
 @Component
 @RequiredArgsConstructor
 public class AccountResourceAspect {
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Value("${resource.zookeeper.ttlMs.product:30000}")
     private final long productTtlMs;
@@ -42,23 +39,14 @@ public class AccountResourceAspect {
     private final CuratorFramework client;
 
     @Around(value = "@within(org.springframework.stereotype.Service)"
-            + " && execution(public void com.exemple.service.customer.account.AccountResource.save(..))"
+            + " && execution(public void com.exemple.service.customer.account.AccountResource.*(..))"
             + " && args(account)",
             argNames = "account")
-    public void saveUniquesProperties(ProceedingJoinPoint joinPoint, JsonNode account) {
-
-        this.saveUniquesProperties(joinPoint, account, MAPPER.createObjectNode());
-    }
-
-    @Around(value = "@within(org.springframework.stereotype.Service)"
-            + " && execution(public void com.exemple.service.customer.account.AccountResource.save(..))"
-            + " && args(account, previousAccount)",
-            argNames = "account,previousAccount")
-    public void saveUniquesProperties(ProceedingJoinPoint joinPoint, JsonNode account, JsonNode previousAccount) {
+    public void checkUniquesProperties(ProceedingJoinPoint joinPoint, JsonNode account) {
 
         var applicationDetail = this.applicationDetailService.get(ServiceContextExecution.context().getApp()).orElseThrow();
 
-        var changedUsernames = accountUsernameService.findAllUsernames(applicationDetail, account, previousAccount).stream()
+        var changedUsernames = accountUsernameService.findAllUsernames(applicationDetail, account).stream()
                 .filter(AccountUsername::hasChanged)
                 .toList();
         var lock = new AccountUsernameLock(changedUsernames, applicationDetail);

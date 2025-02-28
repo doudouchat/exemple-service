@@ -13,21 +13,21 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     SubscriptionResource subscriptionResource
 
     @Override
-    void save(String email, JsonNode subscription) {
+    void create(String email, JsonNode subscription) {
 
         ((ObjectNode) subscription).set('email', new TextNode(email))
         ((ObjectNode) subscription).set('subscription_date', new TextNode(ServiceContextExecution.context().date.toString()))
 
-        subscriptionResource.save(subscription)
+        subscriptionResource.create(subscription)
     }
 
     @Override
-    void save(String email, JsonNode subscription, JsonNode previousSubscription) {
+    void update(String email, JsonNode subscription) {
 
         ((ObjectNode) subscription).set('email', new TextNode(email))
         ((ObjectNode) subscription).set('subscription_date', new TextNode(ServiceContextExecution.context().date.toString()))
 
-        subscriptionResource.save(subscription, previousSubscription)
+        subscriptionResource.update(subscription)
     }
 
     @Override

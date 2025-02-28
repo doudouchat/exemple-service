@@ -51,7 +51,7 @@ public class AccountResourceImpl implements AccountResource {
     }
 
     @Override
-    public void save(JsonNode account) {
+    public void create(JsonNode account) {
 
         Assert.isTrue(account.path(AccountField.ID.field).isTextual(), AccountField.ID.field + " is required");
 
@@ -67,7 +67,7 @@ public class AccountResourceImpl implements AccountResource {
     }
 
     @Override
-    public void save(JsonNode account, JsonNode previousAccount) {
+    public void update(JsonNode account) {
 
         Assert.isTrue(account.path(AccountField.ID.field).isTextual(), AccountField.ID.field + " is required");
 
@@ -77,7 +77,7 @@ public class AccountResourceImpl implements AccountResource {
 
         var batch = new BatchStatementBuilder(BatchType.LOGGED);
         batch.addStatement(insertAccount.build());
-        accountHistoryResource.saveHistories(account, previousAccount).forEach(batch::addStatements);
+        accountHistoryResource.saveHistories(account).forEach(batch::addStatements);
         batch.addStatement(accountEventResource.saveEvent(account, EventType.UPDATE));
 
         session.execute(batch.build());
