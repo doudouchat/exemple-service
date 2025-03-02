@@ -177,12 +177,10 @@ public class AccountApi {
 
         authorizationCheckService.verifyAccountId(id);
 
+        schemaValidation.validate(account, ACCOUNT_RESOURCE);
+
         var previousAccount = getPreviousAccount(id);
-
-        ((ObjectNode) account).put(AccountField.ID.field, id.toString());
-        schemaValidation.validate(account, previousAccount, ACCOUNT_RESOURCE);
-
-        var accountFinal = JsonUtils.merge(account, schemaFilter.filterAllAdditionalProperties(previousAccount, ACCOUNT_RESOURCE));
+        var accountFinal = JsonUtils.merge(account, schemaFilter.filterAllAdditionalAndReadOnlyProperties(previousAccount, ACCOUNT_RESOURCE));
         accountService.update(accountFinal);
 
         return Response.status(Status.NO_CONTENT).build();

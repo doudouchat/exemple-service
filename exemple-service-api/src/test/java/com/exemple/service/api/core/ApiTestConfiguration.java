@@ -67,7 +67,7 @@ public class ApiTestConfiguration {
             }
 
             @Override
-            public JsonNode filterAllAdditionalProperties(String resource, String version, String profile, JsonNode source) {
+            public JsonNode filterAllAdditionalAndReadOnlyProperties(String resource, String version, String profile, JsonNode source) {
                 return MAPPER.nullNode();
             }
 

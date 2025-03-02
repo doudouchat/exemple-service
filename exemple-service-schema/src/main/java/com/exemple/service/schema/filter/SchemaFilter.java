@@ -67,13 +67,13 @@ public class SchemaFilter {
         return allProperties;
     }
 
-    public JsonNode filterAllAdditionalProperties(String resource, String version, String profile, JsonNode source) {
+    public JsonNode filterAllAdditionalAndReadOnlyProperties(String resource, String version, String profile, JsonNode source) {
 
         var schema = schemaBuilder.buildFilterSchema(resource, version, profile);
 
         List<ArrayNode> exceptions = SchemaValidator.performValidation(schema, source,
                 (ValidationException e) -> e.getCauses().stream()
-                        .filter(SchemaFilter::isAdditionalProperties)
+                        .filter(SchemaFilter::isAdditionalOrReadOnlyProperties)
                         .filter((ValidationExceptionCause cause) -> JsonPointer.empty().equals(cause.getPointer().head()))
                         .map((ValidationExceptionCause cause) -> {
                             var patch = MAPPER.createObjectNode();
@@ -94,6 +94,10 @@ public class SchemaFilter {
 
     private static boolean isAdditionalProperties(ValidationExceptionCause cause) {
         return "additionalProperties".equals(cause.getCode());
+    }
+
+    private static boolean isAdditionalOrReadOnlyProperties(ValidationExceptionCause cause) {
+        return List.of("additionalProperties", "readOnly").contains(cause.getCode());
     }
 
     private static boolean isWriteOnly(ValidationExceptionCause cause) {

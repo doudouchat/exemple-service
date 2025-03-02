@@ -117,10 +117,20 @@ class SchemaFilterTest {
                 """);
         JsonNode sourceExpected3 = MAPPER.readTree("{}");
 
+        JsonNode source4 = MAPPER.readTree(
+                """
+                {"lastname": "jean", "id": "44a3d2c3-e2b5-4d5f-933a-754a16b233e2"}
+                """);
+        JsonNode sourceExpected4 = MAPPER.readTree(
+                """
+                {"id": "44a3d2c3-e2b5-4d5f-933a-754a16b233e2"}"
+                """);
+
         return Stream.of(
                 Arguments.of(source1, sourceExpected1),
                 Arguments.of(source2, sourceExpected2),
-                Arguments.of(source3, sourceExpected3));
+                Arguments.of(source3, sourceExpected3),
+                Arguments.of(source4, sourceExpected4));
     }
 
     @ParameterizedTest
@@ -128,7 +138,7 @@ class SchemaFilterTest {
     void filterAllAdditionalProperties(JsonNode source, JsonNode expectedSource) {
 
         // When perform filter
-        JsonNode newSource = schemaFilter.filterAllAdditionalProperties("schema_test", "default", "default", source);
+        JsonNode newSource = schemaFilter.filterAllAdditionalAndReadOnlyProperties("schema_test", "default", "default", source);
 
         // Then check source after filter
         assertThat(newSource).isEqualTo(expectedSource);
@@ -144,7 +154,7 @@ class SchemaFilterTest {
                 """);
 
         // When perform filter
-        JsonNode newSource = schemaFilter.filterAllAdditionalProperties("other_test", "default", "default", source);
+        JsonNode newSource = schemaFilter.filterAllAdditionalAndReadOnlyProperties("other_test", "default", "default", source);
 
         // Then check source after filter
         assertThat(newSource).isEqualTo(source);

@@ -14,9 +14,7 @@ import com.exemple.service.context.SubscriptionContextExecution;
 import com.exemple.service.customer.subscription.SubscriptionService;
 import com.exemple.service.resource.subscription.SubscriptionField;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,8 +48,6 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class SubscriptionApi {
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private static final String SUBSCRIPTION_SCHEMA = "Subscription";
 
@@ -112,15 +108,16 @@ public class SubscriptionApi {
         var previousSubscription = subscriptionService.get(email).map(ObjectNode.class::cast).orElse(null);
 
         if (previousSubscription == null) {
-            schemaValidation.validate(subscription, MAPPER.createObjectNode().set("email", TextNode.valueOf(email)), SUBSCRIPTION_RESOURCE);
+            schemaValidation.validate(subscription, SUBSCRIPTION_RESOURCE);
             subscriptionService.create(email, value);
             return Response.status(Status.CREATED).build();
         }
 
         SubscriptionContextExecution.setPreviousSubscription(previousSubscription);
 
-        schemaValidation.validate(subscription, previousSubscription, SUBSCRIPTION_RESOURCE);
-        var additionalProperties = JsonUtils.merge(value, schemaFilter.filterAllAdditionalProperties(previousSubscription, SUBSCRIPTION_RESOURCE));
+        schemaValidation.validate(subscription, SUBSCRIPTION_RESOURCE);
+        var additionalProperties = JsonUtils.merge(value,
+                schemaFilter.filterAllAdditionalAndReadOnlyProperties(previousSubscription, SUBSCRIPTION_RESOURCE));
         subscriptionService.update(email, additionalProperties);
         return Response.status(Status.NO_CONTENT).build();
 

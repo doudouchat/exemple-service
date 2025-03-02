@@ -112,13 +112,9 @@ class SubscriptionApiTest extends JerseySpringSupport {
                     """
                     {"email": "%s", "lastname": "dupond", "firstname":"jean"}
                     """.formatted(email));
-            JsonNode previousSourceToValidate = MAPPER.readTree(
-                    """
-                    {"email": "%s"}
-                    """.formatted(email));
 
             Mockito.verify(schemaValidation).validate(Mockito.eq("subscription"), Mockito.eq("v1"), Mockito.anyString(),
-                    actualSubscription.capture(), Mockito.eq(previousSourceToValidate));
+                    actualSubscription.capture());
             assertThat(actualSubscription.getValue()).isEqualTo(sourceToValidate);
 
         }
@@ -175,7 +171,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
                     """.formatted(email));
 
             Mockito.verify(schemaValidation).validate(Mockito.eq("subscription"), Mockito.eq("v1"), Mockito.anyString(),
-                    actualSubscription.capture(), Mockito.eq(previousSource));
+                    actualSubscription.capture());
             assertThat(actualSubscription.getValue()).isEqualTo(sourceToValidate);
 
         }

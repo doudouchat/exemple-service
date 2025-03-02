@@ -92,12 +92,6 @@ public class AccountStepDefinitions {
     @When("put account")
     public void putAccount(JsonNode body) {
 
-        Response responseGet = AccountApiClient.get(context.lastId(), TEST_APP, VERSION_V1, authorizationContext.lastAccessToken());
-
-        if (!body.has("creation_date")) {
-            ((ObjectNode) body).put("creation_date", responseGet.jsonPath().getString("creation_date"));
-        }
-
         Response response = AccountApiClient.put(context.lastId(), body, TEST_APP, VERSION_V1, authorizationContext.lastAccessToken());
 
         context.savePut(response);

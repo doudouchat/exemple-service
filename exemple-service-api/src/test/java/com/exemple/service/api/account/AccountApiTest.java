@@ -391,6 +391,10 @@ class AccountApiTest extends JerseySpringSupport {
             // And mock login
 
             Mockito.when(loginService.get("john_doe")).thenReturn(Optional.of(id));
+            
+            // And mock login
+
+            Mockito.when(loginService.get("john_doe")).thenReturn(Optional.of(id));
 
             // and token
 
@@ -418,25 +422,26 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And check service
 
-            JsonNode sourceToValidate = MAPPER.readTree(
+            JsonNode sourceToUpdate = MAPPER.readTree(
                     """
-                    {"id": "%s", "lastname": "Dupond"}
-                    """.formatted(id));
+                    {"lastname": "Dupond"}
+                    """);
 
-            ArgumentCaptor<JsonNode> previousAccount = ArgumentCaptor.forClass(JsonNode.class);
             ArgumentCaptor<JsonNode> actualAccount = ArgumentCaptor.forClass(JsonNode.class);
 
             Mockito.verify(service).update(actualAccount.capture());
-            assertThat(actualAccount.getValue()).isEqualTo(sourceToValidate);
+            assertThat(actualAccount.getValue()).isEqualTo(sourceToUpdate);
 
             // And check validation
 
+            JsonNode sourceToValidate = MAPPER.readTree(
+                    """
+                    {"lastname": "Dupond"}
+                    """);
+
             Mockito.verify(schemaValidation).validate(Mockito.eq("account"), Mockito.eq("v1"), Mockito.anyString(),
-                    actualAccount.capture(),
-                    previousAccount.capture());
-            assertAll(
-                    () -> assertThat(previousAccount.getValue()).isEqualTo(account),
-                    () -> assertThat(actualAccount.getValue()).isEqualTo(sourceToValidate));
+                    actualAccount.capture());
+            assertThat(actualAccount.getValue()).isEqualTo(sourceToValidate);
 
         }
 

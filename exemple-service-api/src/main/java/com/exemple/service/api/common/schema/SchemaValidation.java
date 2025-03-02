@@ -23,14 +23,6 @@ public class SchemaValidation {
         schema.validate(resourceName, version, profile, source);
     }
 
-    public void validate(JsonNode source, JsonNode previousSource, String resourceName) {
-
-        var version = requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER);
-        var profile = ((ApiSecurityContext) requestContext.getSecurityContext()).getProfile();
-
-        schema.validate(resourceName, version, profile, source, previousSource);
-    }
-
     public void validate(ArrayNode patch, JsonNode previousSource, String resourceName) {
 
         var version = requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER);

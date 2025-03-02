@@ -22,12 +22,12 @@ public class SchemaFilter {
         return schema.filter(resourceName, version, profile, source);
     }
 
-    public JsonNode filterAllAdditionalProperties(JsonNode source, String resourceName) {
+    public JsonNode filterAllAdditionalAndReadOnlyProperties(JsonNode source, String resourceName) {
 
         var version = requestContext.getHeaderString(SchemaBeanParam.VERSION_HEADER);
         var profile = ((ApiSecurityContext) requestContext.getSecurityContext()).getProfile();
 
-        return schema.filterAllAdditionalProperties(resourceName, version, profile, source);
+        return schema.filterAllAdditionalAndReadOnlyProperties(resourceName, version, profile, source);
 
     }
 

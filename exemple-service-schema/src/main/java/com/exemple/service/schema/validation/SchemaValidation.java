@@ -36,20 +36,6 @@ public class SchemaValidation {
 
     }
 
-    public void validate(String resource, String version, String profile, JsonNode form, JsonNode old) {
-
-        var schema = schemaBuilder.buildUpdateValidationSchema(resource, version, profile);
-
-        SchemaValidator.performValidation(schema, form, (ValidationException e) -> {
-
-            Predicate<ValidationExceptionCause> newExceptionFilter = (
-                    ValidationExceptionCause cause) -> !isReadOnlyAndSourceIsNotModified(cause, old);
-
-            throwExceptionIfCausesNotEmpty(e, newExceptionFilter);
-        });
-
-    }
-
     public void validate(String resource, String version, String profile, ArrayNode patch, JsonNode old) {
 
         var schema = schemaBuilder.buildUpdateValidationSchema(resource, version, profile);
@@ -100,11 +86,6 @@ public class SchemaValidation {
     private static boolean isExceptionNotAlreadyExists(ValidationExceptionCause cause, Set<ValidationExceptionCause> previousExceptions) {
 
         return !previousExceptions.contains(cause);
-    }
-
-    private static boolean isReadOnlyAndSourceIsNotModified(ValidationExceptionCause cause, JsonNode previousSource) {
-
-        return "readOnly".equals(cause.getCode()) && previousSource.at(cause.getPath()).equals(cause.getValue());
     }
 
 }
