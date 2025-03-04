@@ -9,7 +9,7 @@ Feature: api stock
       """
       {
           "quantity": 5,
-          "product": "/product1"
+          "product": "product1"
       }
       """
     And increase of 20 for product 'product1' from store 'store'
@@ -17,7 +17,7 @@ Feature: api stock
       """
       {
           "quantity": 20,
-          "product": "/product1"
+          "product": "product1"
       }
       """
     And increase of -12 for product 'product1' from store 'store'
@@ -25,7 +25,7 @@ Feature: api stock
       """
       {
           "quantity": -12,
-          "product": "/product1"
+          "product": "product1"
       }
       """
     Then stock of product 'product1' from store 'store' is 13

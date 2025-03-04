@@ -88,7 +88,7 @@ public class StockStepDefinitions {
         assertAll(
                 () -> assertThat(context.lastResponse().getStatusCode()).as("stock %s %s is correct", product, store).isEqualTo(400),
                 () -> assertThat(context.lastResponse().getBody().asString())
-                        .isEqualTo("Stock /" + product + " in /" + store + "#" + salt + ":" + stock + " is insufficient for quantity "
+                        .isEqualTo("Stock " + product + " in " + store + "#" + salt + ":" + stock + " is insufficient for quantity "
                                 + quantity));
 
     }

@@ -40,11 +40,11 @@ class StockServiceTest {
     @Qualifier("storeCuratorFramework")
     private CuratorFramework zookeeper;
 
-    private final String company = "/test";
+    private final String company = "test";
 
-    private static String product = "/product#" + UUID.randomUUID();
+    private static String product = "product#" + UUID.randomUUID();
 
-    private static String store = "/store#" + UUID.randomUUID();
+    private static String store = "store#" + UUID.randomUUID();
 
     @Nested
     class MultiplateUpdate {
@@ -103,8 +103,8 @@ class StockServiceTest {
 
         // when perform get
 
-        var productId = "/product#" + UUID.randomUUID();
-        var storeId = "/store#" + UUID.randomUUID();
+        var productId = "product#" + UUID.randomUUID();
+        var storeId = "store#" + UUID.randomUUID();
 
         var stock = service.get(company, storeId, productId);
 
@@ -119,8 +119,8 @@ class StockServiceTest {
 
         // setup mock resource
 
-        var productId = "/product#" + UUID.randomUUID();
-        var storeId = "/store#" + UUID.randomUUID();
+        var productId = "product#" + UUID.randomUUID();
+        var storeId = "store#" + UUID.randomUUID();
 
         Mockito.when(resource.get(storeId, productId)).thenReturn(Optional.of(5L));
 
@@ -143,8 +143,8 @@ class StockServiceTest {
 
         // setup mock resource
 
-        var productId = "/product#" + UUID.randomUUID();
-        var storeId = "/store#" + UUID.randomUUID();
+        var productId = "product#" + UUID.randomUUID();
+        var storeId = "store#" + UUID.randomUUID();
 
         // when update stock
         var throwable = catchThrowable(() -> service.update(company, storeId, productId, -3));
@@ -169,8 +169,8 @@ class StockServiceTest {
         void updateFailure() {
 
             // when update stock
-            var productId = "/product#" + UUID.randomUUID();
-            var storeId = "/store#" + UUID.randomUUID();
+            var productId = "product#" + UUID.randomUUID();
+            var storeId = "store#" + UUID.randomUUID();
             var throwable = catchThrowable(() -> service.update(company, storeId, productId, 5));
 
             // Then check throwable
@@ -182,8 +182,8 @@ class StockServiceTest {
         void getFailure() {
 
             // when get stock
-            var productId = "/product#" + UUID.randomUUID();
-            var storeId = "/store#" + UUID.randomUUID();
+            var productId = "product#" + UUID.randomUUID();
+            var storeId = "store#" + UUID.randomUUID();
             var throwable = catchThrowable(() -> service.get(company, storeId, productId));
 
             // Then check throwable

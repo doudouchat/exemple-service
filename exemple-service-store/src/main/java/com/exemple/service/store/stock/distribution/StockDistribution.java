@@ -34,7 +34,7 @@ public class StockDistribution {
     @SneakyThrows
     public Optional<Long> getStock(String company, String store, String product) {
         try {
-            return Optional.of(client.getData().forPath(company + store + product)).filter((byte[] stock) -> stock.length > 0)
+            return Optional.of(client.getData().forPath("/" + company + "/" + store + "/" + product)).filter((byte[] stock) -> stock.length > 0)
                     .map(Longs::fromByteArray);
         } catch (KeeperException.NoNodeException e) {
             LOG.warn("Stock " + e.getPath() + " doesn't exist", e);
@@ -44,14 +44,14 @@ public class StockDistribution {
 
     @SneakyThrows
     public void updateStock(String company, String store, String product, long stock) {
-        client.setData().forPath(company + store + product, Longs.toByteArray(stock));
+        client.setData().forPath("/" + company + "/" + store + "/" + product, Longs.toByteArray(stock));
     }
 
     public <T> T lockStock(String company, String store, String product, Supplier<T> action) throws Exception {
 
-        try (PersistentTtlNode node = createProduct(company, store, product)) {
+        try (PersistentTtlNode node = createProduct("/" + company, "/" + store, "/" + product)) {
 
-            InterProcessLock lock = new InterProcessSemaphoreMutex(client, company + store + product);
+            InterProcessLock lock = new InterProcessSemaphoreMutex(client, "/" + company + "/" + store + "/" + product);
 
             try {
                 lock.acquire();

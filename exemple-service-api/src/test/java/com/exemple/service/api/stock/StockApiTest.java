@@ -77,7 +77,7 @@ class StockApiTest extends JerseySpringSupport {
 
             Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
 
-            Mockito.when(service.update("/" + company, "/" + store, "/" + product, 5)).thenReturn(18L);
+            Mockito.when(service.update(company, store, product, 5)).thenReturn(18L);
 
             // and token
 
@@ -160,8 +160,7 @@ class StockApiTest extends JerseySpringSupport {
 
             Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
 
-            Mockito.doThrow(new InsufficientStockException("/" + store, "/" + product, 100, 5)).when(service)
-                    .update("/" + company, "/" + store, "/" + product, 5);
+            Mockito.doThrow(new InsufficientStockException(store, product, 100, 5)).when(service).update(company, store, product, 5);
 
             // and token
 
@@ -186,7 +185,7 @@ class StockApiTest extends JerseySpringSupport {
 
             // And check body
 
-            assertThat(response.readEntity(String.class)).isEqualTo(new InsufficientStockException("/" + store, "/" + product, 100, 5).getMessage());
+            assertThat(response.readEntity(String.class)).isEqualTo(new InsufficientStockException(store, product, 100, 5).getMessage());
 
         }
 
@@ -245,7 +244,7 @@ class StockApiTest extends JerseySpringSupport {
 
             Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
 
-            Mockito.when(service.get("/" + company, "/" + store, "/" + product)).thenReturn(Optional.of(5L));
+            Mockito.when(service.get(company, store, product)).thenReturn(Optional.of(5L));
 
             // and token
 

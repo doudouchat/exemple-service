@@ -66,7 +66,7 @@ public class StockApi {
         var application = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
         var applicationDetail = applicationDetailService.get(application).orElseThrow(() -> new NotFoundApplicationException(application));
 
-        return service.update("/" + applicationDetail.getCompany(), "/" + store, "/" + product, stock.getIncrement());
+        return service.update(applicationDetail.getCompany(), store, product, stock.getIncrement());
 
     }
 
@@ -84,7 +84,7 @@ public class StockApi {
         var application = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
         var applicationDetail = applicationDetailService.get(application).orElseThrow(() -> new NotFoundApplicationException(application));
 
-        Long amount = service.get("/" + applicationDetail.getCompany(), "/" + store, "/" + product).orElseThrow(NotFoundException::new);
+        Long amount = service.get(applicationDetail.getCompany(), store, product).orElseThrow(NotFoundException::new);
 
         return Stock.builder().amount(amount).store(store).product(product).build();
 
