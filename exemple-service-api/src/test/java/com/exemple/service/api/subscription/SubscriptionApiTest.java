@@ -31,7 +31,6 @@ import com.nimbusds.jwt.PlainJWT;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
 @SpringBootTest(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
@@ -71,7 +70,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // Given email
 
-            String email = "jean.dupond@gmail.com";
+            var email = "jean.dupond@gmail.com";
 
             // And mock service
             Mockito.when(service.get(email)).thenReturn(Optional.empty());
@@ -86,12 +85,12 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // When perform put
 
-            JsonNode source = MAPPER.readTree(
+            var source = MAPPER.readTree(
                     """
                     {"lastname": "dupond", "firstname":"jean"}
                     """);
 
-            Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
+            var response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
                     .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
                     .put(Entity.json(source));
 
@@ -101,14 +100,14 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // And check service
 
-            ArgumentCaptor<JsonNode> actualSubscription = ArgumentCaptor.forClass(JsonNode.class);
+            var actualSubscription = ArgumentCaptor.forClass(JsonNode.class);
 
             Mockito.verify(service).create(Mockito.eq(email), actualSubscription.capture());
             assertThat(actualSubscription.getValue()).isEqualTo(source);
 
             // And check validation
 
-            JsonNode sourceToValidate = MAPPER.readTree(
+            var sourceToValidate = MAPPER.readTree(
                     """
                     {"email": "%s", "lastname": "dupond", "firstname":"jean"}
                     """.formatted(email));
@@ -124,10 +123,10 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // Given email
 
-            String email = "jean.dupond@gmail.com";
+            var email = "jean.dupond@gmail.com";
 
             // And mock service
-            JsonNode previousSource = MAPPER.readTree(
+            var previousSource = MAPPER.readTree(
                     """
                     {"email": "%s"}
                     """.formatted(email));
@@ -143,12 +142,12 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // When perform put
 
-            JsonNode source = MAPPER.readTree(
+            var source = MAPPER.readTree(
                     """
                     {"lastname": "dupond", "firstname":"jean"}
                     """);
 
-            Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
+            var response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
                     .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
                     .put(Entity.json(source));
 
@@ -158,14 +157,14 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // And check service
 
-            ArgumentCaptor<JsonNode> actualSubscription = ArgumentCaptor.forClass(JsonNode.class);
+            var actualSubscription = ArgumentCaptor.forClass(JsonNode.class);
 
             Mockito.verify(service).update(Mockito.eq(email), actualSubscription.capture());
             assertThat(actualSubscription.getValue()).isEqualTo(source);
 
             // And check validation
 
-            JsonNode sourceToValidate = MAPPER.readTree(
+            var sourceToValidate = MAPPER.readTree(
                     """
                     {"email": "%s", "lastname": "dupond", "firstname":"jean"}
                     """.formatted(email));
@@ -181,7 +180,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // Given email
 
-            String email = "jean.dupond@gmail.com";
+            var email = "jean.dupond@gmail.com";
 
             // and token
 
@@ -193,12 +192,12 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // When perform put
 
-            JsonNode source = MAPPER.readTree(
+            var source = MAPPER.readTree(
                     """
                     {"lastname": "dupond", "firstname":"jean"}
                     """);
 
-            Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
+            var response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
                     .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
                     .put(Entity.json(source));
 
@@ -222,11 +221,11 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // Given email
 
-            String email = "jean.dupond@gmail.com";
+            var email = "jean.dupond@gmail.com";
 
             // And mock service
 
-            Mockito.when(service.get(email)).thenReturn(Optional.of(subscription));
+            Mockito.when(service.get(email)).thenReturn(Optional.of(subscription.deepCopy()));
 
             // and token
 
@@ -238,7 +237,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // When perform get
 
-            Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
+            var response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
                     .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
                     .get();
 
@@ -257,7 +256,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // Given email
 
-            String email = "jean.dupond@gmail.com";
+            var email = "jean.dupond@gmail.com";
 
             // and token
 
@@ -269,7 +268,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // When perform get
 
-            Response response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
+            var response = target(URL + "/" + email).request(MediaType.APPLICATION_JSON)
                     .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
                     .get();
 

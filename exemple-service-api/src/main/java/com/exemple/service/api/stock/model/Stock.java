@@ -24,4 +24,12 @@ public class Stock {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private final Long amount;
 
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private final String product;
+
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private final String store;
+
 }

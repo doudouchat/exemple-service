@@ -9,6 +9,7 @@ Feature: api subscription
     Then subscription 'jean.dupond@gmail.com' is
       """
       {
+        "email": "jean.dupond@gmail.com"
       }
       """
     And subscription event is
@@ -26,6 +27,7 @@ Feature: api subscription
     Then subscription 'jean.dupond@gmail.com' is
       """
       {
+        "email": "jean.dupond@gmail.com"
       }
       """
     And subscription event is

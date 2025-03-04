@@ -189,6 +189,7 @@ public class AccountStepDefinitions {
         assertThat(response.getStatusCode()).as("account %s not exists", context.lastId()).isEqualTo(200);
 
         ObjectNode expectedBody = (ObjectNode) MAPPER.readTree(response.asString());
+        expectedBody.remove("id");
         expectedBody.remove("creation_date");
         expectedBody.remove("update_date");
 

@@ -19,7 +19,6 @@ import com.exemple.service.resource.account.AccountField;
 import com.exemple.service.schema.validation.annotation.Patch;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.flipkart.zjsonpatch.JsonPatch;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -92,13 +91,9 @@ public class AccountApi {
 
         authorizationCheckService.verifyAccountId(id);
 
-        var response = accountService.get(id)
+        return accountService.get(id)
                 .map(account -> schemaFilter.filter(account, ACCOUNT_RESOURCE))
-                .map(ObjectNode.class::cast)
                 .orElseThrow(NotFoundException::new);
-        response.remove(AccountField.ID.field);
-
-        return response;
     }
 
     @POST

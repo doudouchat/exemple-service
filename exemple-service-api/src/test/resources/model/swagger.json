@@ -643,6 +643,14 @@
 						"type": "integer",
 						"format": "int64",
 						"readOnly": true
+					},
+					"product": {
+						"type": "string",
+						"readOnly": true
+					},
+					"store": {
+						"type": "string",
+						"readOnly": true
 					}
 				}
 			},

@@ -38,7 +38,6 @@ import com.nimbusds.jwt.PlainJWT;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
 @SpringBootTest(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
@@ -81,11 +80,11 @@ class AccountApiTest extends JerseySpringSupport {
 
             // Given account id
 
-            UUID id = UUID.randomUUID();
+            var id = UUID.randomUUID();
 
             // And mock service
 
-            Mockito.when(service.get(id)).thenReturn(Optional.of(account));
+            Mockito.when(service.get(id)).thenReturn(Optional.of(account.deepCopy()));
 
             // And mock login
 
@@ -102,7 +101,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // When perform get
 
-            Response response = target(URL + "/" + id).request(MediaType.APPLICATION_JSON)
+            var response = target(URL + "/" + id).request(MediaType.APPLICATION_JSON)
                     .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
                     .get();
 
@@ -121,7 +120,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // Given account id
 
-            UUID id = UUID.randomUUID();
+            var id = UUID.randomUUID();
 
             // and token
 
@@ -134,7 +133,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // When perform get
 
-            Response response = target(URL + "/" + id).request(MediaType.APPLICATION_JSON)
+            var response = target(URL + "/" + id).request(MediaType.APPLICATION_JSON)
                     .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
                     .get();
 
@@ -153,7 +152,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // Given account id
 
-            UUID id = UUID.randomUUID();
+            var id = UUID.randomUUID();
 
             // And mock login
 
@@ -170,7 +169,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // When perform get
 
-            Response response = target(URL + "/" + id).request(MediaType.APPLICATION_JSON)
+            var response = target(URL + "/" + id).request(MediaType.APPLICATION_JSON)
                     .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
                     .get();
 
@@ -189,7 +188,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // Given account id
 
-            UUID id = UUID.randomUUID();
+            var id = UUID.randomUUID();
 
             // And mock login
 
@@ -206,7 +205,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // When perform get
 
-            Response response = target(URL + "/" + id).request(MediaType.APPLICATION_JSON)
+            var response = target(URL + "/" + id).request(MediaType.APPLICATION_JSON)
                     .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
                     .get();
 
@@ -230,11 +229,11 @@ class AccountApiTest extends JerseySpringSupport {
 
             // Given account id
 
-            UUID id = UUID.randomUUID();
+            var id = UUID.randomUUID();
 
             // And mock service
 
-            Mockito.when(service.get(id)).thenReturn(Optional.of(account));
+            Mockito.when(service.get(id)).thenReturn(Optional.of(account.deepCopy()));
 
             // And mock login
 
@@ -251,12 +250,12 @@ class AccountApiTest extends JerseySpringSupport {
 
             // When perform patch
 
-            JsonNode patch = MAPPER.readTree(
+            var patch = MAPPER.readTree(
                     """
                     [{"op": "add", "path": "/birthday", "value":"1976-12-12"}]
                     """);
 
-            Response response = target(URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
+            var response = target(URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
                     .request(MediaType.APPLICATION_JSON)
                     .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
                     .method("PATCH", Entity.json(patch));
@@ -267,17 +266,17 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And check service
 
-            ArgumentCaptor<JsonNode> previousAccount = ArgumentCaptor.forClass(JsonNode.class);
-            ArgumentCaptor<JsonNode> actualAccount = ArgumentCaptor.forClass(JsonNode.class);
+            var previousAccount = ArgumentCaptor.forClass(JsonNode.class);
+            var actualAccount = ArgumentCaptor.forClass(JsonNode.class);
 
-            JsonNode expectedAccount = ((ObjectNode) account).put("birthday", "1976-12-12");
+            var expectedAccount = ((ObjectNode) account.deepCopy()).put("birthday", "1976-12-12");
 
             Mockito.verify(service).update(actualAccount.capture());
             assertThat(actualAccount.getValue()).isEqualTo(expectedAccount);
 
             // And check validation
 
-            ArgumentCaptor<ArrayNode> patchCapture = ArgumentCaptor.forClass(ArrayNode.class);
+            var patchCapture = ArgumentCaptor.forClass(ArrayNode.class);
 
             Mockito.verify(schemaValidation).validate(Mockito.eq("account"), Mockito.eq("v1"), Mockito.anyString(),
                     patchCapture.capture(),
@@ -293,7 +292,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // Given account id
 
-            UUID id = UUID.randomUUID();
+            var id = UUID.randomUUID();
 
             // and token
 
@@ -306,12 +305,12 @@ class AccountApiTest extends JerseySpringSupport {
 
             // When perform patch
 
-            JsonNode patch = MAPPER.readTree(
+            var patch = MAPPER.readTree(
                     """
                     [{"op": "add", "path": "/birthday", "value":"1976-12-12"}]
                     """);
 
-            Response response = target(URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
+            var response = target(URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
                     .request(MediaType.APPLICATION_JSON)
                     .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
                     .method("PATCH", Entity.json(patch));
@@ -331,7 +330,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // Given account id
 
-            UUID id = UUID.randomUUID();
+            var id = UUID.randomUUID();
 
             // And mock service
 
@@ -352,12 +351,12 @@ class AccountApiTest extends JerseySpringSupport {
 
             // When perform patch
 
-            JsonNode patch = MAPPER.readTree(
+            var patch = MAPPER.readTree(
                     """
                     [{"op": "replace", "path": "/lastname", "value":"Dupond"}]
                     """);
 
-            Response response = target(URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
+            var response = target(URL + "/" + id).property(HttpUrlConnectorProvider.SET_METHOD_WORKAROUND, true)
                     .request(MediaType.APPLICATION_JSON)
                     .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
                     .method("PATCH", Entity.json(patch));
@@ -382,16 +381,16 @@ class AccountApiTest extends JerseySpringSupport {
 
             // Given account id
 
-            UUID id = UUID.randomUUID();
+            var id = UUID.randomUUID();
 
             // And mock service
 
-            Mockito.when(service.get(id)).thenReturn(Optional.of(account));
+            Mockito.when(service.get(id)).thenReturn(Optional.of(account.deepCopy()));
 
             // And mock login
 
             Mockito.when(loginService.get("john_doe")).thenReturn(Optional.of(id));
-            
+
             // And mock login
 
             Mockito.when(loginService.get("john_doe")).thenReturn(Optional.of(id));
@@ -407,12 +406,12 @@ class AccountApiTest extends JerseySpringSupport {
 
             // When perform put
 
-            JsonNode source = MAPPER.readTree(
+            var source = MAPPER.readTree(
                     """
                     {"lastname": "Dupond"}
                     """);
 
-            Response response = target(URL + "/" + id).request(MediaType.APPLICATION_JSON)
+            var response = target(URL + "/" + id).request(MediaType.APPLICATION_JSON)
                     .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
                     .put(Entity.json(source));
 
@@ -422,19 +421,19 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And check service
 
-            JsonNode sourceToUpdate = MAPPER.readTree(
+            var sourceToUpdate = MAPPER.readTree(
                     """
                     {"lastname": "Dupond"}
                     """);
 
-            ArgumentCaptor<JsonNode> actualAccount = ArgumentCaptor.forClass(JsonNode.class);
+            var actualAccount = ArgumentCaptor.forClass(JsonNode.class);
 
             Mockito.verify(service).update(actualAccount.capture());
             assertThat(actualAccount.getValue()).isEqualTo(sourceToUpdate);
 
             // And check validation
 
-            JsonNode sourceToValidate = MAPPER.readTree(
+            var sourceToValidate = MAPPER.readTree(
                     """
                     {"lastname": "Dupond"}
                     """);
@@ -450,7 +449,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // Given account id
 
-            UUID id = UUID.randomUUID();
+            var id = UUID.randomUUID();
 
             // and token
 
@@ -463,12 +462,12 @@ class AccountApiTest extends JerseySpringSupport {
 
             // When perform put
 
-            JsonNode source = MAPPER.readTree(
+            var source = MAPPER.readTree(
                     """
                     {"lastname": "Dupond"}
                     """);
 
-            Response response = target(URL + "/" + id).request(MediaType.APPLICATION_JSON)
+            var response = target(URL + "/" + id).request(MediaType.APPLICATION_JSON)
                     .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
                     .put(Entity.json(source));
 
@@ -492,7 +491,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // Given mock service
 
-            Mockito.when(service.create(Mockito.any(JsonNode.class))).thenReturn(account);
+            Mockito.when(service.create(Mockito.any(JsonNode.class))).thenReturn(account.deepCopy());
 
             // and token
 
@@ -504,12 +503,12 @@ class AccountApiTest extends JerseySpringSupport {
 
             // When perform post
 
-            JsonNode source = MAPPER.readTree(
+            var source = MAPPER.readTree(
                     """
                     {"email": "jean.dupond@gmail.com", "lastname": "dupond", "firstname":"jean"}
                     """);
 
-            Response response = target(URL).request(MediaType.APPLICATION_JSON)
+            var response = target(URL).request(MediaType.APPLICATION_JSON)
                     .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
                     .post(Entity.json(source));
 
@@ -519,12 +518,12 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And check location
 
-            URI baseUri = target(URL).getUri();
+            var baseUri = target(URL).getUri();
             assertThat(response.getLocation()).isEqualTo(URI.create(baseUri + "/" + account.get("id").textValue()));
 
             // And check service
 
-            ArgumentCaptor<JsonNode> actualAccount = ArgumentCaptor.forClass(JsonNode.class);
+            var actualAccount = ArgumentCaptor.forClass(JsonNode.class);
             Mockito.verify(service).create(actualAccount.capture());
             assertThat(actualAccount.getValue()).isEqualTo(source);
 
@@ -549,12 +548,12 @@ class AccountApiTest extends JerseySpringSupport {
 
             // When perform post
 
-            JsonNode source = MAPPER.readTree(
+            var source = MAPPER.readTree(
                     """
                     {"email": "jean.dupond@gmail.com", "lastname": "dupond", "firstname":"jean"}
                     """);
 
-            Response response = target(URL).request(MediaType.APPLICATION_JSON)
+            var response = target(URL).request(MediaType.APPLICATION_JSON)
                     .header(SchemaBeanParam.APP_HEADER, "test").header(SchemaBeanParam.VERSION_HEADER, "v1").header("Authorization", token)
                     .post(Entity.json(source));
 

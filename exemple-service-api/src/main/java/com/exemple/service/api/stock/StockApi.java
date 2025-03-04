@@ -86,7 +86,7 @@ public class StockApi {
 
         Long amount = service.get("/" + applicationDetail.getCompany(), "/" + store, "/" + product).orElseThrow(NotFoundException::new);
 
-        return Stock.builder().amount(amount).build();
+        return Stock.builder().amount(amount).store(store).product(product).build();
 
     }
 

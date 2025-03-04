@@ -270,8 +270,8 @@ class StockApiTest extends JerseySpringSupport {
 
             assertThat(response.readEntity(JsonNode.class)).isEqualTo(MAPPER.readTree(
                     """
-                    {"amount":5}
-                    """));
+                    {"amount":5, "store": "%s", "product": "%s"}
+                    """.formatted(store, product)));
 
         }
 

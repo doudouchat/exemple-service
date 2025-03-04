@@ -76,13 +76,9 @@ public class SubscriptionApi {
     @AppAndVersionCheck
     public JsonNode get(@NotNull @PathParam("email") String email) {
 
-        var response = subscriptionService.get(email)
+        return subscriptionService.get(email)
                 .map(subscription -> schemaFilter.filter(subscription, SUBSCRIPTION_RESOURCE))
-                .map(ObjectNode.class::cast)
                 .orElseThrow(NotFoundException::new);
-        response.remove(SubscriptionField.EMAIL.field);
-
-        return response;
 
     }
 
