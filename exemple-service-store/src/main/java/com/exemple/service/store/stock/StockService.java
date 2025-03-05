@@ -28,7 +28,7 @@ public class StockService {
         long stock = get(company, store, product).orElse(0L);
 
         if (stock + quantity < 0) {
-            throw new InsufficientStockException(company, store, product, stock, quantity);
+            throw new InsufficientStockException(store, product, stock, quantity);
         }
 
         LOG.debug("incrementation stock {} {} {} {}", company, store, product, quantity);

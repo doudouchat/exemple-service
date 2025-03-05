@@ -1,15 +1,9 @@
 package com.exemple.service.store.common;
 
-import java.text.MessageFormat;
-
 import lombok.Getter;
 
 @Getter
 public class InsufficientStockException extends Exception {
-
-    protected static final String EXCEPTION_MESSAGE = "Stock {0}:{1} is insufficient for quantity {2}";
-
-    private final String company;
 
     private final String store;
 
@@ -19,9 +13,8 @@ public class InsufficientStockException extends Exception {
 
     private final long quantity;
 
-    public InsufficientStockException(String company, String store, String product, long stock, long quantity) {
-        super(MessageFormat.format(EXCEPTION_MESSAGE, company + store + product, stock, quantity));
-        this.company = company;
+    public InsufficientStockException(String store, String product, long stock, long quantity) {
+        super("Stock %s in %s:%s is insufficient for quantity %s".formatted(product, store, stock, quantity));
         this.store = store;
         this.product = product;
         this.stock = stock;

@@ -133,7 +133,7 @@ class StockServiceTest {
         // Then check throwable
         assertThat(throwable)
                 .isInstanceOf(InsufficientStockException.class)
-                .hasMessageEndingWith("2 is insufficient for quantity -3");
+                .hasMessage("Stock %s in %s:2 is insufficient for quantity -3".formatted(productId, storeId));
 
     }
 
