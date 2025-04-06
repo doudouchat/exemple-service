@@ -47,13 +47,13 @@
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<maven.compiler.source>21</maven.compiler.source>
-		<maven.compiler.target>21</maven.compiler.target>
+		<maven.compiler.source>24</maven.compiler.source>
+		<maven.compiler.target>24</maven.compiler.target>
 
 		<!-- VERSION -->
 		<cassandra.version>5.0.3</cassandra.version>
 		<zookeeper.version>3.9.3</zookeeper.version>
-		<jacoco.version>0.8.12</jacoco.version>
+		<jacoco.version>0.8.13</jacoco.version>
 
 		<!-- SONAR -->
 		<sonar.coverage.exclusions>**/test/**/*.java</sonar.coverage.exclusions>
