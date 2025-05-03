@@ -89,7 +89,7 @@ class StockServiceTest {
         private void update(String store, String product, int quantity) {
 
             try {
-                service.update(company, store, product, quantity);
+                service.increment(company, store, product, quantity);
             } catch (InsufficientStockException e) {
                 throw new RuntimeException(e);
             }
@@ -125,10 +125,10 @@ class StockServiceTest {
         Mockito.when(resource.get(storeId, productId)).thenReturn(Optional.of(5L));
 
         // when update stock
-        service.update(company, storeId, productId, -3);
+        service.increment(company, storeId, productId, -3);
 
         // and update again
-        var throwable = catchThrowable(() -> service.update(company, storeId, productId, -3));
+        var throwable = catchThrowable(() -> service.increment(company, storeId, productId, -3));
 
         // Then check throwable
         assertThat(throwable)
@@ -147,7 +147,7 @@ class StockServiceTest {
         var storeId = "store#" + UUID.randomUUID();
 
         // when update stock
-        var throwable = catchThrowable(() -> service.update(company, storeId, productId, -3));
+        var throwable = catchThrowable(() -> service.increment(company, storeId, productId, -3));
 
         // Then check throwable
         assertThat(throwable)
@@ -171,7 +171,7 @@ class StockServiceTest {
             // when update stock
             var productId = "product#" + UUID.randomUUID();
             var storeId = "store#" + UUID.randomUUID();
-            var throwable = catchThrowable(() -> service.update(company, storeId, productId, 5));
+            var throwable = catchThrowable(() -> service.increment(company, storeId, productId, 5));
 
             // Then check throwable
             assertThat(throwable).isInstanceOf(IllegalStateException.class);

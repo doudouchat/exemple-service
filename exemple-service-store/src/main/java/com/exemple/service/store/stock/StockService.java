@@ -23,7 +23,7 @@ public class StockService {
 
     private final StockResource resource;
 
-    public Long update(@NotNull String company, @NotBlank String store, @NotBlank String product, int quantity) throws InsufficientStockException {
+    public void increment(@NotNull String company, @NotBlank String store, @NotBlank String product, int quantity) throws InsufficientStockException {
 
         long stock = get(company, store, product).orElse(0L);
 
@@ -35,7 +35,6 @@ public class StockService {
 
         resource.update(store, product, quantity);
         distribution.updateStock(company, store, product, stock + quantity);
-        return stock + quantity;
     }
 
     public Optional<Long> get(@NotNull String company, @NotBlank String store, @NotBlank String product) {

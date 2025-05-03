@@ -1,7 +1,6 @@
 package com.exemple.service.store.stock.distribution;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.locks.InterProcessLock;
@@ -47,7 +46,7 @@ public class StockDistribution {
         client.setData().forPath("/" + company + "/" + store + "/" + product, Longs.toByteArray(stock));
     }
 
-    public <T> T lockStock(String company, String store, String product, Supplier<T> action) throws Exception {
+    public void lockStock(String company, String store, String product, Runnable action) throws Exception {
 
         try (PersistentTtlNode node = createProduct("/" + company, "/" + store, "/" + product)) {
 
@@ -55,7 +54,7 @@ public class StockDistribution {
 
             try {
                 lock.acquire();
-                return action.get();
+                action.run();
             } finally {
                 lock.release();
             }

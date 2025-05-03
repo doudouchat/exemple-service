@@ -7,8 +7,6 @@ import java.util.stream.Collectors;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Iterables;
-
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -34,7 +32,8 @@ public class ValidationExceptionProvider implements ExceptionMapper<ConstraintVi
     public Response toResponse(ConstraintViolationException e) {
 
         Map<String, String> messages = e.getConstraintViolations().stream().collect(
-                Collectors.toMap((ConstraintViolation<?> violation) -> Iterables.getLast(violation.getPropertyPath()).getName(), this::getMessage));
+                Collectors.toMap((ConstraintViolation<?> violation) -> violation.getPropertyPath().iterator().next().getName(),
+                        this::getMessage));
 
         return Response.status(Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(messages).build();
     }

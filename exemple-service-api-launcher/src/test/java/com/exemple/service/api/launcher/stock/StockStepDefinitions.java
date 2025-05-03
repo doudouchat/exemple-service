@@ -6,8 +6,6 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.Duration;
-import java.util.Collections;
-import java.util.Map;
 import java.util.UUID;
 
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -47,9 +45,7 @@ public class StockStepDefinitions {
     @When("increase of {long} for product {string} from store {string}")
     public void increment(long increment, String product, String store) {
 
-        Map<String, Object> body = Collections.singletonMap("increment", increment);
-
-        Response response = StockApiClient.post(store + "#" + salt, product, body, BACK_APP, authorizationContext.lastAccessToken());
+        Response response = StockApiClient.increment(store + "#" + salt, product, increment, BACK_APP, authorizationContext.lastAccessToken());
 
         context.savePost(response);
 
@@ -70,7 +66,7 @@ public class StockStepDefinitions {
         Response response = StockApiClient.get(store + "#" + salt, product, BACK_APP, authorizationContext.lastAccessToken());
 
         assertAll(
-                () -> assertThat(context.lastResponse().getStatusCode()).as("stock %s %s not found", product, store).isEqualTo(200),
+                () -> assertThat(context.lastResponse().getStatusCode()).as("stock %s %s not found", product, store).isEqualTo(204),
                 () -> assertThat(response.jsonPath().getLong("amount")).as("stock %s %s has bad ammount", product, store).isEqualTo(amount));
 
     }

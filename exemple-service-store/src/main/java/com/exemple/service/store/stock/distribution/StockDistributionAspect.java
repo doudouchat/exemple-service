@@ -15,16 +15,16 @@ public class StockDistributionAspect {
 
     private final StockDistribution distribution;
 
-    @Around(value = "execution(public * com.exemple.service.store.stock.StockService.update(..)) && args(company,store,product,..)",
+    @Around(value = "execution(public void com.exemple.service.store.stock.StockService.increment(..)) && args(company,store,product,..)",
             argNames = "company,store,product")
-    public Object lock(ProceedingJoinPoint joinPoint, String company, String store, String product) throws Exception {
+    public void lock(ProceedingJoinPoint joinPoint, String company, String store, String product) throws Exception {
 
-        return this.distribution.lockStock(company, store, product, () -> proceed(joinPoint));
+        this.distribution.lockStock(company, store, product, () -> proceed(joinPoint));
     }
 
     @SneakyThrows
-    private static Object proceed(ProceedingJoinPoint joinPoint) {
-        return joinPoint.proceed();
+    private static void proceed(ProceedingJoinPoint joinPoint) {
+        joinPoint.proceed();
     }
 
 }

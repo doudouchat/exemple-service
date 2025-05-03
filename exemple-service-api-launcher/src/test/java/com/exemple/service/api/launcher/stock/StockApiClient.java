@@ -4,6 +4,7 @@ import static com.exemple.service.api.launcher.core.InitData.APP_HEADER;
 
 import com.exemple.service.api.launcher.core.JsonRestTemplate;
 
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 
 public final class StockApiClient {
@@ -14,11 +15,11 @@ public final class StockApiClient {
 
     }
 
-    public static Response post(String store, String product, Object body, String application, String token) {
+    public static Response increment(String store, String product, Long value, String application, String token) {
 
-        return JsonRestTemplate.given().body(body)
+        return JsonRestTemplate.given(ContentType.TEXT).body(value)
                 .header(APP_HEADER, application).header("Authorization", token)
-                .post(STOCK_URL, store, product);
+                .post(STOCK_URL + "/_increment", store, product);
 
     }
 

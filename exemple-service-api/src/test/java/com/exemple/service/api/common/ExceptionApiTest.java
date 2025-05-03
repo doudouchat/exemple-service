@@ -118,7 +118,7 @@ class ExceptionApiTest extends JerseySpringSupport {
         assertThat(response.readEntity(JsonNode.class))
                 .isEqualTo(MAPPER.readTree(
                         """
-                        {"arg1":"Le json doit être renseigné."}
+                        {"update":"Le json doit être renseigné."}
                         """));
     }
 

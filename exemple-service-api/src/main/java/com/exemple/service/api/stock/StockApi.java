@@ -21,8 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Digits;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -53,20 +52,23 @@ public class StockApi {
     private ContainerRequestContext requestContext;
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/{store}/{product}")
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Path("/{store}/{product}/_increment")
     @Operation(tags = "stock", security = { @SecurityRequirement(name = DocumentApiResource.BEARER_AUTH),
             @SecurityRequirement(name = DocumentApiResource.OAUTH2_CLIENT_CREDENTIALS) })
     @Parameter(in = ParameterIn.HEADER, schema = @Schema(implementation = ApplicationBeanParam.class))
     @RolesAllowed("stock:update")
     @AppAndVersionCheck(optionalVersion = true)
-    public Long post(@PathParam("store") String store, @PathParam("product") String product,
-            @NotNull @Valid @Parameter(schema = @Schema(implementation = Stock.class)) Stock stock) throws InsufficientStockException {
+    public void increment(@PathParam("store") String store, @PathParam("product") String product,
+            @Parameter(schema = @Schema(type = "integer",
+                                        format = "int32")) @Digits(fraction = 0, integer = 9,
+                                                                   message = "{jakarta.validation.constraints.Integer.message}") String increment)
+            throws InsufficientStockException {
 
         var application = requestContext.getHeaderString(ApplicationBeanParam.APP_HEADER);
         var applicationDetail = applicationDetailService.get(application).orElseThrow(() -> new NotFoundApplicationException(application));
 
-        return service.update(applicationDetail.getCompany(), store, product, stock.getIncrement());
+        service.increment(applicationDetail.getCompany(), store, product, Integer.parseInt(increment));
 
     }
 

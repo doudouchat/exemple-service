@@ -6,11 +6,15 @@ import static org.mockito.Mockito.never;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -61,7 +65,7 @@ class StockApiTest extends JerseySpringSupport {
     public static final String URL = "/v1/stocks";
 
     @Nested
-    class update {
+    class increment {
 
         @Test
         void success() throws InsufficientStockException {
@@ -77,7 +81,7 @@ class StockApiTest extends JerseySpringSupport {
 
             Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
 
-            Mockito.when(service.update(company, store, product, 5)).thenReturn(18L);
+            Mockito.doNothing().when(service).increment(company, store, product, 5);
 
             // and token
 
@@ -89,25 +93,32 @@ class StockApiTest extends JerseySpringSupport {
 
             // When perform post
 
-            Response response = target(URL + "/" + store + "/" + product)
+            Response response = target(URL + "/" + store + "/" + product + "/_increment")
                     .request(MediaType.APPLICATION_JSON).header(APP_HEADER, application).header("Authorization", token)
-                    .post(Entity.json(
-                            """
-                            {"increment":5}
-                            """));
+                    .post(Entity.text("5"));
 
             // Then check status
 
-            assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
-
-            // And check body
-
-            assertThat(response.readEntity(Long.class)).isEqualTo(18L);
+            assertThat(response.getStatus()).isEqualTo(Status.NO_CONTENT.getStatusCode());
 
         }
 
-        @Test
-        void validationFailure() throws IOException {
+        static Stream<Arguments> validationFailure() throws IOException {
+
+            return Stream.of(
+                    Arguments.of("", MAPPER.readTree(
+                            """
+                            {"increment":"La valeur doit être un entier acceptable."}
+                            """)),
+                    Arguments.of("qsqsqs", MAPPER.readTree(
+                            """
+                            {"increment":"La valeur doit être un entier acceptable."}
+                            """)));
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        void validationFailure(String body, JsonNode expectedMessage) {
 
             // Given stock
 
@@ -129,9 +140,9 @@ class StockApiTest extends JerseySpringSupport {
 
             // When perform post
 
-            Response response = target(URL + "/" + store + "/" + product)
+            Response response = target(URL + "/" + store + "/" + product + "/_increment")
                     .request(MediaType.APPLICATION_JSON).header(APP_HEADER, application).header("Authorization", token)
-                    .post(Entity.json("{}"));
+                    .post(Entity.text(body));
 
             // Then check status
 
@@ -139,10 +150,7 @@ class StockApiTest extends JerseySpringSupport {
 
             // And check body
 
-            assertThat(response.readEntity(JsonNode.class)).isEqualTo(MAPPER.readTree(
-                    """
-                    {"increment":"La valeur doit être renseignée."}
-                    """));
+            assertThat(response.readEntity(JsonNode.class)).isEqualTo(expectedMessage);
 
         }
 
@@ -160,7 +168,7 @@ class StockApiTest extends JerseySpringSupport {
 
             Mockito.when(applicationDetailService.get(application)).thenReturn(Optional.of(ApplicationDetail.builder().company("company1").build()));
 
-            Mockito.doThrow(new InsufficientStockException(store, product, 100, 5)).when(service).update(company, store, product, 5);
+            Mockito.doThrow(new InsufficientStockException(store, product, 100, 5)).when(service).increment(company, store, product, 5);
 
             // and token
 
@@ -172,12 +180,9 @@ class StockApiTest extends JerseySpringSupport {
 
             // When perform put
 
-            Response response = target(URL + "/" + store + "/" + product)
+            Response response = target(URL + "/" + store + "/" + product + "/_increment")
                     .request(MediaType.APPLICATION_JSON).header(APP_HEADER, application).header("Authorization", token)
-                    .post(Entity.json(
-                            """
-                            {"increment":5}
-                            """));
+                    .post(Entity.text(5));
 
             // Then check status
 
@@ -208,12 +213,9 @@ class StockApiTest extends JerseySpringSupport {
 
             // When perform put
 
-            Response response = target(URL + "/" + store + "/" + product)
+            Response response = target(URL + "/" + store + "/" + product + "/_increment")
                     .request(MediaType.APPLICATION_JSON).header(APP_HEADER, application).header("Authorization", token)
-                    .post(Entity.json(
-                            """
-                            {"increment":5}
-                            """));
+                    .post(Entity.text(5));
 
             // Then check status
 
@@ -221,7 +223,7 @@ class StockApiTest extends JerseySpringSupport {
 
             // verify service
 
-            Mockito.verify(service, never()).update("application", "store", "product", 5);
+            Mockito.verify(service, never()).increment("application", "store", "product", 5);
 
         }
 

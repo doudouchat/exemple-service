@@ -409,12 +409,14 @@
 						"oauth2_client_credentials": []
 					}
 				]
-			},
+			}
+		},
+		"/ws/v1/stocks/{store}/{product}/_increment": {
 			"post": {
 				"tags": [
 					"stock"
 				],
-				"operationId": "post",
+				"operationId": "increment",
 				"parameters": [
 					{
 						"in": "header",
@@ -441,24 +443,19 @@
 				],
 				"requestBody": {
 					"content": {
-						"application/json": {
+						"text/plain": {
 							"schema": {
-								"$ref": "#/components/schemas/Stock"
+								"type": "integer",
+								"format": "int32"
 							}
 						}
-					},
-					"required": true
+					}
 				},
 				"responses": {
 					"default": {
 						"description": "default response",
 						"content": {
-							"*/*": {
-								"schema": {
-									"type": "integer",
-									"format": "int64"
-								}
-							}
+							"*/*": {}
 						}
 					}
 				},
@@ -629,16 +626,8 @@
 				}
 			},
 			"Stock": {
-				"required": [
-					"increment"
-				],
 				"type": "object",
 				"properties": {
-					"increment": {
-						"type": "integer",
-						"format": "int32",
-						"writeOnly": true
-					},
 					"amount": {
 						"type": "integer",
 						"format": "int64",
