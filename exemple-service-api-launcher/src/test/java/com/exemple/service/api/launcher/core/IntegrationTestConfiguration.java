@@ -1,7 +1,5 @@
 package com.exemple.service.api.launcher.core;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.List;
 
@@ -40,10 +38,10 @@ public class IntegrationTestConfiguration {
     private KafkaConsumer<?, ?> consumerEvent;
 
     @Bean
-    public HazelcastInstance hazelcastInstance(@Value("${hazelcast.port:5701}") int port) throws UnknownHostException {
+    public HazelcastInstance hazelcastInstance(@Value("${hazelcast.port:5701}") int port) {
 
         ClientConfig config = new ClientConfig();
-        config.getNetworkConfig().addAddress(InetAddress.getLocalHost().getHostAddress() + ":" + port);
+        config.getNetworkConfig().addAddress("127.0.0.1:" + port);
 
         return HazelcastClient.newHazelcastClient(config);
     }
