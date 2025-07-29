@@ -62,7 +62,7 @@
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-webmvc</artifactId>
 		</dependency>
 
 		<dependency>
@@ -128,6 +128,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- HAZELCAST -->
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-hazelcast</artifactId>
+		</dependency>
+
 		<!-- AWAITILITY -->
 
 		<dependency>
@@ -141,6 +148,7 @@
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
+			<version>6.0.0</version>
 			<scope>test</scope>
 		</dependency>
 
