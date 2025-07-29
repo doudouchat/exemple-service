@@ -51,13 +51,8 @@
 		<!-- JERSEY -->
 
 		<dependency>
-			<groupId>org.glassfish.jersey.containers</groupId>
-			<artifactId>jersey-container-servlet</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.glassfish.jersey.ext</groupId>
-			<artifactId>jersey-spring6</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-jersey</artifactId>
 		</dependency>
 
 		<dependency>
@@ -69,11 +64,6 @@
 					<artifactId>hibernate-validator</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>org.glassfish.jersey.core</groupId>
-			<artifactId>jersey-server</artifactId>
 		</dependency>
 
 		<dependency>
@@ -90,13 +80,8 @@
 
 		<dependency>
 			<groupId>org.glassfish.jersey.connectors</groupId>
-			<artifactId>jersey-apache-connector</artifactId>
+			<artifactId>jersey-apache5-connector</artifactId>
 			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-json-jackson</artifactId>
 		</dependency>
 
 		<!-- JARKATA SERVLET -->

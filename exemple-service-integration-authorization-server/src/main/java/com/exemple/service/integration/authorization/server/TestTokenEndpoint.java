@@ -3,11 +3,10 @@ package com.exemple.service.integration.authorization.server;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.TextNode;
-
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.StringNode;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,7 +20,7 @@ public class TestTokenEndpoint {
     public JsonNode tokenKey() {
 
         var tokenKey = MAPPER.createObjectNode();
-        tokenKey.set("value", TextNode.valueOf(String.valueOf(testAlgorithmConfiguration.getPublicKeyContent())));
+        tokenKey.set("value", StringNode.valueOf(String.valueOf(testAlgorithmConfiguration.getPublicKeyContent())));
 
         return tokenKey;
 
