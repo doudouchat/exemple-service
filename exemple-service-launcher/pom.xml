@@ -62,7 +62,7 @@
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-webmvc</artifactId>
 		</dependency>
 
 		<dependency>
@@ -126,6 +126,13 @@
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<!-- HAZELCAST -->
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-hazelcast</artifactId>
 		</dependency>
 
 		<!-- AWAITILITY -->
