@@ -1,0 +1,684 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>exemple</groupId>
+		<artifactId>exemple-service</artifactId>
+		<version>4.0.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>exemple-service-launcher</artifactId>
+	<packaging>war</packaging>
+
+	<properties>
+
+		<application.contextpath>ExempleService</application.contextpath>
+		<application.host>http://localhost</application.host>
+
+		<!-- VERSION -->
+		<maven-failsafe-plugin.version>3.5.2</maven-failsafe-plugin.version>
+
+		<!-- SONAR -->
+		<sonar.coverage.jacoco.xmlReportPaths>${sonar.coverage.report.path}</sonar.coverage.jacoco.xmlReportPaths>
+
+	</properties>
+
+	<dependencyManagement>
+
+		<dependencies>
+
+			<!-- CUCUMBER -->
+
+			<dependency>
+				<groupId>io.cucumber</groupId>
+				<artifactId>cucumber-bom</artifactId>
+				<version>7.22.2</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<!-- JSOUP -->
+			<!-- https://jsoup.org/ -->
+
+			<dependency>
+				<groupId>org.jsoup</groupId>
+				<artifactId>jsoup</artifactId>
+				<version>1.20.1</version>
+			</dependency>
+
+		</dependencies>
+
+	</dependencyManagement>
+
+	<dependencies>
+
+		<!-- API -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- SPRING BOOT -->
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+
+		<!-- AUTHORIZATION SERVER TEST -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-integration-authorization-server</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- JSOUP -->
+
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- TEST -->
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- JSON PATH -->
+
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- SPRING KAFKA -->
+
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- AWAITILITY -->
+
+		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- REST ASSURED -->
+
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- CUCUMBER -->
+
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-java</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-spring</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-junit-platform-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- JUNIT PLATEFORM -->
+
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-suite-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-suite-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources/contexts/test_company</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
+
+		<pluginManagement>
+
+			<plugins>
+
+				<!-- DOCKER -->
+				<!-- http://dmp.fabric8.io/ -->
+				<plugin>
+					<groupId>io.fabric8</groupId>
+					<artifactId>docker-maven-plugin</artifactId>
+					<version>0.45.0</version>
+				</plugin>
+
+				<!-- TEST INTEGRATION -->
+				<!-- http://maven.apache.org/surefire/maven-failsafe-plugin/ -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<executions>
+						<execution>
+							<goals>
+								<goal>integration-test</goal>
+								<goal>verify</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
+			</plugins>
+
+		</pluginManagement>
+
+		<plugins>
+
+			<!-- DEPLOY -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+
+		</plugins>
+
+	</build>
+
+	<profiles>
+
+		<profile>
+			<id>service</id>
+
+			<properties>
+				<docker.buildArg.VERSION_TOMCAT>${tomcat.version}-jdk21</docker.buildArg.VERSION_TOMCAT>
+				<docker.buildArg.VERSION_OPENJDK>${maven.compiler.target}-jdk</docker.buildArg.VERSION_OPENJDK>
+			</properties>
+
+			<build>
+				<plugins>
+
+					<!-- HELPER -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>reserve-network-port</id>
+								<goals>
+									<goal>reserve-network-port</goal>
+								</goals>
+								<phase>process-resources</phase>
+								<configuration>
+									<portNames>
+										<portName>application.port</portName>
+										<portName>authorization.port</portName>
+										<portName>cassandra.port</portName>
+										<portName>zookeeper.port</portName>
+										<portName>kafka.internal_port</portName>
+										<portName>kafka.client_port</portName>
+										<portName>hazelcast.port</portName>
+									</portNames>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- JACOCO -->
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<configuration>
+							<excludes>
+								<exclude>com/exemple/service/api/launcher/account/**</exclude>
+								<exclude>com/exemple/service/api/launcher/actuate/**</exclude>
+								<exclude>com/exemple/service/api/launcher/core/**</exclude>
+								<exclude>com/exemple/service/api/launcher/login/**</exclude>
+								<exclude>com/exemple/service/api/launcher/stock/**</exclude>
+								<exclude>com/exemple/service/api/launcher/subscription/**</exclude>
+								<exclude>com/exemple/service/api/launcher/swagger/**</exclude>
+							</excludes>
+						</configuration>
+						<executions>
+							<execution>
+								<id>dump</id>
+								<goals>
+									<goal>dump</goal>
+								</goals>
+								<configuration>
+									<address>127.0.0.1</address>
+									<port>6300</port>
+									<destFile>${project.build.directory}/jacoco-it.exec</destFile>
+								</configuration>
+							</execution>
+							<execution>
+								<id>report-integration</id>
+								<goals>
+									<goal>report-integration</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- COPY JACOCO JAR AGENT && CDC AGENT -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.jacoco</groupId>
+									<artifactId>org.jacoco.agent</artifactId>
+									<version>${jacoco.version}</version>
+									<classifier>runtime</classifier>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}/lib</outputDirectory>
+									<destFileName>jacocoagent.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>exemple</groupId>
+									<artifactId>exemple-cdc-agent</artifactId>
+									<version>1.0.0-SNAPSHOT</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}/cdc</outputDirectory>
+									<destFileName>exemple-cdc-agent.jar</destFileName>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</plugin>
+
+					<!-- DOCKER -->
+					<plugin>
+						<groupId>io.fabric8</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>build_exemple_service</id>
+								<goals>
+									<goal>build</goal>
+								</goals>
+								<phase>package</phase>
+								<configuration>
+									<images>
+										<image>
+											<name>exemple-service</name>
+											<build>
+												<dockerFile>${basedir}/../Dockerfile</dockerFile>
+											</build>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>build_authorization_server_test</id>
+								<goals>
+									<goal>build</goal>
+								</goals>
+								<phase>package</phase>
+								<configuration>
+									<images>
+										<image>
+											<name>exemple-authorization-server-test</name>
+											<build>
+												<dockerFile>${project.parent.basedir}/exemple-service-integration-authorization-server/Dockerfile</dockerFile>
+											</build>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>start_authorization_server_test</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>exemple-authorization-server-test</name>
+											<alias>exemple-authorization-server-test</alias>
+											<run>
+												<ports>
+													<port>${authorization.port}:8080</port>
+												</ports>
+												<env>
+													<server.servlet.context-path>/Authorization</server.servlet.context-path>
+												</env>
+												<wait>
+													<http>
+														<url>http://localhost:${authorization.port}/Authorization/actuator/health</url>
+														<method>GET</method>
+														<status>200</status>
+													</http>
+													<time>20000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>start_zookeeper</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>zookeeper:${zookeeper.version}</name>
+											<alias>zookeeper</alias>
+											<run>
+												<ports>
+													<port>${zookeeper.port}:2181</port>
+												</ports>
+												<wait>
+													<time>20000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>start_kafka</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>apache/kafka:${kafka.version}</name>
+											<alias>kafka</alias>
+											<run>
+												<ports>
+													<port>${kafka.client_port}:9092</port>
+													<port>${kafka.internal_port}:9093</port>
+												</ports>
+												<env>
+													<KAFKA_NODE_ID>1</KAFKA_NODE_ID>
+													<KAFKA_PROCESS_ROLES>broker,controller</KAFKA_PROCESS_ROLES>
+													<KAFKA_CONTROLLER_LISTENER_NAMES>CONTROLLER</KAFKA_CONTROLLER_LISTENER_NAMES>
+													<KAFKA_LISTENER_SECURITY_PROTOCOL_MAP>CONTROLLER:PLAINTEXT,CLIENT:PLAINTEXT,INTERNAL:PLAINTEXT</KAFKA_LISTENER_SECURITY_PROTOCOL_MAP>
+													<KAFKA_LISTENERS>CONTROLLER://:19093,CLIENT://:9092,INTERNAL://:9093</KAFKA_LISTENERS>
+													<KAFKA_ADVERTISED_LISTENERS>CLIENT://localhost:${kafka.client_port},INTERNAL://172.17.0.1:${kafka.internal_port}</KAFKA_ADVERTISED_LISTENERS>
+													<KAFKA_INTER_BROKER_LISTENER_NAME>INTERNAL</KAFKA_INTER_BROKER_LISTENER_NAME>
+													<KAFKA_CONTROLLER_QUORUM_VOTERS>1@localhost:19093</KAFKA_CONTROLLER_QUORUM_VOTERS>
+													<KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR>1</KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR>
+													<KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR>1</KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR>
+													<KAFKA_TRANSACTION_STATE_LOG_MIN_ISR>1</KAFKA_TRANSACTION_STATE_LOG_MIN_ISR>
+													<KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS>0</KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS>
+												</env>
+												<wait>
+													<time>10000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>start_cassandra</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>cassandra:${cassandra.version}</name>
+											<alias>cassandra</alias>
+											<run>
+												<ports>
+													<port>${cassandra.port}:9042</port>
+												</ports>
+												<env>
+													<JVM_OPTS>-Dcassandra.skip_wait_for_gossip_to_settle=0 -Dcassandra.initial_token=0</JVM_OPTS>
+													<JVM_EXTRA_OPTS>-javaagent:/exemple-cdc-agent.jar=conf=/tmp/conf/exemple-cdc.yml</JVM_EXTRA_OPTS>
+												</env>
+												<volumes>
+													<bind>
+														<volume>${project.build.directory}/cdc/exemple-cdc-agent.jar:/exemple-cdc-agent.jar</volume>
+														<volume>${project.build.testOutputDirectory}/conf/cdc:/tmp/conf</volume>
+														<volume>${project.build.testOutputDirectory}/conf/cassandra/cassandra.yaml:/etc/cassandra/cassandra.yaml</volume>
+														<volume>${project.build.testOutputDirectory}/conf/cassandra/logback.xml:/etc/cassandra/logback.xml</volume>
+													</bind>
+												</volumes>
+												<wait>
+													<log>(?s)Startup complete</log>
+													<time>60000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+											<copy>
+												<entries>
+													<entry>
+														<containerPath>/tmp/logs/archive</containerPath>
+														<hostDirectory>${project.build.directory}/.logs/cassandra</hostDirectory>
+													</entry>
+												</entries>
+											</copy>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+
+							<execution>
+								<id>start_hazelcast</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>hazelcast/hazelcast:${hazelcast.version}</name>
+											<alias>hazelcast</alias>
+											<run>
+												<ports>
+													<port>${hazelcast.port}:5701</port>
+												</ports>
+												<env>
+													<JAVA_OPTS>-Dhazelcast.config=/usr/local/etc/hazelcast/hazelcast_server.yaml</JAVA_OPTS>
+												</env>
+												<volumes>
+													<bind>
+														<volume>${project.build.testOutputDirectory}/conf:/usr/local/etc/hazelcast/</volume>
+													</bind>
+												</volumes>
+												<wait>
+													<http>
+														<url>http://localhost:${hazelcast.port}/hazelcast/health/ready</url>
+														<method>GET</method>
+														<status>200</status>
+													</http>
+													<time>30000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>start_exemple_service</id>
+								<goals>
+									<goal>start</goal>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>exemple-service</name>
+											<alias>exemple-service</alias>
+											<run>
+												<ports>
+													<port>${application.port}:8080</port>
+													<port>6300:6300</port>
+												</ports>
+												<env>
+													<CATALINA_OPTS>-Dlogging.config=file:/usr/local/tomcat/etc/logback.xml -Dhazelcast.client.config=/usr/local/tomcat/etc/hazelcast.yaml</CATALINA_OPTS>
+													<JAVA_TOOL_OPTIONS>-javaagent:/usr/local/tomcat/etc/lib/jacocoagent.jar=includes=com.exemple.service.*,excludes=*EnhancerBySpringCGLIB*:*FastClassBySpringCGLIB*:*__MapperGenerated*,output=tcpserver,address=*,classdumpdir=/usr/local/tomcat/etc/source</JAVA_TOOL_OPTIONS>
+												</env>
+												<volumes>
+													<bind>
+														<volume>${project.build.testOutputDirectory}/conf:/usr/local/tomcat/etc</volume>
+														<volume>${project.build.directory}/lib:/usr/local/tomcat/etc/lib</volume>
+													</bind>
+												</volumes>
+												<wait>
+													<http>
+														<url>http://localhost:${application.port}/ExempleService/actuator/health</url>
+														<method>GET</method>
+														<status>200</status>
+													</http>
+													<time>90000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+											<copy>
+												<entries>
+													<entry>
+														<containerPath>/usr/local/tomcat/logs/archive</containerPath>
+														<hostDirectory>${project.build.directory}/.logs/service</hostDirectory>
+													</entry>
+													<entry>
+														<containerPath>/usr/local/tomcat/etc/source/com</containerPath>
+														<hostDirectory>${project.build.outputDirectory}</hostDirectory>
+													</entry>
+												</entries>
+											</copy>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>stop_all</id>
+								<goals>
+									<goal>stop</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>it</id>
+
+			<build>
+
+				<plugins>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<systemPropertyVariables>
+								<application.host>${application.host}</application.host>
+								<application.port>${application.port}</application.port>
+								<application.contextpath>${application.contextpath}</application.contextpath>
+							</systemPropertyVariables>
+						</configuration>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+
+	</profiles>
+
+</project>
