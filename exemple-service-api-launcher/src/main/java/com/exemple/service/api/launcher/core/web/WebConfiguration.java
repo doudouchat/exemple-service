@@ -1,4 +1,4 @@
-package com.exemple.service.api.core.web;
+package com.exemple.service.api.launcher.core.web;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;

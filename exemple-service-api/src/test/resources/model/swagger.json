@@ -249,28 +249,6 @@
 				]
 			}
 		},
-		"/ws": {
-			"get": {
-				"operationId": "template",
-				"responses": {
-					"default": {
-						"description": "default response",
-						"content": {
-							"text/xml": {
-								"schema": {
-									"$ref": "#/components/schemas/Info"
-								}
-							},
-							"text/html": {
-								"schema": {
-									"$ref": "#/components/schemas/Info"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
 		"/ws/v1/logins/{username}": {
 			"get": {
 				"tags": [
@@ -604,17 +582,6 @@
 			},
 			"Patch": {
 				"$ref": "/ws/v1/schemas/patch"
-			},
-			"Info": {
-				"type": "object",
-				"properties": {
-					"version": {
-						"type": "string"
-					},
-					"buildTime": {
-						"type": "string"
-					}
-				}
 			},
 			"ApplicationBeanParam": {
 				"required": [

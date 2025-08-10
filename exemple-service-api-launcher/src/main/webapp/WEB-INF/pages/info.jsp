@@ -8,10 +8,10 @@
 		<h1>Service</h1>
 	</div>
 	<div id="version">
-		<h4>Version: ${it.version}</h4>
+		<h4>Version: ${version}</h4>
 	</div>
 	<div id="buildTime">
-		<h4>Date de la version: ${it.buildTime}</h4>
+		<h4>Date de la version: ${buildTime}</h4>
 	</div>
 	<div id="documentations">
 		<h1>Documentations</h1>

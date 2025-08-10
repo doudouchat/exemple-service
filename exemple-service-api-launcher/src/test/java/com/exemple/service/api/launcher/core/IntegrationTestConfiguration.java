@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.stereotype.Controller;
 
 import com.exemple.service.application.core.ApplicationConfiguration;
 import com.exemple.service.integration.authorization.server.TestAlgorithmConfiguration;
@@ -25,7 +26,9 @@ import jakarta.annotation.PostConstruct;
 
 @Configuration
 @Import({ ResourceConfiguration.class, ApplicationConfiguration.class, TestAlgorithmConfiguration.class })
-@ComponentScan(basePackages = "com.exemple.service.api.launcher", excludeFilters = @ComponentScan.Filter(SpringBootApplication.class))
+@ComponentScan(basePackages = "com.exemple.service.api.launcher", excludeFilters = {
+        @ComponentScan.Filter(SpringBootApplication.class), @ComponentScan.Filter(Controller.class)
+})
 public class IntegrationTestConfiguration {
 
     @Value("${event.topics.account}")
