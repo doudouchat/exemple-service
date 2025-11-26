@@ -74,12 +74,7 @@ public class InitData {
                 {"type": "string","format": "date-time","readOnly": true}"
                 """));
 
-        ObjectNode patchCreationDate = MAPPER.createObjectNode();
-        patchCreationDate.put("op", "add");
-        patchCreationDate.put("path", "/required/0");
-        patchCreationDate.put("value", "creation_date");
-
-        accountSchema.setPatchs(Set.of(patchUpdateDate, patchCreationDate));
+        accountSchema.setPatchs(Set.of(patchUpdateDate));
 
         schemaResource.save(accountSchema);
 
