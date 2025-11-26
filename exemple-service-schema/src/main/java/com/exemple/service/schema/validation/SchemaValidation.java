@@ -1,11 +1,15 @@
 package com.exemple.service.schema.validation;
 
+import static com.flipkart.zjsonpatch.CompatibilityFlags.ALLOW_MISSING_TARGET_OBJECT_ON_REPLACE;
+
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.SetUtils;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.schema.common.SchemaBuilder;
@@ -13,9 +17,9 @@ import com.exemple.service.schema.common.SchemaValidator;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionCause;
 import com.exemple.service.schema.filter.SchemaFilter;
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.flipkart.zjsonpatch.CompatibilityFlags;
 import com.flipkart.zjsonpatch.JsonPatch;
 import com.networknt.schema.JsonSchema;
 
@@ -38,23 +42,23 @@ public class SchemaValidation {
 
     public void validate(String resource, String version, String profile, ArrayNode patch, JsonNode old) {
 
+        var oldFilterBySchema = this.schemaFilter.filterAllProperties(resource, version, profile, old);
         var schema = schemaBuilder.buildUpdateValidationSchema(resource, version, profile);
-
-        JsonNode oldFilterBySchema = this.schemaFilter.filterAllProperties(resource, version,profile, old);
+        var readonOnlyExceptions = findReadonOnlyExceptions(schema, patch);
 
         JsonNode form = JsonPatch.apply(patch, oldFilterBySchema,
-                EnumSet.of(CompatibilityFlags.FORBID_REMOVE_MISSING_OBJECT, CompatibilityFlags.ALLOW_MISSING_TARGET_OBJECT_ON_REPLACE));
-
-        SchemaValidator.performValidation(schema, form, (ValidationException e) -> {
+                EnumSet.of(ALLOW_MISSING_TARGET_OBJECT_ON_REPLACE));
+        var allExceptions = SetUtils.union(readonOnlyExceptions, SchemaValidator.findValidationExceptionCauses(schema, form)).toSet();
+        if (!allExceptions.isEmpty()) {
+            var validationException = new ValidationException(allExceptions);
 
             Set<ValidationExceptionCause> previousExceptions = findDistinctExceptions(schema, oldFilterBySchema);
 
             Predicate<ValidationExceptionCause> newExceptionFilter = (ValidationExceptionCause cause) -> isExceptionNotAlreadyExists(cause,
                     previousExceptions);
 
-            throwExceptionIfCausesNotEmpty(e, newExceptionFilter);
-
-        });
+            throwExceptionIfCausesNotEmpty(validationException, newExceptionFilter);
+        }
 
     }
 
@@ -86,6 +90,22 @@ public class SchemaValidation {
     private static boolean isExceptionNotAlreadyExists(ValidationExceptionCause cause, Set<ValidationExceptionCause> previousExceptions) {
 
         return !previousExceptions.contains(cause);
+    }
+
+    private static Set<ValidationExceptionCause> findReadonOnlyExceptions(JsonSchema schema, ArrayNode patch) {
+
+        return patch.valueStream()
+                .filter((JsonNode p) -> "remove".equals(p.get("op").textValue()))
+                .mapMulti((JsonNode p, Consumer<ValidationExceptionCause> check) -> {
+                    JsonNode property = schema.getSchemaNode().path("properties").path(p.get("path").textValue().substring(1));
+                    if (property.path("readOnly").asBoolean(false)) {
+                        check.accept(ValidationExceptionCause.builder()
+                                .code("readOnly")
+                                .pointer(JsonPointer.compile(p.get("path").textValue()))
+                                .build());
+                    }
+                })
+                .collect(Collectors.toSet());
     }
 
 }

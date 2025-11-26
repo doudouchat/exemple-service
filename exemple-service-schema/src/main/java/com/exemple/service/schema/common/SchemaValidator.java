@@ -2,10 +2,12 @@ package com.exemple.service.schema.common;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.exemple.service.schema.common.exception.ValidationException;
+import com.exemple.service.schema.common.exception.ValidationExceptionCause;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.JsonSchema;
 
@@ -36,6 +38,16 @@ public class SchemaValidator {
             validator.accept(e);
         }
 
+    }
+
+    public static Set<ValidationExceptionCause> findValidationExceptionCauses(JsonSchema schema, JsonNode form) {
+
+        try {
+            performValidation(schema, form);
+        } catch (ValidationException e) {
+            return e.getCauses();
+        }
+        return Set.of();
     }
 
     public static void performValidation(JsonSchema schema, JsonNode form) {

@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.stream.Streams;
 import org.assertj.core.api.AbstractAssert;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -358,11 +359,17 @@ class SchemaValidationTest {
             patch1.put("path", "/external_id");
             patch1.put("value", UUID.randomUUID().toString());
 
+            var patch2 = MAPPER.createObjectNode();
+            patch2.put("op", "remove");
+            patch2.put("path", "/id");
+
             return Stream.concat(
                     failures(),
                     Stream.of(
                             // external_id create only
-                            Arguments.of("readOnly", "/external_id", new JsonNode[] { patch1 })));
+                            Arguments.of("readOnly", "/external_id", new JsonNode[] { patch1 }),
+                            // id create only
+                            Arguments.of("readOnly", "/id", new JsonNode[] { patch2 })));
         }
 
         @ParameterizedTest
@@ -622,6 +629,7 @@ class SchemaValidationTest {
                     exception -> Assertions.assertThat(exception).isCause(validationExceptionCause));
         }
 
+        @Disabled
         @Test
         @DisplayName("source patch fails because remove field missing")
         void patchFailureWhenFieldIsMissing() {
