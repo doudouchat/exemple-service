@@ -30,7 +30,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.flipkart.zjsonpatch.JsonPatch;
-import com.flipkart.zjsonpatch.JsonPatchApplicationException;
 
 import lombok.Builder;
 
@@ -358,11 +357,23 @@ class SchemaValidationTest {
             patch1.put("path", "/external_id");
             patch1.put("value", UUID.randomUUID().toString());
 
+            var patch2 = MAPPER.createObjectNode();
+            patch2.put("op", "remove");
+            patch2.put("path", "/id");
+
+            var patch3 = MAPPER.createObjectNode();
+            patch3.put("op", "remove");
+            patch3.put("path", "/hide");
+
             return Stream.concat(
                     failures(),
                     Stream.of(
-                            // external_id create only
-                            Arguments.of("readOnly", "/external_id", new JsonNode[] { patch1 })));
+                            // external_id read only
+                            Arguments.of("readOnly", "/external_id", new JsonNode[] { patch1 }),
+                            // id read only
+                            Arguments.of("readOnly", "/id", new JsonNode[] { patch2 }),
+                            // hide additionalProperties
+                            Arguments.of("additionalProperties", "/hide", new JsonNode[] { patch3 })));
         }
 
         @ParameterizedTest
@@ -620,31 +631,6 @@ class SchemaValidationTest {
             var validationExceptionCause = ExpectedValidationExceptionCause.builder().code("additionalProperties").path("/email").build();
             assertThat(throwable).isInstanceOfSatisfying(ValidationException.class,
                     exception -> Assertions.assertThat(exception).isCause(validationExceptionCause));
-        }
-
-        @Test
-        @DisplayName("source patch fails because remove field missing")
-        void patchFailureWhenFieldIsMissing() {
-
-            // Given origin
-            var origin = Map.of("hide", BooleanNode.TRUE);
-
-            var old = MAPPER.convertValue(origin, JsonNode.class);
-
-            // And form
-            var patchs = MAPPER.createArrayNode();
-
-            var patch = MAPPER.createObjectNode();
-            patch.put("op", "remove");
-            patch.put("path", "/hide");
-
-            patchs.add(patch);
-
-            // When perform
-            var throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", patchs, old));
-
-            // Then check throwable
-            assertThat(throwable).isInstanceOf(JsonPatchApplicationException.class);
         }
 
     }

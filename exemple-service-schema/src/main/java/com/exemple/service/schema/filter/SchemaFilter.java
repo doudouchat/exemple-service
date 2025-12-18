@@ -92,15 +92,15 @@ public class SchemaFilter {
         return onlyAdditionalProperties;
     }
 
-    private static boolean isAdditionalProperties(ValidationExceptionCause cause) {
+    public static boolean isAdditionalProperties(ValidationExceptionCause cause) {
         return "additionalProperties".equals(cause.getCode());
     }
 
-    private static boolean isAdditionalOrReadOnlyProperties(ValidationExceptionCause cause) {
+    public static boolean isAdditionalOrReadOnlyProperties(ValidationExceptionCause cause) {
         return List.of("additionalProperties", "readOnly").contains(cause.getCode());
     }
 
-    private static boolean isWriteOnly(ValidationExceptionCause cause) {
+    public static boolean isWriteOnly(ValidationExceptionCause cause) {
         return "writeOnly".equals(cause.getCode());
     }
 
