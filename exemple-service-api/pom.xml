@@ -222,13 +222,8 @@
 		<!-- MOCK SERVER -->
 
 		<dependency>
-			<groupId>org.mock-server</groupId>
-			<artifactId>mockserver-netty</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.mock-server</groupId>
-			<artifactId>mockserver-client-java</artifactId>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>mockwebserver</artifactId>
 		</dependency>
 
 		<!-- AWAITILITY -->
@@ -271,17 +266,6 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
-
-			<!-- TEST UNITAIRE -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<systemPropertyVariables>
-						<mockserver.logLevel>DEBUG</mockserver.logLevel>
-					</systemPropertyVariables>
-				</configuration>
 			</plugin>
 
 		</plugins>

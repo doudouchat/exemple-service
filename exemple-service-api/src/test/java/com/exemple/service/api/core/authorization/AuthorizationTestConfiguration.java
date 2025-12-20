@@ -1,19 +1,14 @@
 package com.exemple.service.api.core.authorization;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Map;
 
 import org.mockito.Mockito;
-import org.mockserver.client.MockServerClient;
-import org.mockserver.integration.ClientAndServer;
-import org.mockserver.model.HttpRequest;
-import org.mockserver.model.HttpResponse;
-import org.mockserver.model.JsonBody;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -21,6 +16,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 import com.exemple.service.api.core.authorization.impl.AuthorizationTokenManager;
 import com.exemple.service.api.core.authorization.impl.AuthorizationTokenValidation;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -31,6 +28,9 @@ import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jwt.PlainJWT;
+
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 
 @Configuration
 @ComponentScan(basePackages = "com.exemple.service.api.core.authorization")
@@ -47,6 +47,8 @@ public class AuthorizationTestConfiguration {
         OTHER_RSA_KEY = buildRSAKey();
 
     }
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Configuration
     @Profile("AuthorizationMock")
@@ -96,18 +98,16 @@ public class AuthorizationTestConfiguration {
     @Profile("!AuthorizationMock")
     public class NotAuthorizationMock {
 
-        public NotAuthorizationMock(ClientAndServer authorizationClient) {
+        public NotAuthorizationMock(MockWebServer authorizationServer) throws JsonProcessingException {
 
             var jwkSet = new JWKSet(RSA_KEY).getKeys().stream().map(JWK::getRequiredParams).toList();
 
             var keys = Map.of("keys", jwkSet);
 
-            authorizationClient.when(HttpRequest.request()
-                    .withMethod("GET")
-                    .withPath("/oauth/jwks"))
-                    .respond(HttpResponse.response()
-                            .withBody(JsonBody.json(keys))
-                            .withStatusCode(200));
+            authorizationServer.url("/oauth/jwks");
+            authorizationServer.enqueue(new MockResponse()
+                    .setResponseCode(200)
+                    .setBody(MAPPER.writeValueAsString(keys)));
         }
 
         @Bean
@@ -127,22 +127,14 @@ public class AuthorizationTestConfiguration {
     @Profile("!AuthorizationMock")
     public class AuthorizationServer {
 
-        static {
-            System.setProperty("mockserver.logLevel", "DEBUG");
-        }
-
         @Value("${api.authorization.port}")
         private int authorizationPort;
 
-        @Bean
-        public ClientAndServer authorizationServer() {
-            return ClientAndServer.startClientAndServer(authorizationPort);
-        }
-
-        @Bean
-        @DependsOn("authorizationServer")
-        public MockServerClient authorizationClient() {
-            return new MockServerClient("localhost", authorizationPort);
+        @Bean(destroyMethod = "shutdown")
+        public MockWebServer authorizationServer() throws IOException {
+            MockWebServer authorizationServer = new MockWebServer();
+            authorizationServer.start(authorizationPort);
+            return authorizationServer;
         }
 
     }
