@@ -26,7 +26,8 @@ public class SchemaFilter {
 
     public JsonNode filter(String resource, String version, String profile, JsonNode source) {
 
-        var schema = schemaBuilder.buildFilterSchema(resource, version, profile);
+        var schema = schemaBuilder.buildUpdateValidationSchema(resource, version, profile);
+
         List<ArrayNode> exceptions = SchemaValidator.performValidation(schema, source,
                 (ValidationException e) -> e.getCauses().stream()
                         .filter((ValidationExceptionCause cause) -> isAdditionalProperties(cause) || isWriteOnly(cause))
@@ -39,7 +40,8 @@ public class SchemaFilter {
                             var patchs = MAPPER.createArrayNode();
                             patchs.add(patch);
                             return patchs;
-                        }).toList());
+                        }).toList(),
+                true);
         JsonNode filterProperties = source.deepCopy();
         exceptions.forEach((JsonNode patch) -> JsonPatch.applyInPlace(patch, filterProperties));
         return filterProperties;
@@ -47,7 +49,7 @@ public class SchemaFilter {
 
     public JsonNode filterAllProperties(String resource, String version, String profile, JsonNode source) {
 
-        var schema = schemaBuilder.buildFilterSchema(resource, version, profile);
+        var schema = schemaBuilder.buildUpdateValidationSchema(resource, version, profile);
 
         List<ArrayNode> exceptions = SchemaValidator.performValidation(schema, source,
                 (ValidationException e) -> e.getCauses().stream()
@@ -61,7 +63,8 @@ public class SchemaFilter {
                             var patchs = MAPPER.createArrayNode();
                             patchs.add(patch);
                             return patchs;
-                        }).toList());
+                        }).toList(),
+                true);
         JsonNode allProperties = source.deepCopy();
         exceptions.forEach((JsonNode patch) -> JsonPatch.applyInPlace(patch, allProperties));
         return allProperties;
@@ -69,7 +72,7 @@ public class SchemaFilter {
 
     public JsonNode filterAllAdditionalAndReadOnlyProperties(String resource, String version, String profile, JsonNode source) {
 
-        var schema = schemaBuilder.buildFilterSchema(resource, version, profile);
+        var schema = schemaBuilder.buildUpdateValidationSchema(resource, version, profile);
 
         List<ArrayNode> exceptions = SchemaValidator.performValidation(schema, source,
                 (ValidationException e) -> e.getCauses().stream()
@@ -86,7 +89,8 @@ public class SchemaFilter {
                             var patchs = MAPPER.createArrayNode();
                             patchs.add(patch);
                             return patchs;
-                        }).toList());
+                        }).toList(),
+                true);
         JsonNode onlyAdditionalProperties = MAPPER.createObjectNode();
         exceptions.forEach((JsonNode patch) -> JsonPatch.applyInPlace(patch, onlyAdditionalProperties));
         return onlyAdditionalProperties;

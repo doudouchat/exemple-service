@@ -4,11 +4,11 @@ import static com.flipkart.zjsonpatch.CompatibilityFlags.ALLOW_MISSING_TARGET_OB
 
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.SetUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.schema.common.SchemaBuilder;
@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.flipkart.zjsonpatch.JsonPatch;
-import com.networknt.schema.JsonSchema;
+import com.networknt.schema.Schema;
 
 import lombok.RequiredArgsConstructor;
 
@@ -50,8 +50,7 @@ public class SchemaValidation {
 
         JsonNode form = JsonPatch.apply(patch, oldFilterBySchema,
                 EnumSet.of(ALLOW_MISSING_TARGET_OBJECT_ON_REPLACE));
-        var allExceptions = SetUtils.union(readonOnlyAndAdditionalPropertiesExceptions, SchemaValidator.findValidationExceptionCauses(schema, form))
-                .toSet();
+        var allExceptions = ListUtils.union(readonOnlyAndAdditionalPropertiesExceptions, SchemaValidator.findValidationExceptionCauses(schema, form));
         if (!allExceptions.isEmpty()) {
             var validationException = new ValidationException(allExceptions);
 
@@ -65,13 +64,13 @@ public class SchemaValidation {
 
     }
 
-    public void validate(JsonSchema schema, JsonNode target) {
+    public void validate(Schema schema, JsonNode target) {
 
         SchemaValidator.performValidation(schema, target);
 
     }
 
-    private static Set<ValidationExceptionCause> findDistinctExceptions(JsonSchema schema, JsonNode target) {
+    private static Set<ValidationExceptionCause> findDistinctExceptions(Schema schema, JsonNode target) {
 
         Set<ValidationExceptionCause> exceptions = new HashSet<>();
         SchemaValidator.performValidation(schema, target, (ValidationException e) -> e.getCauses().forEach(exceptions::add));
@@ -81,7 +80,7 @@ public class SchemaValidation {
 
     private static void throwExceptionIfCausesNotEmpty(ValidationException e, Predicate<ValidationExceptionCause> filter) {
 
-        var validationException = new ValidationException(e.getCauses().stream().filter(filter).collect(Collectors.toSet()));
+        var validationException = new ValidationException(e.getCauses().stream().filter(filter).toList());
 
         if (!validationException.getCauses().isEmpty()) {
             throw validationException;
@@ -95,7 +94,7 @@ public class SchemaValidation {
         return !previousExceptions.contains(cause);
     }
 
-    private static Set<ValidationExceptionCause> findReadOnlyAndAdditionalPropertiesExceptionsWithRemoveOperation(JsonSchema schema,
+    private static List<ValidationExceptionCause> findReadOnlyAndAdditionalPropertiesExceptionsWithRemoveOperation(Schema schema,
             ArrayNode patch, JsonNode source) {
 
         var patchWithOnlyRemoveOperation = patch.deepCopy();
@@ -111,7 +110,7 @@ public class SchemaValidation {
 
         return SchemaValidator.findValidationExceptionCauses(schema, form).stream()
                 .filter(SchemaFilter::isAdditionalOrReadOnlyProperties)
-                .collect(Collectors.toSet());
+                .toList();
     }
 
 }
