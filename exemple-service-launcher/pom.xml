@@ -13,9 +13,6 @@
 		<application.contextpath>ExempleService</application.contextpath>
 		<application.host>http://localhost</application.host>
 
-		<!-- VERSION -->
-		<maven-failsafe-plugin.version>3.5.2</maven-failsafe-plugin.version>
-
 		<!-- SONAR -->
 		<sonar.coverage.jacoco.xmlReportPaths>${sonar.coverage.report.path}</sonar.coverage.jacoco.xmlReportPaths>
 
@@ -62,7 +59,7 @@
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-webmvc</artifactId>
 		</dependency>
 
 		<dependency>
@@ -126,6 +123,13 @@
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<!-- HAZELCAST -->
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-hazelcast</artifactId>
 		</dependency>
 
 		<!-- AWAITILITY -->

@@ -3,7 +3,6 @@ package com.exemple.service.resource.account;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -43,10 +42,10 @@ import com.exemple.service.resource.common.history.ExpectedHistory;
 import com.exemple.service.resource.common.history.HistoryAssert;
 import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.experimental.SuperBuilder;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @TestMethodOrder(OrderAnnotation.class)
 @SpringBootTest(classes = ResourceTestConfiguration.class)
@@ -111,12 +110,12 @@ class AccountResourceTest {
         @Test
         @DisplayName("save email")
         @Order(1)
-        void save() throws IOException {
+        void save() {
 
             // Given build account
             JsonNode account = MAPPER.readTree(
                     """
-                    {"id": "%s", "email": "jean.dupond@gmail"}"
+                    {"id": "%s", "email": "jean.dupond@gmail"}
 
                     """.formatted(id));
 
@@ -144,7 +143,7 @@ class AccountResourceTest {
             Optional<JsonNode> result = resource.get(id);
             assertThat(result).hasValue(MAPPER.readTree(
                     """
-                    {"id": "%s", "email": "jean.dupond@gmail"}"
+                    {"id": "%s", "email": "jean.dupond@gmail"}
 
                     """.formatted(id)));
 
@@ -159,7 +158,7 @@ class AccountResourceTest {
             expectedEvent.setId(id);
             expectedEvent.setData((MAPPER.readTree(
                     """
-                    {"id": "%s", "email": "jean.dupond@gmail"}"
+                    {"id": "%s", "email": "jean.dupond@gmail"}
 
                     """.formatted(id))));
             assertThat(event).usingRecursiveComparison()
@@ -173,12 +172,12 @@ class AccountResourceTest {
         @Test
         @DisplayName("update email and add age")
         @Order(2)
-        void update() throws IOException {
+        void update() {
 
             // Given build account
             JsonNode account = MAPPER.readTree(
                     """
-                    {"id": "%s", "email": "jean.dupont@gmail", "age": 19}"
+                    {"id": "%s", "email": "jean.dupont@gmail", "age": 19}
 
                     """.formatted(id));
 
@@ -213,7 +212,7 @@ class AccountResourceTest {
             Optional<JsonNode> result = resource.get(id);
             assertThat(result).hasValue(MAPPER.readTree(
                     """
-                    {"id": "%s", "email": "jean.dupont@gmail", "age": 19}"
+                    {"id": "%s", "email": "jean.dupont@gmail", "age": 19}
 
                     """.formatted(id)));
 
@@ -228,7 +227,7 @@ class AccountResourceTest {
             expectedEvent.setId(id);
             expectedEvent.setData((MAPPER.readTree(
                     """
-                    {"id": "%s", "email": "jean.dupont@gmail", "age": 19}"
+                    {"id": "%s", "email": "jean.dupont@gmail", "age": 19}
 
                     """.formatted(id))));
             assertThat(event).usingRecursiveComparison()
@@ -242,12 +241,12 @@ class AccountResourceTest {
         @Test
         @DisplayName("remove email and age")
         @Order(3)
-        void remove() throws IOException {
+        void remove() {
 
             // Given build account
             JsonNode account = MAPPER.readTree(
                     """
-                    {"id": "%s", "email": null, "age": null}"
+                    {"id": "%s", "email": null, "age": null}
 
                     """.formatted(id));
             AccountContextExecution.setPreviousAccount(resource.get(id).get());
@@ -282,7 +281,7 @@ class AccountResourceTest {
             Optional<JsonNode> result = resource.get(id);
             assertThat(result).hasValue(MAPPER.readTree(
                     """
-                    {"id": "%s"}"
+                    {"id": "%s"}
 
                     """.formatted(id)));
 
@@ -297,7 +296,7 @@ class AccountResourceTest {
             expectedEvent.setId(id);
             expectedEvent.setData((MAPPER.readTree(
                     """
-                    {"id": "%s"}"
+                    {"id": "%s"}
 
                     """.formatted(id))));
             assertThat(event).usingRecursiveComparison()
@@ -336,12 +335,12 @@ class AccountResourceTest {
         @Test
         @DisplayName("save addresses")
         @Order(1)
-        void save() throws IOException {
+        void save() {
 
             // Given build account
             JsonNode account = MAPPER.readTree(
                     """
-                    {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}}}"
+                    {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}}}
 
                     """.formatted(id));
 
@@ -375,7 +374,7 @@ class AccountResourceTest {
             Optional<JsonNode> result = resource.get(id);
             assertThat(result).hasValue(MAPPER.readTree(
                     """
-                    {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}}}"
+                    {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}}}
 
                     """.formatted(id)));
 
@@ -390,7 +389,7 @@ class AccountResourceTest {
             expectedEvent.setId(id);
             expectedEvent.setData((MAPPER.readTree(
                     """
-                    {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}}}"
+                    {"id": "%s", "addresses": {"home": {"street": "1 rue de la poste", "floor": 5}}}
 
                     """.formatted(id))));
             assertThat(event).usingRecursiveComparison()
@@ -404,7 +403,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("add 1 addresse")
         @Order(2)
-        void addAdresse() throws IOException {
+        void addAdresse() {
 
             // Given build account
             JsonNode account = MAPPER.readTree(
@@ -477,7 +476,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("update addresse")
         @Order(3)
-        void updateAddresse() throws IOException {
+        void updateAddresse() {
 
             // Given build account
             JsonNode account = MAPPER.readTree(
@@ -563,7 +562,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("delete addresse")
         @Order(4)
-        void deleteAddresse() throws IOException {
+        void deleteAddresse() {
 
             // Given build account
             JsonNode account = MAPPER.readTree(
@@ -636,7 +635,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("remove all addresses")
         @Order(5)
-        void remove() throws IOException {
+        void remove() {
 
             // Given build account
             JsonNode account = MAPPER.readTree(
@@ -721,7 +720,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("save cgus")
         @Order(1)
-        void save() throws IOException {
+        void save() {
 
             // Given build account
             JsonNode account = MAPPER.readTree(
@@ -787,7 +786,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("add 1 cgu")
         @Order(2)
-        void addCgu() throws IOException {
+        void addCgu() {
 
             // Given build account
             JsonNode account = MAPPER.readTree(
@@ -864,7 +863,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("remove all cgus")
         @Order(3)
-        void remove() throws IOException {
+        void remove() {
 
             // Given build account
             JsonNode account = MAPPER.readTree(
@@ -942,7 +941,7 @@ class AccountResourceTest {
         private String email;
 
         @BeforeEach
-        void saveAccount() throws IOException {
+        void saveAccount() {
             email = UUID.randomUUID() + "@gmail";
             JsonNode account = MAPPER.readTree(
                     """
@@ -953,7 +952,7 @@ class AccountResourceTest {
         }
 
         @Test
-        void saveUnique() throws IOException {
+        void saveUnique() {
 
             // When perform
             JsonNode account = MAPPER.readTree(
@@ -970,7 +969,7 @@ class AccountResourceTest {
         }
 
         @Test
-        void updateUnique() throws IOException {
+        void updateUnique() {
 
             // When perform
             JsonNode account = MAPPER.readTree(
@@ -992,7 +991,7 @@ class AccountResourceTest {
         }
 
         @Test
-        void updateSuccessIfEmailNotChange() throws IOException {
+        void updateSuccessIfEmailNotChange() {
 
             // When perform
             JsonNode account = MAPPER.readTree(
@@ -1014,7 +1013,7 @@ class AccountResourceTest {
         }
 
         @Test
-        void updateSuccessIfEmailChange() throws IOException {
+        void updateSuccessIfEmailChange() {
 
             // setup email
             var newEmail = UUID.randomUUID() + "@gmail";
@@ -1039,7 +1038,7 @@ class AccountResourceTest {
         }
 
         @Test
-        void updateSuccessIfEmailIsRemove() throws IOException {
+        void updateSuccessIfEmailIsRemove() {
 
             // When perform
             JsonNode account = MAPPER.readTree(
@@ -1095,7 +1094,7 @@ class AccountResourceTest {
 
         }
 
-        private Throwable save(String email) throws IOException {
+        private Throwable save(String email) {
 
             OffsetDateTime now = OffsetDateTime.now();
             ServiceContextExecution.setDate(now);

@@ -4,7 +4,6 @@ import static com.exemple.service.api.common.model.ApplicationBeanParam.APP_HEAD
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
 
-import java.io.IOException;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -28,8 +27,6 @@ import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.store.common.InsufficientStockException;
 import com.exemple.service.store.stock.StockService;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.PlainJWT;
 
@@ -37,6 +34,8 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
 @ActiveProfiles({ "test", "AuthorizationMock" })
@@ -103,7 +102,7 @@ class StockApiTest extends JerseySpringSupport {
 
         }
 
-        static Stream<Arguments> validationFailure() throws IOException {
+        static Stream<Arguments> validationFailure()  {
 
             return Stream.of(
                     Arguments.of("", MAPPER.readTree(
@@ -233,7 +232,7 @@ class StockApiTest extends JerseySpringSupport {
     class get {
 
         @Test
-        void success() throws IOException {
+        void success()  {
 
             // Given stock
 

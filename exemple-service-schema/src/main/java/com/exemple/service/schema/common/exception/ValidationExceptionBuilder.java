@@ -3,12 +3,12 @@ package com.exemple.service.schema.common.exception;
 import java.util.Collection;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonPointer;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.Error;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import tools.jackson.core.JsonPointer;
+import tools.jackson.databind.JsonNode;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ValidationExceptionBuilder {

@@ -7,11 +7,13 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
-import lombok.extern.jackson.Jacksonized;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonPOJOBuilder;
 
 @Builder
 @Getter
-@Jacksonized
+//TODO move to @Jacksonized
+@JsonDeserialize(builder = ApplicationDetail.ApplicationDetailBuilder.class)
 public class ApplicationDetail {
 
     @NotBlank
@@ -27,14 +29,23 @@ public class ApplicationDetail {
     @Builder.Default
     private final AccountDetail account = AccountDetail.builder().build();
 
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class ApplicationDetailBuilder {
+    }
+
     @Builder
     @Getter
-    @Jacksonized
+  //TODO move to @Jacksonized
+    @JsonDeserialize(builder = AccountDetail.AccountDetailBuilder.class)
     public static class AccountDetail {
 
         @NotEmpty
         @Singular
         private final Set<String> uniqueProperties;
+
+        @JsonPOJOBuilder(withPrefix = "")
+        public static class AccountDetailBuilder {
+        }
     }
 
 }
