@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.schema.description.SchemaDescription;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +13,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.JsonNode;
 
 @Path("/v1/schemas")
 @Component

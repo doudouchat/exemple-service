@@ -8,13 +8,13 @@ import com.exemple.service.schema.common.SchemaBuilder;
 import com.exemple.service.schema.common.SchemaValidator;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionCause;
-import com.fasterxml.jackson.core.JsonPointer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.flipkart.zjsonpatch.JsonPatch;
+import com.flipkart.zjsonpatch.Jackson3JsonPatch;
 
 import lombok.RequiredArgsConstructor;
+import tools.jackson.core.JsonPointer;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
 
 @Component
 @RequiredArgsConstructor
@@ -43,7 +43,7 @@ public class SchemaFilter {
                         }).toList(),
                 true);
         JsonNode filterProperties = source.deepCopy();
-        exceptions.forEach((JsonNode patch) -> JsonPatch.applyInPlace(patch, filterProperties));
+        exceptions.forEach((JsonNode patch) -> Jackson3JsonPatch.applyInPlace(patch, filterProperties));
         return filterProperties;
     }
 
@@ -66,7 +66,7 @@ public class SchemaFilter {
                         }).toList(),
                 true);
         JsonNode allProperties = source.deepCopy();
-        exceptions.forEach((JsonNode patch) -> JsonPatch.applyInPlace(patch, allProperties));
+        exceptions.forEach((JsonNode patch) -> Jackson3JsonPatch.applyInPlace(patch, allProperties));
         return allProperties;
     }
 
@@ -92,7 +92,7 @@ public class SchemaFilter {
                         }).toList(),
                 true);
         JsonNode onlyAdditionalProperties = MAPPER.createObjectNode();
-        exceptions.forEach((JsonNode patch) -> JsonPatch.applyInPlace(patch, onlyAdditionalProperties));
+        exceptions.forEach((JsonNode patch) -> Jackson3JsonPatch.applyInPlace(patch, onlyAdditionalProperties));
         return onlyAdditionalProperties;
     }
 

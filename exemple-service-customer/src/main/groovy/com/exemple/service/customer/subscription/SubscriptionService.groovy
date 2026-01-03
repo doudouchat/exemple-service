@@ -1,9 +1,9 @@
 package com.exemple.service.customer.subscription
 
 import com.exemple.service.context.ServiceContextExecution
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.databind.node.TextNode
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.node.ObjectNode
+import tools.jackson.databind.node.StringNode
 
 import groovy.transform.CompileDynamic
 
@@ -15,8 +15,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     void create(String email, JsonNode subscription) {
 
-        ((ObjectNode) subscription).set('email', new TextNode(email))
-        ((ObjectNode) subscription).set('subscription_date', new TextNode(ServiceContextExecution.context().date.toString()))
+        ((ObjectNode) subscription).set('email', new StringNode(email))
+        ((ObjectNode) subscription).set('subscription_date', new StringNode(ServiceContextExecution.context().date.toString()))
 
         subscriptionResource.create(subscription)
     }
@@ -24,8 +24,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     void update(String email, JsonNode subscription) {
 
-        ((ObjectNode) subscription).set('email', new TextNode(email))
-        ((ObjectNode) subscription).set('subscription_date', new TextNode(ServiceContextExecution.context().date.toString()))
+        ((ObjectNode) subscription).set('email', new StringNode(email))
+        ((ObjectNode) subscription).set('subscription_date', new StringNode(ServiceContextExecution.context().date.toString()))
 
         subscriptionResource.update(subscription)
     }

@@ -14,11 +14,11 @@ import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaEntity;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.annotation.PostConstruct;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 @Configuration
 @DependsOn("initCassandra")
@@ -69,10 +69,10 @@ public class InitData {
         ObjectNode patchUpdateDate = MAPPER.createObjectNode();
         patchUpdateDate.put("op", "add");
         patchUpdateDate.put("path", "/properties/update_date");
-        patchUpdateDate.set("value", MAPPER.readTree(
+        patchUpdateDate.put("value",
                 """
                 {"type": "string","format": "date-time","readOnly": true}"
-                """));
+                """);
 
         accountSchema.setPatchs(Set.of(patchUpdateDate));
 

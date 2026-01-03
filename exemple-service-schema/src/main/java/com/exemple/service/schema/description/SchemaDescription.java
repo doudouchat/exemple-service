@@ -7,8 +7,9 @@ import org.springframework.stereotype.Service;
 
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaEntity;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Service
 public class SchemaDescription {

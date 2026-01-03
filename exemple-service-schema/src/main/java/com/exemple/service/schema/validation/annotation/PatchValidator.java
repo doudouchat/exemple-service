@@ -6,10 +6,10 @@ import com.exemple.service.schema.common.SchemaBuilder;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionCause;
 import com.exemple.service.schema.validation.SchemaValidation;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import tools.jackson.databind.node.ArrayNode;
 
 public class PatchValidator implements ConstraintValidator<Patch, ArrayNode> {
 

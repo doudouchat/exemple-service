@@ -26,11 +26,11 @@ import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
 import com.exemple.service.schema.description.SchemaDescription;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
+import tools.jackson.databind.JsonNode;
 
 @SpringBootTest(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
 @ActiveProfiles({ "test", "AuthorizationMock" })
