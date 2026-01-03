@@ -12,13 +12,12 @@ import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
 import com.exemple.service.resource.common.util.JsonPatchUtils;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
-import com.google.common.collect.Streams;
 
 import lombok.extern.slf4j.Slf4j;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeType;
 
 @Slf4j
 public class HistoryResource<T, E extends HistoryModel<T>> {
@@ -50,10 +49,8 @@ public class HistoryResource<T, E extends HistoryModel<T>> {
 
         Collection<BoundStatement> statements = new ArrayList<>();
 
-        Streams.stream(patchs.elements())
-
+        patchs.elements().stream()
                 .map((JsonNode patch) -> buildHistory(patch, id, now, histories))
-
                 .map((E history) -> {
                     LOG.debug("save history {} {} {}", history.getId(), history.getField(), history.getValue());
                     return this.dao.save(history);
@@ -77,7 +74,7 @@ public class HistoryResource<T, E extends HistoryModel<T>> {
 
     private E buildHistory(JsonNode patch, T id, OffsetDateTime now, Map<String, HistoryModel<T>> histories) {
 
-        String path = patch.get(JsonPatchUtils.PATH).asText();
+        var path = patch.get(JsonPatchUtils.PATH).asString();
         JsonNode value = patch.path(JsonPatchUtils.VALUE);
 
         var history = this.defaultHistoryBuilder.get();
@@ -100,7 +97,7 @@ public class HistoryResource<T, E extends HistoryModel<T>> {
 
     private static boolean patchNotContainsPath(ArrayNode patch, String path) {
 
-        return Streams.stream(patch.elements()).noneMatch((JsonNode element) -> path.equals(element.get(JsonPatchUtils.PATH).textValue()));
+        return patch.elements().stream().noneMatch((JsonNode element) -> path.equals(element.get(JsonPatchUtils.PATH).asString()));
     }
 
 }

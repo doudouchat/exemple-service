@@ -2,7 +2,6 @@ package com.exemple.service.schema.filter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -13,8 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.service.schema.core.SchemaTestConfiguration;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringJUnitConfig(SchemaTestConfiguration.class)
 class SchemaFilterTest {
@@ -25,7 +25,7 @@ class SchemaFilterTest {
     private SchemaFilter schemaFilter;
 
     @Test
-    void filter() throws IOException {
+    void filter() {
 
         // Given create source
         JsonNode source = MAPPER.readTree(
@@ -44,7 +44,7 @@ class SchemaFilterTest {
     }
 
     @Test
-    void filterWhenSchemaNotExists() throws IOException {
+    void filterWhenSchemaNotExists() {
 
         // Given create source
         JsonNode source = MAPPER.readTree(
@@ -60,7 +60,7 @@ class SchemaFilterTest {
     }
 
     @Test
-    void filterAllProperties() throws IOException {
+    void filterAllProperties() {
 
         // Given create source
         JsonNode source = MAPPER.readTree(
@@ -79,7 +79,7 @@ class SchemaFilterTest {
     }
 
     @Test
-    void filterAllPropertiesWhenSchemaNotExists() throws IOException {
+    void filterAllPropertiesWhenSchemaNotExists() {
 
         // Given create source
         JsonNode source = MAPPER.readTree(
@@ -94,7 +94,7 @@ class SchemaFilterTest {
         assertThat(newSource).isEqualTo(MAPPER.readTree("{}"));
     }
 
-    static Stream<Arguments> filterAllAdditionalProperties() throws IOException {
+    static Stream<Arguments> filterAllAdditionalProperties() {
 
         JsonNode source1 = MAPPER.readTree(
                 """
@@ -102,7 +102,7 @@ class SchemaFilterTest {
                 """);
         JsonNode sourceExpected1 = MAPPER.readTree(
                 """
-                {"hide": "value2"}"
+                {"hide": "value2"}
                 """);
 
         JsonNode source2 = MAPPER.readTree(
@@ -123,7 +123,7 @@ class SchemaFilterTest {
                 """);
         JsonNode sourceExpected4 = MAPPER.readTree(
                 """
-                {"id": "44a3d2c3-e2b5-4d5f-933a-754a16b233e2"}"
+                {"id": "44a3d2c3-e2b5-4d5f-933a-754a16b233e2"}
                 """);
 
         return Stream.of(
@@ -145,7 +145,7 @@ class SchemaFilterTest {
     }
 
     @Test
-    void filterAllAdditionalPropertiesWhenSchemaNotExists() throws IOException {
+    void filterAllAdditionalPropertiesWhenSchemaNotExists() {
 
         // Given create source
         JsonNode source = MAPPER.readTree(

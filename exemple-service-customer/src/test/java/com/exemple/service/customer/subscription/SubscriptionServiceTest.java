@@ -2,7 +2,6 @@ package com.exemple.service.customer.subscription;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -17,10 +16,11 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.context.SubscriptionContextExecution;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 
 @SpringJUnitConfig(CustomerTestConfiguration.class)
 class SubscriptionServiceTest {
@@ -62,7 +62,7 @@ class SubscriptionServiceTest {
         // Then check save resource
 
         JsonNode expectedSubscription = ((ObjectNode) source).set("subscription_date",
-                TextNode.valueOf(ServiceContextExecution.context().getDate().toString()));
+                StringNode.valueOf(ServiceContextExecution.context().getDate().toString()));
 
         ArgumentCaptor<JsonNode> subscriptionCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
@@ -72,7 +72,7 @@ class SubscriptionServiceTest {
     }
 
     @Test
-    void update() throws IOException {
+    void update() {
 
         // Given email
 
@@ -92,7 +92,7 @@ class SubscriptionServiceTest {
         // Then check save resource
 
         JsonNode expectedSubscription = ((ObjectNode) source).set("subscription_date",
-                TextNode.valueOf(ServiceContextExecution.context().getDate().toString()));
+                StringNode.valueOf(ServiceContextExecution.context().getDate().toString()));
 
         ArgumentCaptor<JsonNode> subscriptionCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
@@ -103,7 +103,7 @@ class SubscriptionServiceTest {
 
     @DisplayName("get subscription")
     @Test
-    void get() throws IOException {
+    void get() {
 
         // Given email
 

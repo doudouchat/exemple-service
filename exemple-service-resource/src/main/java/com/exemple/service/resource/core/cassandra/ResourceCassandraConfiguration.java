@@ -13,7 +13,6 @@ import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
 import com.datastax.oss.driver.api.core.type.codec.ExtraTypeCodecs;
 import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.core.ResourceConfigurationProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 
 @Configuration
 public class ResourceCassandraConfiguration {
@@ -31,7 +30,7 @@ public class ResourceCassandraConfiguration {
         var loader = DriverConfigLoader.fromFile(cassandraResource);
 
         return CqlSession.builder().withConfigLoader(loader)
-                .addTypeCodecs(ExtraTypeCodecs.json(JsonNode.class))
+                .addTypeCodecs(new Json3Codec())
                 .addTypeCodecs(ExtraTypeCodecs.BLOB_TO_ARRAY)
                 .addTypeCodecs(ExtraTypeCodecs.enumNamesOf(EventType.class));
     }

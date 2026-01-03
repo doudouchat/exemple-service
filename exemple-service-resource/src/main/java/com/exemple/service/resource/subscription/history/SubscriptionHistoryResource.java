@@ -16,7 +16,8 @@ import com.exemple.service.resource.subscription.SubscriptionField;
 import com.exemple.service.resource.subscription.history.dao.SubscriptionHistoryDao;
 import com.exemple.service.resource.subscription.history.mapper.SubscriptionHistoryMapper;
 import com.exemple.service.resource.subscription.model.SubscriptionHistory;
-import com.fasterxml.jackson.databind.JsonNode;
+
+import tools.jackson.databind.JsonNode;
 
 @Component
 
@@ -41,7 +42,7 @@ public class SubscriptionHistoryResource {
 
     public Collection<BoundStatement> saveHistories(JsonNode source) {
 
-        String email = source.get(SubscriptionField.EMAIL.field).textValue();
+        var email = source.get(SubscriptionField.EMAIL.field).stringValue();
 
         return this.historyResource.saveHistories(email, source, SubscriptionContextExecution.getPreviousSubscription());
     }

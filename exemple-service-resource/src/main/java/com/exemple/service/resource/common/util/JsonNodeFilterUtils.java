@@ -4,15 +4,14 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.BiPredicate;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Streams;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class JsonNodeFilterUtils {
@@ -41,7 +40,7 @@ public final class JsonNodeFilterUtils {
         if (source.getValue().isArray()) {
 
             var arrayNode = JsonNodeFactory.instance.arrayNode();
-            List<JsonNode> nodes = Streams.stream(source.getValue().elements())
+            List<JsonNode> nodes = source.getValue().valueStream()
                     .filter(node -> predicate.test(source.getValue(), Maps.immutableEntry(source.getKey(), node)))
                     .map(node -> filter(Maps.immutableEntry(source.getKey(), node), new ObjectMapper().createObjectNode(), predicate))
                     .toList();

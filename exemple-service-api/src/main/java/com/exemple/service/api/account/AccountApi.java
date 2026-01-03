@@ -1,6 +1,5 @@
 package com.exemple.service.api.account;
 
-import java.io.IOException;
 import java.util.UUID;
 
 import org.springframework.stereotype.Component;
@@ -17,9 +16,7 @@ import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.common.validator.NotEmpty;
 import com.exemple.service.resource.account.AccountField;
 import com.exemple.service.schema.validation.annotation.Patch;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.flipkart.zjsonpatch.JsonPatch;
+import com.flipkart.zjsonpatch.Jackson3JsonPatch;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,6 +46,8 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriInfo;
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
 
 @Path("/v1/accounts")
 @OpenAPIDefinition(tags = @Tag(name = "account"))
@@ -116,7 +115,7 @@ public class AccountApi {
         var source = accountService.create(account);
 
         var builder = uriInfo.getAbsolutePathBuilder();
-        builder.path(source.get(AccountField.ID.field).textValue());
+        builder.path(source.get(AccountField.ID.field).stringValue());
         return Response.created(builder.build()).build();
 
     }
@@ -144,7 +143,7 @@ public class AccountApi {
 
         schemaValidation.validate(patch, previousAccount, ACCOUNT_RESOURCE);
 
-        var account = JsonPatch.apply(patch, previousAccount);
+        var account = Jackson3JsonPatch.apply(patch, previousAccount);
 
         accountService.update(account);
 
@@ -167,8 +166,7 @@ public class AccountApi {
     @Parameter(in = ParameterIn.HEADER, schema = @Schema(implementation = SchemaBeanParam.class))
     @RolesAllowed("account:update")
     @AppAndVersionCheck
-    public Response update(@NotNull @PathParam("id") UUID id, @NotNull @Parameter(schema = @Schema(ref = ACCOUNT_SCHEMA)) JsonNode account)
-            throws IOException {
+    public Response update(@NotNull @PathParam("id") UUID id, @NotNull @Parameter(schema = @Schema(ref = ACCOUNT_SCHEMA)) JsonNode account) {
 
         authorizationCheckService.verifyAccountId(id);
 

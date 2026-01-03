@@ -17,9 +17,9 @@ import com.exemple.service.resource.account.model.AccountEvent;
 import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.JsonNode;
 
 @Component
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class AccountEventResource {
 
     public BoundStatement saveEvent(JsonNode source, EventType eventType) {
 
-        var id = UUID.fromString(source.get(AccountField.ID.field).textValue());
+        var id = UUID.fromString(source.get(AccountField.ID.field).stringValue());
 
         var context = ServiceContextExecution.context();
 

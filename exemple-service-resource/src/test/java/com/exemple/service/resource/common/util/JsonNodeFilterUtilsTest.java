@@ -2,18 +2,16 @@ package com.exemple.service.resource.common.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
-
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 class JsonNodeFilterUtilsTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Test
-    void clean() throws IOException {
+    void clean() {
 
         // Given build account
         var account = MAPPER.readTree(
