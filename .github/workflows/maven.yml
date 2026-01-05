@@ -17,6 +17,7 @@ concurrency:
   cancel-in-progress: false
 env:
    MAVEN_OPTS: -Xmx1g
+   BRANCH_CDC: ${{ github.event.inputs.branch_cdc }}
 jobs:
    build:
       runs-on: ubuntu-latest
@@ -51,7 +52,7 @@ jobs:
          with:
             path: exemple-cdc
             repository: doudouchat/exemple-cdc
-            ref: ${{ github.event.inputs.branch_cdc }}
+            ref:  ${{ env.BRANCH_CDC }}
       -  name: Build exemple cdc
          run: mvn -f ${{ github.workspace }}/exemple-cdc --batch-mode clean install -Dmaven.test.skip=true
          env:
