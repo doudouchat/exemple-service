@@ -19,9 +19,9 @@ import com.exemple.service.resource.account.username.AccountUsernameResource;
 import com.exemple.service.resource.common.JsonQueryBuilder;
 import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.core.ResourceExecutionContext;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.extern.slf4j.Slf4j;
+import tools.jackson.databind.JsonNode;
 
 @Service("accountResource")
 @Validated
@@ -53,7 +53,7 @@ public class AccountResourceImpl implements AccountResource {
     @Override
     public void create(JsonNode account) {
 
-        Assert.isTrue(account.path(AccountField.ID.field).isTextual(), AccountField.ID.field + " is required");
+        Assert.isTrue(account.path(AccountField.ID.field).isString(), AccountField.ID.field + " is required");
 
         var insertAccount = jsonQueryBuilder.insert(account);
 
@@ -69,7 +69,7 @@ public class AccountResourceImpl implements AccountResource {
     @Override
     public void update(JsonNode account) {
 
-        Assert.isTrue(account.path(AccountField.ID.field).isTextual(), AccountField.ID.field + " is required");
+        Assert.isTrue(account.path(AccountField.ID.field).isString(), AccountField.ID.field + " is required");
 
         LOG.debug("save account {}", account);
 

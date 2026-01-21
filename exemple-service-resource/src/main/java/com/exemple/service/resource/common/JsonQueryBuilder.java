@@ -5,9 +5,9 @@ import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.insert.Insert;
 import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
 import com.exemple.service.resource.core.ResourceExecutionContext;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.JsonNode;
 
 @RequiredArgsConstructor
 public class JsonQueryBuilder {

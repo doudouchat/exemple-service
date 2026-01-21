@@ -4,9 +4,9 @@ import java.util.Optional;
 
 import com.exemple.service.customer.common.validator.Json;
 import com.exemple.service.customer.common.validator.NotEmpty;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.validation.constraints.NotBlank;
+import tools.jackson.databind.JsonNode;
 
 public interface SubscriptionResource {
 

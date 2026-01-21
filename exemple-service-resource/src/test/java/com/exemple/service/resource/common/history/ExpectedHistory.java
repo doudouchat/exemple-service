@@ -2,12 +2,11 @@ package com.exemple.service.resource.common.history;
 
 import java.time.OffsetDateTime;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.SuperBuilder;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @SuperBuilder
 @Getter

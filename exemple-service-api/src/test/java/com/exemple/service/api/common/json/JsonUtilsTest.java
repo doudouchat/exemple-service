@@ -2,19 +2,17 @@ package com.exemple.service.api.common.json;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
-
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 class JsonUtilsTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Test
-    void merge() throws IOException {
+    void merge() {
 
         // Given build account
         JsonNode source = MAPPER.readTree(

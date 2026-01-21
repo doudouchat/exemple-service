@@ -24,14 +24,14 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionCause;
 import com.exemple.service.schema.core.SchemaTestConfiguration;
-import com.fasterxml.jackson.core.JsonPointer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.BooleanNode;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.flipkart.zjsonpatch.JsonPatch;
+import com.flipkart.zjsonpatch.Jackson3JsonPatch;
 
 import lombok.Builder;
+import tools.jackson.core.JsonPointer;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.BooleanNode;
+import tools.jackson.databind.node.NullNode;
 
 @SpringJUnitConfig(SchemaTestConfiguration.class)
 class SchemaValidationTest {
@@ -214,7 +214,7 @@ class SchemaValidationTest {
             var patch = MAPPER.createArrayNode();
             patch.addAll(Arrays.asList(patchs));
 
-            var model = JsonPatch.apply(patch, old);
+            var model = Jackson3JsonPatch.apply(patch, old);
 
             // When perform
             var throwable = catchThrowable(() -> validation.validate("schema_test", "default", "default", model));

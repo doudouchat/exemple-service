@@ -9,12 +9,12 @@ import java.util.function.Supplier;
 
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionCause;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import tools.jackson.databind.JsonNode;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SchemaValidator {

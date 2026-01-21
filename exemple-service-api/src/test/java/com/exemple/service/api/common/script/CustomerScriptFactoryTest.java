@@ -25,9 +25,10 @@ import org.springframework.util.ResourceUtils;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.customer.account.AccountService;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(classes = CustomerScriptTestConfiguration.class)
 @TestPropertySource(properties = { "customer.contexts.path=${java.io.tmpdir}/scripts", "customer.contexts.delay=2000" })
@@ -55,7 +56,7 @@ class CustomerScriptFactoryTest {
 
     @Test
     @DisplayName("Application has not specific script")
-    void noScript() throws IOException {
+    void noScript() {
 
         // Given init ApplicationDetail
         Mockito.when(applicationDetailService.get("test")).thenReturn(Optional.of(ApplicationDetail.builder().company("default").build()));

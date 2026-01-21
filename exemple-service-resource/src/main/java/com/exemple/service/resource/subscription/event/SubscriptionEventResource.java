@@ -16,9 +16,9 @@ import com.exemple.service.resource.subscription.SubscriptionField;
 import com.exemple.service.resource.subscription.event.dao.SubscriptionEventDao;
 import com.exemple.service.resource.subscription.event.mapper.SubscriptionEventMapper;
 import com.exemple.service.resource.subscription.model.SubscriptionEvent;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.JsonNode;
 
 @Component
 @RequiredArgsConstructor
@@ -30,7 +30,7 @@ public class SubscriptionEventResource {
 
     public BoundStatement saveEvent(JsonNode source, EventType eventType) {
 
-        String email = source.get(SubscriptionField.EMAIL.field).textValue();
+        var email = source.get(SubscriptionField.EMAIL.field).stringValue();
 
         var context = ServiceContextExecution.context();
 

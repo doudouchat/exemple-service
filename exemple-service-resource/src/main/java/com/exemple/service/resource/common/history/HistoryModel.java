@@ -4,12 +4,12 @@ import java.time.Instant;
 
 import com.datastax.oss.driver.api.mapper.annotations.ClusteringColumn;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import tools.jackson.databind.JsonNode;
 
 @Getter
 @Setter

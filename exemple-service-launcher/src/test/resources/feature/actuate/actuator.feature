@@ -12,7 +12,7 @@ Feature: actuator
     And actuator is
       """
       {
-          "status": "UP"
+          "status": "UP", "groups":["liveness", "readiness"]
       }
       """
 

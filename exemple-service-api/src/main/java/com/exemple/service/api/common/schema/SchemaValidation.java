@@ -2,11 +2,11 @@ package com.exemple.service.api.common.schema;
 
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.security.ApiSecurityContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
 
 @RequiredArgsConstructor
 public class SchemaValidation {

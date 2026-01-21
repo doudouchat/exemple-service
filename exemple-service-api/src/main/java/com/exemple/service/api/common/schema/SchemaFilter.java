@@ -2,10 +2,10 @@ package com.exemple.service.api.common.schema;
 
 import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.api.common.security.ApiSecurityContext;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.JsonNode;
 
 @RequiredArgsConstructor
 public class SchemaFilter {

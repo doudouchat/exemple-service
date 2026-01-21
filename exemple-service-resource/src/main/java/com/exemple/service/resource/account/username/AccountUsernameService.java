@@ -10,9 +10,9 @@ import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.context.AccountContextExecution;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.account.AccountField;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.JsonNode;
 
 @Component
 @RequiredArgsConstructor
@@ -42,7 +42,7 @@ public class AccountUsernameService {
     }
 
     public List<AccountUsername> findAllUsernames(ApplicationDetail applicationDetail, JsonNode account) {
-        var id = account.path(AccountField.ID.field).textValue();
+        var id = account.path(AccountField.ID.field).asString();
         var previousAccount = AccountContextExecution.getPreviousAccount();
         return applicationDetail.getAccount().getUniqueProperties().stream()
                 .map((String property) -> new AccountUsername(id, property, account.path(property), previousAccount.path(property)))

@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import org.glassfish.jersey.server.ResourceConfig;
@@ -24,14 +23,14 @@ import com.exemple.service.api.core.authorization.AuthorizationTestConfiguration
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.subscription.SubscriptionService;
 import com.exemple.service.schema.validation.SchemaValidation;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.PlainJWT;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response.Status;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
 @ActiveProfiles({ "test", "AuthorizationMock" })
@@ -66,7 +65,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
     class save {
 
         @Test
-        void success() throws IOException {
+        void success() {
 
             // Given email
 
@@ -119,7 +118,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
         }
 
         @Test
-        void successIfSubscriptionAlreadyExists() throws IOException {
+        void successIfSubscriptionAlreadyExists() {
 
             // Given email
 
@@ -176,7 +175,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
         }
 
         @Test
-        void isForbidden() throws IOException {
+        void isForbidden() {
 
             // Given email
 

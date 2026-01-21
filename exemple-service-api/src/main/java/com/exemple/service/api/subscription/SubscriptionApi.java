@@ -1,7 +1,5 @@
 package com.exemple.service.api.subscription;
 
-import java.io.IOException;
-
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.json.JsonUtils;
@@ -13,8 +11,6 @@ import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.context.SubscriptionContextExecution;
 import com.exemple.service.customer.subscription.SubscriptionService;
 import com.exemple.service.resource.subscription.SubscriptionField;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,6 +38,8 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriInfo;
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 @Path("/v1/subscriptions")
 @OpenAPIDefinition(tags = @Tag(name = "subscription"))
@@ -97,7 +95,7 @@ public class SubscriptionApi {
     @RolesAllowed("subscription:update")
     @AppAndVersionCheck
     public Response update(@NotNull @PathParam("email") String email,
-            @NotNull @Parameter(schema = @Schema(ref = SUBSCRIPTION_SCHEMA)) JsonNode value, @Context UriInfo uriInfo) throws IOException {
+            @NotNull @Parameter(schema = @Schema(ref = SUBSCRIPTION_SCHEMA)) JsonNode value, @Context UriInfo uriInfo) {
 
         var subscription = ((ObjectNode) value.deepCopy()).put(SubscriptionField.EMAIL.field, email);
 

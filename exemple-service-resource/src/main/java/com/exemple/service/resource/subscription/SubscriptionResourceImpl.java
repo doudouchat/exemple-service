@@ -16,7 +16,8 @@ import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.subscription.event.SubscriptionEventResource;
 import com.exemple.service.resource.subscription.history.SubscriptionHistoryResource;
-import com.fasterxml.jackson.databind.JsonNode;
+
+import tools.jackson.databind.JsonNode;
 
 @Service("subscriptionResource")
 @Validated
@@ -55,7 +56,7 @@ public class SubscriptionResourceImpl implements SubscriptionResource {
     @Override
     public void create(JsonNode subscription) {
 
-        Assert.isTrue(subscription.path(SubscriptionField.EMAIL.field).isTextual(), SubscriptionField.EMAIL.field + " is required");
+        Assert.isTrue(subscription.path(SubscriptionField.EMAIL.field).isString(), SubscriptionField.EMAIL.field + " is required");
 
         var createSubscription = jsonQueryBuilder.insert(subscription);
 
@@ -71,7 +72,7 @@ public class SubscriptionResourceImpl implements SubscriptionResource {
     @Override
     public void update(JsonNode subscription) {
 
-        Assert.isTrue(subscription.path(SubscriptionField.EMAIL.field).isTextual(), SubscriptionField.EMAIL.field + " is required");
+        Assert.isTrue(subscription.path(SubscriptionField.EMAIL.field).isString(), SubscriptionField.EMAIL.field + " is required");
 
         var createSubscription = jsonQueryBuilder.insert(subscription);
 

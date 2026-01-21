@@ -24,7 +24,7 @@ public class ApiSecurityContext implements SecurityContext {
         this.principal = principal;
         this.scheme = scheme;
         this.containsRole = containsRole;
-        this.profile = ObjectUtils.defaultIfNull(profile, ApiProfile.USER_PROFILE.profile);
+        this.profile = ObjectUtils.getIfNull(profile, ApiProfile.USER_PROFILE.profile);
     }
 
     public ApiSecurityContext(Principal principal, String scheme, Collection<String> roles, String profile) {

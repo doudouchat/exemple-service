@@ -8,13 +8,13 @@ import org.springframework.cache.interceptor.SimpleKey;
 
 import com.exemple.service.launcher.core.JsonRestTemplate;
 import com.exemple.service.resource.schema.model.SchemaEntity;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.map.IMap;
 
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
+import tools.jackson.databind.ObjectMapper;
 
 public class SwaggerStepDefinitions {
 

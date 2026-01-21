@@ -7,16 +7,15 @@ import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.exemple.service.launcher.core.JsonRestTemplate;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ActuatorStepDefinitions {
 
@@ -67,7 +66,7 @@ public class ActuatorStepDefinitions {
     }
 
     @And("actuator is")
-    public void checkBody(JsonNode body) throws JsonProcessingException {
+    public void checkBody(JsonNode body) {
 
         ObjectNode expectedBody = (ObjectNode) MAPPER.readTree(context.lastGet().asString());
 

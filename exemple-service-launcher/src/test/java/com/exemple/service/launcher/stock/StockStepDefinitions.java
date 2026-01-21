@@ -13,14 +13,14 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.exemple.service.launcher.authorization.AuthorizationTestContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class StockStepDefinitions {
 

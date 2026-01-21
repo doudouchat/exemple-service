@@ -2,7 +2,6 @@ package com.exemple.service.customer.account;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,8 +17,9 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import com.exemple.service.context.AccountContextExecution;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringJUnitConfig(CustomerTestConfiguration.class)
 class AccountServiceTest {
@@ -47,7 +47,7 @@ class AccountServiceTest {
 
     @Test
     @DisplayName("create account")
-    void create() throws IOException {
+    void create() {
 
         // Given account
 
@@ -66,7 +66,7 @@ class AccountServiceTest {
         assertThat(account).isEqualTo(MAPPER.readTree(
                 """
                 {"email": "jean.dupont@gmail.com", "lastname": "Dupont", "firstname": "Jean", "creation_date": "%s", "id": "%s"}
-                """.formatted(ServiceContextExecution.context().getDate(), id.textValue())));
+                """.formatted(ServiceContextExecution.context().getDate(), id.stringValue())));
 
         // And check save account resource
 
@@ -78,7 +78,7 @@ class AccountServiceTest {
 
     @Test
     @DisplayName("update account")
-    void update() throws IOException {
+    void update() {
 
         // Given account
 
@@ -117,7 +117,7 @@ class AccountServiceTest {
 
     @Test
     @DisplayName("update email")
-    void updateEmail() throws IOException {
+    void updateEmail() {
 
         // Given account
 
@@ -158,7 +158,7 @@ class AccountServiceTest {
 
     @Test
     @DisplayName("get account")
-    void get() throws IOException {
+    void get() {
 
         // Given account id
 

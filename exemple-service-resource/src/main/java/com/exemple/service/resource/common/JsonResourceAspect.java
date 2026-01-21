@@ -8,13 +8,14 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
-import com.fasterxml.jackson.databind.JsonNode;
+
+import tools.jackson.databind.JsonNode;
 
 @Aspect
 @Component
 public class JsonResourceAspect {
 
-    @Around("@within(org.springframework.stereotype.Service) && execution(public java.util.Optional<com.fasterxml.jackson.databind.JsonNode> "
+    @Around("@within(org.springframework.stereotype.Service) && execution(public java.util.Optional<tools.jackson.databind.JsonNode> "
             + "com.exemple.service.resource..*.*(..))")
     public Optional<JsonNode> returnOptionalJsonNode(ProceedingJoinPoint joinPoint) throws Throwable {
 

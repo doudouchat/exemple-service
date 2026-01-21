@@ -18,10 +18,10 @@ import com.exemple.service.resource.account.exception.UsernameAlreadyExistsExcep
 import com.exemple.service.resource.account.username.AccountUsername;
 import com.exemple.service.resource.account.username.AccountUsernameService;
 import com.exemple.service.resource.common.lock.Lock;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import tools.jackson.databind.JsonNode;
 
 @Aspect
 @Component

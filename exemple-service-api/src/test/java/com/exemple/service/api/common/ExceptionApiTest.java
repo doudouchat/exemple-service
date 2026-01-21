@@ -2,7 +2,6 @@ package com.exemple.service.api.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -21,9 +20,6 @@ import com.exemple.service.api.core.check.AppAndVersionCheck;
 import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.common.validator.NotEmpty;
 import com.exemple.service.schema.validation.annotation.Patch;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.ws.rs.Consumes;
@@ -39,7 +35,11 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.extern.jackson.Jacksonized;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonPOJOBuilder;
+import tools.jackson.databind.node.ArrayNode;
 
 @SpringBootTest(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
 @ActiveProfiles({ "test", "AuthorizationMock" })
@@ -101,7 +101,7 @@ class ExceptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    void JsonEmptyException() throws IOException {
+    void JsonEmptyException() {
 
         // When perform patch
 
@@ -163,7 +163,7 @@ class ExceptionApiTest extends JerseySpringSupport {
     }
 
     @Test
-    void appAndVersionAreMissing() throws IOException {
+    void appAndVersionAreMissing() {
 
         // When perform get
 
@@ -218,10 +218,15 @@ class ExceptionApiTest extends JerseySpringSupport {
 
         @Getter
         @Builder
-        @Jacksonized
+        // TODO move to @Jacksonized
+        @JsonDeserialize(builder = Test.TestBuilder.class)
         private static class Test {
 
             private final String name;
+
+            @JsonPOJOBuilder(withPrefix = "")
+            public static class TestBuilder {
+            }
 
         }
 

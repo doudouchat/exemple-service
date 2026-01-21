@@ -2,7 +2,9 @@ package com.exemple.service.resource.account.username;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.lang3.StringUtils;
+
+import tools.jackson.databind.JsonNode;
 
 public record AccountUsername(String id,
                               String field,
@@ -14,7 +16,7 @@ public record AccountUsername(String id,
             String field,
             JsonNode value,
             JsonNode previousValue) {
-        this(id, field, value.textValue(), previousValue.textValue());
+        this(id, field, value.asString(null), previousValue.asString(null));
     }
 
     public boolean hasChanged() {
@@ -22,7 +24,7 @@ public record AccountUsername(String id,
     }
 
     public boolean hasValue() {
-        return value != null;
+        return StringUtils.isNotEmpty(value);
     }
 
     public boolean hasPreviousValue() {

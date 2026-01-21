@@ -3,7 +3,6 @@ package com.exemple.service.resource.common.validator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -22,11 +21,11 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.validation.ConstraintViolationException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 @SpringBootTest(classes = ResourceTestConfiguration.class)
 @ActiveProfiles("test")
@@ -38,7 +37,7 @@ class JsonConstraintValidatorTest {
     private AccountResource resource;
 
     @Test
-    void success() throws IOException {
+    void success() {
 
         // Given build account
         UUID id = UUID.randomUUID();

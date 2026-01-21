@@ -3,10 +3,10 @@ package com.exemple.service.schema.common.exception;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.Error;
 
 import lombok.Getter;
+import tools.jackson.databind.JsonNode;
 
 @Getter
 public class ValidationException extends RuntimeException {

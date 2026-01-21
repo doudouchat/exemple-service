@@ -17,7 +17,8 @@ import com.exemple.service.resource.account.history.mapper.AccountHistoryMapper;
 import com.exemple.service.resource.account.model.AccountHistory;
 import com.exemple.service.resource.common.history.HistoryResource;
 import com.exemple.service.resource.core.ResourceExecutionContext;
-import com.fasterxml.jackson.databind.JsonNode;
+
+import tools.jackson.databind.JsonNode;
 
 @Component
 public class AccountHistoryResource {
@@ -41,7 +42,7 @@ public class AccountHistoryResource {
 
     public Collection<BoundStatement> saveHistories(JsonNode source) {
 
-        var id = UUID.fromString(source.get(AccountField.ID.field).textValue());
+        var id = UUID.fromString(source.get(AccountField.ID.field).stringValue());
 
         return this.historyResource.saveHistories(id, source, AccountContextExecution.getPreviousAccount());
     }

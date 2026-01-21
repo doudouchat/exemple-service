@@ -9,14 +9,15 @@ import org.springframework.stereotype.Component;
 
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaEntity;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.flipkart.zjsonpatch.JsonPatch;
+import com.flipkart.zjsonpatch.Jackson3JsonPatch;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaRegistry;
 import com.networknt.schema.SchemaRegistryConfig;
 import com.networknt.schema.SpecificationVersion;
 import com.networknt.schema.path.PathType;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 public class SchemaBuilder {
@@ -64,7 +65,7 @@ public class SchemaBuilder {
     private static Schema buildSchema(JsonNode schema, Set<JsonNode> patchs) {
 
         var patch = MAPPER.createArrayNode().addAll(patchs);
-        var rawSchema = JsonPatch.apply(patch, schema);
+        var rawSchema = Jackson3JsonPatch.apply(patch, schema);
         return buildSchema(rawSchema);
 
     }

@@ -31,10 +31,10 @@
 			<artifactId>spring-context</artifactId>
 		</dependency>
 
-		<!-- FASTER JACKSON -->
+		<!-- TOOLS JACKSON -->
 
 		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
+			<groupId>tools.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
 
@@ -48,7 +48,7 @@
 		<!-- JSON PATCH -->
 
 		<dependency>
-			<groupId>com.flipkart.zjsonpatch</groupId>
+			<groupId>io.github.vishwakarma</groupId>
 			<artifactId>zjsonpatch</artifactId>
 		</dependency>
 

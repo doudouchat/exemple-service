@@ -16,15 +16,15 @@ import com.exemple.service.schema.common.SchemaValidator;
 import com.exemple.service.schema.common.exception.ValidationException;
 import com.exemple.service.schema.common.exception.ValidationExceptionCause;
 import com.exemple.service.schema.filter.SchemaFilter;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import com.flipkart.zjsonpatch.JsonPatch;
+import com.flipkart.zjsonpatch.Jackson3JsonPatch;
 import com.networknt.schema.Schema;
 
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.NullNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 
 @Component
 @RequiredArgsConstructor
@@ -48,7 +48,7 @@ public class SchemaValidation {
         var readonOnlyAndAdditionalPropertiesExceptions = findReadOnlyAndAdditionalPropertiesExceptionsWithRemoveOperation(schema, patch,
                 oldFilterBySchema);
 
-        JsonNode form = JsonPatch.apply(patch, oldFilterBySchema,
+        JsonNode form = Jackson3JsonPatch.apply(patch, oldFilterBySchema,
                 EnumSet.of(ALLOW_MISSING_TARGET_OBJECT_ON_REPLACE));
         var allExceptions = ListUtils.union(readonOnlyAndAdditionalPropertiesExceptions, SchemaValidator.findValidationExceptionCauses(schema, form));
         if (!allExceptions.isEmpty()) {
@@ -99,13 +99,13 @@ public class SchemaValidation {
 
         var patchWithOnlyRemoveOperation = patch.deepCopy();
         patchWithOnlyRemoveOperation.valueStream()
-                .filter((JsonNode p) -> "remove".equals(p.get("op").textValue()))
+                .filter((JsonNode p) -> "remove".equals(p.get("op").stringValue()))
                 .map(ObjectNode.class::cast)
                 .forEach((ObjectNode p) -> {
-                    p.replace("op", new TextNode("replace"));
+                    p.replace("op", new StringNode("replace"));
                     p.replace("value", NullNode.instance);
                 });
-        var form = JsonPatch.apply(patchWithOnlyRemoveOperation, source,
+        var form = Jackson3JsonPatch.apply(patchWithOnlyRemoveOperation, source,
                 EnumSet.of(ALLOW_MISSING_TARGET_OBJECT_ON_REPLACE));
 
         return SchemaValidator.findValidationExceptionCauses(schema, form).stream()

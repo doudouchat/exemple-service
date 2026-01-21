@@ -23,10 +23,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import com.exemple.service.launcher.authorization.AuthorizationTestContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
@@ -35,6 +31,10 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class AccountStepDefinitions {
 
@@ -175,7 +175,7 @@ public class AccountStepDefinitions {
     }
 
     @Then("account is")
-    public void getAccount(JsonNode body) throws IOException {
+    public void getAccount(JsonNode body) {
 
         assertAll(
                 () -> assertThat(context.lastResponse().getStatusCode()).as("account is incorrect %s", context.lastResponse().getStatusCode())
@@ -225,14 +225,14 @@ public class AccountStepDefinitions {
     }
 
     @And("account error only contains")
-    public void checkOnlyError(JsonNode body) throws IOException {
+    public void checkOnlyError(JsonNode body) {
 
         checkCountError(1);
         checkErrors(body);
     }
 
     @And("account error contains {int} errors")
-    public void checkCountError(int count) throws IOException {
+    public void checkCountError(int count) {
 
         assertThat(context.lastResponse().getStatusCode()).as("account has not error").isEqualTo(400);
 
@@ -243,7 +243,7 @@ public class AccountStepDefinitions {
     }
 
     @And("account error contains")
-    public void checkErrors(JsonNode body) throws IOException {
+    public void checkErrors(JsonNode body) {
 
         ArrayNode errors = (ArrayNode) MAPPER.readTree(context.lastResponse().asString());
         assertThat(errors).as("errors %s not contain %s", errors.toPrettyString(), body.toPrettyString())
