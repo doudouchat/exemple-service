@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,16 +28,16 @@ import com.exemple.service.api.core.feature.FeatureConfiguration;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.login.LoginService;
 import com.exemple.service.schema.validation.SchemaValidation;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.PlainJWT;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response.Status;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 @SpringBootTest(classes = { ApiTestConfiguration.class, AuthorizationTestConfiguration.class })
 @ActiveProfiles({ "test", "AuthorizationMock" })
@@ -225,7 +224,7 @@ class AccountApiTest extends JerseySpringSupport {
     class patch {
 
         @Test
-        void success() throws IOException {
+        void success() {
 
             // Given account id
 
@@ -288,7 +287,7 @@ class AccountApiTest extends JerseySpringSupport {
         }
 
         @Test
-        void isForbidden() throws IOException {
+        void isForbidden() {
 
             // Given account id
 
@@ -326,7 +325,7 @@ class AccountApiTest extends JerseySpringSupport {
         }
 
         @Test
-        void JsonPatchException() throws IOException {
+        void JsonPatchException() {
 
             // Given account id
 
@@ -377,7 +376,7 @@ class AccountApiTest extends JerseySpringSupport {
     class put {
 
         @Test
-        void success() throws IOException {
+        void success() {
 
             // Given account id
 
@@ -445,7 +444,7 @@ class AccountApiTest extends JerseySpringSupport {
         }
 
         @Test
-        void isForbidden() throws IOException {
+        void isForbidden() {
 
             // Given account id
 
@@ -487,7 +486,7 @@ class AccountApiTest extends JerseySpringSupport {
     class create {
 
         @Test
-        void success() throws IOException {
+        void success() {
 
             // Given mock service
 
@@ -519,7 +518,7 @@ class AccountApiTest extends JerseySpringSupport {
             // And check location
 
             var baseUri = target(URL).getUri();
-            assertThat(response.getLocation()).isEqualTo(URI.create(baseUri + "/" + account.get("id").textValue()));
+            assertThat(response.getLocation()).isEqualTo(URI.create(baseUri + "/" + account.get("id").stringValue()));
 
             // And check service
 
@@ -536,7 +535,7 @@ class AccountApiTest extends JerseySpringSupport {
         }
 
         @Test
-        void isForbidden() throws IOException {
+        void isForbidden() {
 
             // Given token
 

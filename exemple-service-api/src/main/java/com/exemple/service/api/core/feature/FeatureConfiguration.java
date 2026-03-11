@@ -2,8 +2,7 @@ package com.exemple.service.api.core.feature;
 
 import java.util.logging.Level;
 
-import org.glassfish.jersey.internal.inject.AbstractBinder;
-import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
+import org.glassfish.jersey.inject.hk2.AbstractBinder;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -33,6 +32,9 @@ import com.exemple.service.customer.subscription.SubscriptionService;
 
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.ext.ContextResolver;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 @ApplicationPath("/ws")
 public class FeatureConfiguration extends ResourceConfig {
@@ -91,7 +93,7 @@ public class FeatureConfiguration extends ResourceConfig {
                 .property(LoggingFeature.LOGGING_FEATURE_LOGGER_LEVEL, Level.FINE.getName())
 
                 // JSON
-                .register(JacksonJsonProvider.class)
+                .register(new JacksonJsonProvider(JsonMapper.builder().enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).build()))
                 .register(new FeatureBinder());
 
     }

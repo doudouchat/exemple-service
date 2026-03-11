@@ -10,8 +10,9 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.service.schema.core.SchemaTestConfiguration;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringJUnitConfig(SchemaTestConfiguration.class)
 class SchemaDescriptionTest {
@@ -28,7 +29,7 @@ class SchemaDescriptionTest {
         JsonNode schema = service.get("schema_test", "default", "default");
 
         // Then check response
-        assertThat(schema.get("$schema").textValue()).isEqualTo("https://json-schema.org/draft/2020-12/schema");
+        assertThat(schema.get("$schema").stringValue()).isEqualTo("https://json-schema.org/draft/2020-12/schema");
 
     }
 
@@ -50,7 +51,7 @@ class SchemaDescriptionTest {
         JsonNode schema = service.getPatch();
 
         // Then check response
-        assertThat(schema.get("title").textValue()).isEqualTo("JSON schema for JSONPatch files");
+        assertThat(schema.get("title").stringValue()).isEqualTo("JSON schema for JSONPatch files");
 
     }
 

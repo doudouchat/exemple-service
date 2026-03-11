@@ -1,6 +1,6 @@
 package com.exemple.service.api.core;
 
-import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
+import org.glassfish.jersey.apache5.connector.Apache5ConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
@@ -14,6 +14,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Application;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 @WebAppConfiguration
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -44,7 +45,7 @@ public abstract class JerseySpringSupport {
 
             @Override
             protected void configureClient(ClientConfig config) {
-                config.connectorProvider(new ApacheConnectorProvider());
+                config.connectorProvider(new Apache5ConnectorProvider()).register(JacksonJsonProvider.class);
             }
         };
 

@@ -1,8 +1,8 @@
 package com.exemple.service.customer.account
 
 import com.exemple.service.context.ServiceContextExecution
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.node.ObjectNode
 
 import groovy.transform.CompileDynamic
 

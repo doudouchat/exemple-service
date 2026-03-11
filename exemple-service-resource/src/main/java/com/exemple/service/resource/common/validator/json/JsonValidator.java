@@ -18,11 +18,11 @@ import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
 import com.datastax.oss.driver.internal.core.type.PrimitiveType;
 import com.exemple.service.resource.common.JsonValidatorException;
 import com.exemple.service.resource.common.util.MetadataSchemaUtils;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Maps;
 
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.StringNode;
 
 @Component
 @RequiredArgsConstructor
@@ -77,7 +77,7 @@ public class JsonValidator {
 
         fields.forEach((Entry<String, JsonNode> node) -> {
             var keyType = dataType.getKeyType();
-            valid(keyType, Maps.immutableEntry(json.getKey(), new TextNode(node.getKey())));
+            valid(keyType, Maps.immutableEntry(json.getKey(), new StringNode(node.getKey())));
 
             var valueType = dataType.getValueType();
             valid(valueType, node);
@@ -92,7 +92,7 @@ public class JsonValidator {
             throw new JsonValidatorException(ARRAY_EXCEPTION, json.getKey());
         }
 
-        JsonStreamer<JsonNode> elements = json.getValue()::elements;
+        JsonStreamer<JsonNode> elements = json.getValue()::iterator;
 
         elements.forEach((JsonNode node) -> valid(dataType.getElementType(), Maps.immutableEntry(json.getKey(), node)));
 
@@ -104,7 +104,7 @@ public class JsonValidator {
             throw new JsonValidatorException(ARRAY_EXCEPTION, json.getKey());
         }
 
-        JsonStreamer<JsonNode> elements = json.getValue()::elements;
+        JsonStreamer<JsonNode> elements = json.getValue()::iterator;
 
         elements.forEach((JsonNode node) -> valid(dataType.getElementType(), Maps.immutableEntry(json.getKey(), node)));
 
@@ -130,7 +130,7 @@ public class JsonValidator {
 
         Iterator<DataType> dataTypes = dataType.getComponentTypes().iterator();
 
-        JsonStreamer<JsonNode> elements = json.getValue()::elements;
+        JsonStreamer<JsonNode> elements = json.getValue()::iterator;
 
         elements.forEach((JsonNode node) -> {
 
@@ -150,19 +150,18 @@ public class JsonValidator {
 
     private void validateStringOrInstant(PrimitiveType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
 
-        if (!json.getValue().isTextual()) {
+        if (!json.getValue().isString()) {
             throw new JsonValidatorException("VARCHAR", json.getKey());
         }
 
-        var value = new StringBuilder().append("'").append(json.getValue().asText()).append("'").toString();
+        var value = new StringBuilder().append("'").append(json.getValue().asString()).append("'").toString();
         checkDataType(value, dataType, json);
 
     }
 
     private void validateDefault(DataType dataType, Entry<String, JsonNode> json) throws JsonValidatorException {
 
-        String value = json.getValue().asText();
-        checkDataType(value, dataType, json);
+        checkDataType(json.getValue().asString(), dataType, json);
 
     }
 

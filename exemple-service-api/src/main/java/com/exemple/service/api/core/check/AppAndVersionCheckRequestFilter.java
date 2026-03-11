@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
 
 import com.exemple.service.api.common.model.SchemaBeanParam;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.Priorities;
@@ -14,6 +13,7 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.ObjectMapper;
 
 @Priority(Priorities.AUTHORIZATION)
 @RequiredArgsConstructor

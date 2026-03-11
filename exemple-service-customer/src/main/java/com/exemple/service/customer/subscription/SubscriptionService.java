@@ -2,10 +2,9 @@ package com.exemple.service.customer.subscription;
 
 import java.util.Optional;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import tools.jackson.databind.JsonNode;
 
 public interface SubscriptionService {
 

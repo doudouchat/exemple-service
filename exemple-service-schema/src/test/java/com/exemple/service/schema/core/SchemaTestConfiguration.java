@@ -14,10 +14,10 @@ import org.springframework.validation.beanvalidation.MethodValidationPostProcess
 
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaEntity;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.validation.Validator;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 @Configuration
 @Import(SchemaConfiguration.class)

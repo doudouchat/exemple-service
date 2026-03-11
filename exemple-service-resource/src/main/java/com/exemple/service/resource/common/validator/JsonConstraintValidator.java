@@ -3,12 +3,12 @@ package com.exemple.service.resource.common.validator;
 import com.exemple.service.customer.common.validator.Json;
 import com.exemple.service.resource.common.JsonValidatorException;
 import com.exemple.service.resource.common.validator.json.JsonValidator;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import tools.jackson.databind.JsonNode;
 
 @RequiredArgsConstructor
 @Slf4j

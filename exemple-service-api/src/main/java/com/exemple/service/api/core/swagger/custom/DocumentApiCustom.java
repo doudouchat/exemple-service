@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
@@ -53,7 +54,7 @@ public class DocumentApiCustom extends AbstractSpecFilter {
 
             var name = StringUtils.substring(mediaType.getSchema().get$ref(), "#/components/schemas/".length());
             headers.entrySet().stream()
-                    .filter(header -> StringUtils.equalsAnyIgnoreCase(header.getKey(), DocumentApiResource.RESOURCE + name))
+                    .filter(header -> Strings.CI.equalsAny(header.getKey(), DocumentApiResource.RESOURCE + name))
                     .map(Map.Entry::getValue)
                     .filter(header -> !header.isEmpty())
                     .forEach((List<String> header) -> {
@@ -118,7 +119,7 @@ public class DocumentApiCustom extends AbstractSpecFilter {
 
         headers.entrySet().stream()
 
-                .filter((Map.Entry<String, List<String>> header) -> StringUtils.startsWith(header.getKey(), DocumentApiResource.RESOURCE))
+                .filter((Map.Entry<String, List<String>> header) -> Strings.CS.startsWith(header.getKey(), DocumentApiResource.RESOURCE))
                 .forEach((Map.Entry<String, List<String>> header) -> {
 
                     var name = header.getKey().substring(DocumentApiResource.RESOURCE.length());

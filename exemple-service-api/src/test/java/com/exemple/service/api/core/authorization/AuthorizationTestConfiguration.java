@@ -16,8 +16,6 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 import com.exemple.service.api.core.authorization.impl.AuthorizationTokenManager;
 import com.exemple.service.api.core.authorization.impl.AuthorizationTokenValidation;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -31,6 +29,7 @@ import com.nimbusds.jwt.PlainJWT;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 @ComponentScan(basePackages = "com.exemple.service.api.core.authorization")
@@ -98,7 +97,7 @@ public class AuthorizationTestConfiguration {
     @Profile("!AuthorizationMock")
     public class NotAuthorizationMock {
 
-        public NotAuthorizationMock(MockWebServer authorizationServer) throws JsonProcessingException {
+        public NotAuthorizationMock(MockWebServer authorizationServer) {
 
             var jwkSet = new JWKSet(RSA_KEY).getKeys().stream().map(JWK::getRequiredParams).toList();
 

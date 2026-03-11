@@ -10,8 +10,8 @@ import lombok.extern.jackson.Jacksonized;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
-@Jacksonized
 @Getter
+@Jacksonized
 public class Stock {
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)

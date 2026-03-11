@@ -2,18 +2,16 @@ package com.exemple.service.resource.common.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
-
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 class JsonPatchUtilsTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Test
-    void patchProperty() throws IOException {
+    void patchProperty() {
 
         // Given build model
         var source = MAPPER.readTree(
@@ -39,7 +37,7 @@ class JsonPatchUtilsTest {
     }
 
     @Test
-    void patchObject() throws IOException {
+    void patchObject() {
 
         // Given build model
         var source = MAPPER.readTree(
@@ -68,7 +66,7 @@ class JsonPatchUtilsTest {
     }
 
     @Test
-    void patchMultiObject() throws IOException {
+    void patchMultiObject() {
 
         // Given build model
         var source = MAPPER.readTree(
@@ -98,7 +96,7 @@ class JsonPatchUtilsTest {
     }
 
     @Test
-    void patchArrayProperty() throws IOException {
+    void patchArrayProperty() {
 
         // Given build model
         var source = MAPPER.readTree(
@@ -126,7 +124,7 @@ class JsonPatchUtilsTest {
     }
 
     @Test
-    void patchArrayObject() throws IOException {
+    void patchArrayObject() {
 
         // Given build model
         var source = MAPPER.readTree(

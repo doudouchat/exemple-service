@@ -32,10 +32,10 @@ import com.exemple.service.resource.subscription.event.SubscriptionEventResource
 import com.exemple.service.resource.subscription.history.SubscriptionHistoryResource;
 import com.exemple.service.resource.subscription.model.SubscriptionEvent;
 import com.exemple.service.resource.subscription.model.SubscriptionHistory;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.experimental.SuperBuilder;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @TestMethodOrder(OrderAnnotation.class)
 @SpringBootTest(classes = ResourceTestConfiguration.class)

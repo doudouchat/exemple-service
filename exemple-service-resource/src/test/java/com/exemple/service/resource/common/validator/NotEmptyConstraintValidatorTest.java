@@ -3,7 +3,6 @@ package com.exemple.service.resource.common.validator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-import java.io.IOException;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -19,10 +18,10 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.validation.ConstraintViolationException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(classes = ResourceTestConfiguration.class)
 @ActiveProfiles("test")
@@ -34,7 +33,7 @@ class NotEmptyConstraintValidatorTest {
     private AccountResource resource;
 
     @Test
-    void updateSuccess() throws IOException {
+    void updateSuccess() {
 
         // Given build account
         UUID id = UUID.randomUUID();

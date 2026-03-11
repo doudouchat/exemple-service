@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtClaimAccessor;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 
@@ -51,18 +50,13 @@ public class AuthorizationContextService {
 
     private static ApiSecurityContext buildApiSecurityContext(Jwt jwt) {
 
-        Principal principal = () -> ObjectUtils.defaultIfNull(jwt.getSubject(), getClientId(jwt));
+        Principal principal = () -> ObjectUtils.getIfNull(jwt.getSubject(), () -> jwt.getClaimAsString("client_id"));
         return new ApiSecurityContext(principal, "https", jwt.getClaimAsStringList("scope"), jwt.getClaimAsString("profile"));
     }
 
     private static ApiSecurityContext buildApiSecurityAnonymousContext() {
 
         return new ApiSecurityContext(() -> "anonymous", "http", Collections.emptyList(), null);
-    }
-
-    private static String getClientId(JwtClaimAccessor jwt) {
-
-        return jwt.getClaimAsString("client_id");
     }
 
 }
