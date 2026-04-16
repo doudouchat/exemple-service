@@ -18,7 +18,7 @@ public final class JsonNodeFilterUtils {
 
     public static JsonNode clean(JsonNode source) {
 
-        BiPredicate<JsonNode, Entry<String, JsonNode>> predicate = (root, node) -> !node.getValue().isNull();
+        BiPredicate<JsonNode, Entry<String, JsonNode>> predicate = (_, node) -> !node.getValue().isNull();
 
         return filter(source, predicate);
     }

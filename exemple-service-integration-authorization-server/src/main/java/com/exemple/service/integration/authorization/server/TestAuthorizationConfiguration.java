@@ -80,7 +80,7 @@ public class TestAuthorizationConfiguration {
                 .keyID(UUID.randomUUID().toString())
                 .build();
         var jwkSet = new JWKSet(rsaKey);
-        return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
+        return (jwkSelector, _) -> jwkSelector.select(jwkSet);
     }
 
     @Bean

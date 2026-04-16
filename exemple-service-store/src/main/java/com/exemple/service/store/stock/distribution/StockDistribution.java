@@ -48,7 +48,7 @@ public class StockDistribution {
 
     public void lockStock(String company, String store, String product, Runnable action) throws Exception {
 
-        try (PersistentTtlNode node = createProduct("/" + company, "/" + store, "/" + product)) {
+        try (var _ = createProduct("/" + company, "/" + store, "/" + product)) {
 
             InterProcessLock lock = new InterProcessSemaphoreMutex(client, "/" + company + "/" + store + "/" + product);
 

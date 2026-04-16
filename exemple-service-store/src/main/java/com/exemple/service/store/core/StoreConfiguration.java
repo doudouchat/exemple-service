@@ -31,7 +31,7 @@ public class StoreConfiguration {
                 storeProperties.zookeeper().connectionTimeout(),
                 new RetryNTimes(storeProperties.zookeeper().retry(), storeProperties.zookeeper().sleepMsBetweenRetries()));
 
-        client.getConnectionStateListenable().addListener((c, state) -> LOG.debug("State changed to: {}", state));
+        client.getConnectionStateListenable().addListener((_, state) -> LOG.debug("State changed to: {}", state));
 
         return client;
 

@@ -31,7 +31,7 @@ public class ResourceConfiguration {
                 resourceProperties.zookeeper().connectionTimeout(),
                 new RetryNTimes(resourceProperties.zookeeper().retry(), resourceProperties.zookeeper().sleepMsBetweenRetries()));
 
-        client.getConnectionStateListenable().addListener((c, state) -> LOG.debug("State changed to: {}", state));
+        client.getConnectionStateListenable().addListener((_, state) -> LOG.debug("State changed to: {}", state));
 
         return client;
 
