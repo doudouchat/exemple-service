@@ -1,5 +1,7 @@
 package com.exemple.service.resource.stock.history;
 
+import static com.exemple.service.resource.common.ResourceContext.KEYSPACE;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,7 +12,6 @@ import org.springframework.stereotype.Component;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.stock.history.dao.StockHistoryDao;
 import com.exemple.service.resource.stock.history.mapper.StockHistoryMapper;
 import com.exemple.service.resource.stock.model.StockHistory;
@@ -29,7 +30,7 @@ public class StockHistoryResource {
 
     public SimpleStatement incrementQuantity(String store, String product, Instant date, String user, String application, long quantity) {
 
-        return QueryBuilder.update(ResourceExecutionContext.get().keyspace(), STOCK_HISTORY_TABLE)
+        return QueryBuilder.update(KEYSPACE.get(), STOCK_HISTORY_TABLE)
                 .increment("quantity", QueryBuilder.literal(quantity))
                 .whereColumn("store").isEqualTo(QueryBuilder.literal(store))
                 .whereColumn("product").isEqualTo(QueryBuilder.literal(product))
@@ -46,7 +47,7 @@ public class StockHistoryResource {
 
     private StockHistoryDao dao() {
 
-        return mappers.computeIfAbsent(ResourceExecutionContext.get().keyspace(), this::historyBuild).stockHistoryDao();
+        return mappers.computeIfAbsent(KEYSPACE.get(), this::historyBuild).stockHistoryDao();
     }
 
     private StockHistoryMapper historyBuild(String keyspace) {

@@ -11,7 +11,7 @@ import org.springframework.core.io.ClassPathResource;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.common.model.ApplicationDetail.AccountDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
-import com.exemple.service.resource.core.ResourceExecutionContext;
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaEntity;
 
@@ -58,7 +58,9 @@ public class InitData {
                         .build())
                 .build();
 
-        ResourceExecutionContext.get().setKeyspace(detail.getKeyspace());
+        applicationDetailService.put(TEST_APP, MAPPER.convertValue(detail, JsonNode.class));
+
+        ServiceContextExecution.setApp(TEST_APP);
 
         SchemaEntity accountSchema = new SchemaEntity();
         accountSchema.setVersion(VERSION_V1);
@@ -86,8 +88,6 @@ public class InitData {
 
         schemaResource.save(subscriptionSchema);
 
-        applicationDetailService.put(TEST_APP, MAPPER.convertValue(detail, JsonNode.class));
-
         // STOCK
 
         ApplicationDetail backDetail = ApplicationDetail.builder()
@@ -107,10 +107,15 @@ public class InitData {
         // APP
 
         ApplicationDetail detail = ApplicationDetail.builder()
+                .keyspace("other_keyspace")
+                .company("other_company")
+                .clientId("test")
+                .clientId("test_user")
+                .build();
 
-                .keyspace("other_keyspace").company("other_company").clientId("test").clientId("test_user").build();
+        applicationDetailService.put("other", MAPPER.convertValue(detail, JsonNode.class));
 
-        ResourceExecutionContext.get().setKeyspace(detail.getKeyspace());
+        ServiceContextExecution.setApp("other");
 
         SchemaEntity accountSchema = new SchemaEntity();
         accountSchema.setVersion(VERSION_V1);
@@ -119,8 +124,6 @@ public class InitData {
         accountSchema.setContent(MAPPER.readTree(new ClassPathResource("other.json").getContentAsByteArray()));
 
         schemaResource.save(accountSchema);
-
-        applicationDetailService.put("other", MAPPER.convertValue(detail, JsonNode.class));
 
     }
 

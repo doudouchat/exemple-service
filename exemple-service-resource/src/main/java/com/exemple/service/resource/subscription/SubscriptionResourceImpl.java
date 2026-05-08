@@ -1,5 +1,7 @@
 package com.exemple.service.resource.subscription;
 
+import static com.exemple.service.resource.common.ResourceContext.KEYSPACE;
+
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -13,7 +15,6 @@ import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.exemple.service.customer.subscription.SubscriptionResource;
 import com.exemple.service.resource.common.JsonQueryBuilder;
 import com.exemple.service.resource.common.model.EventType;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.subscription.event.SubscriptionEventResource;
 import com.exemple.service.resource.subscription.history.SubscriptionHistoryResource;
 
@@ -45,7 +46,7 @@ public class SubscriptionResourceImpl implements SubscriptionResource {
     @Override
     public Optional<JsonNode> get(String email) {
 
-        var select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), SUBSCRIPTION_TABLE).json().all()
+        var select = QueryBuilder.selectFrom(KEYSPACE.get(), SUBSCRIPTION_TABLE).json().all()
                 .whereColumn(SubscriptionField.EMAIL.field).isEqualTo(QueryBuilder.literal(email));
 
         var row = session.execute(select.build()).one();
@@ -88,7 +89,7 @@ public class SubscriptionResourceImpl implements SubscriptionResource {
     @Override
     public void delete(String email) {
 
-        var deleteSubscription = QueryBuilder.deleteFrom(ResourceExecutionContext.get().keyspace(), SUBSCRIPTION_TABLE)
+        var deleteSubscription = QueryBuilder.deleteFrom(KEYSPACE.get(), SUBSCRIPTION_TABLE)
                 .whereColumn(SubscriptionField.EMAIL.field).isEqualTo(QueryBuilder.literal(email));
 
         var batch = new BatchStatementBuilder(BatchType.LOGGED);

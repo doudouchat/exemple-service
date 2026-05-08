@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
@@ -19,7 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.exemple.service.resource.schema.model.SchemaEntity;
 import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
@@ -35,13 +33,6 @@ class SchemaResourceTest {
 
     @Autowired
     private SchemaResource resource;
-
-    @BeforeEach
-    void resetResourceContext() {
-
-        ResourceExecutionContext.destroy();
-
-    }
 
     @Nested
     @TestMethodOrder(OrderAnnotation.class)

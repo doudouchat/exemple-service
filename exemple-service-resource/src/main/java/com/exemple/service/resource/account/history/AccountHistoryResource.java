@@ -1,5 +1,7 @@
 package com.exemple.service.resource.account.history;
 
+import static com.exemple.service.resource.common.ResourceContext.KEYSPACE;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +18,6 @@ import com.exemple.service.resource.account.history.dao.AccountHistoryDao;
 import com.exemple.service.resource.account.history.mapper.AccountHistoryMapper;
 import com.exemple.service.resource.account.model.AccountHistory;
 import com.exemple.service.resource.common.history.HistoryResource;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 
 import tools.jackson.databind.JsonNode;
 
@@ -49,7 +50,7 @@ public class AccountHistoryResource {
 
     private AccountHistoryDao dao() {
 
-        return mappers.computeIfAbsent(ResourceExecutionContext.get().keyspace(), this::build).accountHistoryDao();
+        return mappers.computeIfAbsent(KEYSPACE.get(), this::build).accountHistoryDao();
     }
 
     private AccountHistoryMapper build(String keyspace) {

@@ -1,5 +1,7 @@
 package com.exemple.service.resource.account.event;
 
+import static com.exemple.service.resource.common.ResourceContext.KEYSPACE;
+
 import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,7 +18,6 @@ import com.exemple.service.resource.account.event.mapper.AccountEventMapper;
 import com.exemple.service.resource.account.model.AccountEvent;
 import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 
 import lombok.RequiredArgsConstructor;
 import tools.jackson.databind.JsonNode;
@@ -55,7 +56,7 @@ public class AccountEventResource {
 
     private AccountEventDao dao() {
 
-        return mappers.computeIfAbsent(ResourceExecutionContext.get().keyspace(), this::build).accountEventDao();
+        return mappers.computeIfAbsent(KEYSPACE.get(), this::build).accountEventDao();
     }
 
     private AccountEventMapper build(String keyspace) {

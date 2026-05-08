@@ -1,5 +1,7 @@
 package com.exemple.service.resource.account.username;
 
+import static com.exemple.service.resource.common.ResourceContext.KEYSPACE;
+
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,7 +13,6 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.exemple.service.resource.account.model.AccountUsername;
 import com.exemple.service.resource.account.username.dao.AccountUsernameDao;
 import com.exemple.service.resource.account.username.mapper.AccountUsernameMapper;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,7 +42,7 @@ public class AccountUsernameResource {
 
     private AccountUsernameDao dao() {
 
-        return mappers.computeIfAbsent(ResourceExecutionContext.get().keyspace(), this::build).accountUsernameDao();
+        return mappers.computeIfAbsent(KEYSPACE.get(), this::build).accountUsernameDao();
     }
 
     private AccountUsernameMapper build(String keyspace) {

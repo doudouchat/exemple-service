@@ -16,9 +16,9 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.assertj.core.api.Condition;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.subscription.SubscriptionResource;
 import com.exemple.service.launcher.authorization.AuthorizationTestContext;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
@@ -49,7 +49,7 @@ public class SubscriptionStepDefinitions {
     @Before
     public void initKeyspace() {
 
-        ResourceExecutionContext.get().setKeyspace("test_keyspace");
+        ServiceContextExecution.setApp(TEST_APP);
 
     }
 

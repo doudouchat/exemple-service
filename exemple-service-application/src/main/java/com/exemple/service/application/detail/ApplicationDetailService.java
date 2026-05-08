@@ -7,6 +7,8 @@ import org.apache.curator.framework.recipes.nodes.PersistentNode;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -30,6 +32,7 @@ public class ApplicationDetailService {
     private final CuratorFramework client;
 
     @SneakyThrows
+    @Cacheable("application")
     public Optional<ApplicationDetail> get(String application) {
 
         try {
@@ -45,6 +48,7 @@ public class ApplicationDetailService {
 
     }
 
+    @CacheEvict(cacheNames = "application", key = "#application")
     public void put(String application, JsonNode detail) {
 
         LOG.debug("Put detail {} for application {}", detail, application);

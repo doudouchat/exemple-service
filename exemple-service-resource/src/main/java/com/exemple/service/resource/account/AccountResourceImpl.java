@@ -1,5 +1,7 @@
 package com.exemple.service.resource.account;
 
+import static com.exemple.service.resource.common.ResourceContext.KEYSPACE;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,7 +20,6 @@ import com.exemple.service.resource.account.history.AccountHistoryResource;
 import com.exemple.service.resource.account.username.AccountUsernameResource;
 import com.exemple.service.resource.common.JsonQueryBuilder;
 import com.exemple.service.resource.common.model.EventType;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 
 import lombok.extern.slf4j.Slf4j;
 import tools.jackson.databind.JsonNode;
@@ -105,7 +106,7 @@ public class AccountResourceImpl implements AccountResource {
 
         getIdByUsername(field, value).ifPresent((UUID id) -> {
 
-            var delete = QueryBuilder.deleteFrom(ResourceExecutionContext.get().keyspace(), ACCOUNT_TABLE)
+            var delete = QueryBuilder.deleteFrom(KEYSPACE.get(), ACCOUNT_TABLE)
                     .whereColumn(AccountField.ID.field)
                     .isEqualTo(QueryBuilder.literal(id));
 
@@ -117,7 +118,7 @@ public class AccountResourceImpl implements AccountResource {
 
     private Optional<JsonNode> getById(UUID id) {
 
-        var select = QueryBuilder.selectFrom(ResourceExecutionContext.get().keyspace(), ACCOUNT_TABLE).json().all()
+        var select = QueryBuilder.selectFrom(KEYSPACE.get(), ACCOUNT_TABLE).json().all()
                 .whereColumn(AccountField.ID.field).isEqualTo(QueryBuilder.literal(id));
 
         var row = session.execute(select.build().setConsistencyLevel(DefaultConsistencyLevel.QUORUM)).one();

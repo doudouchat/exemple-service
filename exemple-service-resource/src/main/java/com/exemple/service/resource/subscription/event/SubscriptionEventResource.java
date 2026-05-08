@@ -1,5 +1,7 @@
 package com.exemple.service.resource.subscription.event;
 
+import static com.exemple.service.resource.common.ResourceContext.KEYSPACE;
+
 import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -11,7 +13,6 @@ import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.subscription.SubscriptionField;
 import com.exemple.service.resource.subscription.event.dao.SubscriptionEventDao;
 import com.exemple.service.resource.subscription.event.mapper.SubscriptionEventMapper;
@@ -69,7 +70,7 @@ public class SubscriptionEventResource {
 
     private SubscriptionEventDao dao() {
 
-        return mappers.computeIfAbsent(ResourceExecutionContext.get().keyspace(), this::build).subscriptionEventDao();
+        return mappers.computeIfAbsent(KEYSPACE.get(), this::build).subscriptionEventDao();
     }
 
     private SubscriptionEventMapper build(String keyspace) {

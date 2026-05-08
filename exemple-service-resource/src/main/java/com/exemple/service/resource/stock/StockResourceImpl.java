@@ -1,5 +1,7 @@
 package com.exemple.service.resource.stock;
 
+import static com.exemple.service.resource.common.ResourceContext.KEYSPACE;
+
 import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,7 +15,6 @@ import com.datastax.oss.driver.api.core.cql.BatchStatementBuilder;
 import com.datastax.oss.driver.api.core.cql.BatchType;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.exemple.service.context.ServiceContextExecution;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.stock.dao.StockDao;
 import com.exemple.service.resource.stock.history.StockHistoryResource;
 import com.exemple.service.resource.stock.mapper.StockMapper;
@@ -40,7 +41,7 @@ public class StockResourceImpl implements StockResource {
 
         var batch = new BatchStatementBuilder(BatchType.COUNTER)
                 .addStatement(
-                        QueryBuilder.update(ResourceExecutionContext.get().keyspace(), STOCK_TABLE)
+                        QueryBuilder.update(KEYSPACE.get(), STOCK_TABLE)
                                 .increment("quantity", QueryBuilder.literal(quantity))
                                 .whereColumn("store").isEqualTo(QueryBuilder.literal(store))
                                 .whereColumn("product").isEqualTo(QueryBuilder.literal(product))
@@ -62,7 +63,7 @@ public class StockResourceImpl implements StockResource {
 
     private StockDao dao() {
 
-        return mappers.computeIfAbsent(ResourceExecutionContext.get().keyspace(), this::build).stockDao();
+        return mappers.computeIfAbsent(KEYSPACE.get(), this::build).stockDao();
     }
 
     private StockMapper build(String keyspace) {

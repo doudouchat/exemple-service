@@ -8,10 +8,10 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.launcher.account.AccountTestContext;
 import com.exemple.service.launcher.authorization.AuthorizationTestContext;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
@@ -32,7 +32,7 @@ public class LoginStepDefinitions {
     @Before
     public void initKeyspace() {
 
-        ResourceExecutionContext.get().setKeyspace("test_keyspace");
+        ServiceContextExecution.setApp(TEST_APP);
 
     }
 

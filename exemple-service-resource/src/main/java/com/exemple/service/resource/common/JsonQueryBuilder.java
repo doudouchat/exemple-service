@@ -1,10 +1,11 @@
 package com.exemple.service.resource.common;
 
+import static com.exemple.service.resource.common.ResourceContext.KEYSPACE;
+
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.insert.Insert;
 import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 
 import lombok.RequiredArgsConstructor;
 import tools.jackson.databind.JsonNode;
@@ -18,7 +19,7 @@ public class JsonQueryBuilder {
 
     public Insert insert(JsonNode source) {
 
-        return QueryBuilder.insertInto(ResourceExecutionContext.get().keyspace(), this.table).json(JsonNodeFilterUtils.clean(source),
+        return QueryBuilder.insertInto(KEYSPACE.get(), this.table).json(JsonNodeFilterUtils.clean(source),
                 session.getContext().getCodecRegistry());
 
     }

@@ -8,7 +8,6 @@ import com.exemple.service.api.common.model.SchemaBeanParam;
 import com.exemple.service.context.AccountContextExecution;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.context.SubscriptionContextExecution;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.Priorities;
@@ -33,7 +32,6 @@ public class ExecutionContextResponseFilter implements ContainerRequestFilter, C
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
 
         ServiceContextExecution.destroy();
-        ResourceExecutionContext.destroy();
         AccountContextExecution.destroy();
         SubscriptionContextExecution.destroy();
 

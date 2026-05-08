@@ -1,5 +1,7 @@
 package com.exemple.service.resource.subscription.history;
 
+import static com.exemple.service.resource.common.ResourceContext.KEYSPACE;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,7 +13,6 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.exemple.service.context.SubscriptionContextExecution;
 import com.exemple.service.resource.common.history.HistoryResource;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.subscription.SubscriptionField;
 import com.exemple.service.resource.subscription.history.dao.SubscriptionHistoryDao;
 import com.exemple.service.resource.subscription.history.mapper.SubscriptionHistoryMapper;
@@ -49,7 +50,7 @@ public class SubscriptionHistoryResource {
 
     private SubscriptionHistoryDao dao() {
 
-        return mappers.computeIfAbsent(ResourceExecutionContext.get().keyspace(), this::build).subscriptionHistoryDao();
+        return mappers.computeIfAbsent(KEYSPACE.get(), this::build).subscriptionHistoryDao();
     }
 
     private SubscriptionHistoryMapper build(String keyspace) {

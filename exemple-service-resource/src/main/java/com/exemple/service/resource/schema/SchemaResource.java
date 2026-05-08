@@ -1,5 +1,7 @@
 package com.exemple.service.resource.schema;
 
+import static com.exemple.service.resource.common.ResourceContext.KEYSPACE;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.exemple.service.resource.core.ResourceExecutionContext;
 import com.exemple.service.resource.schema.dao.ResourceSchemaDao;
 import com.exemple.service.resource.schema.mapper.ResourceSchemaMapper;
 import com.exemple.service.resource.schema.model.SchemaEntity;
@@ -60,7 +61,7 @@ public class SchemaResource {
 
     private ResourceSchemaDao dao() {
 
-        return mappers.computeIfAbsent(ResourceExecutionContext.get().keyspace(), this::build).resourceSchemaDao();
+        return mappers.computeIfAbsent(KEYSPACE.get(), this::build).resourceSchemaDao();
     }
 
     private ResourceSchemaMapper build(String keyspace) {
