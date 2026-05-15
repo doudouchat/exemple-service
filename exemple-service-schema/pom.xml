@@ -52,6 +52,13 @@
 			<artifactId>zjsonpatch</artifactId>
 		</dependency>
 
+		<!-- JAKARTA INJECT -->
+
+		<dependency>
+			<groupId>jakarta.inject</groupId>
+			<artifactId>jakarta.inject-api</artifactId>
+		</dependency>
+
 		<!-- GOOGLE GUAVA -->
 
 		<dependency>

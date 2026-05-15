@@ -2,12 +2,12 @@ package com.exemple.service.api.common.script;
 
 import java.util.function.Supplier;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.customer.login.LoginService;
 
+import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 
@@ -16,11 +16,15 @@ public class LoginServiceSupplier implements Supplier<LoginService> {
 
     private static final String LOGIN_BEAN = "loginService";
 
-    @Autowired
-    private CustomerScriptFactory scriptFactory;
+    private final CustomerScriptFactory scriptFactory;
 
     @Context
     private ContainerRequestContext requestContext;
+
+    @Inject
+    public LoginServiceSupplier(CustomerScriptFactory scriptFactory) {
+        this.scriptFactory = scriptFactory;
+    }
 
     @Override
     public LoginService get() {

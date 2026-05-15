@@ -2,12 +2,12 @@ package com.exemple.service.api.common.script;
 
 import java.util.function.Supplier;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.model.ApplicationBeanParam;
 import com.exemple.service.customer.subscription.SubscriptionService;
 
+import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 
@@ -16,11 +16,15 @@ public class SubscriptionServiceSupplier implements Supplier<SubscriptionService
 
     private static final String SUBSCRIPTION_BEAN = "subscriptionService";
 
-    @Autowired
-    private CustomerScriptFactory scriptFactory;
+    private final CustomerScriptFactory scriptFactory;
 
     @Context
     private ContainerRequestContext requestContext;
+
+    @Inject
+    public SubscriptionServiceSupplier(CustomerScriptFactory scriptFactory) {
+        this.scriptFactory = scriptFactory;
+    }
 
     @Override
     public SubscriptionService get() {

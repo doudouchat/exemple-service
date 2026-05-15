@@ -3,7 +3,6 @@ package com.exemple.service.api.core.authorization;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.api.common.security.ApiSecurityContext;
@@ -11,6 +10,7 @@ import com.exemple.service.context.UserContext;
 
 import jakarta.annotation.Priority;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
@@ -23,11 +23,15 @@ import lombok.SneakyThrows;
 @Priority(Priorities.AUTHENTICATION)
 public class AuthorizationFilter implements ContainerRequestFilter {
 
-    @Autowired
-    private AuthorizationContextService service;
+    private final AuthorizationContextService service;
 
     @Context
     private SecurityContext securityContext;
+
+    @Inject
+    public AuthorizationFilter(AuthorizationContextService service) {
+        this.service = service;
+    }
 
     @Override
     public void filter(ContainerRequestContext requestContext) {

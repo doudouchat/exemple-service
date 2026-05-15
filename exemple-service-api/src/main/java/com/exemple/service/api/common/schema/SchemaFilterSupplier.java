@@ -2,20 +2,24 @@ package com.exemple.service.api.common.schema;
 
 import java.util.function.Supplier;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 
 @Component
 public class SchemaFilterSupplier implements Supplier<SchemaFilter> {
 
-    @Autowired
-    private com.exemple.service.schema.filter.SchemaFilter schemaFilter;
+    private final com.exemple.service.schema.filter.SchemaFilter schemaFilter;
 
     @Context
     private ContainerRequestContext requestContext;
+
+    @Inject
+    public SchemaFilterSupplier(com.exemple.service.schema.filter.SchemaFilter schemaFilter) {
+        this.schemaFilter = schemaFilter;
+    }
 
     @Override
     public SchemaFilter get() {
