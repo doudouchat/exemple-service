@@ -14,7 +14,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import com.exemple.service.context.AccountContextExecution;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 
@@ -87,14 +86,6 @@ class AccountServiceTest {
                 {"email": "jean.dupont@gmail.com", "lastname": "Dupond"}
                 """);
 
-        // And previousAccount
-
-        var previousSource = MAPPER.readTree(
-                """
-                {"email": "jean.dupont@gmail.com", "lastname": "Dupont", "firstname":"Jean"}
-                """);
-        AccountContextExecution.setPreviousAccount(previousSource);
-
         // When perform save
 
         var account = service.update(source);
@@ -127,14 +118,6 @@ class AccountServiceTest {
                 """
                 {"id": "%s", "email": "jean.dupond@gmail.com"}
                 """.formatted(id));
-
-        // And previousAccount
-
-        var previousSource = MAPPER.readTree(
-                """
-                {"id": "%s", "email": "jean.dupont@gmail.com"}
-                """.formatted(id));
-        AccountContextExecution.setPreviousAccount(previousSource);
 
         // When perform save
 

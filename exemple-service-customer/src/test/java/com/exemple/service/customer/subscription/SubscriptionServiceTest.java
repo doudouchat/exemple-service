@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.service.context.ServiceContextExecution;
-import com.exemple.service.context.SubscriptionContextExecution;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 
 import tools.jackson.databind.JsonNode;
@@ -81,11 +80,6 @@ class SubscriptionServiceTest {
         // When perform save
 
         JsonNode source = MAPPER.createObjectNode();
-        JsonNode previousSource = MAPPER.readTree(
-                """
-                {"email": "jean.dupont@gmail.com"}
-                """);
-        SubscriptionContextExecution.setPreviousSubscription(previousSource);
 
         service.update(email, source);
 

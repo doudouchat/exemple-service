@@ -11,7 +11,7 @@ import com.exemple.service.api.common.schema.SchemaValidation;
 import com.exemple.service.api.core.authorization.AuthorizationCheckService;
 import com.exemple.service.api.core.check.AppAndVersionCheck;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
-import com.exemple.service.context.AccountContextExecution;
+import com.exemple.service.context.AccountContext;
 import com.exemple.service.customer.account.AccountService;
 import com.exemple.service.customer.common.validator.NotEmpty;
 import com.exemple.service.resource.account.AccountField;
@@ -145,7 +145,7 @@ public class AccountApi {
 
         var account = Jackson3JsonPatch.apply(patch, previousAccount);
 
-        accountService.update(account);
+        ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(previousAccount)).run(() -> accountService.update(account));
 
         return Response.status(Status.NO_CONTENT).build();
 
@@ -174,7 +174,7 @@ public class AccountApi {
 
         var previousAccount = getPreviousAccount(id);
         var accountFinal = JsonUtils.merge(account, schemaFilter.filterAllAdditionalAndReadOnlyProperties(previousAccount, ACCOUNT_RESOURCE));
-        accountService.update(accountFinal);
+        ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(previousAccount)).run(() -> accountService.update(accountFinal));
 
         return Response.status(Status.NO_CONTENT).build();
 
@@ -182,9 +182,7 @@ public class AccountApi {
 
     private JsonNode getPreviousAccount(UUID id) {
 
-        accountService.get(id).ifPresentOrElse(AccountContextExecution::setPreviousAccount, NotFoundException::new);
-
-        return AccountContextExecution.getPreviousAccount();
+        return accountService.get(id).orElseThrow(NotFoundException::new);
 
     }
 }

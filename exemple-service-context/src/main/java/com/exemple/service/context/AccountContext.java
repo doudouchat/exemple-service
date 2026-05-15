@@ -1,15 +1,16 @@
 package com.exemple.service.context;
 
-import java.util.Optional;
-
-import lombok.Builder;
-import lombok.Getter;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
-@Builder(toBuilder = true)
-@Getter
-public class AccountContext {
+public record AccountContext(JsonNode previousAccount) {
 
-    private final Optional<JsonNode> previousAccount;
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    public static final ScopedValue<AccountContext> ACCOUNT_CONTEXT = ScopedValue.newInstance();
+
+    public AccountContext() {
+        this(MAPPER.createObjectNode());
+    }
 
 }

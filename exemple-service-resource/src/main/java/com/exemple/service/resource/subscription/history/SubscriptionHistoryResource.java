@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
-import com.exemple.service.context.SubscriptionContextExecution;
+import com.exemple.service.context.SubscriptionContext;
 import com.exemple.service.resource.common.history.HistoryResource;
 import com.exemple.service.resource.subscription.SubscriptionField;
 import com.exemple.service.resource.subscription.history.dao.SubscriptionHistoryDao;
@@ -45,7 +45,8 @@ public class SubscriptionHistoryResource {
 
         var email = source.get(SubscriptionField.EMAIL.field).stringValue();
 
-        return this.historyResource.saveHistories(email, source, SubscriptionContextExecution.getPreviousSubscription());
+        return this.historyResource.saveHistories(email, source,
+                SubscriptionContext.SUBSCRIPTION_CONTEXT.orElse(new SubscriptionContext()).previousSubscription());
     }
 
     private SubscriptionHistoryDao dao() {

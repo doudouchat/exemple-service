@@ -14,7 +14,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +30,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
-import com.exemple.service.context.AccountContextExecution;
+import com.exemple.service.context.AccountContext;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.context.UserContext;
 import com.exemple.service.context.UserContextExtension;
@@ -95,20 +94,6 @@ class AccountResourceTest {
         void deleteAccount() {
 
             resource.removeByUsername("email", "jean.dupond@gmail");
-
-        }
-
-        @BeforeAll
-        void initAccountContext() {
-
-            AccountContextExecution.setPreviousAccount(MAPPER.nullNode());
-
-        }
-
-        @AfterEach
-        void updateAccountContext() {
-
-            AccountContextExecution.setPreviousAccount(resource.get(id).get());
 
         }
 
@@ -189,7 +174,7 @@ class AccountResourceTest {
                     """.formatted(id));
 
             // When perform save
-            resource.update(account);
+            ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(resource.get(id).get())).run(() -> resource.update(account));
 
             // Then check history
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
@@ -257,10 +242,9 @@ class AccountResourceTest {
                     {"id": "%s", "email": null, "age": null}
 
                     """.formatted(id));
-            AccountContextExecution.setPreviousAccount(resource.get(id).get());
 
             // When perform save
-            resource.update(account);
+            ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(resource.get(id).get())).run(() -> resource.update(account));
 
             // Then check history
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
@@ -325,20 +309,6 @@ class AccountResourceTest {
         private final UUID id = UUID.randomUUID();
 
         private OffsetDateTime createDate;
-
-        @AfterEach
-        void updateAccountContext() {
-
-            AccountContextExecution.setPreviousAccount(resource.get(id).get());
-
-        }
-
-        @BeforeAll
-        void initAccountContext() {
-
-            AccountContextExecution.setPreviousAccount(MAPPER.nullNode());
-
-        }
 
         @Test
         @DisplayName("save addresses")
@@ -423,7 +393,7 @@ class AccountResourceTest {
                     """.formatted(id));
 
             // When perform save
-            resource.update(account);
+            ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(resource.get(id).get())).run(() -> resource.update(account));
 
             // Then check history
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
@@ -499,7 +469,7 @@ class AccountResourceTest {
                     """.formatted(id));
 
             // When perform save
-            resource.update(account);
+            ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(resource.get(id).get())).run(() -> resource.update(account));
 
             // Then check history
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
@@ -583,7 +553,7 @@ class AccountResourceTest {
                     """.formatted(id));
 
             // When perform save
-            resource.update(account);
+            ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(resource.get(id).get())).run(() -> resource.update(account));
 
             // Then check history
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
@@ -657,7 +627,7 @@ class AccountResourceTest {
                     """.formatted(id));
 
             // When perform save
-            resource.update(account);
+            ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(resource.get(id).get())).run(() -> resource.update(account));
 
             // Then check history
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
@@ -715,20 +685,6 @@ class AccountResourceTest {
         private final UUID id = UUID.randomUUID();
 
         private OffsetDateTime createDate;
-
-        @AfterEach
-        void updateAccountContext() {
-
-            AccountContextExecution.setPreviousAccount(resource.get(id).get());
-
-        }
-
-        @BeforeAll
-        void initAccountContext() {
-
-            AccountContextExecution.setPreviousAccount(MAPPER.nullNode());
-
-        }
 
         @Test
         @DisplayName("save cgus")
@@ -810,7 +766,7 @@ class AccountResourceTest {
                     """.formatted(id));
 
             // When perform save
-            resource.update(account);
+            ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(resource.get(id).get())).run(() -> resource.update(account));
 
             // Then check history
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
@@ -888,7 +844,7 @@ class AccountResourceTest {
                     """.formatted(id));
 
             // When perform save
-            resource.update(account);
+            ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(resource.get(id).get())).run(() -> resource.update(account));
 
             // Then check history
             OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
@@ -998,8 +954,8 @@ class AccountResourceTest {
                     """
                     {"id": "%s"}
                     """.formatted(id));
-            AccountContextExecution.setPreviousAccount(previousAccount);
-            Throwable throwable = catchThrowable(() -> resource.update(account));
+            Throwable throwable = catchThrowable(
+                    () -> ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(previousAccount)).run(() -> resource.update(account)));
 
             // Then check throwable
             assertThat(throwable).isInstanceOf(UsernameAlreadyExistsException.class).hasFieldOrPropertyWithValue("username", email);
@@ -1021,8 +977,8 @@ class AccountResourceTest {
                     """
                     {"id": "%s", "email": "%s"}
                     """.formatted(id, email));
-            AccountContextExecution.setPreviousAccount(previousAccount);
-            Throwable throwable = catchThrowable(() -> resource.update(account));
+            Throwable throwable = catchThrowable(
+                    () -> ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(previousAccount)).run(() -> resource.update(account)));
 
             // Then check none exception
             assertThat(throwable).as("None exception is expected").isNull();
@@ -1047,8 +1003,8 @@ class AccountResourceTest {
                     """
                     {"id": "%s", "email": "%s"}
                     """.formatted(id, email));
-            AccountContextExecution.setPreviousAccount(previousAccount);
-            Throwable throwable = catchThrowable(() -> resource.update(account));
+            Throwable throwable = catchThrowable(
+                    () -> ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(previousAccount)).run(() -> resource.update(account)));
 
             // Then check none exception
             assertThat(throwable).as("None exception is expected").isNull();
@@ -1070,8 +1026,8 @@ class AccountResourceTest {
                     """
                     {"id": "%s", "email": "%s"}
                     """.formatted(id, email));
-            AccountContextExecution.setPreviousAccount(previousAccount);
-            Throwable throwable = catchThrowable(() -> resource.update(account));
+            Throwable throwable = catchThrowable(
+                    () -> ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(previousAccount)).run(() -> resource.update(account)));
 
             // Then check none exception
             assertThat(throwable).as("None exception is expected").isNull();
@@ -1132,9 +1088,10 @@ class AccountResourceTest {
                     """
                     {"id": "%s"}
                     """.formatted(id));
-            AccountContextExecution.setPreviousAccount(previousAccount);
 
-            return catchThrowable(() -> ScopedValue.where(UserContext.USER_CONTEXT, new UserContext(() -> "user")).run(() -> resource.update(account)));
+            return catchThrowable(
+                    () -> ScopedValue.where(UserContext.USER_CONTEXT, new UserContext(() -> "user")).run(() -> ScopedValue
+                            .where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(previousAccount)).run(() -> resource.update(account))));
         }
     }
 

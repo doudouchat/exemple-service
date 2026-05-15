@@ -8,7 +8,7 @@ import com.exemple.service.api.common.schema.SchemaFilter;
 import com.exemple.service.api.common.schema.SchemaValidation;
 import com.exemple.service.api.core.check.AppAndVersionCheck;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
-import com.exemple.service.context.SubscriptionContextExecution;
+import com.exemple.service.context.SubscriptionContext;
 import com.exemple.service.customer.subscription.SubscriptionService;
 import com.exemple.service.resource.subscription.SubscriptionField;
 
@@ -107,12 +107,11 @@ public class SubscriptionApi {
             return Response.status(Status.CREATED).build();
         }
 
-        SubscriptionContextExecution.setPreviousSubscription(previousSubscription);
-
         schemaValidation.validate(subscription, SUBSCRIPTION_RESOURCE);
         var additionalProperties = JsonUtils.merge(value,
                 schemaFilter.filterAllAdditionalAndReadOnlyProperties(previousSubscription, SUBSCRIPTION_RESOURCE));
-        subscriptionService.update(email, additionalProperties);
+        ScopedValue.where(SubscriptionContext.SUBSCRIPTION_CONTEXT, new SubscriptionContext(previousSubscription))
+                .run(() -> subscriptionService.update(email, additionalProperties));
         return Response.status(Status.NO_CONTENT).build();
 
     }

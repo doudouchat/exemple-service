@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
-import com.exemple.service.context.AccountContextExecution;
+import com.exemple.service.context.AccountContext;
 import com.exemple.service.resource.account.AccountField;
 import com.exemple.service.resource.account.history.dao.AccountHistoryDao;
 import com.exemple.service.resource.account.history.mapper.AccountHistoryMapper;
@@ -45,7 +45,7 @@ public class AccountHistoryResource {
 
         var id = UUID.fromString(source.get(AccountField.ID.field).stringValue());
 
-        return this.historyResource.saveHistories(id, source, AccountContextExecution.getPreviousAccount());
+        return this.historyResource.saveHistories(id, source, AccountContext.ACCOUNT_CONTEXT.orElse(new AccountContext()).previousAccount());
     }
 
     private AccountHistoryDao dao() {

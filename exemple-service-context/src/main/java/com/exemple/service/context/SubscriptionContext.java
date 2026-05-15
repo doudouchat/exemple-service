@@ -1,15 +1,16 @@
 package com.exemple.service.context;
 
-import java.util.Optional;
-
-import lombok.Builder;
-import lombok.Getter;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
-@Builder(toBuilder = true)
-@Getter
-public class SubscriptionContext {
+public record SubscriptionContext(JsonNode previousSubscription) {
 
-    private final Optional<JsonNode> previousSubscription;
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    public static final ScopedValue<SubscriptionContext> SUBSCRIPTION_CONTEXT = ScopedValue.newInstance();
+
+    public SubscriptionContext() {
+        this(MAPPER.createObjectNode());
+    }
 
 }

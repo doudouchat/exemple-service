@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 import com.exemple.service.application.common.model.ApplicationDetail;
-import com.exemple.service.context.AccountContextExecution;
+import com.exemple.service.context.AccountContext;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.account.AccountField;
 
@@ -43,7 +43,7 @@ public class AccountUsernameService {
 
     public List<AccountUsername> findAllUsernames(ApplicationDetail applicationDetail, JsonNode account) {
         var id = account.path(AccountField.ID.field).asString();
-        var previousAccount = AccountContextExecution.getPreviousAccount();
+        var previousAccount = AccountContext.ACCOUNT_CONTEXT.orElse(new AccountContext()).previousAccount();
         return applicationDetail.getAccount().getUniqueProperties().stream()
                 .map((String property) -> new AccountUsername(id, property, account.path(property), previousAccount.path(property)))
                 .toList();
