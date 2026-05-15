@@ -1,5 +1,7 @@
 package com.exemple.service.resource.common.history;
 
+import static com.exemple.service.context.UserContext.USER_CONTEXT;
+
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -85,7 +87,7 @@ public class HistoryResource<T, E extends HistoryModel<T>> {
         history.setPreviousValue(histories.getOrDefault(path, defaultHistory).getValue());
         history.setApplication(ServiceContextExecution.context().getApp());
         history.setVersion(ServiceContextExecution.context().getVersion());
-        history.setUser(ServiceContextExecution.context().getPrincipal().getName());
+        history.setUser(USER_CONTEXT.get().principal().getName());
 
         if (JsonPatchUtils.isRemoveOperation(patch)) {
             history.setValue(DEFAULT_HISTORY_VALUE);

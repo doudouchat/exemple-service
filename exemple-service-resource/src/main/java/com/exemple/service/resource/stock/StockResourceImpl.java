@@ -1,5 +1,6 @@
 package com.exemple.service.resource.stock;
 
+import static com.exemple.service.context.UserContext.USER_CONTEXT;
 import static com.exemple.service.resource.common.ResourceContext.KEYSPACE;
 
 import java.time.Instant;
@@ -49,7 +50,7 @@ public class StockResourceImpl implements StockResource {
                 .addStatement(
                         stockHistory.incrementQuantity(store, product,
                                 Instant.now(),
-                                ServiceContextExecution.context().getPrincipal().getName(),
+                                USER_CONTEXT.get().principal().getName(),
                                 ServiceContextExecution.context().getApp(), quantity));
 
         session.execute(batch.build());

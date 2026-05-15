@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.UserContext;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.launcher.account.AccountTestContext;
 import com.exemple.service.launcher.authorization.AuthorizationTestContext;
@@ -38,8 +39,8 @@ public class LoginStepDefinitions {
 
     @Given("delete username {string}")
     public void remove(String username) {
-        accountResource.removeByUsername("email", username);
 
+        ScopedValue.where(UserContext.USER_CONTEXT, new UserContext(() -> "init")).run(() -> accountResource.removeByUsername("email", username));
     }
 
     @And("get id account {string}")

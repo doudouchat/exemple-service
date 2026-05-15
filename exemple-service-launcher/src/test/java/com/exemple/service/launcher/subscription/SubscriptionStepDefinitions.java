@@ -17,6 +17,7 @@ import org.assertj.core.api.Condition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.UserContext;
 import com.exemple.service.customer.subscription.SubscriptionResource;
 import com.exemple.service.launcher.authorization.AuthorizationTestContext;
 
@@ -56,7 +57,7 @@ public class SubscriptionStepDefinitions {
     @Given("delete subscription {string}")
     public void remove(String email) {
 
-        subscriptionResource.delete(email);
+        ScopedValue.where(UserContext.USER_CONTEXT, new UserContext(() -> "init")).run(() -> subscriptionResource.delete(email));
 
     }
 

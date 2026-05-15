@@ -12,6 +12,7 @@ import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.common.model.ApplicationDetail.AccountDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
 import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.UserContext;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaEntity;
 
@@ -78,7 +79,7 @@ public class InitData {
 
         accountSchema.setPatchs(Set.of(patchUpdateDate));
 
-        schemaResource.save(accountSchema);
+        ScopedValue.where(UserContext.USER_CONTEXT, new UserContext(() -> "init")).run(() -> schemaResource.save(accountSchema));
 
         SchemaEntity subscriptionSchema = new SchemaEntity();
         subscriptionSchema.setVersion(VERSION_V1);
@@ -86,7 +87,7 @@ public class InitData {
         subscriptionSchema.setProfile("user");
         subscriptionSchema.setContent(MAPPER.readTree(new ClassPathResource("subscription.json").getContentAsByteArray()));
 
-        schemaResource.save(subscriptionSchema);
+        ScopedValue.where(UserContext.USER_CONTEXT, new UserContext(() -> "init")).run(() -> schemaResource.save(subscriptionSchema));
 
         // STOCK
 
@@ -123,7 +124,7 @@ public class InitData {
         accountSchema.setProfile("user");
         accountSchema.setContent(MAPPER.readTree(new ClassPathResource("other.json").getContentAsByteArray()));
 
-        schemaResource.save(accountSchema);
+        ScopedValue.where(UserContext.USER_CONTEXT, new UserContext(() -> "init")).run(() -> schemaResource.save(accountSchema));
 
     }
 

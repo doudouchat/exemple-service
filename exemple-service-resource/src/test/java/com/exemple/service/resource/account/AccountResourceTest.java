@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -32,6 +33,9 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.exemple.service.context.AccountContextExecution;
 import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.UserContext;
+import com.exemple.service.context.UserContextExtension;
+import com.exemple.service.context.WithUserContext;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.account.event.AccountEventResource;
 import com.exemple.service.resource.account.exception.UsernameAlreadyExistsException;
@@ -49,6 +53,7 @@ import tools.jackson.databind.ObjectMapper;
 
 @TestMethodOrder(OrderAnnotation.class)
 @SpringBootTest(classes = ResourceTestConfiguration.class)
+@ExtendWith(UserContextExtension.class)
 @ActiveProfiles("test")
 class AccountResourceTest {
 
@@ -71,7 +76,6 @@ class AccountResourceTest {
 
         OffsetDateTime now = OffsetDateTime.now();
         ServiceContextExecution.setDate(now);
-        ServiceContextExecution.setPrincipal(() -> "user");
         ServiceContextExecution.setApp("test");
         ServiceContextExecution.setVersion("v1");
 
@@ -87,6 +91,7 @@ class AccountResourceTest {
         private OffsetDateTime createDate;
 
         @BeforeAll
+        @WithUserContext(name = "user")
         void deleteAccount() {
 
             resource.removeByUsername("email", "jean.dupond@gmail");
@@ -109,6 +114,7 @@ class AccountResourceTest {
 
         @Test
         @DisplayName("save email")
+        @WithUserContext(name = "user")
         @Order(1)
         void save() {
 
@@ -171,6 +177,7 @@ class AccountResourceTest {
 
         @Test
         @DisplayName("update email and add age")
+        @WithUserContext(name = "user")
         @Order(2)
         void update() {
 
@@ -240,6 +247,7 @@ class AccountResourceTest {
 
         @Test
         @DisplayName("remove email and age")
+        @WithUserContext(name = "user")
         @Order(3)
         void remove() {
 
@@ -334,6 +342,7 @@ class AccountResourceTest {
 
         @Test
         @DisplayName("save addresses")
+        @WithUserContext(name = "user")
         @Order(1)
         void save() {
 
@@ -402,6 +411,7 @@ class AccountResourceTest {
 
         @Test
         @DisplayName("add 1 addresse")
+        @WithUserContext(name = "user")
         @Order(2)
         void addAdresse() {
 
@@ -475,6 +485,7 @@ class AccountResourceTest {
 
         @Test
         @DisplayName("update addresse")
+        @WithUserContext(name = "user")
         @Order(3)
         void updateAddresse() {
 
@@ -561,6 +572,7 @@ class AccountResourceTest {
 
         @Test
         @DisplayName("delete addresse")
+        @WithUserContext(name = "user")
         @Order(4)
         void deleteAddresse() {
 
@@ -634,6 +646,7 @@ class AccountResourceTest {
 
         @Test
         @DisplayName("remove all addresses")
+        @WithUserContext(name = "user")
         @Order(5)
         void remove() {
 
@@ -719,6 +732,7 @@ class AccountResourceTest {
 
         @Test
         @DisplayName("save cgus")
+        @WithUserContext(name = "user")
         @Order(1)
         void save() {
 
@@ -785,6 +799,7 @@ class AccountResourceTest {
 
         @Test
         @DisplayName("add 1 cgu")
+        @WithUserContext(name = "user")
         @Order(2)
         void addCgu() {
 
@@ -862,6 +877,7 @@ class AccountResourceTest {
 
         @Test
         @DisplayName("remove all cgus")
+        @WithUserContext(name = "user")
         @Order(3)
         void remove() {
 
@@ -951,6 +967,7 @@ class AccountResourceTest {
 
         }
 
+        @WithUserContext(name = "user")
         @Test
         void saveUnique() {
 
@@ -968,6 +985,7 @@ class AccountResourceTest {
             assertThat(resource.getIdByUsername("email", email)).hasValue(this.id);
         }
 
+        @WithUserContext(name = "user")
         @Test
         void updateUnique() {
 
@@ -990,6 +1008,7 @@ class AccountResourceTest {
             assertThat(resource.getIdByUsername("email", email)).hasValue(this.id);
         }
 
+        @WithUserContext(name = "user")
         @Test
         void updateSuccessIfEmailNotChange() {
 
@@ -1012,6 +1031,7 @@ class AccountResourceTest {
             assertThat(resource.getIdByUsername("email", email)).hasValue(this.id);
         }
 
+        @WithUserContext(name = "user")
         @Test
         void updateSuccessIfEmailChange() {
 
@@ -1037,6 +1057,7 @@ class AccountResourceTest {
             assertThat(resource.getIdByUsername("email", newEmail)).hasValue(this.id);
         }
 
+        @WithUserContext(name = "user")
         @Test
         void updateSuccessIfEmailIsRemove() {
 
@@ -1059,6 +1080,7 @@ class AccountResourceTest {
             assertThat(resource.getIdByUsername("email", email)).isEmpty();
         }
 
+        @WithUserContext(name = "user")
         @Test
         void removeByUsername() {
 
@@ -1070,6 +1092,7 @@ class AccountResourceTest {
         }
 
         @DisplayName("multiple save")
+        @WithUserContext(name = "user")
         @Test
         void multipleSave() throws InterruptedException {
 
@@ -1098,7 +1121,6 @@ class AccountResourceTest {
 
             OffsetDateTime now = OffsetDateTime.now();
             ServiceContextExecution.setDate(now);
-            ServiceContextExecution.setPrincipal(() -> "user");
             ServiceContextExecution.setApp("test");
             ServiceContextExecution.setVersion("v1");
 
@@ -1112,7 +1134,7 @@ class AccountResourceTest {
                     """.formatted(id));
             AccountContextExecution.setPreviousAccount(previousAccount);
 
-            return catchThrowable(() -> resource.update(account));
+            return catchThrowable(() -> ScopedValue.where(UserContext.USER_CONTEXT, new UserContext(() -> "user")).run(() -> resource.update(account)));
         }
     }
 

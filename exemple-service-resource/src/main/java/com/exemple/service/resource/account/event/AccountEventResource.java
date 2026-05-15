@@ -1,5 +1,6 @@
 package com.exemple.service.resource.account.event;
 
+import static com.exemple.service.context.UserContext.USER_CONTEXT;
 import static com.exemple.service.resource.common.ResourceContext.KEYSPACE;
 
 import java.time.Instant;
@@ -43,7 +44,7 @@ public class AccountEventResource {
         accountEvent.setApplication(context.getApp());
         accountEvent.setDate(context.getDate().toInstant());
         accountEvent.setEventType(eventType);
-        accountEvent.setUser(context.getPrincipal().getName());
+        accountEvent.setUser(USER_CONTEXT.get().principal().getName());
 
         return dao().create(accountEvent);
     }

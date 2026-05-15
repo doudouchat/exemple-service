@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,6 +24,8 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.exemple.service.context.ServiceContextExecution;
 import com.exemple.service.context.SubscriptionContextExecution;
+import com.exemple.service.context.UserContextExtension;
+import com.exemple.service.context.WithUserContext;
 import com.exemple.service.customer.subscription.SubscriptionResource;
 import com.exemple.service.resource.common.history.ExpectedHistory;
 import com.exemple.service.resource.common.history.HistoryAssert;
@@ -39,6 +42,7 @@ import tools.jackson.databind.ObjectMapper;
 
 @TestMethodOrder(OrderAnnotation.class)
 @SpringBootTest(classes = ResourceTestConfiguration.class)
+@ExtendWith(UserContextExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
 class SubscriptionResourceTest {
@@ -66,13 +70,13 @@ class SubscriptionResourceTest {
 
         OffsetDateTime now = OffsetDateTime.now();
         ServiceContextExecution.setDate(now);
-        ServiceContextExecution.setPrincipal(() -> "user");
         ServiceContextExecution.setApp("test");
         ServiceContextExecution.setVersion("v1");
 
     }
 
     @Test
+    @WithUserContext(name = "user")
     @Order(0)
     void save() throws IOException {
 
@@ -133,6 +137,7 @@ class SubscriptionResourceTest {
     }
 
     @Test
+    @WithUserContext(name = "user")
     @Order(1)
     void update() throws IOException {
 
@@ -196,6 +201,7 @@ class SubscriptionResourceTest {
     }
 
     @Test
+    @WithUserContext(name = "user")
     @Order(2)
     void delete() {
 

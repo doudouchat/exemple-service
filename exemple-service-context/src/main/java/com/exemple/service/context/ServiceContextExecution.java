@@ -1,6 +1,5 @@
 package com.exemple.service.context;
 
-import java.security.Principal;
 import java.time.OffsetDateTime;
 
 import com.exemple.service.context.ServiceContext.ServiceContextBuilder;
@@ -15,7 +14,6 @@ public final class ServiceContextExecution {
 
         this.model = ServiceContext.builder()
                 .date(OffsetDateTime.now())
-                .principal(() -> "anonymous")
                 .build();
     }
 
@@ -37,12 +35,6 @@ public final class ServiceContextExecution {
     public static void setDate(OffsetDateTime date) {
 
         ServiceContext model = builder().date(date).build();
-        executionContext.get().reset(model);
-    }
-
-    public static void setPrincipal(Principal principal) {
-
-        ServiceContext model = builder().principal(principal).build();
         executionContext.get().reset(model);
     }
 

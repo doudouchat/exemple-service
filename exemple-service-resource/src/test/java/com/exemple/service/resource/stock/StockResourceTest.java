@@ -7,17 +7,21 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.UserContextExtension;
+import com.exemple.service.context.WithUserContext;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.exemple.service.resource.stock.history.StockHistoryResource;
 import com.exemple.service.resource.stock.model.StockHistory;
 import com.exemple.service.store.stock.StockResource;
 
 @SpringBootTest(classes = ResourceTestConfiguration.class)
+@ExtendWith(UserContextExtension.class)
 @ActiveProfiles("test")
 class StockResourceTest {
 
@@ -30,11 +34,11 @@ class StockResourceTest {
     @BeforeEach
     void initExecutionContextDate() {
 
-        ServiceContextExecution.setPrincipal(() -> "user");
         ServiceContextExecution.setApp("test");
 
     }
 
+    @WithUserContext(name = "user")
     @Test
     void update() {
 

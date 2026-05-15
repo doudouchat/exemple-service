@@ -1,5 +1,6 @@
 package com.exemple.service.resource.subscription.event;
 
+import static com.exemple.service.context.UserContext.USER_CONTEXT;
 import static com.exemple.service.resource.common.ResourceContext.KEYSPACE;
 
 import java.time.Instant;
@@ -42,7 +43,7 @@ public class SubscriptionEventResource {
         subscriptionEvent.setApplication(context.getApp());
         subscriptionEvent.setDate(context.getDate().toInstant());
         subscriptionEvent.setEventType(eventType);
-        subscriptionEvent.setUser(context.getPrincipal().getName());
+        subscriptionEvent.setUser(USER_CONTEXT.get().principal().getName());
 
         return dao().create(subscriptionEvent);
     }
@@ -57,7 +58,7 @@ public class SubscriptionEventResource {
         subscriptionEvent.setApplication(context.getApp());
         subscriptionEvent.setDate(context.getDate().toInstant());
         subscriptionEvent.setEventType(eventType);
-        subscriptionEvent.setUser(context.getPrincipal().getName());
+        subscriptionEvent.setUser(USER_CONTEXT.get().principal().getName());
 
         return dao().create(subscriptionEvent);
     }

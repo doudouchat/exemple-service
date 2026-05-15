@@ -4,6 +4,7 @@ import java.time.Duration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
@@ -19,6 +20,7 @@ import com.exemple.service.api.core.authorization.impl.AuthorizationTokenManager
 import lombok.RequiredArgsConstructor;
 
 @Configuration
+@EnableAspectJAutoProxy
 @RequiredArgsConstructor
 public class AuthorizationConfiguration {
 

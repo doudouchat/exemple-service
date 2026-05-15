@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -19,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.exemple.service.context.UserContextExtension;
+import com.exemple.service.context.WithUserContext;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 
@@ -28,6 +31,7 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ObjectNode;
 
 @SpringBootTest(classes = ResourceTestConfiguration.class)
+@ExtendWith(UserContextExtension.class)
 @ActiveProfiles("test")
 class JsonConstraintValidatorTest {
 
@@ -36,6 +40,7 @@ class JsonConstraintValidatorTest {
     @Autowired
     private AccountResource resource;
 
+    @WithUserContext(name = "user")
     @Test
     void success() {
 
