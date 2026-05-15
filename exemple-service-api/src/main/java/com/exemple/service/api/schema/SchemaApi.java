@@ -2,7 +2,7 @@ package com.exemple.service.api.schema;
 
 import org.springframework.stereotype.Component;
 
-import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.ServiceContext;
 import com.exemple.service.schema.description.SchemaDescription;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,9 +29,8 @@ public class SchemaApi {
     public JsonNode get(@NotNull @PathParam("resource") String resource, @NotNull @PathParam("app") String app,
             @NotNull @PathParam("version") String version, @NotNull @PathParam("profile") String profile) {
 
-        ServiceContextExecution.setApp(app);
-
-        return service.get(resource, version, profile);
+        return ScopedValue.where(ServiceContext.SERVICE_CONTEXT, new ServiceContext(app, version))
+                .call(() -> service.get(resource, version, profile));
 
     }
 

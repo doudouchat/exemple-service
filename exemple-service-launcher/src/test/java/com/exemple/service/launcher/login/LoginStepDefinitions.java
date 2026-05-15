@@ -8,13 +8,12 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.UserContext;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.launcher.account.AccountTestContext;
 import com.exemple.service.launcher.authorization.AuthorizationTestContext;
 
-import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.restassured.response.Response;
@@ -30,17 +29,12 @@ public class LoginStepDefinitions {
     @Autowired
     private AuthorizationTestContext authorizationContext;
 
-    @Before
-    public void initKeyspace() {
-
-        ServiceContextExecution.setApp(TEST_APP);
-
-    }
-
     @Given("delete username {string}")
     public void remove(String username) {
 
-        ScopedValue.where(UserContext.USER_CONTEXT, new UserContext(() -> "init")).run(() -> accountResource.removeByUsername("email", username));
+        ScopedValue.where(UserContext.USER_CONTEXT, new UserContext(() -> "init"))
+                .run(() -> ScopedValue.where(ServiceContext.SERVICE_CONTEXT, new ServiceContext(TEST_APP, null))
+                        .run(() -> accountResource.removeByUsername("email", username)));
     }
 
     @And("get id account {string}")

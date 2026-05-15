@@ -11,7 +11,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.exemple.service.context.ServiceContextExecution;
 
 import jakarta.annotation.PostConstruct;
 
@@ -31,8 +30,6 @@ public class InitResourceTestConfiguration {
         executeScript(new ClassPathResource("cassandra/exec.cql"), session::execute);
 
         session.setSchemaMetadataEnabled(true);
-
-        ServiceContextExecution.setApp("test");
     }
 
     private static void executeScript(Resource script, Consumer<String> execute) throws IOException {

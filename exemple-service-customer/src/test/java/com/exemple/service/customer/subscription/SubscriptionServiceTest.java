@@ -4,16 +4,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.ServiceContext;
+import com.exemple.service.context.ServiceContextExtension;
+import com.exemple.service.context.WithServiceContext;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 
 import tools.jackson.databind.JsonNode;
@@ -22,6 +24,7 @@ import tools.jackson.databind.node.ObjectNode;
 import tools.jackson.databind.node.StringNode;
 
 @SpringJUnitConfig(CustomerTestConfiguration.class)
+@ExtendWith(ServiceContextExtension.class)
 class SubscriptionServiceTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -39,13 +42,8 @@ class SubscriptionServiceTest {
 
     }
 
-    @BeforeAll
-    static void initServiceContextExecution() {
-
-        ServiceContextExecution.setApp("default");
-    }
-
     @Test
+    @WithServiceContext
     void create() {
 
         // Given email
@@ -61,7 +59,7 @@ class SubscriptionServiceTest {
         // Then check save resource
 
         JsonNode expectedSubscription = ((ObjectNode) source).set("subscription_date",
-                StringNode.valueOf(ServiceContextExecution.context().getDate().toString()));
+                StringNode.valueOf(ServiceContext.SERVICE_CONTEXT.get().date().toString()));
 
         ArgumentCaptor<JsonNode> subscriptionCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
@@ -71,6 +69,7 @@ class SubscriptionServiceTest {
     }
 
     @Test
+    @WithServiceContext
     void update() {
 
         // Given email
@@ -86,7 +85,7 @@ class SubscriptionServiceTest {
         // Then check save resource
 
         JsonNode expectedSubscription = ((ObjectNode) source).set("subscription_date",
-                StringNode.valueOf(ServiceContextExecution.context().getDate().toString()));
+                StringNode.valueOf(ServiceContext.SERVICE_CONTEXT.get().date().toString()));
 
         ArgumentCaptor<JsonNode> subscriptionCaptor = ArgumentCaptor.forClass(JsonNode.class);
 

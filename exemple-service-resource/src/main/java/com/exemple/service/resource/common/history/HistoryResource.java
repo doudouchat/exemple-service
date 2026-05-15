@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
-import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.ServiceContext;
 import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
 import com.exemple.service.resource.common.util.JsonPatchUtils;
 
@@ -42,7 +42,7 @@ public class HistoryResource<T, E extends HistoryModel<T>> {
 
     public Collection<BoundStatement> saveHistories(T id, JsonNode source, JsonNode previousSource) {
 
-        OffsetDateTime now = ServiceContextExecution.context().getDate();
+        OffsetDateTime now = ServiceContext.SERVICE_CONTEXT.get().date();
 
         Map<String, HistoryModel<T>> histories = this.dao.findById(id).all().stream()
                 .collect(Collectors.toMap(HistoryModel::getField, Function.identity()));
@@ -85,8 +85,8 @@ public class HistoryResource<T, E extends HistoryModel<T>> {
         history.setDate(now.toInstant());
         history.setValue(value);
         history.setPreviousValue(histories.getOrDefault(path, defaultHistory).getValue());
-        history.setApplication(ServiceContextExecution.context().getApp());
-        history.setVersion(ServiceContextExecution.context().getVersion());
+        history.setApplication(ServiceContext.SERVICE_CONTEXT.get().app());
+        history.setVersion(ServiceContext.SERVICE_CONTEXT.get().version());
         history.setUser(USER_CONTEXT.get().principal().getName());
 
         if (JsonPatchUtils.isRemoveOperation(patch)) {

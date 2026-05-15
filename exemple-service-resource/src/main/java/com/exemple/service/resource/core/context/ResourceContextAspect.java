@@ -11,7 +11,7 @@ import org.springframework.util.Assert;
 
 import com.exemple.service.application.common.exception.NotFoundApplicationException;
 import com.exemple.service.application.detail.ApplicationDetailService;
-import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.ServiceContext;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -30,7 +30,7 @@ public class ResourceContextAspect {
             + "execution(public * com.exemple.service.resource.common.validator.json.JsonValidator.*(..))")
     public Object initResourceContext(ProceedingJoinPoint joinPoint) {
 
-        var app = ServiceContextExecution.context().getApp();
+        var app = ServiceContext.SERVICE_CONTEXT.get().app();
 
         Assert.notNull(app, "App is required");
 

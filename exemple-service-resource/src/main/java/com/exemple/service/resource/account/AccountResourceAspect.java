@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
-import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.ServiceContext;
 import com.exemple.service.resource.account.exception.UsernameAlreadyExistsException;
 import com.exemple.service.resource.account.username.AccountUsername;
 import com.exemple.service.resource.account.username.AccountUsernameService;
@@ -44,7 +44,7 @@ public class AccountResourceAspect {
             argNames = "account")
     public void checkUniquesProperties(ProceedingJoinPoint joinPoint, JsonNode account) {
 
-        var applicationDetail = this.applicationDetailService.get(ServiceContextExecution.context().getApp()).orElseThrow();
+        var applicationDetail = this.applicationDetailService.get(ServiceContext.SERVICE_CONTEXT.get().app()).orElseThrow();
 
         var changedUsernames = accountUsernameService.findAllUsernames(applicationDetail, account).stream()
                 .filter(AccountUsername::hasChanged)

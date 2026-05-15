@@ -16,12 +16,11 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.assertj.core.api.Condition;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.ServiceContext;
 import com.exemple.service.context.UserContext;
 import com.exemple.service.customer.subscription.SubscriptionResource;
 import com.exemple.service.launcher.authorization.AuthorizationTestContext;
 
-import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
@@ -47,17 +46,12 @@ public class SubscriptionStepDefinitions {
     @Autowired
     private KafkaConsumer<String, JsonNode> consumerEvent;
 
-    @Before
-    public void initKeyspace() {
-
-        ServiceContextExecution.setApp(TEST_APP);
-
-    }
-
     @Given("delete subscription {string}")
     public void remove(String email) {
 
-        ScopedValue.where(UserContext.USER_CONTEXT, new UserContext(() -> "init")).run(() -> subscriptionResource.delete(email));
+        ScopedValue.where(UserContext.USER_CONTEXT, new UserContext(() -> "init"))
+                .run(() -> ScopedValue.where(ServiceContext.SERVICE_CONTEXT, new ServiceContext(TEST_APP, null))
+                        .run(() -> subscriptionResource.delete(email)));
 
     }
 

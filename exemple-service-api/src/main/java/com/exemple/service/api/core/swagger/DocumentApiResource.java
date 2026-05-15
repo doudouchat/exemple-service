@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import com.exemple.service.api.core.ApiContext;
 import com.exemple.service.api.core.swagger.custom.DocumentApiCustom;
 import com.exemple.service.api.core.swagger.security.DocumentApiSecurity;
-import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.ServiceContext;
 import com.exemple.service.resource.schema.SchemaResource;
 import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
 
@@ -84,8 +84,6 @@ public class DocumentApiResource extends BaseOpenApiResource {
     public Response getOpenApi(@Context HttpHeaders headers, @Context UriInfo uriInfo, @PathParam("type") String type, @PathParam("app") String app)
             throws Exception {
 
-        ServiceContextExecution.setApp(app);
-
         String host = uriInfo.getBaseUri().getPath().replace("/ws", "");
 
         headers.getRequestHeaders().put(APP, Collections.singletonList(app));
@@ -105,12 +103,14 @@ public class DocumentApiResource extends BaseOpenApiResource {
 
         oas.getComponents().setSecuritySchemes(documentApiSecurity.buildSecurityScheme());
 
+        ScopedValue.where(ServiceContext.SERVICE_CONTEXT, new ServiceContext(app, null)).run(() ->
+
         oas.getTags().stream()
                 .map(Tag::getName)
                 .forEach(resource -> headers.getRequestHeaders().put(
                         RESOURCE + resource,
                         schemaResource.allVersions(resource).stream()
-                                .map((SchemaVersionProfileEntity v) -> v.getVersion().concat("|").concat(v.getProfile())).toList()));
+                                .map((SchemaVersionProfileEntity v) -> v.getVersion().concat("|").concat(v.getProfile())).toList())));
 
         return super.getOpenApi(headers, config, application, uriInfo, type);
     }

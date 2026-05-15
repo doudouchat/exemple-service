@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
 import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,9 +30,11 @@ import org.springframework.test.context.ActiveProfiles;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.exemple.service.context.AccountContext;
-import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.ServiceContext;
+import com.exemple.service.context.ServiceContextExtension;
 import com.exemple.service.context.UserContext;
 import com.exemple.service.context.UserContextExtension;
+import com.exemple.service.context.WithServiceContext;
 import com.exemple.service.context.WithUserContext;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.account.event.AccountEventResource;
@@ -52,7 +53,7 @@ import tools.jackson.databind.ObjectMapper;
 
 @TestMethodOrder(OrderAnnotation.class)
 @SpringBootTest(classes = ResourceTestConfiguration.class)
-@ExtendWith(UserContextExtension.class)
+@ExtendWith({ UserContextExtension.class, ServiceContextExtension.class })
 @ActiveProfiles("test")
 class AccountResourceTest {
 
@@ -70,16 +71,6 @@ class AccountResourceTest {
     @Autowired
     private CqlSession session;
 
-    @BeforeEach
-    void initExecutionContextDate() {
-
-        OffsetDateTime now = OffsetDateTime.now();
-        ServiceContextExecution.setDate(now);
-        ServiceContextExecution.setApp("test");
-        ServiceContextExecution.setVersion("v1");
-
-    }
-
     @Nested
     @TestMethodOrder(OrderAnnotation.class)
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -91,6 +82,7 @@ class AccountResourceTest {
 
         @BeforeAll
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test")
         void deleteAccount() {
 
             resource.removeByUsername("email", "jean.dupond@gmail");
@@ -100,6 +92,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("save email")
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test", version = "v1")
         @Order(1)
         void save() {
 
@@ -114,7 +107,7 @@ class AccountResourceTest {
             resource.create(account);
 
             // Then check history
-            createDate = ServiceContextExecution.context().getDate();
+            createDate = ServiceContext.SERVICE_CONTEXT.get().date();
 
             var expectedHistory1 = ExpectedAccountHistory.builder()
                     .field("/email")
@@ -139,10 +132,10 @@ class AccountResourceTest {
                     """.formatted(id)));
 
             // And check event
-            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.CREATE);
-            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setDate(ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
             expectedEvent.setUser("user");
@@ -163,6 +156,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("update email and add age")
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test", version = "v1")
         @Order(2)
         void update() {
 
@@ -177,7 +171,7 @@ class AccountResourceTest {
             ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(resource.get(id).get())).run(() -> resource.update(account));
 
             // Then check history
-            OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
+            OffsetDateTime updateDate = ServiceContext.SERVICE_CONTEXT.get().date();
 
             var expectedHistory1 = ExpectedAccountHistory.builder()
                     .field("/email")
@@ -209,10 +203,10 @@ class AccountResourceTest {
                     """.formatted(id)));
 
             // And check event
-            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.UPDATE);
-            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setDate(ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
             expectedEvent.setUser("user");
@@ -233,6 +227,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("remove email and age")
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test", version = "v1")
         @Order(3)
         void remove() {
 
@@ -247,7 +242,7 @@ class AccountResourceTest {
             ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(resource.get(id).get())).run(() -> resource.update(account));
 
             // Then check history
-            OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
+            OffsetDateTime updateDate = ServiceContext.SERVICE_CONTEXT.get().date();
 
             var expectedHistory1 = ExpectedAccountHistory.builder()
                     .field("/email")
@@ -278,10 +273,10 @@ class AccountResourceTest {
                     """.formatted(id)));
 
             // And check event
-            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.UPDATE);
-            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setDate(ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
             expectedEvent.setUser("user");
@@ -313,6 +308,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("save addresses")
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test", version = "v1")
         @Order(1)
         void save() {
 
@@ -327,7 +323,7 @@ class AccountResourceTest {
             resource.create(account);
 
             // Then check history
-            createDate = ServiceContextExecution.context().getDate();
+            createDate = ServiceContext.SERVICE_CONTEXT.get().date();
 
             var expectedHistory1 = ExpectedAccountHistory.builder()
                     .field("/addresses/home/floor")
@@ -358,10 +354,10 @@ class AccountResourceTest {
                     """.formatted(id)));
 
             // And check event
-            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.CREATE);
-            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setDate(ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
             expectedEvent.setUser("user");
@@ -382,6 +378,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("add 1 addresse")
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test", version = "v1")
         @Order(2)
         void addAdresse() {
 
@@ -396,7 +393,7 @@ class AccountResourceTest {
             ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(resource.get(id).get())).run(() -> resource.update(account));
 
             // Then check history
-            OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
+            OffsetDateTime updateDate = ServiceContext.SERVICE_CONTEXT.get().date();
 
             var expectedHistory1 = ExpectedAccountHistory.builder()
                     .field("/addresses/home/floor")
@@ -432,10 +429,10 @@ class AccountResourceTest {
                     """.formatted(id)));
 
             // And check event
-            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.UPDATE);
-            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setDate(ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
             expectedEvent.setUser("user");
@@ -456,6 +453,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("update addresse")
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test", version = "v1")
         @Order(3)
         void updateAddresse() {
 
@@ -472,7 +470,7 @@ class AccountResourceTest {
             ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(resource.get(id).get())).run(() -> resource.update(account));
 
             // Then check history
-            OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
+            OffsetDateTime updateDate = ServiceContext.SERVICE_CONTEXT.get().date();
 
             var expectedHistory1 = ExpectedAccountHistory.builder()
                     .field("/addresses/home/floor")
@@ -517,10 +515,10 @@ class AccountResourceTest {
                     """.formatted(id)));
 
             // And check event
-            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.UPDATE);
-            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setDate(ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
             expectedEvent.setUser("user");
@@ -543,6 +541,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("delete addresse")
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test", version = "v1")
         @Order(4)
         void deleteAddresse() {
 
@@ -556,7 +555,7 @@ class AccountResourceTest {
             ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(resource.get(id).get())).run(() -> resource.update(account));
 
             // Then check history
-            OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
+            OffsetDateTime updateDate = ServiceContext.SERVICE_CONTEXT.get().date();
 
             var expectedHistory1 = ExpectedAccountHistory.builder()
                     .field("/addresses/home/floor")
@@ -594,10 +593,10 @@ class AccountResourceTest {
                     """.formatted(id)));
 
             // And check event
-            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.UPDATE);
-            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setDate(ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
             expectedEvent.setUser("user");
@@ -617,6 +616,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("remove all addresses")
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test", version = "v1")
         @Order(5)
         void remove() {
 
@@ -630,7 +630,7 @@ class AccountResourceTest {
             ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(resource.get(id).get())).run(() -> resource.update(account));
 
             // Then check history
-            OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
+            OffsetDateTime updateDate = ServiceContext.SERVICE_CONTEXT.get().date();
 
             var expectedHistory1 = ExpectedAccountHistory.builder()
                     .field("/id")
@@ -656,10 +656,10 @@ class AccountResourceTest {
                     """.formatted(id)));
 
             // And check event
-            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.UPDATE);
-            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setDate(ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
             expectedEvent.setUser("user");
@@ -689,6 +689,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("save cgus")
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test", version = "v1")
         @Order(1)
         void save() {
 
@@ -702,7 +703,7 @@ class AccountResourceTest {
             resource.create(account);
 
             // Then check history
-            createDate = ServiceContextExecution.context().getDate();
+            createDate = ServiceContext.SERVICE_CONTEXT.get().date();
 
             var expectedHistory1 = ExpectedAccountHistory.builder()
                     .field("/cgus/0/code")
@@ -732,10 +733,10 @@ class AccountResourceTest {
                     """.formatted(id)));
 
             // And check event
-            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.CREATE);
-            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setDate(ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
             expectedEvent.setUser("user");
@@ -756,6 +757,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("add 1 cgu")
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test", version = "v1")
         @Order(2)
         void addCgu() {
 
@@ -769,7 +771,7 @@ class AccountResourceTest {
             ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(resource.get(id).get())).run(() -> resource.update(account));
 
             // Then check history
-            OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
+            OffsetDateTime updateDate = ServiceContext.SERVICE_CONTEXT.get().date();
 
             var expectedHistory1 = ExpectedAccountHistory.builder()
                     .field("/cgus/0/code")
@@ -811,10 +813,10 @@ class AccountResourceTest {
                     """.formatted(id)));
 
             // And check event
-            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.UPDATE);
-            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setDate(ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
             expectedEvent.setUser("user");
@@ -834,6 +836,7 @@ class AccountResourceTest {
         @Test
         @DisplayName("remove all cgus")
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test", version = "v1")
         @Order(3)
         void remove() {
 
@@ -847,7 +850,7 @@ class AccountResourceTest {
             ScopedValue.where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(resource.get(id).get())).run(() -> resource.update(account));
 
             // Then check history
-            OffsetDateTime updateDate = ServiceContextExecution.context().getDate();
+            OffsetDateTime updateDate = ServiceContext.SERVICE_CONTEXT.get().date();
 
             var expectedHistory1 = ExpectedAccountHistory.builder()
                     .field("/cgus")
@@ -873,10 +876,10 @@ class AccountResourceTest {
                     """.formatted(id)));
 
             // And check event
-            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContextExecution.context().getDate().toInstant());
+            AccountEvent event = accountEventResource.getByIdAndDate(id, ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             var expectedEvent = new AccountEvent();
             expectedEvent.setEventType(EventType.UPDATE);
-            expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            expectedEvent.setDate(ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
             expectedEvent.setApplication("test");
             expectedEvent.setVersion("v1");
             expectedEvent.setUser("user");
@@ -895,6 +898,7 @@ class AccountResourceTest {
     }
 
     @Test
+    @WithServiceContext(app = "test")
     void getNotExist() {
 
         // When perform get
@@ -913,6 +917,7 @@ class AccountResourceTest {
         private String email;
 
         @BeforeEach
+        @WithServiceContext(app = "test")
         void saveAccount() {
             email = UUID.randomUUID() + "@gmail";
             JsonNode account = MAPPER.readTree(
@@ -924,6 +929,7 @@ class AccountResourceTest {
         }
 
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test")
         @Test
         void saveUnique() {
 
@@ -942,6 +948,7 @@ class AccountResourceTest {
         }
 
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test")
         @Test
         void updateUnique() {
 
@@ -965,6 +972,7 @@ class AccountResourceTest {
         }
 
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test")
         @Test
         void updateSuccessIfEmailNotChange() {
 
@@ -988,6 +996,7 @@ class AccountResourceTest {
         }
 
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test")
         @Test
         void updateSuccessIfEmailChange() {
 
@@ -1014,6 +1023,7 @@ class AccountResourceTest {
         }
 
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test")
         @Test
         void updateSuccessIfEmailIsRemove() {
 
@@ -1037,6 +1047,7 @@ class AccountResourceTest {
         }
 
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test")
         @Test
         void removeByUsername() {
 
@@ -1049,6 +1060,7 @@ class AccountResourceTest {
 
         @DisplayName("multiple save")
         @WithUserContext(name = "user")
+        @WithServiceContext(app = "test")
         @Test
         void multipleSave() throws InterruptedException {
 
@@ -1075,11 +1087,6 @@ class AccountResourceTest {
 
         private Throwable save(String email) {
 
-            OffsetDateTime now = OffsetDateTime.now();
-            ServiceContextExecution.setDate(now);
-            ServiceContextExecution.setApp("test");
-            ServiceContextExecution.setVersion("v1");
-
             JsonNode account = MAPPER.readTree(
                     """
                     {"id": "%s", "email": "%s"}
@@ -1091,7 +1098,8 @@ class AccountResourceTest {
 
             return catchThrowable(
                     () -> ScopedValue.where(UserContext.USER_CONTEXT, new UserContext(() -> "user")).run(() -> ScopedValue
-                            .where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(previousAccount)).run(() -> resource.update(account))));
+                            .where(AccountContext.ACCOUNT_CONTEXT, new AccountContext(previousAccount)).run(() -> ScopedValue
+                                    .where(ServiceContext.SERVICE_CONTEXT, new ServiceContext("test", null)).run(() -> resource.update(account)))));
         }
     }
 
@@ -1111,7 +1119,7 @@ class AccountResourceTest {
             var history = new AccountHistory();
             history.setId(id);
             history.setField(getField());
-            history.setDate(getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            history.setDate(getDate().toInstant());
             history.setApplication("test");
             history.setVersion("v1");
             history.setUser("user");

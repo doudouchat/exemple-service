@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
-import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.ServiceContext;
 import com.exemple.service.resource.common.model.EventType;
 import com.exemple.service.resource.common.util.JsonNodeFilterUtils;
 import com.exemple.service.resource.subscription.SubscriptionField;
@@ -34,14 +34,14 @@ public class SubscriptionEventResource {
 
         var email = source.get(SubscriptionField.EMAIL.field).stringValue();
 
-        var context = ServiceContextExecution.context();
+        var context = ServiceContext.SERVICE_CONTEXT.get();
 
         var subscriptionEvent = new SubscriptionEvent();
         subscriptionEvent.setEmail(email);
         subscriptionEvent.setData(JsonNodeFilterUtils.clean(source));
-        subscriptionEvent.setVersion(context.getVersion());
-        subscriptionEvent.setApplication(context.getApp());
-        subscriptionEvent.setDate(context.getDate().toInstant());
+        subscriptionEvent.setVersion(context.version());
+        subscriptionEvent.setApplication(context.app());
+        subscriptionEvent.setDate(context.date().toInstant());
         subscriptionEvent.setEventType(eventType);
         subscriptionEvent.setUser(USER_CONTEXT.get().principal().getName());
 
@@ -50,13 +50,13 @@ public class SubscriptionEventResource {
 
     public BoundStatement saveEvent(String email, EventType eventType) {
 
-        var context = ServiceContextExecution.context();
+        var context = ServiceContext.SERVICE_CONTEXT.get();
 
         var subscriptionEvent = new SubscriptionEvent();
         subscriptionEvent.setEmail(email);
-        subscriptionEvent.setVersion(context.getVersion());
-        subscriptionEvent.setApplication(context.getApp());
-        subscriptionEvent.setDate(context.getDate().toInstant());
+        subscriptionEvent.setVersion(context.version());
+        subscriptionEvent.setApplication(context.app());
+        subscriptionEvent.setDate(context.date().toInstant());
         subscriptionEvent.setEventType(eventType);
         subscriptionEvent.setUser(USER_CONTEXT.get().principal().getName());
 

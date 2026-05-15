@@ -1,18 +1,16 @@
 package com.exemple.service.context;
 
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 
-import lombok.Builder;
-import lombok.Getter;
+public record ServiceContext(OffsetDateTime date,
+                             String app,
+                             String version) {
 
-@Builder(toBuilder = true)
-@Getter
-public class ServiceContext {
+    public static final ScopedValue<ServiceContext> SERVICE_CONTEXT = ScopedValue.newInstance();
 
-    private final OffsetDateTime date;
-
-    private final String app;
-
-    private final String version;
+    public ServiceContext(String app, String version) {
+        this(OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS), app, version);
+    }
 
 }

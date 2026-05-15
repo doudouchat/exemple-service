@@ -20,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.exemple.service.context.ServiceContextExtension;
 import com.exemple.service.context.UserContextExtension;
+import com.exemple.service.context.WithServiceContext;
 import com.exemple.service.context.WithUserContext;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
@@ -31,7 +33,7 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ObjectNode;
 
 @SpringBootTest(classes = ResourceTestConfiguration.class)
-@ExtendWith(UserContextExtension.class)
+@ExtendWith({ UserContextExtension.class, ServiceContextExtension.class })
 @ActiveProfiles("test")
 class JsonConstraintValidatorTest {
 
@@ -41,6 +43,7 @@ class JsonConstraintValidatorTest {
     private AccountResource resource;
 
     @WithUserContext(name = "user")
+    @WithServiceContext(app = "test")
     @Test
     void success() {
 
@@ -128,6 +131,7 @@ class JsonConstraintValidatorTest {
     @DisplayName("save fails because json is incorrect")
     @ParameterizedTest
     @MethodSource
+    @WithServiceContext(app = "test")
     void saveFailure(String property, Object value) {
 
         // setup source

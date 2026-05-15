@@ -17,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.exemple.service.context.ServiceContextExtension;
 import com.exemple.service.context.UserContextExtension;
+import com.exemple.service.context.WithServiceContext;
 import com.exemple.service.context.WithUserContext;
 import com.exemple.service.customer.account.AccountResource;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
@@ -27,7 +29,7 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(classes = ResourceTestConfiguration.class)
-@ExtendWith(UserContextExtension.class)
+@ExtendWith({ UserContextExtension.class, ServiceContextExtension.class })
 @ActiveProfiles("test")
 class NotEmptyConstraintValidatorTest {
 
@@ -37,6 +39,7 @@ class NotEmptyConstraintValidatorTest {
     private AccountResource resource;
 
     @WithUserContext(name = "user")
+    @WithServiceContext(app = "test")
     @Test
     void updateSuccess() {
 
@@ -66,6 +69,7 @@ class NotEmptyConstraintValidatorTest {
     @ParameterizedTest
     @MethodSource
     @NullSource
+    @WithServiceContext(app = "test")
     void updateFailure(JsonNode account) {
 
         // When perform save

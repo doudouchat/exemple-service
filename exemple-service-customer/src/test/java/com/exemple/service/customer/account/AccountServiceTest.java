@@ -5,22 +5,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.ServiceContext;
+import com.exemple.service.context.ServiceContextExtension;
+import com.exemple.service.context.WithServiceContext;
 import com.exemple.service.customer.core.CustomerTestConfiguration;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringJUnitConfig(CustomerTestConfiguration.class)
+@ExtendWith(ServiceContextExtension.class)
 class AccountServiceTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -38,13 +41,8 @@ class AccountServiceTest {
 
     }
 
-    @BeforeAll
-    static void initServiceContextExecution() {
-
-        ServiceContextExecution.setApp("default");
-    }
-
     @Test
+    @WithServiceContext
     @DisplayName("create account")
     void create() {
 
@@ -65,7 +63,7 @@ class AccountServiceTest {
         assertThat(account).isEqualTo(MAPPER.readTree(
                 """
                 {"email": "jean.dupont@gmail.com", "lastname": "Dupont", "firstname": "Jean", "creation_date": "%s", "id": "%s"}
-                """.formatted(ServiceContextExecution.context().getDate(), id.stringValue())));
+                """.formatted(ServiceContext.SERVICE_CONTEXT.get().date(), id.stringValue())));
 
         // And check save account resource
 

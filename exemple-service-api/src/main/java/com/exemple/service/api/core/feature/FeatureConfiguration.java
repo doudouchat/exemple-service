@@ -23,7 +23,7 @@ import com.exemple.service.api.core.authorization.AuthorizationCheckService;
 import com.exemple.service.api.core.authorization.AuthorizationCheckServiceSupplier;
 import com.exemple.service.api.core.authorization.AuthorizationFilter;
 import com.exemple.service.api.core.check.AppAndVersionCheckFeature;
-import com.exemple.service.api.core.filter.ExecutionContextResponseFilter;
+import com.exemple.service.api.core.context.CreateServiceContext;
 import com.exemple.service.api.core.listener.ApiEventListener;
 import com.exemple.service.api.core.swagger.DocumentApiResource;
 import com.exemple.service.customer.account.AccountService;
@@ -69,7 +69,7 @@ public class FeatureConfiguration extends ResourceConfig {
 
                 // execution context
 
-                .register(ExecutionContextResponseFilter.class)
+                .register(CreateServiceContext.class)
 
                 // listener event
 

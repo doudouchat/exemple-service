@@ -5,15 +5,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.ServiceContextExtension;
 import com.exemple.service.context.UserContextExtension;
+import com.exemple.service.context.WithServiceContext;
 import com.exemple.service.context.WithUserContext;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.exemple.service.resource.stock.history.StockHistoryResource;
@@ -21,7 +21,7 @@ import com.exemple.service.resource.stock.model.StockHistory;
 import com.exemple.service.store.stock.StockResource;
 
 @SpringBootTest(classes = ResourceTestConfiguration.class)
-@ExtendWith(UserContextExtension.class)
+@ExtendWith({ UserContextExtension.class, ServiceContextExtension.class })
 @ActiveProfiles("test")
 class StockResourceTest {
 
@@ -31,14 +31,8 @@ class StockResourceTest {
     @Autowired
     private StockHistoryResource historyResource;
 
-    @BeforeEach
-    void initExecutionContextDate() {
-
-        ServiceContextExecution.setApp("test");
-
-    }
-
     @WithUserContext(name = "user")
+    @WithServiceContext(app = "test")
     @Test
     void update() {
 
@@ -74,6 +68,7 @@ class StockResourceTest {
     }
 
     @Test
+    @WithServiceContext(app = "test")
     void getNotExist() {
 
         assertThat(resource.get(UUID.randomUUID().toString(), UUID.randomUUID().toString())).isEmpty();

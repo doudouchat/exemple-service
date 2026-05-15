@@ -1,6 +1,6 @@
 package com.exemple.service.customer.subscription
 
-import com.exemple.service.context.ServiceContextExecution
+import com.exemple.service.context.ServiceContext
 import tools.jackson.databind.JsonNode
 import tools.jackson.databind.node.ObjectNode
 import tools.jackson.databind.node.StringNode
@@ -16,7 +16,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     void create(String email, JsonNode subscription) {
 
         ((ObjectNode) subscription).set('email', new StringNode(email))
-        ((ObjectNode) subscription).set('subscription_date', new StringNode(ServiceContextExecution.context().date.toString()))
+        ((ObjectNode) subscription).set('subscription_date', new StringNode(ServiceContext.SERVICE_CONTEXT.get().date.toString()))
 
         subscriptionResource.create(subscription)
     }
@@ -25,7 +25,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     void update(String email, JsonNode subscription) {
 
         ((ObjectNode) subscription).set('email', new StringNode(email))
-        ((ObjectNode) subscription).set('subscription_date', new StringNode(ServiceContextExecution.context().date.toString()))
+        ((ObjectNode) subscription).set('subscription_date', new StringNode(ServiceContext.SERVICE_CONTEXT.get().date.toString()))
 
         subscriptionResource.update(subscription)
     }

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
-import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.ServiceContext;
 import com.exemple.service.resource.account.AccountField;
 import com.exemple.service.resource.account.event.dao.AccountEventDao;
 import com.exemple.service.resource.account.event.mapper.AccountEventMapper;
@@ -35,14 +35,14 @@ public class AccountEventResource {
 
         var id = UUID.fromString(source.get(AccountField.ID.field).stringValue());
 
-        var context = ServiceContextExecution.context();
+        var context = ServiceContext.SERVICE_CONTEXT.get();
 
         var accountEvent = new AccountEvent();
         accountEvent.setId(id);
         accountEvent.setData(JsonNodeFilterUtils.clean(source));
-        accountEvent.setVersion(context.getVersion());
-        accountEvent.setApplication(context.getApp());
-        accountEvent.setDate(context.getDate().toInstant());
+        accountEvent.setVersion(context.version());
+        accountEvent.setApplication(context.app());
+        accountEvent.setDate(context.date().toInstant());
         accountEvent.setEventType(eventType);
         accountEvent.setUser(USER_CONTEXT.get().principal().getName());
 

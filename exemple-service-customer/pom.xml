@@ -79,6 +79,16 @@
 			<artifactId>groovy-json</artifactId>
 		</dependency>
 
+		<!-- CONTEXT TEST -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-context</artifactId>
+			<version>${project.version}</version>
+			<classifier>tests</classifier>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>

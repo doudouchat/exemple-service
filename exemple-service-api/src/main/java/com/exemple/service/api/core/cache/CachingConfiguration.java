@@ -8,7 +8,7 @@ import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.cache.interceptor.SimpleKeyGenerator;
 import org.springframework.context.annotation.Configuration;
 
-import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.ServiceContext;
 
 @Configuration
 public class CachingConfiguration implements CachingConfigurer {
@@ -23,7 +23,7 @@ public class CachingConfiguration implements CachingConfigurer {
         @Override
         public Object generate(Object o, Method method, Object... params) {
 
-            return SimpleKeyGenerator.generateKey(ArrayUtils.addFirst(params, ServiceContextExecution.context().getApp()));
+            return SimpleKeyGenerator.generateKey(ArrayUtils.addFirst(params, ServiceContext.SERVICE_CONTEXT.get().app()));
         }
 
     }

@@ -13,11 +13,14 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.exemple.service.context.ServiceContextExtension;
+import com.exemple.service.context.WithServiceContext;
 import com.exemple.service.resource.core.ResourceTestConfiguration;
 import com.exemple.service.resource.schema.model.SchemaEntity;
 import com.exemple.service.resource.schema.model.SchemaVersionProfileEntity;
@@ -26,6 +29,7 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(classes = ResourceTestConfiguration.class)
+@ExtendWith(ServiceContextExtension.class)
 @ActiveProfiles("test")
 class SchemaResourceTest {
 
@@ -42,6 +46,7 @@ class SchemaResourceTest {
         private JsonNode schemaResource;
 
         @Test
+        @WithServiceContext(app = "test")
         @Order(1)
         void save() throws IOException {
 
@@ -74,6 +79,7 @@ class SchemaResourceTest {
         }
 
         @Test
+        @WithServiceContext(app = "test")
         @Order(2)
         void cleanAll() {
 
@@ -102,6 +108,7 @@ class SchemaResourceTest {
     }
 
     @Test
+    @WithServiceContext(app = "test")
     void allVersions() {
 
         // Given create schema
@@ -137,6 +144,7 @@ class SchemaResourceTest {
     }
 
     @Test
+    @WithServiceContext(app = "test")
     void getEmptySchema() {
 
         // When perform get

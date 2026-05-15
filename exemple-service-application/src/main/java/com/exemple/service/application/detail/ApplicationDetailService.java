@@ -32,7 +32,7 @@ public class ApplicationDetailService {
     private final CuratorFramework client;
 
     @SneakyThrows
-    @Cacheable("application")
+    @Cacheable(cacheNames = "application", key = "#root.args[0]")
     public Optional<ApplicationDetail> get(String application) {
 
         try {

@@ -4,12 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -22,9 +20,11 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
-import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.ServiceContext;
+import com.exemple.service.context.ServiceContextExtension;
 import com.exemple.service.context.SubscriptionContext;
 import com.exemple.service.context.UserContextExtension;
+import com.exemple.service.context.WithServiceContext;
 import com.exemple.service.context.WithUserContext;
 import com.exemple.service.customer.subscription.SubscriptionResource;
 import com.exemple.service.resource.common.history.ExpectedHistory;
@@ -42,7 +42,7 @@ import tools.jackson.databind.ObjectMapper;
 
 @TestMethodOrder(OrderAnnotation.class)
 @SpringBootTest(classes = ResourceTestConfiguration.class)
-@ExtendWith(UserContextExtension.class)
+@ExtendWith({ UserContextExtension.class, ServiceContextExtension.class })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
 class SubscriptionResourceTest {
@@ -65,18 +65,9 @@ class SubscriptionResourceTest {
 
     private OffsetDateTime createDate;
 
-    @BeforeEach
-    void initExecutionContextDate() {
-
-        OffsetDateTime now = OffsetDateTime.now();
-        ServiceContextExecution.setDate(now);
-        ServiceContextExecution.setApp("test");
-        ServiceContextExecution.setVersion("v1");
-
-    }
-
     @Test
     @WithUserContext(name = "user")
+    @WithServiceContext(app = "test", version = "v1")
     @Order(0)
     void save() throws IOException {
 
@@ -97,10 +88,10 @@ class SubscriptionResourceTest {
                 """.formatted(email)));
 
         // And check event
-        SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
+        SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
         var expectedEvent = new SubscriptionEvent();
         expectedEvent.setEventType(EventType.CREATE);
-        expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+        expectedEvent.setDate(ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
         expectedEvent.setApplication("test");
         expectedEvent.setVersion("v1");
         expectedEvent.setUser("user");
@@ -118,7 +109,7 @@ class SubscriptionResourceTest {
         assertThat(events.all()).hasSize(1);
 
         // and check history
-        createDate = ServiceContextExecution.context().getDate();
+        createDate = ServiceContext.SERVICE_CONTEXT.get().date();
 
         var expectedHistory1 = ExpectedSubscriptionHistory.builder()
                 .field("/email")
@@ -138,6 +129,7 @@ class SubscriptionResourceTest {
 
     @Test
     @WithUserContext(name = "user")
+    @WithServiceContext(app = "test", version = "v1")
     @Order(1)
     void update() throws IOException {
 
@@ -160,10 +152,10 @@ class SubscriptionResourceTest {
                 """.formatted(email)));
 
         // And check event
-        SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
+        SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
         var expectedEvent = new SubscriptionEvent();
         expectedEvent.setEventType(EventType.UPDATE);
-        expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+        expectedEvent.setDate(ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
         expectedEvent.setApplication("test");
         expectedEvent.setVersion("v1");
         expectedEvent.setUser("user");
@@ -181,7 +173,7 @@ class SubscriptionResourceTest {
         assertThat(events.all()).hasSize(2);
 
         // and check history
-        var updateDate = ServiceContextExecution.context().getDate();
+        var updateDate = ServiceContext.SERVICE_CONTEXT.get().date();
 
         var expectedHistory1 = ExpectedSubscriptionHistory.builder()
                 .field("/email")
@@ -202,6 +194,7 @@ class SubscriptionResourceTest {
 
     @Test
     @WithUserContext(name = "user")
+    @WithServiceContext(app = "test", version = "v1")
     @Order(2)
     void delete() {
 
@@ -212,10 +205,10 @@ class SubscriptionResourceTest {
         assertThat(resource.get(email)).isEmpty();
 
         // And check event
-        SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContextExecution.context().getDate().toInstant());
+        SubscriptionEvent event = subscriptionEventResource.getByIdAndDate(email, ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
         var expectedEvent = new SubscriptionEvent();
         expectedEvent.setEventType(EventType.DELETE);
-        expectedEvent.setDate(ServiceContextExecution.context().getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+        expectedEvent.setDate(ServiceContext.SERVICE_CONTEXT.get().date().toInstant());
         expectedEvent.setApplication("test");
         expectedEvent.setVersion("v1");
         expectedEvent.setUser("user");
@@ -245,7 +238,7 @@ class SubscriptionResourceTest {
             var history = new SubscriptionHistory();
             history.setId(email);
             history.setField(getField());
-            history.setDate(getDate().toInstant().truncatedTo(ChronoUnit.MILLIS));
+            history.setDate(getDate().toInstant());
             history.setApplication("test");
             history.setVersion("v1");
             history.setUser("user");

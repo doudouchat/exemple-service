@@ -15,7 +15,7 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BatchStatementBuilder;
 import com.datastax.oss.driver.api.core.cql.BatchType;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
-import com.exemple.service.context.ServiceContextExecution;
+import com.exemple.service.context.ServiceContext;
 import com.exemple.service.resource.stock.dao.StockDao;
 import com.exemple.service.resource.stock.history.StockHistoryResource;
 import com.exemple.service.resource.stock.mapper.StockMapper;
@@ -51,7 +51,7 @@ public class StockResourceImpl implements StockResource {
                         stockHistory.incrementQuantity(store, product,
                                 Instant.now(),
                                 USER_CONTEXT.get().principal().getName(),
-                                ServiceContextExecution.context().getApp(), quantity));
+                                ServiceContext.SERVICE_CONTEXT.get().app(), quantity));
 
         session.execute(batch.build());
     }
