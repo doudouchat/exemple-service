@@ -22,7 +22,7 @@ jobs:
    build:
       runs-on: ubuntu-latest
       steps:
-      -  uses: actions/checkout@v5
+      -  uses: actions/checkout@v6
       -  name: Set up JDK
          uses: actions/setup-java@v5
          with:
@@ -31,24 +31,24 @@ jobs:
               17
               25
       -  name: Cache SonarCloud packages
-         uses: actions/cache@v4
+         uses: actions/cache@v5
          with:
             path: ~/.sonar/cache
             key: ${{ runner.os }}-sonar
             restore-keys: ${{ runner.os }}-sonar
       -  name: Cache Maven packages
-         uses: actions/cache@v4
+         uses: actions/cache@v5
          with:
             path: ~/.m2
             key: ${{ runner.os }}-m2-${{ hashFiles('/pom.xml') }}
             restore-keys: ${{ runner.os }}-m2
       -  name: maven-settings-xml-action
-         uses: whelk-io/maven-settings-xml-action@v22
+         uses: s4u/maven-settings-action@v4.0.0
          with:
            repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
-           plugin_repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
+           pluginRepositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
       -  name: Checkout exemple cdc
-         uses: actions/checkout@v5
+         uses: actions/checkout@v6
          with:
             path: exemple-cdc
             repository: doudouchat/exemple-cdc
@@ -59,7 +59,7 @@ jobs:
            JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
       -  name: Build with Maven
          run: mvn --batch-mode clean verify -Pservice,it -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-      -  uses: codecov/codecov-action@v5
+      -  uses: codecov/codecov-action@v6
          env:
             CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       -  name: Analyse
