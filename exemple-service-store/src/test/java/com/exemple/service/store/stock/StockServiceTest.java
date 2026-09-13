@@ -2,6 +2,8 @@ package com.exemple.service.store.stock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -16,7 +18,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -55,7 +56,7 @@ class StockServiceTest {
 
             // setup mock resource
 
-            Mockito.when(resource.get(store, product)).thenReturn(Optional.of(100L));
+            when(resource.get(store, product)).thenReturn(Optional.of(100L));
 
             // when perform multiple update
 
@@ -78,7 +79,7 @@ class StockServiceTest {
 
             // Then check mock
 
-            Mockito.verify(resource).get(store, product);
+            verify(resource).get(store, product);
 
             // And check stock
 
@@ -122,7 +123,7 @@ class StockServiceTest {
         var productId = "product#" + UUID.randomUUID();
         var storeId = "store#" + UUID.randomUUID();
 
-        Mockito.when(resource.get(storeId, productId)).thenReturn(Optional.of(5L));
+        when(resource.get(storeId, productId)).thenReturn(Optional.of(5L));
 
         // when update stock
         service.increment(company, storeId, productId, -3);

@@ -1,6 +1,9 @@
 package com.exemple.service.customer.subscription;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
@@ -9,7 +12,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -38,7 +40,7 @@ class SubscriptionServiceTest {
     @BeforeEach
     void before() {
 
-        Mockito.reset(resource);
+        reset(resource);
 
     }
 
@@ -63,7 +65,7 @@ class SubscriptionServiceTest {
 
         ArgumentCaptor<JsonNode> subscriptionCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
-        Mockito.verify(resource).create(subscriptionCaptor.capture());
+        verify(resource).create(subscriptionCaptor.capture());
         assertThat(subscriptionCaptor.getValue()).isEqualTo(expectedSubscription);
 
     }
@@ -89,7 +91,7 @@ class SubscriptionServiceTest {
 
         ArgumentCaptor<JsonNode> subscriptionCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
-        Mockito.verify(resource).update(subscriptionCaptor.capture());
+        verify(resource).update(subscriptionCaptor.capture());
         assertThat(subscriptionCaptor.getValue()).isEqualTo(expectedSubscription);
 
     }
@@ -109,7 +111,7 @@ class SubscriptionServiceTest {
                 {"email": "jean.dupont@gmail.com"}
                 """);
 
-        Mockito.when(resource.get(email)).thenReturn(Optional.of(source));
+        when(resource.get(email)).thenReturn(Optional.of(source));
 
         // When perform get
 

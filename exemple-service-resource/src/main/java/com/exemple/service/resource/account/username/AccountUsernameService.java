@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.context.AccountContext;
@@ -14,7 +14,7 @@ import com.exemple.service.resource.account.AccountField;
 import lombok.RequiredArgsConstructor;
 import tools.jackson.databind.JsonNode;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class AccountUsernameService {
 

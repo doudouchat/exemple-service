@@ -1,6 +1,7 @@
 package com.exemple.service.store.core;
 
-import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -15,7 +16,7 @@ public class StoreTestConfiguration {
 
     @Bean
     public StockResource stockResource() {
-        return Mockito.mock(StockResource.class);
+        return mock(StockResource.class);
     }
 
     @Bean

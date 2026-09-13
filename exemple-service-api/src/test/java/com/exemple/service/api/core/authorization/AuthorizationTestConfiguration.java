@@ -1,10 +1,13 @@
 package com.exemple.service.api.core.authorization;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Map;
 
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -56,8 +59,8 @@ public class AuthorizationTestConfiguration {
         @Bean
         public AuthorizationTokenManager authorizationTokenManager() {
 
-            AuthorizationTokenManager authorizationTokenManager = Mockito.mock(AuthorizationTokenManager.class);
-            Mockito.when(authorizationTokenManager.containsToken(Mockito.any())).thenReturn(false);
+            AuthorizationTokenManager authorizationTokenManager = mock(AuthorizationTokenManager.class);
+            when(authorizationTokenManager.containsToken(any())).thenReturn(false);
 
             return authorizationTokenManager;
 
@@ -66,7 +69,7 @@ public class AuthorizationTestConfiguration {
         @Bean
         public AuthorizationTokenValidation authorizationTokenValidation() {
 
-            return Mockito.mock(AuthorizationTokenValidation.class);
+            return mock(AuthorizationTokenValidation.class);
 
         }
 

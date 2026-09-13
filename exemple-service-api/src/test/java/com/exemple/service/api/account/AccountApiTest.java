@@ -3,7 +3,12 @@ package com.exemple.service.api.account;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.net.URI;
 import java.util.Optional;
@@ -15,7 +20,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -65,7 +69,7 @@ class AccountApiTest extends JerseySpringSupport {
     @BeforeEach
     void before() {
 
-        Mockito.reset(service, schemaValidation);
+        reset(service, schemaValidation);
 
     }
 
@@ -83,11 +87,11 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And mock service
 
-            Mockito.when(service.get(id)).thenReturn(Optional.of(account.deepCopy()));
+            when(service.get(id)).thenReturn(Optional.of(account.deepCopy()));
 
             // And mock login
 
-            Mockito.when(loginService.get("john_doe")).thenReturn(Optional.of(id));
+            when(loginService.get("john_doe")).thenReturn(Optional.of(id));
 
             // and token
 
@@ -142,7 +146,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And check service
 
-            Mockito.verify(service, never()).get(any());
+            verify(service, never()).get(any());
 
         }
 
@@ -155,7 +159,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And mock login
 
-            Mockito.when(loginService.get("john_doe")).thenReturn(Optional.empty());
+            when(loginService.get("john_doe")).thenReturn(Optional.empty());
 
             // and token
 
@@ -178,7 +182,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And check service
 
-            Mockito.verify(service, never()).get(any());
+            verify(service, never()).get(any());
 
         }
 
@@ -191,7 +195,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And mock login
 
-            Mockito.when(loginService.get("john_doe")).thenReturn(Optional.of(UUID.randomUUID()));
+            when(loginService.get("john_doe")).thenReturn(Optional.of(UUID.randomUUID()));
 
             // and token
 
@@ -214,7 +218,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And check service
 
-            Mockito.verify(service, never()).get(any());
+            verify(service, never()).get(any());
 
         }
 
@@ -232,11 +236,11 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And mock service
 
-            Mockito.when(service.get(id)).thenReturn(Optional.of(account.deepCopy()));
+            when(service.get(id)).thenReturn(Optional.of(account.deepCopy()));
 
             // And mock login
 
-            Mockito.when(loginService.get("john_doe")).thenReturn(Optional.of(id));
+            when(loginService.get("john_doe")).thenReturn(Optional.of(id));
 
             // and token
 
@@ -270,14 +274,14 @@ class AccountApiTest extends JerseySpringSupport {
 
             var expectedAccount = ((ObjectNode) account.deepCopy()).put("birthday", "1976-12-12");
 
-            Mockito.verify(service).update(actualAccount.capture());
+            verify(service).update(actualAccount.capture());
             assertThat(actualAccount.getValue()).isEqualTo(expectedAccount);
 
             // And check validation
 
             var patchCapture = ArgumentCaptor.forClass(ArrayNode.class);
 
-            Mockito.verify(schemaValidation).validate(Mockito.eq("account"), Mockito.eq("v1"), Mockito.anyString(),
+            verify(schemaValidation).validate(eq("account"), eq("v1"), anyString(),
                     patchCapture.capture(),
                     previousAccount.capture());
             assertAll(
@@ -320,7 +324,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And check service
 
-            Mockito.verify(service, never()).update(any());
+            verify(service, never()).update(any());
 
         }
 
@@ -333,11 +337,11 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And mock service
 
-            Mockito.when(service.get(id)).thenReturn(Optional.of(MAPPER.createObjectNode()));
+            when(service.get(id)).thenReturn(Optional.of(MAPPER.createObjectNode()));
 
             // And mock login
 
-            Mockito.when(loginService.get("john_doe")).thenReturn(Optional.of(id));
+            when(loginService.get("john_doe")).thenReturn(Optional.of(id));
 
             // and token
 
@@ -384,15 +388,15 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And mock service
 
-            Mockito.when(service.get(id)).thenReturn(Optional.of(account.deepCopy()));
+            when(service.get(id)).thenReturn(Optional.of(account.deepCopy()));
 
             // And mock login
 
-            Mockito.when(loginService.get("john_doe")).thenReturn(Optional.of(id));
+            when(loginService.get("john_doe")).thenReturn(Optional.of(id));
 
             // And mock login
 
-            Mockito.when(loginService.get("john_doe")).thenReturn(Optional.of(id));
+            when(loginService.get("john_doe")).thenReturn(Optional.of(id));
 
             // and token
 
@@ -427,7 +431,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             var actualAccount = ArgumentCaptor.forClass(JsonNode.class);
 
-            Mockito.verify(service).update(actualAccount.capture());
+            verify(service).update(actualAccount.capture());
             assertThat(actualAccount.getValue()).isEqualTo(sourceToUpdate);
 
             // And check validation
@@ -437,8 +441,7 @@ class AccountApiTest extends JerseySpringSupport {
                     {"lastname": "Dupond"}
                     """);
 
-            Mockito.verify(schemaValidation).validate(Mockito.eq("account"), Mockito.eq("v1"), Mockito.anyString(),
-                    actualAccount.capture());
+            verify(schemaValidation).validate(eq("account"), eq("v1"), anyString(), actualAccount.capture());
             assertThat(actualAccount.getValue()).isEqualTo(sourceToValidate);
 
         }
@@ -476,7 +479,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And check service
 
-            Mockito.verify(service, never()).update(any());
+            verify(service, never()).update(any());
 
         }
 
@@ -490,7 +493,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // Given mock service
 
-            Mockito.when(service.create(Mockito.any(JsonNode.class))).thenReturn(account.deepCopy());
+            when(service.create(any(JsonNode.class))).thenReturn(account.deepCopy());
 
             // and token
 
@@ -523,12 +526,12 @@ class AccountApiTest extends JerseySpringSupport {
             // And check service
 
             var actualAccount = ArgumentCaptor.forClass(JsonNode.class);
-            Mockito.verify(service).create(actualAccount.capture());
+            verify(service).create(actualAccount.capture());
             assertThat(actualAccount.getValue()).isEqualTo(source);
 
             // And check validation
 
-            Mockito.verify(schemaValidation).validate(Mockito.eq("account"), Mockito.eq("v1"), Mockito.anyString(),
+            verify(schemaValidation).validate(eq("account"), eq("v1"), anyString(),
                     actualAccount.capture());
             assertThat(actualAccount.getValue()).isEqualTo(source);
 
@@ -562,7 +565,7 @@ class AccountApiTest extends JerseySpringSupport {
 
             // And check service
 
-            Mockito.verify(service, never()).create(any());
+            verify(service, never()).create(any());
 
         }
 

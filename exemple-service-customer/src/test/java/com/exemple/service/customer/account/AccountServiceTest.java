@@ -1,6 +1,9 @@
 package com.exemple.service.customer.account;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -10,7 +13,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -37,7 +39,7 @@ class AccountServiceTest {
     @BeforeEach
     void before() {
 
-        Mockito.reset(accountResource);
+        reset(accountResource);
 
     }
 
@@ -68,7 +70,7 @@ class AccountServiceTest {
         // And check save account resource
 
         var accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
-        Mockito.verify(accountResource).create(accountCaptor.capture());
+        verify(accountResource).create(accountCaptor.capture());
         assertThat(accountCaptor.getValue()).isEqualTo(account);
 
     }
@@ -99,7 +101,7 @@ class AccountServiceTest {
 
         var accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
-        Mockito.verify(accountResource).update(accountCaptor.capture());
+        verify(accountResource).update(accountCaptor.capture());
         assertThat(accountCaptor.getValue()).isEqualTo(account);
 
     }
@@ -132,7 +134,7 @@ class AccountServiceTest {
 
         var accountCaptor = ArgumentCaptor.forClass(JsonNode.class);
 
-        Mockito.verify(accountResource).update(accountCaptor.capture());
+        verify(accountResource).update(accountCaptor.capture());
         assertThat(accountCaptor.getValue()).isEqualTo(account);
 
     }
@@ -151,7 +153,7 @@ class AccountServiceTest {
                 """
                 {"email": "jean.dupont@gmail.com", "lastname": "Dupont", "firstname":"Jean"}
                 """);
-        Mockito.when(accountResource.get(id)).thenReturn(Optional.of(source));
+        when(accountResource.get(id)).thenReturn(Optional.of(source));
 
         // When perform get
 

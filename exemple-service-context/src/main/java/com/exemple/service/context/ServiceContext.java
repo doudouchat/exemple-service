@@ -1,5 +1,6 @@
 package com.exemple.service.context;
 
+import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -10,7 +11,7 @@ public record ServiceContext(OffsetDateTime date,
     public static final ScopedValue<ServiceContext> SERVICE_CONTEXT = ScopedValue.newInstance();
 
     public ServiceContext(String app, String version) {
-        this(OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS), app, version);
+        this(OffsetDateTime.now(Clock.systemDefaultZone()).truncatedTo(ChronoUnit.MILLIS), app, version);
     }
 
 }

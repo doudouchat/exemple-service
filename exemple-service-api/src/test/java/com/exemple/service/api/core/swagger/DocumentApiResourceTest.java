@@ -1,6 +1,9 @@
 package com.exemple.service.api.core.swagger;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -14,7 +17,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -60,7 +62,7 @@ class DocumentApiResourceTest extends JerseySpringSupport {
     @BeforeEach
     void before() {
 
-        Mockito.reset(schemaResource);
+        reset(schemaResource);
 
     }
 
@@ -75,7 +77,7 @@ class DocumentApiResourceTest extends JerseySpringSupport {
 
         // Given service mock
 
-        Mockito.when(schemaResource.allVersions("account")).thenReturn(
+        when(schemaResource.allVersions("account")).thenReturn(
                 Arrays.asList(SchemaVersionProfileEntity.builder().version("v1").profile("user").build(),
                         SchemaVersionProfileEntity.builder().version("v2").profile("admin").build()));
 
@@ -107,7 +109,7 @@ class DocumentApiResourceTest extends JerseySpringSupport {
 
         // Given mock service
 
-        Mockito.when(schemaDescription.get(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(schema);
+        when(schemaDescription.get(anyString(), anyString(), anyString())).thenReturn(schema);
 
         // When perform get
 
@@ -129,7 +131,7 @@ class DocumentApiResourceTest extends JerseySpringSupport {
 
         // Given mock service
 
-        Mockito.when(schemaDescription.getPatch()).thenReturn(schema);
+        when(schemaDescription.getPatch()).thenReturn(schema);
 
         // When perform get
 

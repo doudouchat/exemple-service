@@ -1,6 +1,7 @@
 package com.exemple.service.customer.core;
 
-import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
@@ -14,12 +15,12 @@ public class CustomerTestConfiguration {
 
     @Bean
     public AccountResource accountResource() {
-        return Mockito.mock(AccountResource.class);
+        return mock(AccountResource.class);
     }
 
     @Bean
     public SubscriptionResource subscriptionResource() {
-        return Mockito.mock(SubscriptionResource.class);
+        return mock(SubscriptionResource.class);
     }
 
 }

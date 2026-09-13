@@ -1,8 +1,11 @@
 package com.exemple.service.resource.core;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.Optional;
 
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -49,9 +52,9 @@ public class ResourceTestConfiguration {
     @Bean
     public ApplicationDetailService ApplicationDetailService() {
 
-        ApplicationDetailService service = Mockito.mock(ApplicationDetailService.class);
+        ApplicationDetailService service = mock(ApplicationDetailService.class);
 
-        Mockito.when(service.get(Mockito.anyString())).thenReturn(Optional.of(
+        when(service.get(anyString())).thenReturn(Optional.of(
                 ApplicationDetail.builder()
                         .keyspace("test")
                         .account(AccountDetail.builder().uniqueProperty("email")

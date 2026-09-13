@@ -45,7 +45,7 @@ public class PatchValidator implements ConstraintValidator<Patch, ArrayNode> {
     private static void buildMessageException(ValidationException exception, ConstraintValidatorContext context) {
 
         context.disableDefaultConstraintViolation();
-        exception.getCauses().stream().forEach((ValidationExceptionCause e) -> context.buildConstraintViolationWithTemplate(e.getMessage())
+        exception.getCauses().forEach((ValidationExceptionCause e) -> context.buildConstraintViolationWithTemplate(e.getMessage())
                 .addPropertyNode(e.getPath()).addConstraintViolation());
     }
 
