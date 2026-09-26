@@ -2,7 +2,12 @@ package com.exemple.service.api.subscription;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
@@ -11,7 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -55,7 +59,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
     @BeforeEach
     void before() {
 
-        Mockito.reset(service, schemaValidation);
+        reset(service, schemaValidation);
 
     }
 
@@ -72,7 +76,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
             var email = "jean.dupond@gmail.com";
 
             // And mock service
-            Mockito.when(service.get(email)).thenReturn(Optional.empty());
+            when(service.get(email)).thenReturn(Optional.empty());
 
             // and token
 
@@ -101,7 +105,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             var actualSubscription = ArgumentCaptor.forClass(JsonNode.class);
 
-            Mockito.verify(service).create(Mockito.eq(email), actualSubscription.capture());
+            verify(service).create(eq(email), actualSubscription.capture());
             assertThat(actualSubscription.getValue()).isEqualTo(source);
 
             // And check validation
@@ -111,7 +115,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
                     {"email": "%s", "lastname": "dupond", "firstname":"jean"}
                     """.formatted(email));
 
-            Mockito.verify(schemaValidation).validate(Mockito.eq("subscription"), Mockito.eq("v1"), Mockito.anyString(),
+            verify(schemaValidation).validate(eq("subscription"), eq("v1"), anyString(),
                     actualSubscription.capture());
             assertThat(actualSubscription.getValue()).isEqualTo(sourceToValidate);
 
@@ -129,7 +133,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
                     """
                     {"email": "%s"}
                     """.formatted(email));
-            Mockito.when(service.get(email)).thenReturn(Optional.of(previousSource));
+            when(service.get(email)).thenReturn(Optional.of(previousSource));
 
             // and token
 
@@ -158,7 +162,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             var actualSubscription = ArgumentCaptor.forClass(JsonNode.class);
 
-            Mockito.verify(service).update(Mockito.eq(email), actualSubscription.capture());
+            verify(service).update(eq(email), actualSubscription.capture());
             assertThat(actualSubscription.getValue()).isEqualTo(source);
 
             // And check validation
@@ -168,7 +172,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
                     {"email": "%s", "lastname": "dupond", "firstname":"jean"}
                     """.formatted(email));
 
-            Mockito.verify(schemaValidation).validate(Mockito.eq("subscription"), Mockito.eq("v1"), Mockito.anyString(),
+            verify(schemaValidation).validate(eq("subscription"), eq("v1"), anyString(),
                     actualSubscription.capture());
             assertThat(actualSubscription.getValue()).isEqualTo(sourceToValidate);
 
@@ -206,7 +210,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // And check service
 
-            Mockito.verify(service, never()).update(any(), any());
+            verify(service, never()).update(any(), any());
 
         }
 
@@ -224,7 +228,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // And mock service
 
-            Mockito.when(service.get(email)).thenReturn(Optional.of(subscription.deepCopy()));
+            when(service.get(email)).thenReturn(Optional.of(subscription.deepCopy()));
 
             // and token
 
@@ -277,7 +281,7 @@ class SubscriptionApiTest extends JerseySpringSupport {
 
             // And check service
 
-            Mockito.verify(service, never()).get(any());
+            verify(service, never()).get(any());
 
         }
     }

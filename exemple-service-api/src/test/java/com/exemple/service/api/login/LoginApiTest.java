@@ -3,6 +3,9 @@ package com.exemple.service.api.login;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -11,7 +14,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -44,7 +46,7 @@ class LoginApiTest extends JerseySpringSupport {
     @BeforeEach
     void before() {
 
-        Mockito.reset(resource);
+        reset(resource);
 
     }
 
@@ -62,7 +64,7 @@ class LoginApiTest extends JerseySpringSupport {
 
             // And mock service
 
-            Mockito.when(resource.get(username)).thenReturn(Optional.of(UUID.randomUUID()));
+            when(resource.get(username)).thenReturn(Optional.of(UUID.randomUUID()));
 
             // and token
 
@@ -93,7 +95,7 @@ class LoginApiTest extends JerseySpringSupport {
 
             // And mock service
 
-            Mockito.when(resource.get(username)).thenReturn(Optional.empty());
+            when(resource.get(username)).thenReturn(Optional.empty());
 
             // and token
 
@@ -158,7 +160,7 @@ class LoginApiTest extends JerseySpringSupport {
 
             UUID id = UUID.randomUUID();
 
-            Mockito.when(resource.get(username)).thenReturn(Optional.of(id));
+            when(resource.get(username)).thenReturn(Optional.of(id));
 
             // and token
 
@@ -193,7 +195,7 @@ class LoginApiTest extends JerseySpringSupport {
 
             // And mock service
 
-            Mockito.when(resource.get(username)).thenReturn(Optional.empty());
+            when(resource.get(username)).thenReturn(Optional.empty());
 
             // and token
 
@@ -244,7 +246,7 @@ class LoginApiTest extends JerseySpringSupport {
 
             // And check service
 
-            Mockito.verify(resource, never()).get(any());
+            verify(resource, never()).get(any());
 
         }
 
@@ -276,7 +278,7 @@ class LoginApiTest extends JerseySpringSupport {
 
             // And check service
 
-            Mockito.verify(resource, never()).get(any());
+            verify(resource, never()).get(any());
 
         }
 

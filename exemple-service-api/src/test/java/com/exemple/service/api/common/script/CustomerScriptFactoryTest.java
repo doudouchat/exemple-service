@@ -2,6 +2,7 @@ package com.exemple.service.api.common.script;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +16,6 @@ import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -49,17 +49,12 @@ class CustomerScriptFactoryTest {
         ResourceUtils.getFile(SCRIPTS_DIRECTORY_PATH).mkdir();
     }
 
-    @BeforeAll
-    static void deleteScriptDirectory() throws IOException {
-        ResourceUtils.getFile(SCRIPTS_DIRECTORY_PATH).delete();
-    }
-
     @Test
     @DisplayName("Application has not specific script")
     void noScript() {
 
         // Given init ApplicationDetail
-        Mockito.when(applicationDetailService.get("test")).thenReturn(Optional.of(ApplicationDetail.builder().company("default").build()));
+        when(applicationDetailService.get("test")).thenReturn(Optional.of(ApplicationDetail.builder().company("default").build()));
 
         // when perform
         AccountService service = factory.getBean("accountService", AccountService.class, "test");
@@ -87,7 +82,7 @@ class CustomerScriptFactoryTest {
         Files.copy(companyTestScript, ResourceUtils.getFile(SCRIPTS_DIRECTORY_PATH + "/" + application + "/" + companyTestScript.getName()));
 
         // And init ApplicationDetail
-        Mockito.when(applicationDetailService.get("test")).thenReturn(Optional.of(ApplicationDetail.builder().company(application).build()));
+        when(applicationDetailService.get("test")).thenReturn(Optional.of(ApplicationDetail.builder().company(application).build()));
 
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
 
@@ -120,7 +115,7 @@ class CustomerScriptFactoryTest {
         Files.copy(ResourceUtils.getFile("classpath:scripts/company_test/exemple-service-customer.xml"), script);
 
         // And init ApplicationDetail
-        Mockito.when(applicationDetailService.get("test")).thenReturn(Optional.of(ApplicationDetail.builder().company(application).build()));
+        when(applicationDetailService.get("test")).thenReturn(Optional.of(ApplicationDetail.builder().company(application).build()));
 
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
 

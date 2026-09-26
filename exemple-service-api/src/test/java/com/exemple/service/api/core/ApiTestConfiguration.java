@@ -1,8 +1,12 @@
 package com.exemple.service.api.core;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 
-import org.mockito.Mockito;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -34,22 +38,22 @@ public class ApiTestConfiguration {
 
     @Bean
     public AccountService accountService() {
-        return Mockito.mock(AccountService.class);
+        return mock(AccountService.class);
     }
 
     @Bean
     public SchemaDescription schemaService() {
-        return Mockito.mock(SchemaDescription.class);
+        return mock(SchemaDescription.class);
     }
 
     @Bean
     public SchemaValidation schemaValidation() {
-        return Mockito.mock(SchemaValidation.class);
+        return mock(SchemaValidation.class);
     }
 
     @Bean
     public SchemaBuilder schemaBuilder() {
-        return Mockito.mock(SchemaBuilder.class);
+        return mock(SchemaBuilder.class);
     }
 
     @Bean
@@ -78,37 +82,37 @@ public class ApiTestConfiguration {
 
     @Bean
     public LoginService loginService() {
-        return Mockito.mock(LoginService.class);
+        return mock(LoginService.class);
     }
 
     @Bean
     public StockService stockService() {
-        return Mockito.mock(StockService.class);
+        return mock(StockService.class);
     }
 
     @Bean
     public SchemaResource schemaResource() {
-        return Mockito.mock(SchemaResource.class);
+        return mock(SchemaResource.class);
     }
 
     @Bean
     public SubscriptionService subscriptionService() {
-        return Mockito.mock(SubscriptionService.class);
+        return mock(SubscriptionService.class);
     }
 
     @Bean
     public ApplicationDetailService ApplicationDetailService() {
-        return Mockito.mock(ApplicationDetailService.class);
+        return mock(ApplicationDetailService.class);
     }
 
     @Bean
     public CustomerScriptFactory customerScriptFactory(ApplicationContext context) {
-        CustomerScriptFactory customerScriptFactory = Mockito.mock(CustomerScriptFactory.class);
-        Mockito.when(customerScriptFactory.getBean(Mockito.anyString(), Mockito.eq(SubscriptionService.class), Mockito.anyString()))
+        CustomerScriptFactory customerScriptFactory = mock(CustomerScriptFactory.class);
+        when(customerScriptFactory.getBean(anyString(), eq(SubscriptionService.class), anyString()))
                 .thenReturn(context.getBean(SubscriptionService.class));
-        Mockito.when(customerScriptFactory.getBean(Mockito.anyString(), Mockito.eq(AccountService.class), Mockito.anyString()))
+        when(customerScriptFactory.getBean(anyString(), eq(AccountService.class), anyString()))
                 .thenReturn(context.getBean(AccountService.class));
-        Mockito.when(customerScriptFactory.getBean(Mockito.anyString(), Mockito.eq(LoginService.class), Mockito.anyString()))
+        when(customerScriptFactory.getBean(anyString(), eq(LoginService.class), anyString()))
                 .thenReturn(context.getBean(LoginService.class));
         return customerScriptFactory;
     }

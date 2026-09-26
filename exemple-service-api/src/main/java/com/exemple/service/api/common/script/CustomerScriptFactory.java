@@ -44,9 +44,10 @@ public class CustomerScriptFactory {
 
     private final File contextsPath;
 
+    @SneakyThrows(IOException.class)
     public CustomerScriptFactory(ApplicationDetailService applicationDetailService,
             CustomerConfigurationProperties customerProperties,
-            ApplicationContext applicationContext) throws IOException {
+            ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
         this.defaultApplicationContext = new FileSystemXmlApplicationContext(new String[] { "classpath:exemple-service-customer.xml" },
                 this.applicationContext);

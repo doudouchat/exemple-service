@@ -1,6 +1,7 @@
 package com.exemple.service.api.common.script;
 
-import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
+
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -19,12 +20,12 @@ public class CustomerScriptTestConfiguration {
 
     @Bean
     public ApplicationDetailService applicationDetailService() {
-        return Mockito.mock(ApplicationDetailService.class);
+        return mock(ApplicationDetailService.class);
     }
 
     @Bean
     public ApplicationContext applicationContext() {
-        return Mockito.mock(ApplicationContext.class);
+        return mock(ApplicationContext.class);
     }
 
 }

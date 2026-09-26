@@ -1,6 +1,8 @@
 package com.exemple.service.api.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
 import java.util.UUID;
@@ -8,7 +10,6 @@ import java.util.UUID;
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -46,7 +47,7 @@ class ExceptionApiTest extends JerseySpringSupport {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private static Action action = Mockito.mock(Action.class);
+    private static Action action = mock(Action.class);
 
     private static final String URL = "/v1/test";
 
@@ -147,7 +148,7 @@ class ExceptionApiTest extends JerseySpringSupport {
 
         // Given mock service
 
-        Mockito.doThrow(new RuntimeException()).when(action).execute();
+        doThrow(new RuntimeException()).when(action).execute();
 
         // When perform get
 

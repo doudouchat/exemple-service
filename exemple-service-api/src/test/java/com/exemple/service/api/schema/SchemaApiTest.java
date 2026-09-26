@@ -1,11 +1,12 @@
 package com.exemple.service.api.schema;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -39,7 +40,7 @@ class SchemaApiTest extends JerseySpringSupport {
     @BeforeEach
     void before() {
 
-        Mockito.reset(service);
+        reset(service);
 
     }
 
@@ -55,7 +56,7 @@ class SchemaApiTest extends JerseySpringSupport {
         String version = "v1";
         String profile = "user";
 
-        Mockito.when(service.get(resource, version, profile)).thenReturn(schema);
+        when(service.get(resource, version, profile)).thenReturn(schema);
 
         // When perform get
 
@@ -76,7 +77,7 @@ class SchemaApiTest extends JerseySpringSupport {
 
         // Given mock service
 
-        Mockito.when(service.getPatch()).thenReturn(schema);
+        when(service.getPatch()).thenReturn(schema);
 
         // When perform get
 

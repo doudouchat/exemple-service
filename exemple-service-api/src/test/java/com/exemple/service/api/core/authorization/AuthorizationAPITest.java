@@ -2,6 +2,7 @@ package com.exemple.service.api.core.authorization;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.util.Date;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -70,7 +70,7 @@ class AuthorizationAPITest extends JerseySpringSupport {
     @BeforeEach
     void before() {
 
-        Mockito.when(applicationDetailService.get("test")).thenReturn(Optional.of(ApplicationDetail.builder().clientId("clientId1").build()));
+        when(applicationDetailService.get("test")).thenReturn(Optional.of(ApplicationDetail.builder().clientId("clientId1").build()));
 
         testFilter.context = null;
 
@@ -93,7 +93,7 @@ class AuthorizationAPITest extends JerseySpringSupport {
 
         // And mock application information
 
-        Mockito.when(applicationDetailService.get("test")).thenReturn(Optional.empty());
+        when(applicationDetailService.get("test")).thenReturn(Optional.empty());
 
         // When perform get
 
@@ -132,7 +132,7 @@ class AuthorizationAPITest extends JerseySpringSupport {
 
         // And mock application information
 
-        Mockito.when(applicationDetailService.get("test")).thenReturn(Optional.of(ApplicationDetail.builder().clientId("clientId1").build()));
+        when(applicationDetailService.get("test")).thenReturn(Optional.of(ApplicationDetail.builder().clientId("clientId1").build()));
 
         // When perform get
 

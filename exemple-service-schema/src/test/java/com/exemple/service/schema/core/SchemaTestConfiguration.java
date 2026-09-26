@@ -1,10 +1,12 @@
 package com.exemple.service.schema.core;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 
-import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -27,10 +29,10 @@ public class SchemaTestConfiguration {
 
     @Bean
     public SchemaResource schemaResource() throws IOException {
-        SchemaResource resource = Mockito.mock(SchemaResource.class);
+        SchemaResource resource = mock(SchemaResource.class);
 
         SchemaEntity unknownResourceSchema = new SchemaEntity();
-        Mockito.when(resource.get("schema_test", "unknown", "unknown")).thenReturn(Optional.of(unknownResourceSchema));
+        when(resource.get("schema_test", "unknown", "unknown")).thenReturn(Optional.of(unknownResourceSchema));
 
         SchemaEntity schemaTest = new SchemaEntity();
         schemaTest.setContent(MAPPER.readTree(new ClassPathResource("schema_test.json").getContentAsByteArray()));
@@ -49,12 +51,12 @@ public class SchemaTestConfiguration {
                 """));
 
         schemaTest.setPatchs(Set.of(patchExternalId, patchUpdateDate));
-        Mockito.when(resource.get("schema_test", "default", "default")).thenReturn(Optional.of(schemaTest));
+        when(resource.get("schema_test", "default", "default")).thenReturn(Optional.of(schemaTest));
 
         SchemaEntity schemaArray = new SchemaEntity();
         schemaArray.setContent(MAPPER.readTree(new ClassPathResource("schema_array.json").getContentAsByteArray()));
 
-        Mockito.when(resource.get("array_test", "default", "default")).thenReturn(Optional.of(schemaArray));
+        when(resource.get("array_test", "default", "default")).thenReturn(Optional.of(schemaArray));
 
         return resource;
     }
